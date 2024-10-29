@@ -1,0 +1,96 @@
+@import './../mixins/flex';
+
+$alignment: baseline center flex-start flex-end inherit initial normal revert space-around space-between space-evenly
+	stretch unset;
+$direction: column column-reverse inherit initial revert row row-reverse unset;
+$flow: column column-reverse inherit initial nowrap revert row row-reverse unset wrap wrap-reverse;
+$numbers: 0 1 2 3 4 5 6 7 8 9 10;
+$wrap: inherit initial nowrap revert unset wrap wrap-reverse;
+
+/**
+	* HOW TO USE IT: In the .html file use class like this:
+	* <div class="cesx-align-content--center"></div> to align
+	*/
+@each $value in $alignment {
+	.cesx-align-content--#{$value} {
+		@include align-content($value);
+	}
+}
+
+/**
+	* HOW TO USE IT: In the .html file use class like this:
+	* <div class="cesx-align-items--center"></div> to align
+	*/
+@each $value in $alignment {
+	.cesx-align-items--#{$value} {
+		@include align-items($value);
+	}
+}
+
+/**
+	* HOW TO USE IT: In the .html file use class like this:
+	* <div class="cesx-align-self--center"></div> to align
+	*/
+@each $value in $alignment {
+	.cesx-align-self--#{$value} {
+		@include align-self($value);
+	}
+}
+
+/**
+	* HOW TO USE IT: In the .html file use class like this:
+	* <div class="cesx-flex-direction--center"></div> to align
+	*/
+@each $value in $direction {
+	.cesx-flex-direction--#{$value} {
+		@include flex-direction($value);
+	}
+}
+
+/**
+	* HOW TO USE IT: In the .html file use class like this:
+	* <div class="cesx-flex-flow--column"></div> to align
+	*/
+@each $value in $flow {
+	.cesx-flex-flow--#{$value} {
+		@include flex-flow($value);
+	}
+}
+
+/**
+	* HOW TO USE IT: In the .html file use class like this:
+	* <div class="cesx-order--1"></div> to align
+	*/
+@each $value in $numbers {
+	.cesx-order--#{$value} {
+		@include flex-order($value);
+	}
+}
+
+/**
+	* HOW TO USE IT: In the .html file use class like this:
+	* <div class="cesx-flex-wrap--center"></div> to align
+	*/
+@each $value in $wrap {
+	.cesx-flex-wrap--#{$value} {
+		@include flex-wrap($value);
+	}
+}
+
+/**
+	* HOW TO USE IT: In the .html file use class like this:
+	* <div class="cesx-justify-content--center"></div> to align
+	*/
+@each $value in $alignment {
+	.cesx-justify-content--#{$value} {
+		@include justify-content($value);
+	}
+}
+
+.cesx-flexbox {
+	@include flexbox();
+}
+
+.cesx-inline-flex {
+	@include inline-flex();
+}

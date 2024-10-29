@@ -1,0 +1,46 @@
+:root {
+	/* font family */
+	--font-family-conti: 'Inter', -apple-system, blinkmacsystemfont, 'Segoe UI', roboto, 'Helvetica Neue', arial,
+		'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+	/* font weight */
+	--font-weight-regular: 400;
+	--font-weight-medium: 500;
+	--font-weight-semibold: 600;
+	--font-weight-bold: 700;
+	--font-weight-black: 900;
+
+	/* font base values */
+	--font-base-size: 16px;
+	--font-scale-ratio: 0.15rem;
+	--font-base-line-height: 16px;
+	--font-bottom-margin: 1em;
+
+	@for $i from 1 through 15 {
+		.cesarx-font-size-#{$i} {
+			font-size: calc(var(--font-base-size) + (#{$i} - 1) * var(--font-scale-ratio));
+		}
+	}
+
+	/* font size */
+	--display-2xl: calc(var(--font-base-size) * 4.5); // 72px
+	--display-xl: calc(var(--font-base-size) * 3.75); // 60px
+	--display-lg: calc(var(--font-base-size) * 3); // 48px
+	--display-md: calc(var(--font-base-size) * 2.25); // 36px
+	--display-sm: calc(var(--font-base-size) * 1.875); // 30px
+	--display-xs: calc(var(--font-base-size) * 1.5); // 24px
+	--text-xl: calc(var(--font-base-size) * 1.25); // 20px
+	--text-lg: calc(var(--font-base-size) * 1.125); // 18px
+	--text-md: var(--font-base-size); // 16px
+	--text-sm: calc(var(--font-base-size) * 0.875); // 14px
+	--text-xs: calc(var(--font-base-size) * 0.75); // 12px
+
+	/* line height */
+	--font-7-line-height: calc(var(--font-base-line-height) * 2.5); // 40px
+	--font-6-line-height: calc(var(--font-base-line-height) * 2.25); // 36px
+	--font-5-line-height: calc(var(--font-base-line-height) * 2); // 32px
+	--font-4-line-height: calc(var(--font-base-line-height) * 1.75); // 28px
+	--font-3-line-height: calc(var(--font-base-line-height) * 1.5); // 24px
+	--font-2-line-height: calc(var(--font-base-line-height) * 1.25); // 20px
+	--font-1-line-height: var(--font-base-line-height); // 16px
+}

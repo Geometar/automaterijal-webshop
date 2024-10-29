@@ -1,0 +1,119 @@
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html {
+	background-color: var(--figma-base-white);
+	line-height: var(--font-1-line-height);
+	text-size-adjust: 100%;
+	-webkit-tap-highlight-color: rgb(0 0 0 / 0%);
+}
+
+.cursor-pointer {
+	cursor: pointer;
+}
+
+.flex-direction--column {
+	flex-direction: column !important;
+}
+
+.hidden {
+	visibility: hidden;
+}
+
+.no-pointer-events {
+	pointer-events: none;
+}
+
+.no-wrap {
+	white-space: nowrap;
+}
+
+.strikethrough {
+	text-decoration: line-through;
+}
+
+.transparency {
+	opacity: 0.8;
+}
+
+.white-space-pre-line {
+	white-space: pre-line;
+}
+
+::-webkit-scrollbar {
+	background-color: transparent;
+	width: calc(var(--space-xxs) * 3);
+	height: calc(var(--space-xxs) * 3);
+}
+
+::-webkit-scrollbar-track-piece,
+::-webkit-scrollbar-track {
+	background-color: transparent !important;
+}
+
+::-webkit-scrollbar-thumb {
+	background-color: var(--figma-grey-300);
+	--webkit-border-radius: var(--space-xs);
+	border-radius: var(--space-xs);
+}
+
+.message {
+	border-radius: var(--space-xs);
+	font-weight: var(--font-weight-black);
+	margin: 0 var(--space-s);
+	padding: var(--space-s);
+
+	&__success {
+		background-color: var(--figma-success-500);
+	}
+
+	&__error {
+		background-color: var(--figma-error-500);
+	}
+}
+
+.display {
+	&--block {
+		display: block;
+	}
+
+	&--flex {
+		display: flex;
+	}
+
+	&--inline {
+		display: inline;
+	}
+
+	&--none {
+		display: none !important;
+	}
+}
+
+.justify-content {
+	&--space-around {
+		justify-content: space-around;
+	}
+
+	&--space-between {
+		justify-content: space-between;
+	}
+
+	&--space-evenly {
+		justify-content: space-evenly;
+	}
+}
+
+.user-select-none {
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}

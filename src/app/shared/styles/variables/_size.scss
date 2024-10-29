@@ -1,0 +1,12 @@
+:root {
+	--size-extra-small: calc(var(--space-xs) * 16); // 128px
+	--size-small: calc(var(--space-m) * 10); // 320px
+	--size-medium: calc(var(--space-m) * 17); // 544pd
+	--size-large: calc(var(--space-m) * 28); // 896px
+	--size-extra-large: calc(var(--space-m) * 43); // 1376px
+	--size-full: 100%;
+	--size-full-vh: 100vh;
+	--size-full-vw: 100vw;
+	--size-auto: auto;
+	--size-sticky-column: calc(var(--space-s) * 12.5);
+}
