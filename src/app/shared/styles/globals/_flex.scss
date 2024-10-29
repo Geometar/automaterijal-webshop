@@ -9,88 +9,88 @@ $wrap: inherit initial nowrap revert unset wrap wrap-reverse;
 
 /**
 	* HOW TO USE IT: In the .html file use class like this:
-	* <div class="cesx-align-content--center"></div> to align
+	* <div class="autom-align-content--center"></div> to align
 	*/
 @each $value in $alignment {
-	.cesx-align-content--#{$value} {
+	.autom-align-content--#{$value} {
 		@include align-content($value);
 	}
 }
 
 /**
 	* HOW TO USE IT: In the .html file use class like this:
-	* <div class="cesx-align-items--center"></div> to align
+	* <div class="autom-align-items--center"></div> to align
 	*/
 @each $value in $alignment {
-	.cesx-align-items--#{$value} {
+	.autom-align-items--#{$value} {
 		@include align-items($value);
 	}
 }
 
 /**
 	* HOW TO USE IT: In the .html file use class like this:
-	* <div class="cesx-align-self--center"></div> to align
+	* <div class="autom-align-self--center"></div> to align
 	*/
 @each $value in $alignment {
-	.cesx-align-self--#{$value} {
+	.autom-align-self--#{$value} {
 		@include align-self($value);
 	}
 }
 
 /**
 	* HOW TO USE IT: In the .html file use class like this:
-	* <div class="cesx-flex-direction--center"></div> to align
+	* <div class="autom-flex-direction--center"></div> to align
 	*/
 @each $value in $direction {
-	.cesx-flex-direction--#{$value} {
+	.autom-flex-direction--#{$value} {
 		@include flex-direction($value);
 	}
 }
 
 /**
 	* HOW TO USE IT: In the .html file use class like this:
-	* <div class="cesx-flex-flow--column"></div> to align
+	* <div class="autom-flex-flow--column"></div> to align
 	*/
 @each $value in $flow {
-	.cesx-flex-flow--#{$value} {
+	.autom-flex-flow--#{$value} {
 		@include flex-flow($value);
 	}
 }
 
 /**
 	* HOW TO USE IT: In the .html file use class like this:
-	* <div class="cesx-order--1"></div> to align
+	* <div class="autom-order--1"></div> to align
 	*/
 @each $value in $numbers {
-	.cesx-order--#{$value} {
+	.autom-order--#{$value} {
 		@include flex-order($value);
 	}
 }
 
 /**
 	* HOW TO USE IT: In the .html file use class like this:
-	* <div class="cesx-flex-wrap--center"></div> to align
+	* <div class="autom-flex-wrap--center"></div> to align
 	*/
 @each $value in $wrap {
-	.cesx-flex-wrap--#{$value} {
+	.autom-flex-wrap--#{$value} {
 		@include flex-wrap($value);
 	}
 }
 
 /**
 	* HOW TO USE IT: In the .html file use class like this:
-	* <div class="cesx-justify-content--center"></div> to align
+	* <div class="autom-justify-content--center"></div> to align
 	*/
 @each $value in $alignment {
-	.cesx-justify-content--#{$value} {
+	.autom-justify-content--#{$value} {
 		@include justify-content($value);
 	}
 }
 
-.cesx-flexbox {
+.autom-flexbox {
 	@include flexbox();
 }
 
-.cesx-inline-flex {
+.autom-inline-flex {
 	@include inline-flex();
 }

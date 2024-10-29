@@ -17,7 +17,7 @@
 	--font-bottom-margin: 1em;
 
 	@for $i from 1 through 15 {
-		.cesarx-font-size-#{$i} {
+		.autom-font-size-#{$i} {
 			font-size: calc(var(--font-base-size) + (#{$i} - 1) * var(--font-scale-ratio));
 		}
 	}

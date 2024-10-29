@@ -1,0 +1,21 @@
+$iterations: 1 2 3 4 5 6 7 8 9 10;
+$levels: 1 2 3 4 5 6 7 8 9 10 99 999 9999;
+$sizes: 10 15 20 25 30 35 40 45 50 55 60 65 70 75 80 85 90 100;
+
+@each $i in $iterations {
+	.flex-#{$i} {
+		flex: $i;
+	}
+}
+
+@each $size in $sizes {
+	.cesx-flex__#{$size} {
+		flex: 1 1 $size * 1%;
+	}
+}
+
+@each $level in $levels {
+	.z-index--#{$level} {
+		z-index: $level !important;
+	}
+}

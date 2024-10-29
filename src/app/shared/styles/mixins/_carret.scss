@@ -1,0 +1,34 @@
+@mixin carret($direction, $size, $stroke, $bgcolor, $expanded: false) {
+	background: var(--figma-grey-500);
+	cursor: pointer;
+	display: block;
+	float: left;
+	height: $size !important;
+	margin: calc($size / 2) !important;
+	transform: rotate(($direction + 45) * 1deg) !important;
+	width: $size !important;
+
+	@if $expanded {
+		position: relative;
+		top: var(--space-xxs);
+	}
+
+	-moz-transform: rotate(($direction + 45) * 1deg);
+	-o-transform: rotate(($direction + 45) * 1deg);
+	-webkit-transform: rotate(($direction + 45) * 1deg);
+
+	&:after {
+		background: $bgcolor;
+		content: '';
+		cursor: pointer;
+		height: $size;
+		left: $stroke;
+		position: absolute;
+		top: $stroke;
+		width: $size;
+	}
+
+	&:hover {
+		background: var(--figma-grey-300);
+	}
+}

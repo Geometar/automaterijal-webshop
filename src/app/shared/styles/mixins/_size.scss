@@ -1,0 +1,23 @@
+$sizes: 10px, 20px, 30px, 40px, 50px, 60px, 70px, 80px, 90px, 100px, 110px, 120px, 130px, 140px, 150px, 160px, 170px,
+	180px, 190px, 200px, 210px, 220px, 230px, 240px, 250px, 260px, 270px, 280px, 290px, 300px, 310px, 320px, 330px, 340px,
+	350px, 360px, 370px, 380px, 390px, 400px, 410px, 420px, 430px, 440px, 450px, 460px, 470px, 480px, 490px, 500px, 510px,
+	520px, 530px, 540px, 550px, 560px, 570px, 580px, 590px, 600px, 610px, 620px, 630px, 640px, 650px, 660px, 670px, 680px,
+	690px, 700px, 710px, 720px, 730px, 740px, 750px, 760px, 770px, 780px, 790px, 800px, 810px, 820px, 830px, 840px, 850px,
+	860px, 870px, 880px, 890px, 900px, 910px, 920px, 930px, 940px, 950px, 960px, 970px, 980px, 990px, 1000px, 1010px,
+	1020px, 1030px, 1040px, 1050px, 1060px, 1070px, 1080px, 1090px, 1100px, 1110px, 1120px, 1130px, 1140px, 1150px, 1160px,
+	1170px, 1180px, 1190px, 1200px, 1210px, 1220px, 1230px, 1240px, 1250px, 1260px, 1270px, 1280px, 1290px, 1300px, 1310px,
+	1320px, 1330px, 1340px, 1350px, 1360px, 1370px, 1380px, 1390px, 1400px, 1410px, 1420px, 1430px, 1440px, 1450px, 1460px,
+	1470px, 1480px, 1490px, 1500px, 1510px, 1520px, 1530px, 1540px, 1550px, 1560px, 1570px, 1580px, 1590px, 1600px, 1610px,
+	1620px, 1630px, 1640px, 1650px, 1660px, 1670px, 1680px, 1690px, 1700px, 1710px, 1720px, 1730px, 1740px, 1750px, 1760px,
+	1770px, 1780px, 1790px, 1800px, 1810px, 1820px, 1830px, 1840px, 1850px, 1860px, 1870px, 1880px, 1890px, 1900px, 1910px,
+	1920px;
+
+@each $size in $sizes {
+	.autom-height__#{$size} {
+		height: $size;
+	}
+
+	.autom-width__#{$size} {
+		width: $size;
+	}
+}

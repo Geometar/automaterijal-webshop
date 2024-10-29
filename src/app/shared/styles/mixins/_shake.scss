@@ -1,0 +1,26 @@
+@mixin shake($duration) {
+	animation: shake $duration;
+
+	@keyframes shake {
+		10%,
+		90% {
+			transform: translate3d(calc(var(--space-xs) / -8), 0, 0);
+		}
+
+		20%,
+		80% {
+			transform: translate3d(var(--space-xxxs), 0, 0);
+		}
+
+		30%,
+		50%,
+		70% {
+			transform: translate3d(calc(var(--space-xs) / -2), 0, 0);
+		}
+
+		40%,
+		60% {
+			transform: translate3d(var(--space-xxs), 0, 0);
+		}
+	}
+}
