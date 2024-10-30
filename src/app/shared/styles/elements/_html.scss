@@ -1,0 +1,45 @@
+a,
+a:not([href]):not([class]) {
+	color: var(--figma-primary-700);
+	cursor: pointer;
+	font-size: var(--text-sm);
+	font-style: normal;
+	font-weight: var(--font-weight-regular);
+	line-height: var(--font-1-line-height);
+	text-decoration: underline;
+
+	&:hover {
+		cursor: pointer;
+		color: var(--figma-primary-600);
+	}
+}
+
+b,
+strong {
+	font-weight: var(--font-weight-black);
+}
+
+p {
+	line-height: var(--font-1-line-height);
+}
+
+ul {
+	list-style: none;
+	margin-bottom: auto;
+	padding: 0;
+}
+
+label {
+	display: inline-block;
+	width: 100%;
+}
+
+hr {
+	align-self: stretch;
+	background-color: var(--figma-grey-500);
+	border: none;
+	flex: none;
+	height: var(--space-default);
+	margin: var(--space-m) 0;
+	order: 0;
+}

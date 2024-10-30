@@ -1,0 +1,128 @@
+$fonts-path: '../../../../../public/fonts/';
+
+@font-face {
+	font-display: swap;
+	font-family: 'Inter';
+	font-style: normal;
+	font-weight: 400;
+	src: url('#{$fonts-path}/Inter-Regular.ttf');
+}
+
+@font-face {
+	font-display: swap;
+	font-family: 'Inter';
+	font-style: normal;
+	font-weight: 500;
+	src: url('#{$fonts-path}/Inter-Medium.ttf');
+}
+
+@font-face {
+	font-display: swap;
+	font-family: 'Inter';
+	font-style: normal;
+	font-weight: 700;
+	src: url('#{$fonts-path}/Inter-SemiBold.ttf');
+}
+
+@font-face {
+	font-display: swap;
+	font-family: 'Inter';
+	font-style: normal;
+	font-weight: 900;
+	src: url('#{$fonts-path}/Inter-Bold.ttf');
+}
+
+*,
+*::before,
+*::after,
+body,
+html {
+	font-family: var(--font-family-conti) !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	display: block;
+	margin: 0 !important;
+}
+
+h1,
+.h1 {
+	color: var(--figma-grey-900);
+	font-size: var(--display-md) !important;
+	font-weight: var(--font-weight-medium) !important;
+	line-height: var(--font-6-line-height) !important;
+}
+
+h2,
+.h2 {
+	color: var(--figma-grey-900);
+	font-size: var(--text-xl) !important;
+	font-weight: var(--font-weight-medium) !important;
+	line-height: var(--font-5-line-height) !important;
+}
+
+h3,
+.h3 {
+	color: var(--figma-grey-900);
+	font-size: var(--text-lg) !important;
+	font-weight: var(--font-weight-medium) !important;
+	line-height: var(--font-4-line-height) !important;
+}
+
+h4,
+.h4 {
+	color: var(--figma-grey-900);
+	font-size: var(--text-md) !important;
+	font-weight: var(--font-weight-medium) !important;
+	line-height: var(--font-2-line-height) !important;
+}
+
+h5,
+.h5 {
+	color: var(--figma-grey-500);
+	font-size: var(--text-sm) !important;
+	font-weight: var(--font-weight-regular) !important;
+	line-height: var(--font-2-line-height) !important;
+}
+
+h6,
+.h6 {
+	color: var(--figma-grey-500);
+	font-size: var(--text-xs) !important;
+	font-weight: var(--font-weight-regular) !important;
+	line-height: var(--font-2-line-height) !important;
+}
+
+/* font weight */
+.font-regular {
+	font-weight: var(--font-weight-regular);
+}
+
+.font-medium {
+	font-weight: var(--font-weight-medium);
+}
+
+.font-semibold {
+	font-weight: var(--font-weight-semibold);
+}
+
+.font-bold {
+	font-weight: var(--font-weight-bold);
+}
+
+.font-black {
+	font-weight: var(--font-weight-black);
+}
+
+.text--truncate {
+	display: block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	word-break: break-all;
+}
