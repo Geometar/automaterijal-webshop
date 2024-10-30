@@ -4,15 +4,12 @@
 	box-sizing: border-box;
 }
 
-* {
-	box-sizing: border-box;
-}
-
 html {
+	-webkit-tap-highlight-color: rgb(0 0 0 / 0%);
 	background-color: var(--figma-base-white);
+	box-sizing: border-box;
 	line-height: var(--font-1-line-height);
 	text-size-adjust: 100%;
-	-webkit-tap-highlight-color: rgb(0 0 0 / 0%);
 }
 
 .cursor-pointer {
@@ -116,4 +113,14 @@ html {
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
+}
+
+a:focus,
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  box-shadow: none;
+  outline: #000 dotted 2px;
+  outline-offset: .05em;
 }

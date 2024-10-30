@@ -48,7 +48,7 @@ autom-root {
 		}
 
 		&__main {
-			@extend .cesarx-flex__row;
+			@extend .autom-flex__row;
 			column-gap: var(--space-m);
 		}
 
@@ -59,12 +59,12 @@ autom-root {
 			width: 100%;
 
 			&--small {
-				@extend .cesarx-flex__col;
+				@extend .autom-flex__col;
 				max-width: calc(var(--space-xxs) * 52.5);
 			}
 
 			&--extra-small {
-				@extend .cesarx-flex__col;
+				@extend .autom-flex__col;
 				max-width: calc(var(--space-xxxs) * 52.5);
 			}
 		}
