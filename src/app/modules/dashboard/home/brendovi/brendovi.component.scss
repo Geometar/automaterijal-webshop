@@ -1,0 +1,21 @@
+.product {
+  gap: 30px;
+  align-items: center;
+  justify-content: center;
+
+  &--card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 160px;
+    height: 150px;
+  }
+
+  &--card img {
+    cursor: pointer;
+    filter: grayscale(30%);
+  }
+  &--card img:hover {
+    filter: grayscale(0%);
+  }
+}
