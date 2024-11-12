@@ -1,0 +1,220 @@
+.cesarx-icon {
+	cursor: pointer;
+	height: var(--space-s);
+	width: var(--space-s);
+
+	& svg path {
+		shape-image-threshold: initial;
+		shape-rendering: auto;
+	}
+
+	&.eu-labels svg path {
+		stroke-opacity: 0.67;
+		stroke-width: calc(var(--space-xxxs) / 4);
+	}
+
+	&.error-600 svg path {
+		stroke: var(--figma-error-600);
+	}
+
+	&.error-700 svg path {
+		stroke: var(--figma-error-700);
+	}
+
+	&.green-600 svg path {
+		stroke: var(--figma-green-600);
+	}
+
+	&.green-700 svg path {
+		stroke: var(--figma-green-700);
+	}
+
+	&.grey-300 svg path {
+		stroke: var(--figma-grey-300);
+	}
+
+	&.grey-400 svg path {
+		stroke: var(--figma-grey-400);
+	}
+
+	&.grey-500 svg path {
+		stroke: var(--figma-grey-500);
+	}
+
+	&.grey-600 svg path {
+		stroke: var(--figma-grey-600);
+	}
+
+	&.grey-700 svg path {
+		stroke: var(--figma-grey-700);
+	}
+
+	&.red svg path {
+		stroke: var(--figma-error-600);
+	}
+
+	&.green svg path {
+		stroke: var(--figma-green-600);
+	}
+
+	&.orange svg path {
+		stroke: var(--figma-warning-600);
+	}
+
+	&.primary-600 svg path {
+		stroke: var(--figma-primary-600);
+	}
+
+	&.primary-700 svg path {
+		stroke: var(--figma-primary-700);
+	}
+
+	&.disabled {
+		pointer-events: none;
+
+		& svg path {
+			opacity: 0.5;
+		}
+	}
+
+	&.no-stroke svg path {
+		stroke: none !important;
+	}
+
+	&.stroke--1 svg path {
+		stroke-width: 1px;
+	}
+
+	&.no-fill svg path {
+		fill: none !important;
+	}
+
+	&.success-500 svg path {
+		stroke: var(--figma-success-500);
+	}
+
+	&[data-mat-icon-name='self service 5'] svg path {
+		&:nth-child(1),
+		&:nth-child(2) {
+			stroke-width: var(--space-xxxs);
+		}
+
+		&:nth-child(3),
+		&:nth-child(5) {
+			stroke-width: 0;
+		}
+
+		&:nth-child(4) {
+			stroke-width: var(--space-default);
+		}
+	}
+}
+
+.summary-table {
+	.icon--tire-origin {
+		.icon--new-tire {
+			.mat-icon {
+				height: calc(var(--text-xs) + 1); // 13px
+				width: var(--text-xs); // 12px;
+			}
+		}
+
+		.icon--stock-tire {
+			.mat-icon {
+				height: calc(var(--text-md) - 1); // 15px
+				width: var(--text-sm); // 14px
+			}
+		}
+
+		.icon--swapped-tire {
+			.mat-icon {
+				height: calc(var(--text-md) - 1); // 15px
+				width: var(--text-sm); // 14px;
+			}
+		}
+	}
+
+	.td--tire-arrow,
+	.td--regrooved,
+	.td--repaired,
+	.td--action-image,
+	.td--action-edit {
+		.cesarx-icon {
+			height: var(--text-xl); // 20px
+			width: var(--text-xl); // 20px
+		}
+	}
+
+	.icon--tire-repaired,
+	.icon--tire-regrooved {
+		svg > g > path:nth-child(2) {
+			stroke: white !important;
+		}
+	}
+}
+
+.icon--wet-grip,
+.icon--noise-wave {
+	.mat-icon {
+		height: calc(var(--text-xl) * 2) !important; // 40px
+		width: calc(var(--text-xl) * 2) !important; // 40px
+	}
+}
+
+.icon--eu-label-rating {
+	.mat-icon {
+		height: var(--text-xl) !important; // 20px
+		width: calc(var(--text-xl) + var(--text-sm)) !important; // 34px
+	}
+}
+
+.icon--fuel-efficiency {
+	.mat-icon {
+		height: calc(var(--text-md) * 2) !important; // 32px
+		width: calc(var(--text-md) * 2) !important; // 32px
+	}
+}
+
+.icon--fuel-efficiency,
+.icon--noise-wave {
+	.mat-icon {
+		margin-top: calc(var(--space-xxs) * -1); // -px;
+	}
+}
+
+.stepper {
+	.icon--valid {
+		mat-icon {
+			width: calc(var(--space-xxs) * 3); // 12px;
+			margin-top: var(--space-xxxs); // 2px;
+		}
+
+		svg path {
+			stroke: none;
+		}
+
+		&-disabled {
+			svg path {
+				fill: var(--figma-success-300);
+			}
+		}
+	}
+
+	.icon--invalid {
+		mat-icon {
+			height: var(--space-s); // 16px
+		}
+
+		svg path {
+			stroke: var(--figma-error-600);
+		}
+	}
+}
+
+.errors-summary {
+	.cesarx-icon {
+		& svg path {
+			stroke: var(--figma-error-700);
+		}
+	}
+}

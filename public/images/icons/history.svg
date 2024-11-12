@@ -1,0 +1,11 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .cls-history {
+        stroke: var(--figma-grey-500);
+      }
+    </style>
+  </defs>
+<path class="cls-history" d="M19 12.5V6.8C19 5.11984 19 4.27976 18.673 3.63803C18.3854 3.07354 17.9265 2.6146 17.362 2.32698C16.7202 2 15.8802 2 14.2 2H7.8C6.11984 2 5.27976 2 4.63803 2.32698C4.07354 2.6146 3.6146 3.07354 3.32698 3.63803C3 4.27976 3 5.11984 3 6.8V17.2C3 18.8802 3 19.7202 3.32698 20.362C3.6146 20.9265 4.07354 21.3854 4.63803 21.673C5.27976 22 6.1198 22 7.79986 22H11.5M13 11H7M9 15H7M15 7H7" stroke="#18181B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path class="cls-history" d="M17.5 17.5V19L18.5 20M21.5 19C21.5 21.2091 19.7091 23 17.5 23C15.2909 23 13.5 21.2091 13.5 19C13.5 16.7909 15.2909 15 17.5 15C19.7091 15 21.5 16.7909 21.5 19Z" stroke="#18181B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
