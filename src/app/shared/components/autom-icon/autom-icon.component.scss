@@ -29,6 +29,10 @@
 		stroke: var(--figma-green-700);
 	}
 
+	&.grey-100 svg path {
+		stroke: var(--figma-grey-100) !important;
+	}
+
 	&.grey-300 svg path {
 		stroke: var(--figma-grey-300);
 	}

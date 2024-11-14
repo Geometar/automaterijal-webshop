@@ -7,6 +7,7 @@ export enum ColorEnum {
   GREEN_400 = 'green-400',
   GREEN_600 = 'green-600',
   GREEN_700 = 'green-700',
+  GREY_100 = 'grey-100',
   GREY_300 = 'grey-300',
   GREY_400 = 'grey-400',
   GREY_500 = 'grey-500',

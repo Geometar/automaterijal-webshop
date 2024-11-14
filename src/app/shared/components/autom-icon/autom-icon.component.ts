@@ -1,5 +1,5 @@
 import { ColorEnum } from '../../data-models/enums/color.enum';
-import { Component, Input } from '@angular/core';
+import { Component, Input, ViewEncapsulation } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MatIconModule, MatIconRegistry } from '@angular/material/icon';
 import { TooltipModel } from '../../data-models/interface/tooltip.interface';
@@ -16,7 +16,8 @@ import { AnimatedIconsEnum, IconsEnum, TooltipPositionEnum, TooltipThemeEnum, To
   standalone: true,
   imports: [CommonModule, MatIconModule, AutomTooltipDirective],
   templateUrl: './autom-icon.component.html',
-  styleUrl: './autom-icon.component.scss'
+  styleUrl: './autom-icon.component.scss',
+  encapsulation: ViewEncapsulation.None
 })
 export class AutomIconComponent {
 
