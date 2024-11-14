@@ -14,4 +14,5 @@ import { ColorEnum } from '../../../../shared/data-models/enums';
 })
 export class HeaderComponent {
   iconColor = ColorEnum;
+  yearCompanyIsCreated = new Date().getFullYear() - 1990;
 }

@@ -460,6 +460,7 @@ body {
 
 .hero-banner {
   aspect-ratio: var(--width) / var(--height);
+  z-index: 1;
 }
 
 .hero-banner img {
@@ -734,8 +735,9 @@ body {
   }
 
   .hero-content {
-    max-width: 520px;
     margin-inline: auto;
+    max-width: 520px;
+    z-index: 1;
   }
 
   .hero .section-text {
@@ -1077,7 +1079,7 @@ body {
     left: 0;
     width: 50%;
     height: 100%;
-    background-image: url("/images/navigation/about-abs-banner.png");
+    background-image: url("/images/navigation/o-nama.png") ;
     background-repeat: no-repeat;
     background-size: cover;
     background-position: right;
