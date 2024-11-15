@@ -124,4 +124,16 @@
   75% {
     transform: translateX(var(--space-xxs));
   }
+  
+}
+
+
+
+@keyframes moving {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(10px);
+  }
 }
