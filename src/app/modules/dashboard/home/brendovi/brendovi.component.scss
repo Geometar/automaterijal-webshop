@@ -3,6 +3,10 @@
   align-items: center;
   justify-content: center;
 
+  &--background {
+    background: linear-gradient(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0)), url("/images/navigation/service-bg.jpg") center/cover no-repeat;
+  }
+
   &--card {
     display: flex;
     align-items: center;

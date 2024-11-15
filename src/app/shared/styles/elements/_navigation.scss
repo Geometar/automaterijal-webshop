@@ -50,6 +50,7 @@
    */
 
   --section-padding: 60px;
+  --section-nested-padding: 45px;
 
   /**
    * box shadow
@@ -286,6 +287,10 @@ body {
   padding-block: var(--section-padding);
 }
 
+.section-nested {
+  padding-block: var(--section-nested-padding);
+}
+
 .btn-link {
   font-family: var(--ff-chakra-petch);
   text-transform: uppercase;
@@ -417,6 +422,7 @@ body {
 .navbar-link {
   font-family: var(--ff-chakra-petch);
   font-size: var(--fs-5);
+  font-weight: bolder;
   text-transform: uppercase;
   color: var(--white);
   padding: 10px 20px;
@@ -1143,7 +1149,7 @@ body {
   }
 
   .logo img {
-    width: 128px;
+    width: 186px;
   }
 
   .header .btn {

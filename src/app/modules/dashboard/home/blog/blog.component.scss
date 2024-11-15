@@ -2,82 +2,97 @@
   display: grid;
   gap: 35px;
 }
+
 /*-----------------------------------*\
   #BLOG
 \*-----------------------------------*/
 
-.blog .title-wrapper {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 10px 50px;
-  margin-block-end: 50px;
+.blog {
+  &--background {
+    background: linear-gradient(rgba(0, 0, 0, 0.0), rgba(0, 0, 0, 0.05)), url("/images/navigation/service-bg.jpg") center/cover no-repeat;
+  }
+  .title-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px 50px;
+    margin-block-end: 50px;
+  }
+
+  .btn-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: var(--fw-500);
+    transition: var(--transition-1);
+
+    &:is(:hover, :focus) {
+      color: var(--tan-crayola);
+    }
+  }
 }
 
-.blog .btn-link {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: var(--fw-500);
-  transition: var(--transition-1);
-}
+.blog-card {
+  .card-banner {
+    position: relative;
+  }
 
-.blog .btn-link:is(:hover, :focus) { color: var(--tan-crayola); }
+  .card-btn {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: var(--white);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 15px;
+    transform: translateX(100%);
+    transition: var(--transition-2);
 
-.blog-card .card-banner { position: relative; }
+    &:is(:hover, :focus) {
+      transform: translateX(0);
+    }
+  }
 
-.blog-card .card-btn {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  background-color: var(--white);
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 5px 15px;
-  transform: translateX(100%);
-  transition: var(--transition-2);
-}
+  .card-title {
+    margin-block: 20px 10px;
+    transition: var(--transition-1);
+    height: 50px;
 
-.blog-card:is(:hover, :focus) .card-btn { transform: translateX(0); }
+    &:is(:hover, :focus) {
+      color: var(--tan-crayola);
+    }
+  }
 
-.blog-card .card-title {
-  margin-block: 20px 10px;
-  transition: var(--transition-1);
-  height: 50px;
-}
-
-.blog-card .card-title:is(:hover, :focus) { color: var(--tan-crayola); }
-
-.blog-card .card-meta-list {
-  display: flex;
-  align-items: center;
+  .card-meta-list {
+    display: flex;
+    align-items: center;
+  }
 }
 
 .card-meta-item {
   position: relative;
   color: var(--granite-gray);
   font-size: var(--fs-5);
-}
 
-.card-meta-item:not(:last-child)::after {
-  content: "/";
-  margin-inline: 8px;
-  color: var(--spanish-gray);
+  &:not(:last-child)::after {
+    content: "/";
+    margin-inline: 8px;
+    color: var(--spanish-gray);
+  }
 }
 
 .card-meta-text {
   display: inline-block;
   color: var(--black);
   transition: var(--transition-1);
+
+  a:is(:hover, :focus) {
+    color: var(--tan-crayola);
+  }
 }
 
-a.card-meta-text:is(:hover, :focus) { color: var(--tan-crayola); }
-
-
-
 @media (min-width: 575px) {
-
   /**
    * REUSED STYLE
    */
@@ -85,13 +100,13 @@ a.card-meta-text:is(:hover, :focus) { color: var(--tan-crayola); }
   .grid-list {
     grid-template-columns: 1fr 1fr;
     column-gap: 25px;
-  }
 
-  .grid-list > li:last-child {
-    grid-column: span 2;
-    max-width: calc(50% - 12.5px);
-    width: 100%;
-    margin-inline: auto;
+    > li:last-child {
+      grid-column: span 2;
+      max-width: calc(50% - 12.5px);
+      width: 100%;
+      margin-inline: auto;
+    }
   }
 }
 
@@ -99,13 +114,16 @@ a.card-meta-text:is(:hover, :focus) { color: var(--tan-crayola); }
  * responsive for large than 992px screen
  */
 
- @media (min-width: 992px) {
-
+@media (min-width: 992px) {
   /**
    * REUSED STYLE
    */
 
-  .grid-list > li:last-child { all: unset; }
+  .grid-list {
+    grid-template-columns: repeat(3, 1fr);
 
-  .grid-list { grid-template-columns: repeat(3, 1fr); }
- }
+    > li:last-child {
+      all: unset;
+    }
+  }
+}
