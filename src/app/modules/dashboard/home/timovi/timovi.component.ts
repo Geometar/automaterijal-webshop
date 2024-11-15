@@ -1,17 +1,16 @@
 import { Component } from '@angular/core';
-import { YouTubePlayer } from '@angular/youtube-player';
 import { AutomIconComponent } from '../../../../shared/components/autom-icon/autom-icon.component';
 
 // Enums
 import { ColorEnum } from '../../../../shared/data-models/enums';
 
 @Component({
-  selector: 'home-header',
+  selector: 'autom-timovi-home',
   standalone: true,
-  imports: [AutomIconComponent, YouTubePlayer],
-  templateUrl: './header.component.html',
-  styleUrl: './header.component.scss'
+  imports: [AutomIconComponent],
+  templateUrl: './timovi.component.html',
+  styleUrl: './timovi.component.scss'
 })
-export class HeaderComponent {
+export class TimoviComponent {
   iconColor = ColorEnum;
 }
