@@ -53,9 +53,9 @@ h6 {
 h1,
 .h1 {
   color: var(--figma-grey-900);
-  font-size: clamp(1.5rem, 3vw, 2.5rem) !important; // Manji font za h1
+  font-size: clamp(1.3rem, 3vw, 2.5rem) !important; // Manji font za h1
   font-weight: var(--font-weight-medium) !important;
-  line-height: clamp(1.8rem, 3.5vw, 2.8rem) !important; // Smanjen razmak
+  line-height: clamp(1.5rem, 3.5vw, 2.8rem) !important; // Smanjen razmak
 }
 
 h2,

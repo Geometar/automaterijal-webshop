@@ -287,10 +287,6 @@ body {
   padding-block: var(--section-padding);
 }
 
-.section-nested {
-  padding-block: var(--section-nested-padding);
-}
-
 .btn-link {
   font-family: var(--ff-chakra-petch);
   text-transform: uppercase;
@@ -694,6 +690,19 @@ body {
 /*-----------------------------------*\
   #MEDIA QUERIES
 \*-----------------------------------*/
+
+/**
+ * responsive for large than 300px screen
+ */
+
+@media (min-width: 300px) {
+
+  .hero-content {
+    margin-inline: auto;
+    max-width: 520px;
+    z-index: 1;
+  }
+}
 
 /**
  * responsive for large than 575px screen
