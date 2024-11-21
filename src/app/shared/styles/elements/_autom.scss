@@ -112,6 +112,20 @@
   }
 }
 
+.util {
+  &__flex {
+    &--wrap {
+      display: flex;
+      flex-wrap: wrap;
+    }
+    &--center {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+}
+
 @keyframes shake {
   25% {
     transform: translateX(var(--space-xxs));

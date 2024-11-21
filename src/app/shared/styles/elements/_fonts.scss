@@ -1,35 +1,35 @@
-$fonts-path: '../../../../../public/fonts/';
+$fonts-path: "../../../../../public/fonts/";
 
 @font-face {
-	font-display: swap;
-	font-family: 'Inter';
-	font-style: normal;
-	font-weight: 400;
-	src: url('#{$fonts-path}/Inter-Regular.ttf');
+  font-display: swap;
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  src: url("#{$fonts-path}/Inter-Regular.ttf");
 }
 
 @font-face {
-	font-display: swap;
-	font-family: 'Inter';
-	font-style: normal;
-	font-weight: 500;
-	src: url('#{$fonts-path}/Inter-Medium.ttf');
+  font-display: swap;
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 500;
+  src: url("#{$fonts-path}/Inter-Medium.ttf");
 }
 
 @font-face {
-	font-display: swap;
-	font-family: 'Inter';
-	font-style: normal;
-	font-weight: 700;
-	src: url('#{$fonts-path}/Inter-SemiBold.ttf');
+  font-display: swap;
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 700;
+  src: url("#{$fonts-path}/Inter-SemiBold.ttf");
 }
 
 @font-face {
-	font-display: swap;
-	font-family: 'Inter';
-	font-style: normal;
-	font-weight: 900;
-	src: url('#{$fonts-path}/Inter-Bold.ttf');
+  font-display: swap;
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 900;
+  src: url("#{$fonts-path}/Inter-Bold.ttf");
 }
 
 *,
@@ -37,7 +37,7 @@ $fonts-path: '../../../../../public/fonts/';
 *::after,
 body,
 html {
-	font-family: var(--font-family-conti) !important;
+  font-family: var(--font-family-conti) !important;
 }
 
 h1,
@@ -46,83 +46,83 @@ h3,
 h4,
 h5,
 h6 {
-	display: block;
-	margin: 0 !important;
+  display: block;
+  margin: 0 !important;
 }
 
 h1,
 .h1 {
-	color: var(--figma-grey-900);
-	font-size: var(--display-md) !important;
-	font-weight: var(--font-weight-medium) !important;
-	line-height: var(--font-6-line-height) !important;
+  color: var(--figma-grey-900);
+  font-size: clamp(1.5rem, 3vw, 2.5rem) !important; // Manji font za h1
+  font-weight: var(--font-weight-medium) !important;
+  line-height: clamp(1.8rem, 3.5vw, 2.8rem) !important; // Smanjen razmak
 }
 
 h2,
 .h2 {
-	color: var(--figma-grey-900);
-	font-size: var(--text-xl) !important;
-	font-weight: var(--font-weight-medium) !important;
-	line-height: var(--font-5-line-height) !important;
+  color: var(--figma-grey-900);
+  font-size: clamp(1.25rem, 2.5vw, 2rem) !important; // Manji font za h2
+  font-weight: var(--font-weight-medium) !important;
+  line-height: clamp(1.5rem, 3vw, 2.3rem) !important; // Smanjen razmak
 }
 
 h3,
 .h3 {
-	color: var(--figma-grey-900);
-	font-size: var(--text-lg) !important;
-	font-weight: var(--font-weight-medium) !important;
-	line-height: var(--font-4-line-height) !important;
+  color: var(--figma-grey-900);
+  font-size: clamp(1.1rem, 2vw, 1.3rem) !important; // Manji font za h3
+  font-weight: var(--font-weight-medium) !important;
+  line-height: clamp(1.3rem, 2.5vw, 1.5rem) !important; // Smanjen razmak
 }
 
 h4,
 .h4 {
-	color: var(--figma-grey-900);
-	font-size: var(--text-md) !important;
-	font-weight: var(--font-weight-medium) !important;
-	line-height: var(--font-2-line-height) !important;
+  color: var(--figma-grey-900);
+  font-size: clamp(1rem, 1.8vw, 1.5rem) !important; // Manji font za h4
+  font-weight: var(--font-weight-medium) !important;
+  line-height: clamp(1.2rem, 2vw, 1.7rem) !important; // Smanjen razmak
 }
 
 h5,
 .h5 {
-	color: var(--figma-grey-500);
-	font-size: var(--text-sm) !important;
-	font-weight: var(--font-weight-regular) !important;
-	line-height: var(--font-2-line-height) !important;
+  color: var(--figma-grey-500);
+  font-size: clamp(0.875rem, 1.5vw, 1.25rem) !important; // Manji font za h5
+  font-weight: var(--font-weight-regular) !important;
+  line-height: clamp(1rem, 1.8vw, 1.5rem) !important; // Smanjen razmak
 }
 
 h6,
 .h6 {
-	color: var(--figma-grey-500);
-	font-size: var(--text-xs) !important;
-	font-weight: var(--font-weight-regular) !important;
-	line-height: var(--font-2-line-height) !important;
+  color: var(--figma-grey-500);
+  font-size: clamp(0.75rem, 1.2vw, 1rem) !important; // Manji font za h6
+  font-weight: var(--font-weight-regular) !important;
+  line-height: clamp(0.9rem, 1.5vw, 1.2rem) !important; // Smanjen razmak
 }
 
 /* font weight */
 .font-regular {
-	font-weight: var(--font-weight-regular);
+  font-weight: var(--font-weight-regular);
 }
 
 .font-medium {
-	font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-medium);
 }
 
 .font-semibold {
-	font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-semibold);
 }
 
 .font-bold {
-	font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-bold);
 }
 
 .font-black {
-	font-weight: var(--font-weight-black);
+  font-weight: var(--font-weight-black);
 }
 
 .text--truncate {
-	display: block;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-	word-break: break-all;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  word-break: break-all;
 }

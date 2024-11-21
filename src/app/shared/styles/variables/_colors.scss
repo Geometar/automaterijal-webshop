@@ -1,113 +1,123 @@
 :root {
-	/* Figma design colors */
+  /* Figma design colors */
 
-	/* Base colors */
-	--figma-base-white: #ffffff;
-	--figma-base-black: #000000;
+  /* Base colors */
+  --figma-base-white: #ffffff;
+  --figma-base-black: #000000;
 
-	/* Grey colors */
-	--figma-grey-25: #fcfcfc;
-	--figma-grey-50: #fafafa;
-	--figma-grey-75: #f2f4f7;
-	--figma-grey-100: #f4f4f5;
-	--figma-grey-200: #e4e4e7;
-	--figma-grey-300: #d1d1d6;
-	--figma-grey-400: #a0a0ab;
-	--figma-grey-500: #70707b;
-	--figma-grey-600: #51525c;
-	--figma-grey-700: #3f3f46;
-	--figma-grey-800: #26272b;
-	--figma-grey-900: #18181b;
+  /* Grey colors */
+  --figma-grey-25: #fcfcfc;
+  --figma-grey-50: #fafafa;
+  --figma-grey-75: #f2f4f7;
+  --figma-grey-100: #f4f4f5;
+  --figma-grey-200: #e4e4e7;
+  --figma-grey-300: #d1d1d6;
+  --figma-grey-400: #a0a0ab;
+  --figma-grey-500: #70707b;
+  --figma-grey-600: #51525c;
+  --figma-grey-700: #3f3f46;
+  --figma-grey-800: #26272b;
+  --figma-grey-900: #18181b;
 
-	/* Primary colors */
-	--figma-orange: #f0a940;
-	--figma-primary-25: #fffcf7;
-	--figma-primary-50: #fff8e3;
-	--figma-primary-100: #fff4cd;
-	--figma-primary-200: #ffe6ad;
-	--figma-primary-300: #ffd689;
-	--figma-primary-500: #ffb534;
-	--figma-primary-600: #ffa500;
-	--figma-primary-700: #de7e02;
-	--figma-primary-800: #bd5c01;
+  /* Primary colors */
+  --figma-orange: #f0a940;
+  --figma-primary-25: #fffcf7;
+  --figma-primary-50: #fff8e3;
+  --figma-primary-100: #fff4cd;
+  --figma-primary-200: #ffe6ad;
+  --figma-primary-300: #ffd689;
+  --figma-primary-500: #ffb534;
+  --figma-primary-600: #ffa500;
+  --figma-primary-700: #de7e02;
+  --figma-primary-800: #bd5c01;
 
-	/* Error colors */
-	--figma-error-25: #fffbfa;
-	--figma-error-50: #fef3f2;
-	--figma-error-100: #fee4e2;
-	--figma-error-300: #fda29b;
-	--figma-error-500: #f04438;
-	--figma-error-600: #d92d20;
-	--figma-error-700: #b42318;
+  /* Error colors */
+  --figma-error-25: #fffbfa;
+  --figma-error-50: #fef3f2;
+  --figma-error-100: #fee4e2;
+  --figma-error-300: #fda29b;
+  --figma-error-500: #f04438;
+  --figma-error-600: #d92d20;
+  --figma-error-700: #b42318;
 
-	/* Success colors */
-	--figma-success-25: #f6fef9;
-	--figma-success-50: #ecfdf3;
-	--figma-success-100: #d1fadf;
-	--figma-success-300: #6ce9a6;
-	--figma-success-500: #12b76a;
-	--figma-success-600: #039855;
-	--figma-success-700: #027a48;
+  /* Success colors */
+  --figma-success-25: #f6fef9;
+  --figma-success-50: #ecfdf3;
+  --figma-success-100: #d1fadf;
+  --figma-success-300: #6ce9a6;
+  --figma-success-500: #12b76a;
+  --figma-success-600: #039855;
+  --figma-success-700: #027a48;
 
-	/* Warning colors */
-	--figma-warning-25: #fefdf0;
-	--figma-warning-50: #fefbe8;
-	--figma-warning-300: #fde272;
-	--figma-warning-600: #ca8504;
-	--figma-warning-700: #a15c07;
+  /* Warning colors */
+  --figma-warning-25: #fefdf0;
+  --figma-warning-50: #fefbe8;
+  --figma-warning-300: #fde272;
+  --figma-warning-600: #ca8504;
+  --figma-warning-700: #a15c07;
 
-	/* Green colors */
-	--figma-green-50: #ecfdf3;
-	--figma-green-400: #85e13a;
-	--figma-green-600: #4ca30d;
-	--figma-green-700: #027a48;
+  /* Green colors */
+  --figma-green-50: #ecfdf3;
+  --figma-green-400: #85e13a;
+  --figma-green-600: #4ca30d;
+  --figma-green-700: #027a48;
 
-	--figma-rose-50: #fff1f3;
-	--figma-rose-100: #ffe4e8;
-	--figma-rose-500: #f63d68;
-	--figma-rose-700: #c01048;
+  --figma-rose-50: #fff1f3;
+  --figma-rose-100: #ffe4e8;
+  --figma-rose-500: #f63d68;
+  --figma-rose-700: #c01048;
 
-	--birdview-fleetcheck-blue: #004eaf;
-	--figma-blue-50: #eff8ff;
-	--figma-blue-100: #5bcff8;
-	--figma-blue-200: #4db9f6;
-	--figma-blue-300: #3ea0f4;
-	--figma-blue-400: #308af3;
-	--figma-blue-500: #2374f1;
-	--figma-blue-600: #155eef;
-	--figma-blue-700: #175cd3;
+  --birdview-fleetcheck-blue: #004eaf;
+  --figma-blue-50: #eff8ff;
+  --figma-blue-100: #5bcff8;
+  --figma-blue-200: #4db9f6;
+  --figma-blue-300: #3ea0f4;
+  --figma-blue-400: #308af3;
+  --figma-blue-500: #2374f1;
+  --figma-blue-600: #155eef;
+  --figma-blue-700: #175cd3;
 
-	--figma-cyan-300: #67e3f9;
+  --figma-cyan-300: #67e3f9;
 
-	--figma-indigo-50: #eef4ff;
-	--figma-indigo-700: #3538cd;
+  --figma-indigo-50: #eef4ff;
+  --figma-indigo-700: #3538cd;
 
-	--figma-pink-50: #fdf2fa;
-	--figma-pink-500: #f63d68;
-	--figma-pink-700: #c11574;
+  --figma-pink-50: #fdf2fa;
+  --figma-pink-500: #f63d68;
+  --figma-pink-700: #c11574;
 
-	--figma-violet-50: #f4f3ff;
-	--figma-violet-100: #ebe9fe;
-	--figma-violet-300: #ba24d5;
-	--figma-violet-500: #7a5af8;
-	--figma-violet-600: #7839ee;
-	--figma-violet-700: #5925dc;
+  --figma-violet-50: #f4f3ff;
+  --figma-violet-100: #ebe9fe;
+  --figma-violet-300: #ba24d5;
+  --figma-violet-500: #7a5af8;
+  --figma-violet-600: #7839ee;
+  --figma-violet-700: #5925dc;
 
-	--figma-grey-blue-25: #fcfcfd;
-	--figma-grey-blue-50: #f8f9fc;
-	--figma-grey-blue-100: #eaecf5;
-	--figma-grey-blue-200: #d5d9eb;
-	--figma-grey-blue-500: #4e5ba6;
-	--figma-grey-blue-700: #363f72;
+  --figma-grey-blue-25: #fcfcfd;
+  --figma-grey-blue-50: #f8f9fc;
+  --figma-grey-blue-100: #eaecf5;
+  --figma-grey-blue-200: #d5d9eb;
+  --figma-grey-blue-500: #4e5ba6;
+  --figma-grey-blue-700: #363f72;
 
-	--figma-orange-50: #fef6ee;
-	--figma-orange-700: #b93815;
+  --figma-orange-50: #fef6ee;
+  --figma-orange-700: #b93815;
 
-	--figma-yellow-400: #fac515;
-	--figma-yellow-500: #eaaa08;
+  --figma-yellow-400: #fac515;
+  --figma-yellow-500: #eaaa08;
 
-	--figma-SR-quality-check: #cbd024;
-	--figma-SR-finished: #b4d62b;
-	--figma-SR-valid: #9cdb33;
-	--figma-SR-evaluated: #e3cb1c;
+  --figma-SR-quality-check: #cbd024;
+  --figma-SR-finished: #b4d62b;
+  --figma-SR-valid: #9cdb33;
+  --figma-SR-evaluated: #e3cb1c;
+
+  --dark-blue-gray: #41516c;
+  --golden-yellow: #fbca3e;
+  --rose-red: #e24a68;
+  --deep-blue: #1b5f8c;
+  --teal-green: #4cadad;
+  --purple: #9b59b6;
+  --emerald-green: #16a085;
+  --crimson-red: #c0392b;
+  --vibrant-orange: #f39c12;
 }
