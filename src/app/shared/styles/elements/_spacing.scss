@@ -360,15 +360,15 @@
 		}
 
 		&__m {
-			margin-bottom: calc(1.5 * var(--space-m));
+			margin-bottom: calc(1.5 * var(--space-m)) !important;
 		}
 
 		&__l {
-			margin-bottom: calc(1.5 * var(--space-l));
+			margin-bottom: calc(1.5 * var(--space-l)) !important;
 		}
 
 		&__xl {
-			margin-bottom: calc(1.5 * var(--space-xl));
+			margin-bottom: calc(1.5 * var(--space-xl)) !important;
 		}
 
 		&__none {

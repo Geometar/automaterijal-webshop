@@ -10,5 +10,10 @@ export const routes: Routes = [
     path: 'home',
     loadComponent: () =>
       import('./modules/dashboard/home/home.component').then((m) => m.HomeComponent)
+  },
+  {
+    path: 'onama',
+    loadComponent: () =>
+      import('./modules/dashboard/o-nama/o-nama.component').then((m) => m.ONamaComponent)
   }
 ];

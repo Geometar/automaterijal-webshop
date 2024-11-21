@@ -1,0 +1,62 @@
+.onama-brendovi {
+    text-align: center;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+
+  .sector-title {
+    font-size: 1.8rem;
+    color: var(--figma-error-700);
+    font-weight: bolder;
+    margin-bottom: 15px;
+  }
+
+  .sector-description {
+    font-size: 1.1rem;
+    color: var(--figma-grey-900);
+    margin-bottom: 30px;
+  }
+
+  .brand-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+  }
+
+  .brand {
+    flex: 1 1 100px;
+    max-width: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .brand img {
+    max-width: 100%;
+    height: auto;
+    filter: grayscale(100%); /* Početno crno-belo za profesionalan efekat */
+    transition: filter 0.3s ease;
+  }
+
+  .brand:hover img {
+    filter: grayscale(0%); /* Obojiti na hover */
+  }
+
+  .brand:hover {
+    transform: scale(1.1); /* Blago povećanje */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .history-section {
+    background-color: #f9f9f9;
+    padding: 50px 20px;
+  }
+
+  .history-section .section-title {
+    text-align: center;
+    font-size: 2em;
+    margin-bottom: 30px;
+    color: #333;
+  }
+}
