@@ -13,6 +13,11 @@
 		stroke-width: calc(var(--space-xxxs) / 4);
 	}
 
+
+	&.info-25 svg path {
+		stroke: var(--figma-info-25);
+	}
+
 	&.error-600 svg path {
 		stroke: var(--figma-error-600);
 	}
