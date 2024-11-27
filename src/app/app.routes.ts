@@ -15,5 +15,10 @@ export const routes: Routes = [
     path: 'onama',
     loadComponent: () =>
       import('./modules/dashboard/o-nama/o-nama.component').then((m) => m.ONamaComponent)
+  },
+  {
+    path: 'kontakt',
+    loadComponent: () =>
+      import('./modules/dashboard/kontakt/kontakt.component').then((m) => m.KontaktComponent)
   }
 ];
