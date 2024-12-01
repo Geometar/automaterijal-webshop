@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 
 @Component({
   selector: 'autom-navigation',
@@ -9,4 +9,10 @@ import { Component } from '@angular/core';
 })
 export class NavigationComponent {
 
+  fixedHeaderClass = false;
+
+  @HostListener('window:scroll')
+  onScroll(): void {
+    this.fixedHeaderClass = window.scrollY > 90;
+  }
 }
