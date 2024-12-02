@@ -1,0 +1,44 @@
+<div class="autom-label">
+  <span
+    [attr.data-e2e-selector]="label"
+    [class.autom-label__small]="sizeEnum.SMALL === size"
+    [class.autom-label__large]="sizeEnum.LARGE === size"
+    [title]="label"
+  >
+    {{ label }}
+  </span>
+  <span
+    *ngIf="required"
+    class="autom-label__required"
+    [automTooltip]="requiredTooltip"
+    [automTooltipPosition]="tooltipPosition.RIGHT"
+    [automTooltipTheme]="tooltipTheme.DARK"
+    [automTooltipType]="tooltipType.TEXT"
+  ></span>
+
+  <ng-container *ngIf="labelIcons.length">
+    <ng-container *ngFor="let icon of labelIcons">
+      <div
+        class="autom-label__icons-container"
+        [ngClass]="icon.class"
+        (click)="eventEmitter.emit(icon.label)"
+      >
+        <autom-icon
+          class="autom-label__icons"
+          [disabled]="icon.disabled!"
+          [source]="icon.svg"
+          [automTooltip]="icon.tooltip?.tooltipText"
+          [automTooltipPosition]="tooltipPosition.TOP"
+          [automTooltipTheme]="tooltipTheme.DARK"
+          [automTooltipType]="tooltipType.TEXT"
+        ></autom-icon>
+        <span
+          class="autom-label__icons-label"
+          [attr.data-e2e-selector]="icon.label"
+        >
+          {{ icon.label }}
+        </span>
+      </div>
+    </ng-container>
+  </ng-container>
+</div>

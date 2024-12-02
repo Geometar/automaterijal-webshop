@@ -1,0 +1,68 @@
+.autom-label {
+	align-items: center;
+	color: var(--figma-grey-700);
+	display: flex;
+	font-size: var(--text-sm);
+	font-style: normal;
+	font-weight: var(--font-weight-medium);
+	height: calc(var(--space-xxs) * 7);
+	line-height: var(--font-2-line-height);
+	margin: calc(var(--space-xxs) * 1.5) 0;
+
+	&__small,
+	&__large {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	&__small {
+		max-width: calc(var(--space-m) * 4.75);
+	}
+
+	&__large {
+		max-width: calc(var(--space-m) * 10.75);
+	}
+
+	&__icons {
+		cursor: pointer;
+		line-height: var(--space-s);
+		margin-left: var(--space-s);
+		margin-right: var(--space-xxs);
+		position: relative;
+		top: var(--space-xxxs);
+
+		.mat-icon {
+			width: var(--space-s);
+			height: var(--space-s);
+
+			& svg path {
+				stroke: var(--figma-grey-600);
+			}
+		}
+
+		&-container {
+			cursor: pointer;
+
+			&:hover {
+				color: var(--figma-primary-700);
+
+				.mat-icon svg path {
+					stroke: var(--figma-primary-700);
+				}
+			}
+
+			&.delete {
+				color: var(--figma-error-500);
+
+				.mat-icon svg path {
+					stroke: var(--figma-error-500);
+				}
+			}
+		}
+
+		&-label {
+			font-weight: var(--font-weight-regular);
+		}
+	}
+}
