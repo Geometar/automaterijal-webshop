@@ -12,7 +12,7 @@ import { IconModel } from '../../data-models/interface';
 import { AutomTooltipDirective } from '../autom-tooltip/autom-tooltip.directive';
 
 @Component({
-  selector: 'app-autom-label',
+  selector: 'autom-label',
   standalone: true,
   imports: [CommonModule, AutomIconComponent, AutomTooltipDirective],
   templateUrl: './autom-label.component.html',
@@ -22,7 +22,7 @@ export class AutomLabelComponent {
   @Input() label = '';
   @Input() labelIcons: Array<IconModel> = [];
   @Input() required = false;
-  @Input() size = SizeEnum;
+  @Input() size: SizeEnum = SizeEnum.AUTO;
   @Output() eventEmitter = new EventEmitter<string>();
 
   sizeEnum = SizeEnum;

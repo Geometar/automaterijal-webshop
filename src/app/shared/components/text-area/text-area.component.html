@@ -1,0 +1,42 @@
+<form [formGroup]="textForm">
+  <autom-label
+    *ngIf="label"
+    [label]="label"
+    [labelIcons]="labelIcons"
+    [required]="required"
+    [size]="labelSize"
+  ></autom-label>
+
+  <textarea
+    #textAreaField
+    class="autom-text-area"
+    formControlName="textArea"
+    [attr.data-e2e-selector]="selector || label || placeholder"
+    [autofocus]="autofocus"
+    [class.input-error]="inputError"
+    [cols]="cols"
+    [maxLength]="maxLength"
+    [name]="name"
+    [ngClass]="textAreaSize"
+    [placeholder]="placeholder"
+    [readonly]="readonly"
+    [required]="required"
+    [rows]="rows"
+    (blur)="emitSelected.emit(textArea)"
+    (change)="onTextAreaChange()"
+    (keyup)="emitSelected.emit(textArea)"
+  ></textarea>
+  <div
+    *ngIf="counter"
+    class="autom-text-area__counter"
+    [class.error]="textAreaField?.value?.length === maxLength"
+  >
+    {{ textAreaField?.value?.length }} / {{ maxLength }}
+    {{ "TEXTAREA_CHARS" }}
+  </div>
+  <p *ngIf="hint" class="text-hint" [attr.data-e2e-selector]="hint">
+    {{ hint }}
+  </p>
+  <p *ngIf="textAreaError" class="text-error">* {{ "TEXTAREA_ERROR" }}</p>
+  <p *ngIf="textAreaRequired" class="text-error">* {{ "REQUIRED" }}</p>
+</form>

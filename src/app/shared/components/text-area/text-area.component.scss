@@ -1,0 +1,82 @@
+.autom-text-area {
+	align-items: flex-end;
+	background: var(--figma-base-white);
+	border-radius: var(--space-xs);
+	border: var(--space-default) solid var(--figma-grey-300);
+	box-shadow: var(--figma-shadow-xs);
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	color: var(--figma-grey-500);
+	display: flex;
+	flex-direction: column;
+	font-size: var(--font-base-size);
+	justify-content: flex-end;
+	line-height: var(--font-3-line-height);
+	margin: 0;
+	min-width: calc(var(--space-m) * 10);
+	outline: none;
+	padding: calc(var(--space-s) / 1.6) calc(var(--space-xs) * 1.75);
+	width: 100%;
+
+	&__counter {
+		color: var(--figma-grey-500);
+		font-size: var(--text-sm);
+		font-weight: var(--font-weight-regular);
+		margin-top: var(--space-xs);
+		margin-left: var(--space-xxs);
+
+		&.error {
+			color: var(--figma-error-500);
+		}
+	}
+
+	&__small {
+		height: calc(var(--space-s) * 8);
+	}
+
+	&__medium {
+		height: calc(var(--space-s) * 10);
+	}
+
+	&__large {
+		height: calc(var(--space-s) * 12);
+	}
+
+	&:focus-within {
+		border: var(--space-default) solid var(--figma-primary-600);
+		box-shadow: 0 0 calc(var(--space-xs) / 1.6) var(--figma-primary-600);
+	}
+
+	&.input-error {
+		border: var(--space-default) solid var(--figma-error-500);
+		box-shadow: 0 0 calc(var(--space-xs) / 1.6) var(--figma-error-500);
+	}
+
+	&[disabled] {
+		background: var(--figma-grey-50);
+		border: var(--space-default) solid var(--figma-grey-300);
+		box-shadow: 0 0 calc(var(--space-xs) / 1.6) var(--figma-grey-300);
+		resize: none;
+	}
+}
+
+.text {
+	font-size: calc(var(--font-base-size) / 1.2);
+	line-height: var(--font-1-line-height);
+	margin: var(--space-xxs) 0;
+
+	&-error {
+		@extend .text;
+		color: var(--figma-error-500);
+	}
+
+	&-hint {
+		@extend .text;
+		color: var(--figma-grey-500);
+	}
+}
+
+textarea::placeholder {
+	color: var(--figma-grey-300);
+}
