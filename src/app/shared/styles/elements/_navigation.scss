@@ -364,7 +364,7 @@ body {
 
 .header-active {
   animation: slideIn 0.5s ease forwards;
-  background-color: hsla(222, 44%, 18%, 0.95);
+  background-color: hsla(222, 27%, 18%, 0.95);
   box-shadow: var(--shadow-1);
   padding: 15px 15px;
   position: fixed !important;
@@ -1166,14 +1166,6 @@ body {
 
   .header {
     padding-block: 25px;
-  }
-
-  .header-active {
-    background-color: red;
-    position: fixed;
-    transform: translateY(-100%);
-    box-shadow: var(--shadow);
-    animation: slideIn 0.5s ease forwards;
   }
 
   .logo img {
