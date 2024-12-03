@@ -1,16 +1,18 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 
 // Automaterijal Component
 import { AutomLabelComponent } from '../autom-label/autom-label.component';
 import { AutomIconComponent } from '../autom-icon/autom-icon.component';
 
 // Angular Material Modules
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { FormsModule, ReactiveFormsModule, UntypedFormControl, Validators } from '@angular/forms';
-import { ColorEnum, IconsEnum, OrientationEnum, SizeEnum, TooltipPositionEnum, TooltipThemeEnum, TooltipTypesEnum } from '../../data-models/enums';
-import { IconModel, TooltipModel } from '../../data-models/interface';
+
+// Enums
+import { ColorEnum, IconsEnum, SizeEnum, TooltipPositionEnum, TooltipThemeEnum, TooltipTypesEnum } from '../../data-models/enums';
+import { IconModel } from '../../data-models/interface';
 import { SelectAlert, SelectModel } from '../../data-models/interface/selected-item.interface';
 import { AutomTooltipDirective } from '../autom-tooltip/autom-tooltip.directive';
 

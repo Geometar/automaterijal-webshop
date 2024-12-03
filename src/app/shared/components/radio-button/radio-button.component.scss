@@ -1,0 +1,135 @@
+mat-radio-group {
+	align-items: center;
+	display: flex;
+
+	&.radio-button-group {
+		&__card {
+			&--horizontal,
+			&--vertical {
+				align-items: flex-start;
+				display: flex;
+				gap: calc(var(--space-xxs) * 3);
+			}
+
+			&--horizontal {
+				flex-direction: row;
+			}
+
+			&--vertical {
+				flex-direction: column;
+			}
+		}
+
+		&--vertical {
+			align-items: flex-start;
+			flex-direction: column;
+			flex-wrap: unset;
+			height: auto;
+		}
+	}
+}
+
+.radio-button {
+	margin-top: calc(var(--space-xxxs) * 3);
+
+	::ng-deep .mat-radio-label-content {
+		color: var(--figma-grey-700);
+		font-size: var(--text-sm);
+		font-weight: var(--font-weight-regular);
+	}
+
+	&__alert {
+		position: absolute;
+		right: var(--space-s);
+		top: var(--space-s);
+
+		::ng-deep .mat-icon {
+			height: calc(var(--space-xxs) * 5);
+			overflow: inherit;
+			width: calc(var(--space-xxs) * 5);
+		}
+	}
+
+	&__card {
+		align-items: flex-start;
+		align-self: stretch;
+		background: var(--figma-base-white);
+		border-radius: var(--space-xs);
+		border: var(--space-default) solid var(--figma-grey-200);
+		box-sizing: border-box;
+		cursor: pointer;
+		display: flex;
+		flex-direction: row;
+		flex-grow: 0;
+		height: calc(var(--space-xxs) * 13);
+		margin-top: 0;
+		min-width: calc(var(--space-m) * 8);
+		position: relative;
+		width: 100%;
+
+		::ng-deep .mat-radio-label {
+			padding: var(--space-s);
+		}
+
+		&:hover,
+		&--active {
+			background-color: var(--figma-primary-50);
+			border: var(--space-default) solid var(--figma-primary-300);
+
+			::ng-deep .mat-radio-label-content {
+				color: var(--figma-primary-800);
+			}
+		}
+
+		&--disabled {
+			background-color: var(--figma-grey-50) !important;
+			border: var(--space-default) solid var(--figma-grey-200) !important;
+			cursor: default;
+			pointer-events: none;
+
+			::ng-deep .mat-radio-label-content {
+				color: var(--figma-grey-700) !important;
+			}
+		}
+	}
+
+	&-container {
+		&--auto {
+			width: auto;
+		}
+
+		&--full {
+			width: var(--size-full);
+		}
+
+		&--extra-small {
+			width: var(--size-extra-small);
+		}
+
+		&--small {
+			width: var(--size-small);
+		}
+
+		&--medium {
+			width: var(--size-medium);
+		}
+
+		&--large {
+			width: var(--size-large);
+		}
+	}
+
+	&--horizontal {
+		margin-right: calc(var(--space-xxs) * 3);
+	}
+
+	&-subtitle {
+		display: block;
+		padding-top: var(--space-xs);
+	}
+
+	&-title {
+		display: block;
+		font-weight: var(--font-weight-bold);
+	}
+}

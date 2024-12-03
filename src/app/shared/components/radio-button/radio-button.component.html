@@ -1,0 +1,53 @@
+<autom-label
+  *ngIf="label && !hideRadioGroup"
+  [label]="label"
+  [labelIcons]="labelIcons"
+  [required]="required"
+></autom-label>
+
+<div *ngIf="!hideRadioGroup" class="autom-input-wrapper">
+  <mat-radio-group
+    [class.radio-button-group__card--horizontal]="
+      theme === orientation.CARD_HORIZONTAL
+    "
+    [class.radio-button-group__card--vertical]="
+      theme === orientation.CARD_VERTICAL
+    "
+    [class.radio-button-group--vertical]="theme === orientation.VERTICAL"
+  >
+    <ng-container *ngFor="let option of options; index as index">
+      <mat-radio-button
+        *ngIf="!option.hidden"
+        class="radio-button"
+        [attr.data-e2e-selector]="option.value"
+        [checked]="option.checked"
+        [class.radio-button__card]="isCardView"
+        [class.radio-button__card--active]="option.checked && isCardView"
+        [class.radio-button__card--disabled]="option.disabled && isCardView"
+        [class.radio-button--horizontal]="theme === orientation.HORIZONTAL"
+        [disabled]="option.disabled"
+        [class.radioClasses]="isCardView"
+        [value]="option.value"
+        (change)="onChange($event)"
+      >
+        <span
+          *ngIf="!hideValue"
+          [ngClass]="displaySubtitle ? 'radio-button-title' : ''"
+          >{{ option.value }}</span
+        >
+        <span *ngIf="option.subtitle" class="radio-button-subtitle">{{
+          option.subtitle
+        }}</span>
+
+        <autom-icon
+          *ngIf="option.alert"
+          class="radio-button__alert"
+          [color]="option.alert.color"
+          [source]="option.alert.source"
+          [automTooltip]="option.alert.tooltipContent"
+          [automTooltipPosition]="tooltipPosition.TOP"
+        ></autom-icon>
+      </mat-radio-button>
+    </ng-container>
+  </mat-radio-group>
+</div>
