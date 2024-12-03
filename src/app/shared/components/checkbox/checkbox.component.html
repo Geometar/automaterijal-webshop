@@ -1,0 +1,44 @@
+<autom-label
+  *ngIf="label"
+  [label]="label"
+  [labelIcons]="labelIcons"
+  [required]="required"
+></autom-label>
+
+<div
+  class="autom-input-wrapper"
+  [class.autom-checkbox__vertical]="!horizontal"
+  [class.autom-checkbox-group__card--horizontal]="
+    theme === orientation.CARD_HORIZONTAL
+  "
+  [class.autom-checkbox-group__card--vertical]="
+    theme === orientation.CARD_VERTICAL
+  "
+>
+  <mat-checkbox
+    *ngFor="let item of items; let i = index"
+    class="autom-checkbox"
+    [attr.data-e2e-selector]="item.value || item.key"
+    [attr.data-e2e-detail]="item.checked"
+    [class.autom-checkbox__checked]="item.checked || item.indeterminate"
+    [class.autom-checkbox__disabled]="item.disabled"
+    [class.autom-checkbox__card]="isCardView"
+    [class.autom-checkbox__card--active]="item.checked && isCardView"
+    [class.autom-checkbox__card--disabled]="item.disabled && isCardView"
+    [checked]="item.checked"
+    [disabled]="item.disabled"
+    [indeterminate]="item.indeterminate"
+    [ngClass]="isCardView ? checkboxClasses : null"
+    [value]="item.checked.toString()"
+    (change)="onChange($event, item, i)"
+  >
+    <ng-template #displaylabel>
+      <autom-label
+        [attr.data-e2e-selector]="item.value"
+        [label]="item.value"
+        [labelIcons]="labelIcons"
+        [required]="item.required!"
+      ></autom-label>
+    </ng-template>
+  </mat-checkbox>
+</div>
