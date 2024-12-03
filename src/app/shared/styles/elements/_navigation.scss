@@ -366,6 +366,7 @@ body {
   animation: slideIn 0.5s ease forwards;
   background-color: hsla(222, 27%, 18%, 0.95);
   box-shadow: var(--shadow-1);
+  padding: 0px !important;
   padding: 15px 15px;
   position: fixed !important;
   transform: translateY(-100%);
@@ -1169,7 +1170,7 @@ body {
   }
 
   .logo img {
-    width: 164px;
+    width: 134px;
   }
 
   .header .btn {
