@@ -1,0 +1,101 @@
+<!-- A: text only, OR text + icon -->
+<ng-container *ngIf="!iconOnlyMode">
+  <!--
+		additional condition added to the click handler,
+		to allow for the unit testing of angular's
+		event emitter behaviour also on disabled buttons
+	-->
+  <button
+    class="button"
+    type="button"
+    [attr.data-e2e-component]="e2eComponentsEnum.BUTTON"
+    [attr.data-e2e-selector]="label"
+    [attr.tabindex]="tabindex"
+    [attr.theme]="theme"
+    [class.button--primary]="type === buttonTypes.PRIMARY"
+    [class.button--secondary]="type === buttonTypes.SECONDARY"
+    [class.button--ternary]="type === buttonTypes.TERNARY"
+    [disabled]="disabled"
+    (click)="!disabled && clickEvent.emit($event)"
+  >
+    <div class="button__content-wrapper" [class.button--disabled]="disabled">
+      <!-- Icon template start -->
+      <ng-container *ngIf="iconPrefix">
+        <autom-icon
+          class="autom-margin--right__xs"
+          slot="prefix"
+          [disabled]="disabled!"
+          [source]="iconSource!"
+        ></autom-icon>
+      </ng-container>
+      <!-- Icon template end -->
+
+      <!-- Counter before the label start -->
+      <ng-container
+        *ngIf="counter!.showCounter && counter!.position === positionEnum.LEFT"
+      >
+        <ng-container
+          [ngTemplateOutlet]="counterTemplate"
+          [ngTemplateOutlet]="counterTemplate"
+          [ngTemplateOutletContext]="{ counter}"
+        ></ng-container>
+      </ng-container>
+      <!-- Counter before the label end -->
+
+      <!-- Label start -->
+      <span class="button__text-label" [attr.data-e2e-selector]="label">
+        {{ label }}
+      </span>
+      <!-- Label end -->
+
+      <!-- Counter after the label start -->
+      <ng-container
+        *ngIf="counter!.showCounter && counter!.position === positionEnum.RIGHT"
+        [ngTemplateOutlet]="counterTemplate"
+        [ngTemplateOutletContext]="{ counter}"
+      >
+      </ng-container>
+      <!-- Counter after the label end -->
+    </div>
+  </button>
+</ng-container>
+
+<!-- B: icon-only -->
+<ng-container *ngIf="iconOnlyMode">
+  <!--
+		additional condition added to the click handler,
+		to allow for the unit testing of angular's
+		event emitter behaviour also on disabled buttons
+	-->
+  <button
+    class="icon-button"
+    [attr.data-e2e-selector]="iconSource"
+    [attr.tabindex]="tabindex"
+    [attr.theme]="theme"
+    [class.icon-button--primary]="type === buttonTypes.PRIMARY"
+    [class.icon-button--secondary]="type === buttonTypes.SECONDARY"
+    [class.icon-button--ternary]="type === buttonTypes.TERNARY"
+    [disabled]="disabled"
+    (click)="!disabled && clickEvent.emit($event)"
+  >
+    <autom-icon
+      class="icon-button_icon"
+      slot="prefix"
+      [disabled]="disabled!"
+      [source]="iconSource!"
+    ></autom-icon>
+  </button>
+</ng-container>
+
+<!-- Counter template start-->
+<ng-template #counterTemplate let-counter="counter">
+  <div
+    class="button__counter"
+    [class.autom-margin--left__xxs]="counter.position === positionEnum.RIGHT"
+    [class.autom-margin--right__xxs]="counter.position === positionEnum.LEFT"
+    [title]="counter.value"
+  >
+    {{ counter.value }}
+  </div>
+</ng-template>
+<!-- Counter template end-->

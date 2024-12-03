@@ -1,3 +1,4 @@
+export * from './button.interface';
 export * from './checkbox.interface';
 export * from './icon.interface';
 export * from './radio-button.interface';

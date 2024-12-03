@@ -1,0 +1,47 @@
+<!-- An Overlay Below The Popup -->
+<div
+  *ngIf="visible && overlay"
+  (click)="onOverlayClick()"
+  class="popup-overlay"
+></div>
+<!-- Popup Container -->
+<div
+  *ngIf="visible"
+  #popupContainer
+  class="popup-container"
+  id="popupContainer"
+  [cdkDragDisabled]="!allowDrag"
+  [class.narrow-card]="narrowCard"
+  [class.popup-container--rounded]="rounded"
+  [ngClass]="popupClasses"
+  [ngStyle]="{ width: customWidth ? customWidth + 'px' : '' }"
+  [style.top.px]="customPosition ? customTop : ''"
+  [style.left.px]="customPosition ? customLeft : ''"
+  cdkDrag
+>
+  <!-- Header Part -->
+  <header class="popup-container__header" cdkDragHandle>
+    <ng-content select="[custom-header]"></ng-content>
+  </header>
+
+  <!-- Popup Body -->
+  <body
+    class="popup-container__body"
+    [class.popup-container--rounded]="rounded"
+  >
+    <!-- <conti-loading-overlay
+      *ngIf="loading"
+      class="popup-container--loading"
+      [attr.data-loading]="loading ? 'active' : 'done'"
+    ></conti-loading-overlay> -->
+    <ng-content *ngIf="!loading" select="[custom-body]"></ng-content>
+  </body>
+
+  <!-- Footer Part -->
+  <footer
+    class="popup-container__footer"
+    [class.popup-container--rounded]="rounded"
+  >
+    <ng-content select="[custom-footer]"></ng-content>
+  </footer>
+</div>

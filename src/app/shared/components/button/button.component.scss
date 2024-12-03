@@ -1,0 +1,475 @@
+/*
+ * Common: text only AND icon + text -------------------------------------------------
+ */
+
+ .button,
+ .icon-button {
+   border-radius: var(--space-xs);
+   border: var(--space-default) solid transparent;
+   box-shadow: var(--figma-shadow-xs);
+   box-sizing: border-box;
+   cursor: pointer;
+   display: inline-block;
+   font-size: var(--text-sm);
+   font-weight: var(--font-weight-regular);
+   line-height: var(--font-1-line-height);
+   transition: var(--ease-in-out);
+ 
+   &:disabled {
+     cursor: default;
+   }
+ 
+   // do not allow the button label text to expand fully,
+   // when also preceded by a button icon
+   autom-icon + .button__text-label {
+     width: auto;
+   }
+ }
+ 
+ .button__content-wrapper {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+ }
+ 
+ .button--disabled {
+   pointer-events: none;
+ }
+ 
+ .button__text-label {
+   width: 100%;
+ }
+ 
+ .button__counter {
+   align-items: center;
+   background-color: var(--figma-primary-700);
+   border-radius: 50%;
+   color: var(--figma-base-white);
+   display: flex;
+   font-size: calc(var(--text-xs) * 0.8);
+   height: calc(var(--space-xs) * 2.5);
+   justify-content: center;
+   left: calc(var(--space-m));
+   padding: var(--space-xs);
+   width: calc(var(--space-xs) * 2.5);
+   -webkit-user-select: none;
+   user-select: none;
+ }
+ 
+ /*
+  * Default: text only, OR icon + text -------------------------------------------------
+  */
+ .button {
+   height: calc(var(--space-s) * 2.25);
+   min-width: max-content;
+   padding: var(--space-xxs) calc(var(--space-s) * 3.5 / 4);
+ 
+   &--primary {
+     &[theme~='default'] {
+       // :normal
+       background-color: var(--figma-primary-600);
+       border-color: var(--figma-primary-600);
+       color: var(--figma-base-white);
+ 
+       &:hover {
+         background-color: var(--figma-primary-700);
+         border-color: var(--figma-primary-700);
+       }
+ 
+       &:disabled {
+         background-color: var(--figma-primary-200);
+         border-color: var(--figma-primary-200);
+       }
+ 
+       path {
+         fill: var(--figma-base-white);
+       }
+     }
+ 
+     &[theme~='dark-red'] {
+       // :normal
+       background: var(--figma-error-700);
+       border-color: var(--figma-error-700);
+       color: var(--figma-base-white);
+ 
+       autom-icon svg path {
+         stroke: var(--figma-base-white);
+       }
+ 
+       &:hover {
+         background: var(--figma-error-500);
+         border-color: var(--figma-error-500);
+       }
+ 
+       &:disabled {
+         background: var(--figma-error-50);
+         border-color: var(--figma-error-100);
+         color: var(--figma-base-white);
+ 
+         autom-icon svg path {
+           stroke: var(--figma-error-50);
+         }
+       }
+     }
+ 
+     &[theme~='light-red'] {
+       // :normal
+       background: var(--figma-error-500);
+       border-color: var(--figma-error-500);
+       color: var(--figma-base-white);
+ 
+       autom-icon svg path {
+         stroke: var(--figma-base-white);
+       }
+ 
+       &:hover {
+         background: var(--figma-error-700);
+         border-color: var(--figma-error-700);
+       }
+ 
+       &:disabled {
+         background: var(--figma-error-50);
+         border-color: var(--figma-error-100);
+         color: var(--figma-base-white);
+ 
+         autom-icon svg path {
+           stroke: var(--figma-error-50);
+         }
+       }
+     }
+   }
+ 
+   &--secondary {
+     &[theme~='light-orange'] {
+       // :normal
+       background-color: var(--figma-primary-50);
+       border-color: var(--figma-primary-50);
+       color: var(--figma-primary-700);
+ 
+       &:hover {
+         background-color: var(--figma-primary-100);
+         border-color: var(--figma-primary-100);
+       }
+ 
+       &:disabled {
+         background-color: var(--figma-primary-25);
+         border-color: var(--figma-primary-300);
+         color: var(--figma-primary-300);
+       }
+     }
+ 
+     &[theme~='light-grey'] {
+       // :normal
+       background: var(--figma-base-white);
+       border-color: var(--figma-grey-300);
+       color: var(--figma-grey-700);
+ 
+       autom-icon svg path {
+         stroke: var(--figma-grey-700);
+       }
+ 
+       &:hover {
+         background: var(--figma-grey-50);
+         border-color: var(--figma-grey-300);
+         color: var(--figma-grey-800);
+       }
+ 
+       &:disabled {
+         background: var(--figma-base-white);
+         border-color: var(--figma-grey-200);
+         color: var(--figma-grey-300);
+ 
+         autom-icon svg rect {
+           fill: var(--figma-grey-300);
+         }
+       }
+     }
+ 
+     &[theme~='light-red'] {
+       // :normal
+       background: var(--figma-error-50);
+       border-color: var(--figma-error-100);
+       color: var(--figma-error-700);
+ 
+       autom-icon svg path {
+         stroke: var(--figma-error-700);
+       }
+ 
+       &:hover {
+         background: var(--figma-error-500);
+         border-color: var(--figma-error-500);
+         color: var(--figma-error-50);
+ 
+         autom-icon svg path {
+           stroke: var(--figma-base-white);
+         }
+       }
+ 
+       &:disabled {
+         background: var(--figma-error-50);
+         border-color: var(--figma-error-100);
+         color: var(--figma-base-white);
+ 
+         autom-icon svg path {
+           stroke: var(--figma-error-50);
+         }
+       }
+     }
+   }
+ 
+   &--ternary {
+     background: transparent;
+     box-shadow: none;
+ 
+     &[theme~='default'] {
+       // :normal
+       color: var(--figma-grey-700);
+ 
+       &:hover {
+         color: var(--figma-grey-600);
+       }
+ 
+       &:disabled {
+         background-color: transparent;
+         border-color: transparent;
+         color: var(--figma-grey-200);
+ 
+         .autom-icon svg path {
+           stroke: var(--figma-grey-300);
+         }
+       }
+ 
+       .autom-icon svg path {
+         stroke: var(--figma-grey-700);
+       }
+     }
+ 
+     &[theme~='orange'] {
+       // :normal
+       color: var(--figma-primary-700);
+ 
+       &:hover {
+         background: var(--figma-primary-50);
+       }
+ 
+       &:disabled {
+         background: transparent;
+         color: var(--figma-grey-300);
+       }
+     }
+ 
+     &[theme~='dark-grey'] {
+       // :normal
+       color: var(--figma-grey-500);
+ 
+       autom-icon svg path {
+         stroke: var(--figma-grey-500);
+       }
+ 
+       &:hover {
+         background: var(--figma-grey-50);
+       }
+ 
+       &:disabled {
+         background: transparent;
+         color: var(--figma-grey-300);
+ 
+         autom-icon svg path {
+           stroke: var(--figma-grey-50);
+         }
+       }
+     }
+ 
+     &[theme~='light-grey'] {
+       // :normal
+       color: var(--figma-grey-700);
+       border: var(--space-default) solid var(--figma-grey-300);
+ 
+       &:hover {
+         background: var(--figma-grey-50);
+       }
+ 
+       &:disabled {
+         background: transparent;
+         color: var(--figma-grey-200);
+       }
+     }
+ 
+     &[theme~='dark-red'] {
+       // :normal
+       color: var(--figma-error-600);
+ 
+       autom-icon svg path {
+         stroke: var(--figma-error-600);
+       }
+ 
+       &:hover {
+         background: var(--figma-error-50);
+       }
+ 
+       &:disabled {
+         color: var(--figma-error-50);
+ 
+         autom-icon svg path {
+           stroke: var(--figma-error-50);
+         }
+       }
+     }
+   }
+ }
+ 
+ /*
+  * Icon only  -------------------------------------------------
+  */
+ .icon-button {
+   align-items: center;
+   display: flex;
+   flex-direction: row;
+   justify-content: center;
+ 
+   width: calc(var(--space-space-m) + var(--space--xxs));
+ 
+   &_icon {
+     margin-top: var(--space-xxs);
+   }
+ 
+   &--primary {
+     &[theme~='default'] {
+       // :normal
+       background-color: var(--figma-primary-600);
+       border-color: var(--figma-primary-600);
+       color: var(--figma-base-white);
+ 
+       &:hover {
+         background-color: var(--figma-primary-700);
+         border-color: var(--figma-primary-700);
+       }
+ 
+       &:disabled {
+         background-color: var(--figma-primary-200);
+         border-color: var(--figma-primary-200);
+       }
+ 
+       autom-icon {
+         path {
+           stroke: var(--figma-base-white);
+         }
+       }
+     }
+   }
+ 
+   &--secondary {
+     &[theme~='dark-grey'] {
+       // :normal
+       background: var(--figma-base-white);
+       border-color: var(--figma-grey-300);
+       color: var(--figma-grey-700);
+ 
+       &:hover {
+         background: var(--figma-grey-50);
+         border-color: var(--figma-grey-300);
+         color: var(--figma-grey-800);
+       }
+ 
+       &:disabled {
+         background: var(--figma-base-white);
+         border-color: var(--figma-grey-200);
+         color: var(--figma-grey-300);
+       }
+     }
+ 
+     &[theme~='light-orange'] {
+       autom-icon {
+         path {
+           stroke: var(--figma-primary-700);
+         }
+       }
+ 
+       // :normal
+       background-color: var(--figma-primary-50);
+       border-color: var(--figma-primary-50);
+       color: var(--figma-primary-700);
+ 
+       &:hover {
+         background-color: var(--figma-primary-100);
+         border-color: var(--figma-primary-100);
+       }
+     }
+   }
+ 
+   &--ternary {
+     &[theme~='default'] {
+       // :normal
+       border: none;
+       background: transparent;
+       box-shadow: none;
+ 
+       path {
+         fill: var(--figma-grey-700);
+       }
+ 
+       &:hover {
+         background: var(--figma-grey-600);
+ 
+         path {
+           fill: var(--figma-grey-700);
+         }
+       }
+     }
+ 
+     &[theme~='dark-red'] {
+       // :normal
+       border: none;
+       background: transparent;
+       box-shadow: none;
+ 
+       path {
+         fill: var(--figma-error-700);
+       }
+ 
+       &:hover {
+         background: var(--figma-error-50);
+ 
+         path {
+           fill: var(--figma-error-700);
+         }
+       }
+ 
+       &:disabled {
+         background: transparent;
+ 
+         path {
+           fill: var(--figma-error-300);
+         }
+       }
+     }
+ 
+     &[theme~='dark-grey'] {
+       // :normal
+       border: none;
+       background: transparent;
+       box-shadow: none;
+ 
+       path {
+         fill: var(--figma-grey-700);
+       }
+ 
+       &:hover {
+         background: var(--figma-grey-100);
+ 
+         path {
+           fill: var(--figma-grey-700);
+         }
+       }
+ 
+       &:disabled {
+         background: transparent;
+ 
+         path {
+           fill: var(--figma-grey-300);
+         }
+       }
+     }
+   }
+ }
+ 
