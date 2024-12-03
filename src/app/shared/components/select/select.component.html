@@ -1,0 +1,100 @@
+<autom-label
+  *ngIf="label"
+  [label]="label"
+  [labelIcons]="labelIcons"
+  [required]="required"
+></autom-label>
+
+<div class="autom-input-wrapper" [ngClass]="selectClasses">
+  <mat-select
+    class="mat-select--styled-with-arrow"
+    disableOptionCentering
+    floatLabel="always"
+    name="selection"
+    panelClass="mat-select--panel"
+    [attr.data-e2e-selector]="selector || label || placeholder"
+    [class.mat-select--disabled]="disableSelect"
+    [class.invalid-selection]="inputHasErrorGetter"
+    [compareWith]="compareFunction"
+    [formControl]="formCtrl"
+    [placeholder]="placeholder"
+    [required]="required"
+    [typeaheadDebounceInterval]="1000"
+    (selectionChange)="onChange($event)"
+  >
+    <mat-select-trigger
+      *ngIf="selectedValue?.value"
+      class="mat-select-trigger"
+      [attr.data-e2e-selector]="selector || label || placeholder"
+      [attr.data-e2e-detail]="selectedValue?.value"
+    >
+      <autom-icon
+        *ngIf="selectedValue?.value && selectedValue?.icon"
+        class="mat-select-trigger__icon"
+        [source]="selectedValue!.icon!"
+      ></autom-icon>
+      <span *ngIf="selectedValue!.countryCode" class="mat-select__country-code">
+        {{ selectedValue!.countryCode }}
+      </span>
+      <span *ngIf="selectedValue!.boldValue" class="mat-select--bold">
+        {{ selectedValue!.boldValue }} &nbsp;
+      </span>
+      {{ selectedValue?.value }}
+    </mat-select-trigger>
+
+    <mat-option
+      *ngIf="placeholder"
+      class="mat-placeholder"
+      [attr.data-e2e-selector]="placeholder"
+      [value]=""
+    >
+      {{ placeholder }}
+    </mat-option>
+    <mat-option
+      *ngFor="let selection of selectionList"
+      [class.disabled-input]="selection.disabled"
+      [value]="selection"
+    >
+      <autom-icon
+        *ngIf="selection.icon"
+        [color]="selection.color!"
+        [source]="selection.icon"
+      ></autom-icon>
+      <span *ngIf="selection.countryCode" class="mat-select__country-code">
+        {{ selection.countryCode }}
+      </span>
+      <span *ngIf="selection.boldValue" class="mat-select--bold">
+        {{ selection.boldValue }} &nbsp;
+      </span>
+      {{ selection.value }}
+    </mat-option>
+  </mat-select>
+
+  <autom-icon
+    *ngIf="alert"
+    class="mat-select__alert"
+    [automTooltip]="alert.tooltipContent"
+    [automTooltipPosition]="tooltipPositionEnum.TOP"
+    [color]="alert.color"
+    [source]="alert.source"
+  ></autom-icon>
+
+  <!-- Validation internal error -->
+  <ng-container *ngIf="inputHasErrorGetter">
+    <autom-icon
+      *ngIf="tooltipError"
+      class="mat-select__tooltip-error"
+      [color]="colorEnum.ERROR_700"
+      [source]="iconEnum.ALERT_CIRCLE"
+      [automTooltip]="tooltipError"
+      [automTooltipPosition]="tooltipPositionEnum.TOP"
+      [automTooltipTheme]="tooltipThemeEnum.DARK"
+      [automTooltipType]="tooltipTypesEnum.TEXT"
+    ></autom-icon>
+
+    <div *ngIf="!tooltipError" class="autom-error">
+      <p *ngIf="formCtrl?.hasError('required')">* {{ "REQUIRED" }}</p>
+      <p *ngIf="invalid && error">* {{ error }}</p>
+    </div>
+  </ng-container>
+</div>

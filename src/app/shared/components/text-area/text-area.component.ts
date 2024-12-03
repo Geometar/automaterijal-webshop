@@ -80,7 +80,7 @@ export class TextAreaComponent {
   }
 
   get textAreaSize(): string {
-    return 'cesarx-text-area__' + this.height;
+    return 'autom-text-area__' + this.height;
   }
 
   constructor(private cdRef: ChangeDetectorRef) { }

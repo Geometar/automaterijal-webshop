@@ -2,7 +2,6 @@ import { ColorEnum } from '../../data-models/enums/color.enum';
 import { Component, Input, ViewEncapsulation } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MatIconModule, MatIconRegistry } from '@angular/material/icon';
-import { TooltipModel } from '../../data-models/interface/tooltip.interface';
 import { CommonModule } from '@angular/common';
 
 // Directive
@@ -10,6 +9,9 @@ import { AutomTooltipDirective } from '../autom-tooltip/autom-tooltip.directive'
 
 // Enums
 import { AnimatedIconsEnum, IconsEnum, TooltipPositionEnum, TooltipThemeEnum, TooltipTypesEnum } from '../../data-models/enums';
+
+// Data Models
+import { TooltipModel } from '../../data-models/interface/tooltip.interface';
 
 @Component({
   selector: 'autom-icon',

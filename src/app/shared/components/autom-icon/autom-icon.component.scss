@@ -1,4 +1,4 @@
-.cesarx-icon {
+.autom-icon {
 	cursor: pointer;
 	height: var(--space-s);
 	width: var(--space-s);
@@ -148,7 +148,7 @@
 	.td--repaired,
 	.td--action-image,
 	.td--action-edit {
-		.cesarx-icon {
+		.autom-icon {
 			height: var(--text-xl); // 20px
 			width: var(--text-xl); // 20px
 		}
@@ -221,7 +221,7 @@
 }
 
 .errors-summary {
-	.cesarx-icon {
+	.autom-icon {
 		& svg path {
 			stroke: var(--figma-error-700);
 		}
