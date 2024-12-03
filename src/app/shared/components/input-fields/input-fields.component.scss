@@ -1,0 +1,68 @@
+input[type='date']:not(.mat-date-range-input-inner),
+input[type='datetime-local'],
+input[type='time'] {
+	align-items: center;
+	display: flex;
+	flex-direction: row-reverse;
+	justify-content: flex-start;
+}
+
+input[type='date']::-webkit-calendar-picker-indicator,
+input[type='date']:disabled::-webkit-calendar-picker-indicator,
+input[type='datetime-local']::-webkit-calendar-picker-indicator,
+input[type='datetime-local']:disabled::-webkit-calendar-picker-indicator {
+	display: none;
+}
+
+input[type='date']::-webkit-datetime-edit,
+input[type='datetime-local']::-webkit-datetime-edit {
+	flex: 1 0 100%;
+}
+
+input[type='time']::-webkit-calendar-picker-indicator,
+input[type='time']:disabled::-webkit-calendar-picker-indicator {
+	align-items: center;
+	border: 0;
+	cursor: pointer;
+	display: inline-flex;
+	height: calc(var(--space-xxs) * 6);
+	left: calc(var(--space-xxs) * -1);
+	margin-right: var(--space-xxs);
+	opacity: 0.4;
+	order: 1;
+	padding: var(--space-xxxs);
+	position: relative;
+	text-align: left;
+	top: 0;
+	visibility: visible;
+	width: calc(var(--space-xxs) * 6);
+}
+
+input[type='time']::-webkit-calendar-picker-indicator,
+input[type='time']:disabled::-webkit-calendar-picker-indicator {
+	left: calc(var(--space-xxs) * -3);
+	margin-right: 0;
+	padding: 0;
+	text-align: center;
+}
+
+input[type='date']:disabled::-webkit-calendar-picker-indicator,
+input[type='datetime-local']:disabled::-webkit-calendar-picker-indicator,
+input[type='time']:disabled::-webkit-calendar-picker-indicator {
+	cursor: default !important;
+	opacity: 0.3;
+	pointer-events: none;
+}
+
+input[type='search' i]::-webkit-search-cancel-button {
+	display: none;
+}
+
+// TODO: Activate these properties in case Figma design starts supporting it
+// input:-webkit-autofill,
+// input:-webkit-autofill:hover,
+// input:-webkit-autofill:focus,
+// input:-webkit-autofill:active {
+// 	-webkit-box-shadow: 0 0 0 var(--space-l) var(--figma-primary-50) inset !important;
+// 	box-shadow: 0 0 0 var(--space-l) var(--figma-primary-50) inset !important;
+// }

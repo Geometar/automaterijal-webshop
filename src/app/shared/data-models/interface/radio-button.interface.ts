@@ -1,4 +1,5 @@
-import { ColorEnum } from '@storybook/enums';
+import { ColorEnum } from "../enums";
+
 
 export interface RadioOption {
 	alert?: RadioButtonAlert;

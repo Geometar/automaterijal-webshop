@@ -51,51 +51,49 @@
 
       <!-- Right side: Contact Form -->
       <div class="contact-form">
-        <form action="/send-message" method="POST">
-          <div class="form-group">
-            <input
-              type="text"
-              id="first-name"
-              name="first-name"
-              placeholder="Ime *"
-              required
-            />
-            <input
-              type="text"
-              id="last-name"
-              name="last-name"
-              placeholder="Prezime *"
-              required
-            />
-          </div>
-          <input
-            type="text"
-            id="company"
-            name="company"
-            placeholder="Ime firme"
+        <div [formGroup]="kontaktForma" class="form-group">
+          <autom-input-fields
+            [formControlName]="'ime'"
+            [placeholder]="'Ime *'"
+            [required]="true"
+            [type]="inputType.TEXT"
+            ngDefaultControl
           />
-          <input
-            type="tel"
-            id="phone"
-            name="phone"
-            placeholder="Broj telefona *"
-            required
+          <autom-input-fields
+            [formControlName]="'prezime'"
+            [required]="true"
+            [placeholder]="'Prezime *'"
+            [type]="inputType.TEXT"
+            ngDefaultControl
           />
-          <input
-            type="email"
-            id="email"
-            name="email"
-            placeholder="Email *"
-            required
-          />
-          <textarea
-            id="message"
-            name="message"
-            rows="4"
-            placeholder="Poruka"
-          ></textarea>
-          <button type="submit">Pošalji sada!</button>
-        </form>
+        </div>
+        <input
+          type="text"
+          id="company"
+          name="company"
+          placeholder="Ime firme"
+        />
+        <input
+          type="tel"
+          id="phone"
+          name="phone"
+          placeholder="Broj telefona *"
+          required
+        />
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="Email *"
+          required
+        />
+        <textarea
+          id="message"
+          name="message"
+          rows="4"
+          placeholder="Poruka"
+        ></textarea>
+        <button type="submit">Pošalji sada!</button>
       </div>
     </div>
   </div>

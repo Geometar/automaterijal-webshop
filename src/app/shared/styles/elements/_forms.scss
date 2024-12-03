@@ -1,0 +1,440 @@
+@import './../mixins/mixins.scss';
+
+.autom {
+	&-input {
+		align-items: center;
+		align-self: stretch;
+		background-color: var(--figma-base-white);
+		border-radius: var(--space-xs);
+		border: var(--space-default) solid var(--figma-grey-300);
+		box-shadow: var(--figma-shadow-xs);
+		box-sizing: border-box;
+		color: var(--figma-grey-500);
+		cursor: pointer;
+		display: flex;
+		flex-direction: row;
+		flex-grow: 0;
+		flex: none;
+		font-size: var(--text-md);
+		font-weight: var(--font-weight-regular);
+		height: calc(var(--space-xs) * 5.5);
+		line-height: var(--font-3-line-height);
+		margin: 0;
+		padding: calc(var(--space-xxs) * 2.5) calc(var(--space-xxs) * 3.5);
+		position: relative;
+		width: 100%;
+
+		&::placeholder {
+			color: var(--figma-grey-300);
+			font: var(--text-md);
+		}
+
+		&-wrapper {
+			margin: 0;
+			min-width: calc(var(--space-xxs) * 50);
+			padding: 0;
+			position: relative;
+			width: 100%;
+
+			// used for single character currencies like $, €
+			&__currency--short {
+				.autom-input__currency {
+					padding-right: calc(var(--space-xs) * 5); // 40px;
+				}
+			}
+
+			// used for 3 character currencies like CHF, RON
+			&__currency--long {
+				.autom-input__currency {
+					padding-right: calc(var(--space-xs) * 7); // 56px;
+				}
+			}
+		}
+
+		&__auto {
+			min-width: auto;
+			max-width: auto;
+		}
+
+		&__full {
+			min-width: 100%;
+		}
+
+		&__extra-small {
+			width: var(--size-extra-small) !important;
+		}
+
+		&__small {
+			min-width: calc(var(--space-xxs) * 20) !important;
+			max-width: calc(var(--space-xxs) * 30) !important;
+		}
+
+		&__medium {
+			min-width: calc(var(--space-xxs) * 30) !important;
+			max-width: calc(var(--space-xxs) * 45) !important;
+		}
+
+		&__large {
+			min-width: calc(var(--space-xxs) * 45) !important;
+		}
+
+		&__extra-large {
+			min-width: calc(var(--space-xxs) * 90) !important;
+		}
+
+		&__currency {
+			border: var(--space-default) solid var(--figma-grey-300);
+			border-radius: var(--space-xs);
+			color: var(--figma-grey-500);
+			flex: 1 1 auto;
+			font-size: var(--text-md);
+			height: calc(var(--space-xs) * 5.5);
+			padding-left: calc(var(--space-xxxs) * 7); // 14px;
+			width: 100%;
+
+			&:focus,
+			&:focus-within {
+				border: var(--space-default) solid var(--figma-primary-600);
+				box-shadow: 0 0 calc(var(--space-xs) / 1.6) var(--figma-primary-600);
+				outline: none;
+			}
+		}
+
+		&__date-range {
+			background-color: var(--figma-base-white);
+			border: var(--space-default) solid var(--figma-grey-100);
+			border-radius: var(--space-xs);
+			box-shadow: var(--figma-shadow-lg);
+			left: 0;
+			min-width: calc(var(--space-s) * 16);
+			padding: var(--space-s);
+			position: absolute;
+			top: var(--space-l);
+			z-index: var(--z-index-6);
+
+			&__input {
+				mat-icon svg path {
+					stroke: var(--figma-grey-400);
+				}
+			}
+
+			&__footer {
+				display: flex;
+				justify-content: space-between;
+			}
+
+			&__btn {
+				&-apply {
+					margin-left: var(--space-xxxs);
+				}
+
+				&-reset {
+					margin-right: var(--space-xxxs);
+				}
+			}
+		}
+
+		&__date {
+			@extend .autom-input;
+			padding-left: calc(var(--space-xs) * 6);
+
+			&--disabled {
+				background: var(--figma-grey-50);
+
+				input {
+					background: var(--figma-grey-50);
+				}
+			}
+
+			&--toggle {
+				margin-left: var(--space-xxs);
+				margin-top: var(--space-xs);
+				position: absolute;
+				z-index: var(--z-index-1);
+
+				&--disabled .mat-icon {
+					opacity: 0.5;
+					pointer-events: none;
+				}
+			}
+		}
+
+		&__flag {
+			align-items: center;
+			display: flex;
+			height: calc(var(--space-xs) * 3);
+			margin-right: var(--space-xs);
+			width: calc(var(--space-xs) * 3);
+		}
+
+		&__pre-icon {
+			padding-left: calc(var(--space-xs) * 6);
+		}
+
+		&:focus-within {
+			border: var(--space-default) solid var(--figma-primary-600);
+			box-shadow: 0 0 calc(var(--space-xs) / 1.6) var(--figma-primary-600);
+			outline: none;
+		}
+
+		&:disabled,
+		&[readonly] {
+			@extend .disabled-input;
+
+			&:focus-visible {
+				border: var(--space-default) solid var(--figma-grey-300);
+				box-shadow: var(--figma-shadow-xs);
+				outline: none;
+			}
+		}
+
+		&-custom {
+			@extend .autom-input;
+			background-color: var(--figma-grey-50);
+			border-color: var(--figma-grey-300);
+			color: var(--figma-grey-500);
+			position: relative;
+
+			&__anchor {
+				color: var(--figma-primary-700);
+				font-size: var(--text-md);
+				font-style: normal;
+				font-weight: var(--font-weight-regular);
+				line-height: calc(var(--space-s) * 1.5);
+				text-decoration: underline;
+
+				&:hover {
+					color: var(--figma-primary-600);
+				}
+			}
+		}
+
+		&__text {
+			@extend .autom-input;
+		}
+
+		/*
+		 * Styling overrides for 3rd party NgxTimepicker.
+		 *
+		 * This section only includes the manual mode (actual input elements).
+		 * For styling overrides of the popup element of this component, please check .timepicker lower in this file
+		 */
+		// Timepicker input
+		&__timepicker {
+			@extend .autom-input;
+			// make sure this has enough width also for AM/PM element; mainly needed for storybook example
+			min-width: calc(var(--space-xl) * 2 + var(--space-s)); // 144px
+			padding: 0;
+
+			// clock icon
+			.ngx-material-timepicker-toggle {
+				svg path {
+					fill: var(--figma-grey-400);
+				}
+			}
+
+			.ngx-timepicker {
+				border-bottom: none !important;
+				padding: 0 calc(var(--space-xxxs) + var(--space-xxs)); // 6px;
+				width: 100%;
+
+				&--disabled {
+					background: var(--figma-grey-50) !important;
+					border-radius: var(--space-xs);
+				}
+
+				// hour and minutes : separator
+				&__time-colon {
+					margin-left: 0 !important;
+				}
+			}
+
+			// digits container
+			.ngx-timepicker-control {
+				padding: 0 !important;
+				width: calc(var(--space-m) - var(--space-xxxs)) !important; // 30px
+
+				&--active:after {
+					background-color: var(--figma-orange) !important;
+				}
+
+				// increment/decrement button controls (currently fully hidden)
+				&__arrows {
+					display: none !important;
+					top: calc(-1 * var(--space-xs)) !important; // -8px
+				}
+
+				&__input {
+					padding: 0 !important;
+				}
+			}
+
+			// font/accent color for AM/PM selector
+			.period {
+				margin-top: var(--space-xxxs); // 2px
+			}
+
+			.period-selector__button--active {
+				color: var(--figma-orange) !important;
+			}
+
+			// bottom border accents for active hour/minutes/ampm control
+			.period-control__button:after {
+				background-color: var(--figma-orange) !important;
+			}
+		}
+
+		&__typehead {
+			@extend .autom-input;
+			padding-left: calc(var(--space-xs) * 5);
+		}
+	}
+
+	&-hint {
+		color: var(--figma-grey-500);
+		font-size: var(--text-xs);
+		margin: var(--space-xs) 0;
+	}
+}
+
+.carret {
+	&-down {
+		@include carret(180, calc(var(--space-xxxs) * 5), var(--space-xxxs), var(--figma-base-white));
+	}
+
+	&-up {
+		@include carret(0, calc(var(--space-xxxs) * 5), var(--space-xxxs), var(--figma-base-white), true);
+	}
+
+	&-wrapper {
+		background-color: var(--figma-base-white);
+		border-radius: 0 var(--space-xs) var(--space-xs) 0;
+		padding: calc(var(--space-xxs) * 2.5);
+		position: absolute;
+		right: var(--space-xxxs);
+		top: var(--space-xxxs);
+
+		&--disabled,
+		&--readonly {
+			background-color: var(--figma-grey-50);
+			pointer-events: none;
+		}
+
+		&:focus-visible {
+			outline: none;
+		}
+	}
+}
+
+.clear-btn {
+	cursor: pointer;
+	position: absolute;
+	right: var(--space-xxxs);
+	top: var(--space-xxxs);
+	z-index: var(--z-index-1);
+
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+
+	button {
+		background-color: var(--figma-base-white);
+		border: 0;
+		border-radius: 0 calc(var(--space-xxxs) * 3) calc(var(--space-xxxs) * 3) 0;
+		box-shadow: none;
+		height: calc(var(--space-xxs) * 10);
+		width: calc(var(--space-xxs) * 10);
+	}
+}
+
+.custom-label {
+	align-items: center;
+	background-color: var(--figma-base-white);
+	border-radius: 0 var(--space-xs) var(--space-xs) 0;
+	display: flex;
+	height: calc(var(--space-xs) * 5);
+	padding: 0 var(--space-s);
+	position: absolute;
+	right: var(--space-default);
+	top: var(--space-default);
+	vertical-align: middle;
+	z-index: var(--z-index-2);
+
+	&--icon {
+		@extend .custom-label;
+		padding: 0 var(--space-xs);
+	}
+}
+
+.disabled-input {
+	background-color: var(--figma-grey-50) !important;
+	color: var(--figma-grey-300) !important;
+	pointer-events: none;
+}
+
+.input-prefix {
+	position: relative;
+	top: calc(var(--space-xxxs) * 1.5);
+}
+
+.pre-icon {
+	left: calc(var(--space-xs) * 1.75);
+	position: absolute;
+	top: calc(var(--space-xxxs) * 5.5);
+	z-index: var(--z-index-1);
+}
+
+.suffix-icon {
+	align-items: center;
+	background: var(--figma-base-white);
+	border-radius: 0 calc(var(--space-xxxs) * 3.5) calc(var(--space-xxxs) * 3.5) 0;
+	display: flex;
+	height: calc(var(--space-xxxs) * 21);
+	padding: calc(var(--space-xxxs) * 5) calc(var(--space-xxxs) * 7);
+	position: absolute;
+	right: var(--space-default);
+	top: var(--space-default);
+	z-index: var(--z-index-1);
+}
+
+[tabindex='-1']:focus {
+	outline: none;
+}
+
+:focus-visible {
+	outline: var(--figma-primary-600) auto var(--space-default);
+}
+
+::-webkit-inner-spin-button {
+	display: none;
+}
+
+/*
+ * Styling overrides for 3rd party NgxTimepicker: pop up element
+ *
+ * For styling overrides of the manual mode (input element) of this component, please check &__timepicker higher in this file
+*/
+// Timepicker popup
+.timepicker {
+	.timepicker__header {
+		background-color: var(--figma-orange) !important;
+	}
+
+	.clock-face__number > span.active,
+	.clock-face__clock-hand.clock-face__clock-hand_minute {
+		background-color: var(--figma-orange) !important;
+
+		&:before {
+			border-color: var(--figma-orange) !important;
+		}
+	}
+
+	.clock-face__clock-hand {
+		background-color: var(--figma-orange) !important;
+	}
+
+	.timepicker-button {
+		color: var(--figma-orange) !important;
+	}
+}

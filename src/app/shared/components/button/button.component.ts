@@ -11,7 +11,7 @@ import { ButtonCounter } from '../../data-models/interface';
 import { ButtonThemes, ButtonTypes, IconButtonThemes, PositionEnum } from '../../data-models/enums';
 
 @Component({
-  selector: 'app-button',
+  selector: 'autom-button',
   standalone: true,
   imports: [CommonModule, AutomIconComponent],
   templateUrl: './button.component.html',

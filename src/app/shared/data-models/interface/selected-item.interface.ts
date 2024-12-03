@@ -19,7 +19,6 @@ export interface SelectModel {
 	hideFor?: Array<string>;
 	icon?: string;
 	key?: string;
-	type?: SelectCustomTypeEnum;
 	// object to hold any data required by the custom type
 	typeData?: any;
 	value?: string;

@@ -1,0 +1,245 @@
+<!-- Input Label -->
+<autom-label
+  *ngIf="label"
+  [label]="label"
+  [labelIcons]="labelIcons"
+  [required]="required"
+  [size]="labelSize"
+  (eventEmitter)="customActionEvent.emit($event)"
+></autom-label>
+
+<!-- Main Input Wrapper -->
+<div
+  class="autom-input-wrapper"
+  [attr.data-e2e-selector]="selector || label"
+  [class.autom-input-wrapper__currency]="currency"
+  [class.autom-input-wrapper__currency--short]="currencyCode.length === 1"
+  [class.autom-input-wrapper__currency--long]="currencyCode.length > 1"
+  [ngClass]="customClass || 'autom-input__' + size"
+  [formGroup]="form!"
+>
+  <!-- Input Prefix and Pre Icon -->
+  <span
+    *ngIf="prefix || preIcon"
+    class="pre-icon"
+    [class.disabled-input]="disableInput"
+  >
+    <autom-icon *ngIf="preIcon" [source]="preIcon"> </autom-icon>
+    <span *ngIf="prefix" class="input-prefix">
+      {{ prefix }}
+    </span>
+  </span>
+
+  <!-- Custom Input Container -->
+  <ng-container *ngIf="type === inputTypes.CUSTOM">
+    <div
+      class="autom-input-custom"
+      [class.autom-input__pre-icon]="preIcon || prefix"
+      [id]="id"
+    >
+      <span
+        [attr.data-e2e-selector]="selector || value"
+        [class.autom-input-custom__anchor]="anchor"
+        (click)="customAction && customActionEvent.emit(customAction)"
+      >
+        {{ value }}
+      </span>
+    </div>
+  </ng-container>
+  <!-- Email, Search and Text Input Container -->
+  <ng-container
+    *ngIf="
+      type === inputTypes.EMAIL ||
+      type === inputTypes.SEARCH ||
+      type === inputTypes.TEXT
+    "
+  >
+    <input
+      #automInput
+      class="autom-input__text"
+      [(ngModel)]="value"
+      [attr.data-e2e-selector]="selector || label || placeholder"
+      [attr.maxLength]="maxLength"
+      [autofocus]="autofocus"
+      [class.autom-error-input]="inputHasErrorGetter"
+      [class.autom-error-input--animation]="
+        inputHasErrorGetter && errorAnimationTrigger
+      "
+      [class.autom-input__pre-icon]="preIcon || prefix"
+      [formControlName]="'formCtrl'"
+      [id]="id"
+      [pattern]="pattern"
+      [placeholder]="placeholder"
+      [readonly]="readonly"
+      [required]="required"
+      [type]="type"
+      [value]="value"
+      (blur)="getInputErrorState()"
+      (change)="emitSelectedValue()"
+      (keydown)="emitSelectedValue()"
+      (keyup)="emitSelectedValue()"
+    />
+  </ng-container>
+
+  <!-- Number Input Container -->
+  <ng-container *ngIf="type === inputTypes.NUMBER">
+    <input
+      #automInput
+      [(ngModel)]="value"
+      [ngClass]="currency ? 'autom-input__currency' : 'autom-input__text'"
+      [attr.data-e2e-selector]="selector || label"
+      [autofocus]="autofocus"
+      [class.autom-error-input]="inputHasErrorGetter"
+      [class.autom-error-input--animation]="
+        inputHasErrorGetter && errorAnimationTrigger
+      "
+      [class.autom-input__pre-icon]="preIcon || prefix"
+      [formControlName]="'formCtrl'"
+      [id]="id"
+      [max]="max"
+      [min]="min"
+      [pattern]="pattern"
+      [placeholder]="placeholder"
+      [readonly]="readonly"
+      [required]="required"
+      [step]="step"
+      [type]="type"
+      [value]="value"
+      (blur)="numberHandler(true)"
+      (keydown)="numberHandler()"
+      (keyup)="numberHandler()"
+      (paste)="numberHandler()"
+    />
+  </ng-container>
+
+  <!-- Password Input Container -->
+  <ng-container *ngIf="type === inputTypes.PASSWORD">
+    <input
+      #automInput
+      class="autom-input__text"
+      [(ngModel)]="value"
+      [attr.autocomplete]="'off'"
+      [attr.data-e2e-selector]="selector || label"
+      [attr.maxlength]="maxLength"
+      [autofocus]="autofocus"
+      [class.autom-error-input]="inputHasErrorGetter"
+      [class.autom-error-input--animation]="
+        inputHasErrorGetter && errorAnimationTrigger
+      "
+      [class.autom-input__pre-icon]="preIcon || prefix"
+      [formControlName]="'formCtrl'"
+      [id]="id"
+      [pattern]="pattern"
+      [placeholder]="placeholder"
+      [readonly]="readonly"
+      [required]="required"
+      [type]="viewPassword ? inputTypes.CUSTOM : inputTypes.PASSWORD"
+      [value]="value"
+      (blur)="getInputErrorState()"
+      (change)="emitSelectedValue()"
+      (keydown)="emitSelectedValue()"
+      (keyup)="emitSelectedValue()"
+    />
+  </ng-container>
+
+  <autom-icon
+    *ngIf="inputHasErrorGetter && (internalError || inputInsideTable)"
+    class="suffix-icon"
+    [class.disabled-input]="disableInput"
+    [automTooltip]="errorMessage"
+    [automTooltipPosition]="tooltipPositionEnum.TOP"
+    [automTooltipTheme]="tooltipThemeEnum.DARK"
+    [automTooltipType]="tooltipTypesEnum.TEXT"
+    [color]="colorEnum.ERROR_700"
+    [source]="iconEnum.ALERT_CIRCLE"
+  ></autom-icon>
+
+  <!-- Custom Suffix Icon -->
+  <autom-icon
+    *ngIf="suffixIcon"
+    class="custom-label--icon"
+    [source]="suffixIcon"
+    (click)="suffixIconActionEvent(suffixIconAction)"
+  ></autom-icon>
+
+  <!-- Custom Label -->
+  <!-- Only shown for empty or valid inputs. Invalid inputs will override this with the 'i' warning icon -->
+  <span
+    *ngIf="!inputHasErrorGetter && (custom || currency)"
+    [ngClass]="currency ? 'suffix-icon' : 'custom-label'"
+    [attr.data-e2e-selector]="selector || custom || currency"
+    [class.disabled-input]="disableInput"
+  >
+    <span *ngIf="custom">{{ custom }}</span>
+    <span *ngIf="currency">{{ currencyCode }}</span>
+  </span>
+
+  <!-- Clear Button -->
+  <autom-button
+    *ngIf="
+      !custom &&
+      !disableInput &&
+      !inputHasError &&
+      !readonly &&
+      clearBtn &&
+      inputHaveClearButton &&
+      type !== inputTypes.TIMEPICKER &&
+      (type === inputTypes.DATE_RANGE
+        ? form!.controls['start'].value || form!.controls['end'].value
+        : form!.controls['formCtrl'].value &&
+          !form!.controls['formCtrl'].disabled)
+    "
+    class="clear-btn"
+    [class.disabled-input]="disableInput"
+    [iconOnlyMode]="true"
+    [iconSource]="iconEnum.X"
+    [tabindex]="-1"
+    [type]="buttonType.TERNARY"
+    (click)="resetForm()"
+  ></autom-button>
+
+  <!-- Password View Button -->
+  <autom-button
+    *ngIf="type === inputTypes.PASSWORD"
+    class="clear-btn"
+    [disabled]="!form!.controls['formCtrl']!.value"
+    [iconOnlyMode]="true"
+    [iconSource]="viewPassword ? iconEnum.EYE_OFF : iconEnum.EYE"
+    [tabindex]="-1"
+    [type]="buttonType.TERNARY"
+    (click)="viewPassword = !viewPassword"
+  ></autom-button>
+
+  <!-- Input hint/error/warning -->
+  <ng-container [ngTemplateOutlet]="inputInfo"></ng-container>
+</div>
+
+<ng-template #inputInfo>
+  <!-- Hint Message -->
+  <div
+    class="autom-hint"
+    *ngIf="hint && !value"
+    [attr.data-e2e-selector]="selector || hint"
+  >
+    {{ hint }}
+  </div>
+
+  <!-- Error Messages -->
+  <div
+    *ngIf="
+      inputHasErrorGetter && !inputInsideTable && !internalError && errorMessage
+    "
+    class="autom-error"
+  >
+    <div>* {{ errorMessage }}</div>
+  </div>
+
+  <!-- Warning Message -->
+  <div
+    *ngIf="warning"
+    class="autom-warning"
+    [attr.data-e2e-selector]="selector || warning"
+  >
+    {{ warning }}
+  </div>
+</ng-template>

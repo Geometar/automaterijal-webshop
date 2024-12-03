@@ -1,8 +1,5 @@
-import { BadgeTypeEnum } from '@storybook/enums';
-
 export interface CheckboxModel {
 	all?: boolean;
-	badge?: BadgeTypeEnum;
 	checked: boolean;
 	controlName?: string;
 	disabled?: boolean;

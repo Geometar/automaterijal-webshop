@@ -6,20 +6,18 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 
 // Automaterijal import
 import { AutomLabelComponent } from '../autom-label/autom-label.component';
-import { BadgeComponent } from '../badge/badge.component';
 
 // Data Models
 import { CheckboxModel, IconModel, TooltipModel } from '../../data-models/interface';
 
 // Enums
-import { BadgeTypeEnum, OrientationEnum, SizeEnum } from '../../data-models/enums';
+import { OrientationEnum, SizeEnum } from '../../data-models/enums';
 
 @Component({
   selector: 'app-checkbox',
   standalone: true,
   imports: [
     AutomLabelComponent,
-    BadgeComponent,
     CommonModule,
     FormsModule,
     MatCheckboxModule,
@@ -44,12 +42,11 @@ export class CheckboxComponent implements OnInit, OnChanges {
   @Output() emitSelected = new EventEmitter<any>();
 
   // Enums
-  badgeType = BadgeTypeEnum;
   orientation = OrientationEnum;
   sizeEnum = SizeEnum;
 
   get checkboxClasses(): string {
-    return 'cesarx-checkbox--' + this.size;
+    return 'autom-checkbox--' + this.size;
   }
 
   get isCardView(): boolean {

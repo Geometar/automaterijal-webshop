@@ -1,6 +1,6 @@
-// Enums
-import { ButtonThemes, ButtonTypes, PositionEnum } from '@storybook/enums';
+import { ButtonThemes, ButtonTypes, PositionEnum } from "../enums";
 
+// Enums
 export interface ButtonCounter {
 	position?: PositionEnum;
 	showCounter: boolean;
