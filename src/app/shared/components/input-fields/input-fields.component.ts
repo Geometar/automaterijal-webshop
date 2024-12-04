@@ -189,7 +189,11 @@ export class InputFieldsComponent implements AfterViewInit, OnChanges, OnInit {
         break;
 
       case ctrl.hasError('pattern'):
-        message = 'Nije ispostovan patern!'
+        message = InputTypeEnum.EMAIL === this.type ? 'Email nije dobar' : 'Nije ispostovan patern!'
+        break;
+
+      case ctrl.hasError('email'):
+        message = 'Email nije dobar!'
         break;
     }
 
@@ -350,14 +354,14 @@ export class InputFieldsComponent implements AfterViewInit, OnChanges, OnInit {
 
 
   emitSelectedValue(): void {
-    this.emitSelected.emit(this.value);
+    this.emitSelected.emit(this.form?.controls['formCtrl']?.value);
   }
 
   numberHandler(focusOut?: boolean): void {
     this.getInputErrorState();
 
     if (focusOut) {
-      let value = this.value;
+      let value = this.form?.controls['formCtrl']?.value;
 
       if (this.roundOff) value = Math.round(+value).toString();
 

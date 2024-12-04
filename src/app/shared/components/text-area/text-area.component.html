@@ -22,7 +22,7 @@
     [readonly]="readonly"
     [required]="required"
     [rows]="rows"
-    (blur)="emitSelected.emit(textArea)"
+    (blur)="init = false; emitSelected.emit(textArea)"
     (change)="onTextAreaChange()"
     (keyup)="emitSelected.emit(textArea)"
   ></textarea>
@@ -38,5 +38,5 @@
     {{ hint }}
   </p>
   <p *ngIf="textAreaError" class="text-error">* {{ "TEXTAREA_ERROR" }}</p>
-  <p *ngIf="textAreaRequired" class="text-error">* {{ "REQUIRED" }}</p>
+  <p *ngIf="textAreaRequired" class="text-error">* Polje obavezno!</p>
 </form>

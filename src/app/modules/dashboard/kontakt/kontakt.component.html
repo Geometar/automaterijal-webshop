@@ -50,13 +50,14 @@
       </div>
 
       <!-- Right side: Contact Form -->
-      <div class="contact-form">
-        <div [formGroup]="kontaktForma" class="form-group">
+      <div class="contact-form" [formGroup]="kontaktForma">
+        <div class="form-group">
           <autom-input-fields
             [formControlName]="'ime'"
             [placeholder]="'Ime *'"
             [required]="true"
             [type]="inputType.TEXT"
+            (emitSelected)="setSelectionValue('ime', $event)"
             ngDefaultControl
           />
           <autom-input-fields
@@ -64,36 +65,49 @@
             [required]="true"
             [placeholder]="'Prezime *'"
             [type]="inputType.TEXT"
+            (emitSelected)="setSelectionValue('prezime', $event)"
             ngDefaultControl
           />
         </div>
-        <input
-          type="text"
-          id="company"
-          name="company"
-          placeholder="Ime firme"
+        <autom-input-fields
+          [formControlName]="'firma'"
+          [placeholder]="'Firma'"
+          [type]="inputType.TEXT"
+          (emitSelected)="setSelectionValue('firma', $event)"
+          ngDefaultControl
         />
-        <input
-          type="tel"
-          id="phone"
-          name="phone"
-          placeholder="Broj telefona *"
-          required
+        <autom-input-fields
+          [formControlName]="'tel'"
+          [placeholder]="'Telefon'"
+          [type]="inputType.TEXT"
+          (emitSelected)="setSelectionValue('tel', $event)"
+          ngDefaultControl
         />
-        <input
-          type="email"
-          id="email"
-          name="email"
-          placeholder="Email *"
-          required
+        <autom-input-fields
+          [formControlName]="'email'"
+          [required]="true"
+          [placeholder]="'Email *'"
+          [type]="inputType.EMAIL"
+          [validators]="[
+            {
+              name: 'pattern',
+              value: emailAddressPattern
+            }
+          ]"
+          (emitSelected)="setSelectionValue('email', $event)"
+          ngDefaultControl
         />
-        <textarea
-          id="message"
-          name="message"
-          rows="4"
-          placeholder="Poruka"
-        ></textarea>
-        <button type="submit">Pošalji sada!</button>
+        <autom-text-area
+          [formControlName]="'poruka'"
+          [required]="true"
+          [placeholder]="'Tekst poruke *'"
+          (emitSelected)="setSelectionValue('poruka', $event)"
+          ngDefaultControl
+        />
+        <autom-button
+          [disabled]="kontaktForma.pristine || !kontaktForma.valid"
+          [label]="'Pošalji sada!'"
+        ></autom-button>
       </div>
     </div>
   </div>

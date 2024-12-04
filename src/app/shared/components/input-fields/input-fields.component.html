@@ -57,7 +57,6 @@
     <input
       #automInput
       class="autom-input__text"
-      [(ngModel)]="value"
       [attr.data-e2e-selector]="selector || label || placeholder"
       [attr.maxLength]="maxLength"
       [autofocus]="autofocus"
@@ -85,7 +84,6 @@
   <ng-container *ngIf="type === inputTypes.NUMBER">
     <input
       #automInput
-      [(ngModel)]="value"
       [ngClass]="currency ? 'autom-input__currency' : 'autom-input__text'"
       [attr.data-e2e-selector]="selector || label"
       [autofocus]="autofocus"

@@ -28,7 +28,7 @@ export class ButtonComponent {
   @Input() label? = 'button';
   @Input() tabindex: number | null = null;
   // mandatory inputs
-  @Input() theme: ButtonThemes | IconButtonThemes | null = null;
+  @Input() theme: ButtonThemes | IconButtonThemes = ButtonThemes.DEFAULT;
   @Input() type: ButtonTypes = ButtonTypes.PRIMARY;
   // outputs
   @Output() clickEvent = new EventEmitter<Event>();

@@ -10,7 +10,7 @@ import { SizeEnum } from '../../data-models/enums';
 import { IconModel } from '../../data-models/interface';
 
 @Component({
-  selector: 'app-text-area',
+  selector: 'autom-text-area',
   standalone: true,
   imports: [
     CommonModule,
