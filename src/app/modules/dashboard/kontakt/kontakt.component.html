@@ -105,8 +105,11 @@
           ngDefaultControl
         />
         <autom-button
-          [disabled]="kontaktForma.pristine || !kontaktForma.valid"
+          [disabled]="
+            kontaktForma.pristine || !kontaktForma.valid || ucitavanje
+          "
           [label]="'Pošalji sada!'"
+          (clickEvent)="posaljiPoruku()"
         ></autom-button>
       </div>
     </div>
