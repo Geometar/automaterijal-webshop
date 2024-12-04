@@ -1,5 +1,7 @@
 $colors: (
-  --figma-figma-base-white: #ffffff,
+  --bittersweet: hsl(5, 100%, 69%),
+  --rich-black-fogra-29: hsl(217, 28%, 9%),
+  --figma-base-white: #ffffff,
   --figma-figma-base-black: #000000,
   --figma-figma-grey-25: #f9f9f9,
   --figma-figma-grey-50: #f2f2f2,
@@ -84,7 +86,7 @@ $colors: (
 
 @each $name, $value in $colors {
   .color-#{$name} {
-    color: var(#{$name}, #{$value}),
+    color: var(#{$name}) !important;
   }
 
   .bg-#{$name} {

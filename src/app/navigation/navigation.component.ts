@@ -1,13 +1,20 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, ViewEncapsulation } from '@angular/core';
+import { AutomIconComponent } from '../shared/components/autom-icon/autom-icon.component';
+import { ColorEnum, IconsEnum } from '../shared/data-models/enums';
 
 @Component({
   selector: 'autom-navigation',
   standalone: true,
-  imports: [],
+  imports: [AutomIconComponent],
   templateUrl: './navigation.component.html',
-  styleUrl: './navigation.component.scss'
+  styleUrl: './navigation.component.scss',
+  encapsulation: ViewEncapsulation.None
 })
 export class NavigationComponent {
+
+  //Enums
+  colorEnum = ColorEnum;
+  iconEnum = IconsEnum;
 
   fixedHeaderClass = false;
 

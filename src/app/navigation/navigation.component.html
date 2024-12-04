@@ -1,42 +1,88 @@
-<header [class.header-active]="fixedHeaderClass" class="header">
+<header class="header" data-header>
   <div class="container">
+    <div class="overlay" data-overlay></div>
+
     <a href="#" class="logo">
       <img
-        src="/images/logo/logo.png"
-        width="128"
-        height="63"
-        alt="autofix home"
+        src="/images/logo/logo.svg"
+        width="160"
+        height="50"
+        alt="Footcap logo"
       />
     </a>
 
+    <button class="nav-open-btn" data-nav-open-btn aria-label="Open Menu">
+      <autom-icon
+        name="menu-outline"
+        [source]="iconEnum.ALIGN_JUSTIFY"
+      ></autom-icon>
+    </button>
+
     <nav class="navbar" data-navbar>
+      <button class="nav-close-btn" data-nav-close-btn aria-label="Close Menu">
+        <autom-icon
+          name="close-outline"
+          [color]="colorEnum.RICH_BLACK"
+          [source]="iconEnum.ALIGN_JUSTIFY"
+        ></autom-icon>
+      </button>
+
+      <a href="#" class="logo">
+        <img
+          src="/images/logo/logo.svg"
+          width="190"
+          height="50"
+          alt="Footcap logo"
+        />
+      </a>
+
       <ul class="navbar-list">
-        <li>
+        <li class="navbar-item">
           <a href="home" class="navbar-link">Home</a>
         </li>
 
-        <li>
+        <li class="navbar-item">
           <a href="onama" class="navbar-link">O nama</a>
         </li>
 
-        <li>
+        <li class="navbar-item">
           <a href="kontakt" class="navbar-link">Kontakt</a>
         </li>
 
+        <li class="navbar-item">
+          <a href="webshop" class="navbar-link">Webshop</a>
+        </li>
+
+        <li class="navbar-item">
+          <a href="login" class="navbar-link color---figma-error-600">Login</a>
+        </li>
+      </ul>
+
+      <ul class="nav-action-list">
         <li>
-          <a href="login" class="navbar-link login">Login</a>
+          <button class="nav-action-btn">
+            <autom-icon
+              name="search-outline"
+              [color]="colorEnum.RICH_BLACK"
+              [source]="iconEnum.USER"
+            ></autom-icon>
+
+            <span class="nav-action-text">Profile</span>
+          </button>
+        </li>
+
+        <li>
+          <a href="#" class="nav-action-btn">
+            <autom-icon
+              name="person-outline"
+              [color]="colorEnum.RICH_BLACK"
+              [source]="iconEnum.SHOPPING_CART"
+            ></autom-icon>
+
+            <span class="nav-action-text">Korpa</span>
+          </a>
         </li>
       </ul>
     </nav>
-
-    <a href="#" class="btn btn-primary">
-      <span class="span">WEB SHOP</span>
-    </a>
-
-    <button class="nav-toggle-btn" aria-label="toggle menu" data-nav-toggler>
-      <span class="nav-toggle-icon icon-1"></span>
-      <span class="nav-toggle-icon icon-2"></span>
-      <span class="nav-toggle-icon icon-3"></span>
-    </button>
   </div>
 </header>

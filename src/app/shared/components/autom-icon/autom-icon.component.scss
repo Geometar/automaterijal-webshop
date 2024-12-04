@@ -14,6 +14,15 @@
 	}
 
 
+	&.rich-black-fogra-29 svg path {
+		stroke: var(--rich-black-fogra-29);
+	}
+
+	&.rich-black-fogra-29 svg path:hover {
+		stroke: var(--bittersweet);
+	}
+
+
 	&.info-25 svg path {
 		stroke: var(--figma-info-25);
 	}
