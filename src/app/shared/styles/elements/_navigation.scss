@@ -1,11 +1,3 @@
-/*-----------------------------------*\
-  #style.css
-\*-----------------------------------*/
-
-/**
- * copyright 2022 codewithsadee
- */
-
 
 
 /**
@@ -27,13 +19,11 @@
   pointer-events: all;
 }
 
-
- .desktop-navigation-menu {
+.desktop-navigation-menu {
   display: none;
- }
+}
 
-
- .mobile-bottom-navigation {
+.mobile-bottom-navigation {
   background: var(--white);
   position: fixed;
   bottom: 0;
@@ -86,7 +76,6 @@
   z-index: 20;
 }
 
-
 .menu-top {
   padding-bottom: 15px;
   margin-bottom: 10px;
@@ -107,7 +96,9 @@
   font-size: 22px;
 }
 
-.mobile-menu-category-list { margin-bottom: 30px; }
+.mobile-menu-category-list {
+  margin-bottom: 30px;
+}
 
 .menu-category .accordion-menu {
   width: 100%;
@@ -116,7 +107,9 @@
   align-items: center;
 }
 
-.mobile-menu-category-list .menu-category { border-bottom: 1px solid var(--figma-grey-100); }
+.mobile-menu-category-list .menu-category {
+  border-bottom: 1px solid var(--figma-grey-100);
+}
 
 .mobile-menu-category-list .menu-title {
   color: var(--rich-black-fogra-29);
@@ -125,11 +118,9 @@
   padding: 12px 0;
 }
 
-
 .mobile-menu-category-list .menu-title:hover {
   color: var(--bittersweet);
 }
-
 
 .menu-social-container {
   display: flex;
@@ -507,7 +498,9 @@ body {
   z-index: 4;
 }
 
-.header.active { box-shadow: 0 2px 10px hsla(0, 0%, 0%, 0.1); }
+.header.active {
+  box-shadow: 0 2px 10px hsla(0, 0%, 0%, 0.1);
+}
 
 .header .container {
   display: flex;
@@ -523,9 +516,13 @@ body {
   padding: 8px;
 }
 
-.nav-open-btn:is(:hover, :focus) { background: var(--bittersweet); }
+.nav-open-btn:is(:hover, :focus) {
+  background: var(--bittersweet);
+}
 
-.nav-open-btn ion-icon { --ionicon-stroke-width: 40px; }
+.nav-open-btn ion-icon {
+  --ionicon-stroke-width: 40px;
+}
 
 .navbar {
   background: var(--white);
@@ -560,19 +557,27 @@ body {
   transition: var(--transition-1);
 }
 
-.nav-close-btn ion-icon { --ionicon-stroke-width: 55px; }
+.nav-close-btn ion-icon {
+  --ionicon-stroke-width: 55px;
+}
 
-.nav-close-btn:is(:hover, :focus) { color: var(--bittersweet); }
+.nav-close-btn:is(:hover, :focus) {
+  color: var(--bittersweet);
+}
 
 .navbar .logo {
   background: var(--maximum-blue-green_10);
   padding-block: 50px 40px;
 }
 
-.navbar .logo img { margin-inline: auto; }
+.navbar .logo img {
+  margin-inline: auto;
+}
 
 .navbar-list,
-.nav-action-list { margin: 30px; }
+.nav-action-list {
+  margin: 30px;
+}
 
 .navbar-list {
   padding: 20px;
@@ -585,11 +590,17 @@ body {
   transition: var(--transition-1);
 }
 
-.navbar-link:is(:hover, :focus) { color: var(--bittersweet); }
+.navbar-link:is(:hover, :focus) {
+  color: var(--bittersweet);
+}
 
-.navbar-item:not(:last-child) { border-bottom: 1px solid var(--gainsboro); }
+.navbar-item:not(:last-child) {
+  border-bottom: 1px solid var(--gainsboro);
+}
 
-.nav-action-list > li:first-child { display: none; }
+.nav-action-list > li:first-child {
+  display: none;
+}
 
 .nav-action-btn {
   color: var(--rich-black-fogra-29);
@@ -601,8 +612,12 @@ body {
   transition: var(--transition-1);
 }
 
-.nav-action-btn:is(:hover, :focus) { color: var(--bittersweet); }
-.nav-action-btn svg path:is(:hover, :focus) { color: var(--bittersweet); }
+.nav-action-btn:is(:hover, :focus) {
+  color: var(--bittersweet);
+}
+.nav-action-btn svg path:is(:hover, :focus) {
+  color: var(--bittersweet);
+}
 .nav-action-text strong {
   font-weight: initial;
   color: var(--bittersweet);
@@ -895,6 +910,9 @@ body {
  */
 
 @media (min-width: 300px) {
+  .hero-banner img {
+    width: 70%;
+  }
   .hero-content {
     margin-inline: auto;
     max-width: 520px;
@@ -907,8 +925,6 @@ body {
  */
 
 @media (min-width: 575px) {
-
-
   .mobile-bottom-navigation {
     border-top-left-radius: var(--border-radius-md);
     border-top-right-radius: var(--border-radius-md);
@@ -1122,7 +1138,9 @@ body {
  */
 
 @media (min-width: 992px) {
-  .mobile-bottom-navigation { display: none; }
+  .mobile-bottom-navigation {
+    display: none;
+  }
 
   /**
    * CUSTOM PROPERTY
@@ -1158,60 +1176,76 @@ body {
     font-size: 1.2rem;
   }
 
-/*-----------------------------------*\
+  /*-----------------------------------*\
  * #HEADER
 \*-----------------------------------*/
 
   /**
    * HEADER
    */
-   .desktop-navigation-menu {
+  .desktop-navigation-menu {
     display: block;
-   }
-   .nav-open-btn,
-   .nav-close-btn,
-   .navbar .logo,
-   .nav-action-text,
-   .overlay { display: none; }
- 
-   .navbar,
-   .navbar-list,
-   .nav-action-list { all: unset; }
- 
-   .navbar-item:not(:last-child) { border: none; }
- 
-   .navbar-list,
-   .nav-action-list { display: flex; }
- 
-   .nav-action-list { gap: 20px; }
- 
-   .navbar {
-     display: flex;
-     align-items: center;
-     flex-grow: 1;
-   }
- 
-   .navbar-list {
-     margin-inline: auto;
-     gap: 35px;
-   }
- 
-   .navbar-link {
-     font-family: var(--ff-roboto) !important;
-     font-weight: var(--fw-600);
-   }
- 
-   .nav-action-list > li:first-child { display: block; }
- 
-   .nav-action-btn { position: relative; }
- 
-   .nav-action-badge ion-icon { --ionicon-stroke-width: 30px; }
- 
-   .nav-action-badge {
-     position: absolute;
-     top: 5px;
-     right: -12px;
-   }
+  }
+  .nav-open-btn,
+  .nav-close-btn,
+  .navbar .logo,
+  .nav-action-text,
+  .overlay {
+    display: none;
+  }
+
+  .navbar,
+  .navbar-list,
+  .nav-action-list {
+    all: unset;
+  }
+
+  .navbar-item:not(:last-child) {
+    border: none;
+  }
+
+  .navbar-list,
+  .nav-action-list {
+    display: flex;
+  }
+
+  .nav-action-list {
+    gap: 20px;
+  }
+
+  .navbar {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+  }
+
+  .navbar-list {
+    margin-inline: auto;
+    gap: 35px;
+  }
+
+  .navbar-link {
+    font-family: var(--ff-roboto) !important;
+    font-weight: var(--fw-600);
+  }
+
+  .nav-action-list > li:first-child {
+    display: block;
+  }
+
+  .nav-action-btn {
+    position: relative;
+  }
+
+  .nav-action-badge ion-icon {
+    --ionicon-stroke-width: 30px;
+  }
+
+  .nav-action-badge {
+    position: absolute;
+    top: 5px;
+    right: -12px;
+  }
 
   /**
    * HERO
@@ -1306,7 +1340,7 @@ body {
     height: 100%;
     background-image: url("/images/navigation/o-nama.png");
     background-repeat: no-repeat;
-    background-size: cover;
+    background-size: contain;
     background-position: right;
     z-index: -1;
   }
@@ -1348,7 +1382,7 @@ body {
 
   .container,
   .hero .container {
-    max-width: 1140px;
+    max-width: 1200px;
   }
 
   .btn {
@@ -1358,7 +1392,6 @@ body {
   .btn .material-symbols-rounded {
     --fs: 1.3em;
   }
-
 
   /**
    * HERO

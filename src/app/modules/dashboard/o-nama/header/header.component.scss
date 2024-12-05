@@ -46,3 +46,11 @@
     z-index: 0; /* Overlay između videa i teksta */
   }
 }
+
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hero.has-video-background {
+    height: 50vh;
+  }
+}

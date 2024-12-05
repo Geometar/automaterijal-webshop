@@ -1,6 +1,14 @@
-.grid-list {
-  display: grid;
-  gap: 35px;
+.youtube-list {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 30px;
+  justify-content: center;
+}
+
+.blog-wrapper {
+  width: 353px;
+  height: 365px;
 }
 
 /*-----------------------------------*\
@@ -86,41 +94,5 @@
 
   a:is(:hover, :focus) {
     color: var(--tan-crayola);
-  }
-}
-
-@media (min-width: 575px) {
-  /**
-   * REUSED STYLE
-   */
-
-  .grid-list {
-    grid-template-columns: 1fr 1fr;
-    column-gap: 25px;
-
-    > li:last-child {
-      grid-column: span 2;
-      max-width: calc(50% - 12.5px);
-      width: 100%;
-      margin-inline: auto;
-    }
-  }
-}
-
-/**
- * responsive for large than 992px screen
- */
-
-@media (min-width: 992px) {
-  /**
-   * REUSED STYLE
-   */
-
-  .grid-list {
-    grid-template-columns: repeat(3, 1fr);
-
-    > li:last-child {
-      all: unset;
-    }
   }
 }
