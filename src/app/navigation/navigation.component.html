@@ -1,4 +1,5 @@
-<header class="header" data-header>
+<div *ngIf="mobileSidebarOpen" class="overlay" data-overlay></div>
+<nav class="header desktop-navigation-menu" data-header>
   <div class="container">
     <div class="overlay" data-overlay></div>
 
@@ -85,4 +86,108 @@
       </ul>
     </nav>
   </div>
-</header>
+</nav>
+
+<div class="mobile-bottom-navigation">
+  <button
+    class="action-btn"
+    data-mobile-menu-open-btn
+    (click)="mobileSidebarOpen = !mobileSidebarOpen"
+  >
+    <autom-icon
+      [color]="colorEnum.RICH_BLACK"
+      [source]="iconEnum.ALIGN_JUSTIFY"
+    ></autom-icon>
+  </button>
+
+  <button class="action-btn">
+    <autom-icon
+      [color]="colorEnum.RICH_BLACK"
+      [source]="iconEnum.HOME"
+    ></autom-icon>
+  </button>
+
+  <button class="action-btn">
+    <autom-icon
+      [color]="colorEnum.RICH_BLACK"
+      [source]="iconEnum.USER"
+    ></autom-icon>
+  </button>
+
+  <button class="action-btn">
+    <autom-icon
+      [color]="colorEnum.RICH_BLACK"
+      [source]="iconEnum.SHOPPING_CART"
+    ></autom-icon>
+
+    <span class="count">0</span>
+  </button>
+
+  <button class="action-btn" data-mobile-menu-open-btn>
+    <autom-icon
+      [color]="colorEnum.RICH_BLACK"
+      [source]="iconEnum.ALIGN_JUSTIFY"
+    ></autom-icon>
+  </button>
+</div>
+
+<nav
+  *ngIf="mobileSidebarOpen"
+  class="mobile-navigation-menu has-scrollbar-mobile"
+  data-mobile-menu
+>
+  <div class="menu-top">
+    <h2 class="menu-title">Menu</h2>
+
+    <button class="menu-close-btn" data-mobile-menu-close-btn>
+      <autom-icon
+        [color]="colorEnum.RICH_BLACK"
+        [source]="iconEnum.X"
+      ></autom-icon>
+    </button>
+  </div>
+
+  <ul class="mobile-menu-category-list">
+    <li class="menu-category">
+      <a href="/home" class="menu-title">Home</a>
+    </li>
+
+    <li class="menu-category">
+      <a href="/onama" class="menu-title">Onama</a>
+    </li>
+
+    <li class="menu-category">
+      <a href="/kontakt" class="menu-title">Kontakt</a>
+    </li>
+
+    <li class="menu-category">
+      <a href="/webshop" class="menu-title">Webshop</a>
+    </li>
+
+    <li class="menu-category">
+      <a href="/login" class="menu-title">Login</a>
+    </li>
+  </ul>
+
+  <div class="menu-bottom">
+    <ul class="menu-social-container">
+      <li>
+        <a href="#" class="social-link">
+          <autom-icon
+            [color]="colorEnum.RICH_BLACK"
+            [source]="iconEnum.FACEBOOK"
+          ></autom-icon>
+        </a>
+      </li>
+
+      <li>
+        <a href="#" class="social-link">
+          <autom-icon
+            [color]="colorEnum.RICH_BLACK"
+            [source]="iconEnum.INSTAGRAM"
+          ></autom-icon>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
