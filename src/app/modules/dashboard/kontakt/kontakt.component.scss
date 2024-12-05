@@ -33,6 +33,7 @@
 .contact-header {
   padding: 20px;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-around;
   gap: 20px;
   border-bottom: 1px solid #ddd;
@@ -47,8 +48,8 @@
 
 .contact-header p {
   margin: 5px 0;
-  font-size: 1rem;
-  color: #333;
+  color: var(--rich-black-fogra-29);
+  font-weight: var(--fw-600);
 }
 
 .contact-header a {
@@ -94,6 +95,7 @@
 .contact-form .form-group {
   display: flex;
   justify-content: space-around;
+  gap: 10px;
 }
 
 .contact-form input,
