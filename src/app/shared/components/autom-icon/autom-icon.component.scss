@@ -22,6 +22,14 @@
 		stroke: var(--bittersweet);
 	}
 
+	&.rich-black-fogra-29-white-hover svg path {
+		stroke: var(--rich-black-fogra-29);
+	}
+
+	&.rich-black-fogra-29-white-hover svg path:hover {
+		stroke: var(--cultured);
+	}
+
 
 	&.info-25 svg path {
 		stroke: var(--figma-info-25);

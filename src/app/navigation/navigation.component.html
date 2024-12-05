@@ -1,4 +1,4 @@
-<div *ngIf="mobileSidebarOpen" class="overlay" data-overlay></div>
+<div *ngIf="mobileSidebarOpen" class="overlay-mobile" data-overlay></div>
 <nav class="header desktop-navigation-menu" data-header>
   <div class="container">
     <div class="overlay" data-overlay></div>
@@ -100,12 +100,12 @@
     ></autom-icon>
   </button>
 
-  <button class="action-btn">
+  <a class="action-btn" href="/home">
     <autom-icon
       [color]="colorEnum.RICH_BLACK"
       [source]="iconEnum.HOME"
     ></autom-icon>
-  </button>
+  </a>
 
   <button class="action-btn">
     <autom-icon
@@ -139,7 +139,11 @@
   <div class="menu-top">
     <h2 class="menu-title">Menu</h2>
 
-    <button class="menu-close-btn" data-mobile-menu-close-btn>
+    <button
+      class="menu-close-btn"
+      (click)="mobileSidebarOpen = false"
+      data-mobile-menu-close-btn
+    >
       <autom-icon
         [color]="colorEnum.RICH_BLACK"
         [source]="iconEnum.X"
@@ -174,7 +178,7 @@
       <li>
         <a href="#" class="social-link">
           <autom-icon
-            [color]="colorEnum.RICH_BLACK"
+            [color]="colorEnum.RICH_BLACK_WHITE_HOVER"
             [source]="iconEnum.FACEBOOK"
           ></autom-icon>
         </a>
@@ -183,7 +187,7 @@
       <li>
         <a href="#" class="social-link">
           <autom-icon
-            [color]="colorEnum.RICH_BLACK"
+            [color]="colorEnum.RICH_BLACK_WHITE_HOVER"
             [source]="iconEnum.INSTAGRAM"
           ></autom-icon>
         </a>

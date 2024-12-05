@@ -12,7 +12,7 @@
  * overlay 
  */
 
-.overlay {
+.overlay-mobile {
   position: fixed;
   top: 0;
   left: 0;
@@ -23,9 +23,6 @@
   pointer-events: none;
   z-index: 15;
   transition: 0.5s ease;
-}
-
-.overlay.active {
   opacity: 1;
   pointer-events: all;
 }
@@ -129,6 +126,11 @@
 }
 
 
+.mobile-menu-category-list .menu-title:hover {
+  color: var(--bittersweet);
+}
+
+
 .menu-social-container {
   display: flex;
   justify-content: center;
@@ -142,6 +144,10 @@
   font-size: 20px;
   padding: 10px;
   border-radius: var(--border-radius-md);
+}
+
+.menu-social-container .social-link:hover {
+  background: var(--bittersweet);
 }
 
 /*-----------------------------------*\
@@ -622,9 +628,6 @@ body {
   opacity: 0;
   pointer-events: none;
   transition: var(--transition-1);
-}
-
-.overlay.active {
   opacity: 1;
   pointer-events: all;
 }

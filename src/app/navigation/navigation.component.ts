@@ -1,7 +1,11 @@
 import { Component, HostListener, ViewEncapsulation } from '@angular/core';
-import { AutomIconComponent } from '../shared/components/autom-icon/autom-icon.component';
-import { ColorEnum, IconsEnum } from '../shared/data-models/enums';
 import { CommonModule } from '@angular/common';
+
+// Automaterijal import
+import { AutomIconComponent } from '../shared/components/autom-icon/autom-icon.component';
+
+// Enums
+import { ColorEnum, IconsEnum } from '../shared/data-models/enums';
 
 @Component({
   selector: 'autom-navigation',
