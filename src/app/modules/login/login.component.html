@@ -1,50 +1,202 @@
 <section class="header-margin--top login login-container">
   <div class="header-margin--bottom login-left">
-    <h3>Dobrodosli u prodavnicu Automaterijala</h3>
-    <form class="login-form__container" [formGroup]="loginForm">
-      <autom-input-fields
-        [clearBtn]="true"
-        [formControlName]="'username'"
-        [id]="'username'"
-        [label]="'Korisnicko ime'"
-        [required]="true"
-        [size]="sizeEnum.FULL"
-        [type]="inputTypeEnums.TEXT"
-        [validators]="[{ required: true }]"
-        (emitSelected)="setSelectionValue('username', $event)"
-        (keydown.enter)="login()"
-        ngDefaultControl
-      ></autom-input-fields>
-      <autom-input-fields
-        [clearBtn]="true"
-        [formControlName]="'password'"
-        [id]="'password'"
-        [label]="'Sifra'"
-        [required]="true"
-        [size]="sizeEnum.FULL"
-        [type]="inputTypeEnums.PASSWORD"
-        [validators]="[{ required: true }]"
-        (emitSelected)="setSelectionValue('password', $event)"
-        (keydown.enter)="login()"
-        ngDefaultControl
-      ></autom-input-fields>
-      <a href="#" class="forgot-password">Zaboravio sifru?</a>
-      <autom-button
-        class="login-form-button"
-        [disabled]="!loginForm.valid || disableLoginBtn"
-        [iconPrefix]="loginInProgress"
-        [iconSource]="buttonIcon"
-        [label]="'Uloguj se'"
-        [theme]="buttonTheme.DEFAULT"
-        [type]="buttonTypes.PRIMARY"
-        (clickEvent)="login()"
-        ngDefaultControl
-      ></autom-button>
-    </form>
+    <ng-container *ngIf="showForgotPassword">
+      <h3>Restartujte vasu sifru</h3>
+      <form class="login-form__container" [formGroup]="forgotPasswordForm">
+        <autom-input-fields
+          [clearBtn]="true"
+          [formControlName]="'id'"
+          [id]="'forgotPasswordForm'"
+          [label]="'Id'"
+          [placeholder]="'Email ili korisnicko ime'"
+          [required]="true"
+          [size]="sizeEnum.FULL"
+          [type]="inputTypeEnums.TEXT"
+          [validators]="[{ required: true }]"
+          (emitSelected)="setSelectionValue('forgotPasswordForm', $event)"
+          (keydown.enter)="login()"
+          ngDefaultControl
+        ></autom-input-fields>
+        <a class="forgot-password" (click)="toggleLogin()">Setio se sifre?</a>
+        <autom-button
+          class="login-form-button"
+          [disabled]="!forgotPasswordForm.valid || disableLoginBtn"
+          [iconPrefix]="loginInProgress"
+          [iconSource]="buttonIcon"
+          [label]="'Uloguj se'"
+          [theme]="buttonTheme.DEFAULT"
+          [type]="buttonTypes.PRIMARY"
+          (clickEvent)="login()"
+          ngDefaultControl
+        ></autom-button>
+      </form>
+    </ng-container>
+    <ng-container *ngIf="showLogin">
+      <h3>Dobrodosli u prodavnicu Automaterijala</h3>
+      <form class="login-form__container" [formGroup]="loginForm">
+        <autom-input-fields
+          [clearBtn]="true"
+          [formControlName]="'username'"
+          [id]="'username'"
+          [label]="'Korisnicko ime'"
+          [required]="true"
+          [size]="sizeEnum.FULL"
+          [type]="inputTypeEnums.TEXT"
+          [validators]="[{ required: true }]"
+          (emitSelected)="setSelectionValue('username', $event)"
+          (keydown.enter)="login()"
+          ngDefaultControl
+        ></autom-input-fields>
+        <autom-input-fields
+          [clearBtn]="true"
+          [formControlName]="'password'"
+          [id]="'password'"
+          [label]="'Sifra'"
+          [required]="true"
+          [size]="sizeEnum.FULL"
+          [type]="inputTypeEnums.PASSWORD"
+          [validators]="[{ required: true }]"
+          (emitSelected)="setSelectionValue('password', $event)"
+          (keydown.enter)="login()"
+          ngDefaultControl
+        ></autom-input-fields>
+        <a class="forgot-password" (click)="toggleZaboravljenaSifra()"
+          >Zaboravio sifru?</a
+        >
+        <autom-button
+          class="login-form-button"
+          [disabled]="!loginForm.valid || disableLoginBtn"
+          [iconPrefix]="loginInProgress"
+          [iconSource]="buttonIcon"
+          [label]="'Uloguj se'"
+          [theme]="buttonTheme.DEFAULT"
+          [type]="buttonTypes.PRIMARY"
+          (clickEvent)="login()"
+          ngDefaultControl
+        ></autom-button>
+      </form>
+    </ng-container>
+
+    <ng-container *ngIf="showAccountCreation">
+      <h3>Napravite svoj nalog</h3>
+      <form class="login-form__container" [formGroup]="accountCreationForm">
+        <autom-input-fields
+          [clearBtn]="true"
+          [formControlName]="'nazivFirme'"
+          [id]="'nazivFirme'"
+          [label]="'Naziv firme'"
+          [required]="true"
+          [size]="sizeEnum.FULL"
+          [type]="inputTypeEnums.TEXT"
+          [validators]="[{ required: true }]"
+          (emitSelected)="
+            setSelectionValueAccountCreation('nazivFirme', $event)
+          "
+          (keydown.enter)="login()"
+          ngDefaultControl
+        ></autom-input-fields>
+        <autom-input-fields
+          [clearBtn]="true"
+          [formControlName]="'pib'"
+          [id]="'pib'"
+          [label]="'Pib'"
+          [required]="true"
+          [size]="sizeEnum.FULL"
+          [type]="inputTypeEnums.NUMBER"
+          [validators]="[{ required: true }]"
+          (emitSelected)="setSelectionValueAccountCreation('pib', $event)"
+          (keydown.enter)="login()"
+          ngDefaultControl
+        ></autom-input-fields>
+        <autom-input-fields
+          [clearBtn]="true"
+          [formControlName]="'grad'"
+          [id]="'grad'"
+          [label]="'Grad'"
+          [required]="true"
+          [size]="sizeEnum.FULL"
+          [type]="inputTypeEnums.TEXT"
+          [validators]="[{ required: true }]"
+          (emitSelected)="setSelectionValueAccountCreation('grad', $event)"
+          (keydown.enter)="login()"
+          ngDefaultControl
+        ></autom-input-fields>
+        <autom-input-fields
+          [clearBtn]="true"
+          [formControlName]="'adresa'"
+          [id]="'adresa'"
+          [label]="'Adresa'"
+          [required]="true"
+          [size]="sizeEnum.FULL"
+          [type]="inputTypeEnums.TEXT"
+          [validators]="[{ required: true }]"
+          (emitSelected)="setSelectionValueAccountCreation('adresa', $event)"
+          (keydown.enter)="login()"
+          ngDefaultControl
+        ></autom-input-fields>
+        <autom-input-fields
+          [clearBtn]="true"
+          [formControlName]="'email'"
+          [id]="'email'"
+          [label]="'Email'"
+          [required]="true"
+          [size]="sizeEnum.FULL"
+          [type]="inputTypeEnums.TEXT"
+          [validators]="[
+            { required: true },
+            {
+              name: 'pattern',
+              value: emailAddressPattern
+            }
+          ]"
+          (emitSelected)="setSelectionValueAccountCreation('email', $event)"
+          (keydown.enter)="login()"
+          ngDefaultControl
+        ></autom-input-fields>
+        <autom-input-fields
+          [clearBtn]="true"
+          [formControlName]="'kontaktTelefon'"
+          [id]="'kontaktTelefon'"
+          [label]="'Kontakt telefon'"
+          [required]="true"
+          [size]="sizeEnum.FULL"
+          [type]="inputTypeEnums.TEXT"
+          [validators]="[{ required: true }]"
+          (emitSelected)="
+            setSelectionValueAccountCreation('kontaktTelefon', $event)
+          "
+          (keydown.enter)="login()"
+          ngDefaultControl
+        ></autom-input-fields>
+        <autom-button
+          class="login-form-button"
+          [disabled]="!accountCreationForm.valid"
+          [iconPrefix]="loginInProgress"
+          [iconSource]="buttonIcon"
+          [label]="'Kreiraj'"
+          [theme]="buttonTheme.DEFAULT"
+          [type]="buttonTypes.PRIMARY"
+          (clickEvent)="kreirajNalog()"
+          ngDefaultControl
+        ></autom-button>
+      </form>
+    </ng-container>
   </div>
   <div class="header-margin--bottom login-right">
-    <h3>Nemas nalog?</h3>
-    <p>Napravi svoj nalog i uzivaj u dodatnim pogodnostima.</p>
-    <button class="sign-up-btn">Kreiraj</button>
+    <ng-container *ngIf="showLogin || showForgotPassword">
+      <h3>Nemas nalog?</h3>
+      <p>Napravi svoj nalog i uzivaj u dodatnim pogodnostima.</p>
+      <button class="sign-up-btn" (click)="toggleAccountCreation()">
+        Kreiraj
+      </button>
+    </ng-container>
+    <ng-container *ngIf="showAccountCreation">
+      <h3>Imas nalog?</h3>
+      <p>
+        Uloguj se sada da pristupiš svom nalogu i nastaviš s kupovinom ili
+        pregledom svojih podataka.
+      </p>
+      <button class="sign-up-btn" (click)="toggleLogin()">Login</button>
+    </ng-container>
   </div>
 </section>
