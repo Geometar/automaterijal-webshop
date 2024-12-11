@@ -1,0 +1,47 @@
+<section class="hero login-container">
+  <div class="login-form__inner">
+    <h3>Web shop</h3>
+    <p>Dobrodosli u virtualnu prodavnicu</p>
+    <form class="login-form__container" [formGroup]="loginForm">
+      <autom-input-fields
+        [clearBtn]="true"
+        [formControlName]="'userName'"
+        [id]="'userName'"
+        [label]="'Korisnicko ime'"
+        [required]="true"
+        [size]="sizeEnum.FULL"
+        [type]="inputTypeEnums.TEXT"
+        [validators]="[{ required: true }]"
+        (emitSelected)="setSelectionValue('userName', $event)"
+        (keydown.enter)="login()"
+        ngDefaultControl
+      ></autom-input-fields>
+      <autom-input-fields
+        [clearBtn]="true"
+        [formControlName]="'password'"
+        [id]="'password'"
+        [label]="'Sifra'"
+        [required]="true"
+        [size]="sizeEnum.FULL"
+        [type]="inputTypeEnums.PASSWORD"
+        [validators]="[{ required: true }]"
+        (emitSelected)="setSelectionValue('password', $event)"
+        (keydown.enter)="login()"
+        ngDefaultControl
+      ></autom-input-fields>
+    </form>
+    <!-- Login button -->
+    <div class="login-form__container">
+      <autom-button
+        class="login-button"
+        [disabled]="!loginForm.valid || disableLoginBtn"
+        [iconPrefix]="loginInProgress"
+        [iconSource]="buttonIcon"
+        [label]="'Uloguj se'"
+        [theme]="buttonTheme.DEFAULT"
+        [type]="buttonTypes.PRIMARY"
+        (clickEvent)="login()"
+      ></autom-button>
+    </div>
+  </div>
+</section>

@@ -23,7 +23,7 @@ import { TooltipModel } from '../../data-models/interface/tooltip.interface';
 })
 export class AutomIconComponent {
 
-  @Input() color: ColorEnum = ColorEnum.GREY_400;
+  @Input() color: ColorEnum = ColorEnum.RICH_BLACK;
   @Input() disabled = false;
   @Input() euLabels = false;
   @Input() source: string = '';

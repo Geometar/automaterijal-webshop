@@ -18,16 +18,23 @@
 		stroke: var(--rich-black-fogra-29);
 	}
 
-	&.rich-black-fogra-29 svg path:hover {
-		stroke: var(--bittersweet);
-	}
+	&.rich-black-fogra-29:hover {
+		svg path {
+			cursor: pointer;
+			stroke: var(--bittersweet);
+		}
+	} 
 
 	&.rich-black-fogra-29-white-hover svg path {
 		stroke: var(--rich-black-fogra-29);
 	}
 
-	&.rich-black-fogra-29-white-hover svg path:hover {
-		stroke: var(--cultured);
+	&.rich-black-fogra-29-white-hover:hover {
+		svg path {
+			cursor: pointer;
+			stroke: var(--cultured);
+		}
+
 	}
 
 
