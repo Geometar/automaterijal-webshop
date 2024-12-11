@@ -39,23 +39,48 @@
 
       <ul class="navbar-list">
         <li class="navbar-item">
-          <a href="home" class="navbar-link">Home</a>
+          <a
+            routerLink="/home"
+            class="navbar-link"
+            [ngClass]="currentUrl === '/home' ? 'nav-active' : null"
+            >Home</a
+          >
         </li>
 
         <li class="navbar-item">
-          <a href="onama" class="navbar-link">O nama</a>
+          <a
+            routerLink="/onama"
+            class="navbar-link"
+            [ngClass]="currentUrl === '/onama' ? 'nav-active' : null"
+            >O nama</a
+          >
         </li>
 
         <li class="navbar-item">
-          <a href="kontakt" class="navbar-link">Kontakt</a>
+          <a
+            routerLink="/kontakt"
+            class="navbar-link"
+            [ngClass]="currentUrl === '/kontakt' ? 'nav-active' : null"
+            >Kontakt</a
+          >
         </li>
 
         <li class="navbar-item">
-          <a href="webshop" class="navbar-link">Webshop</a>
+          <a
+            href="webshop"
+            class="navbar-link"
+            [ngClass]="currentUrl === '/webshop' ? 'nav-active' : null"
+            >Webshop</a
+          >
         </li>
 
         <li class="navbar-item">
-          <a href="login" class="navbar-link color---figma-error-600">Login</a>
+          <a
+            href="login"
+            [ngClass]="currentUrl === '/login' ? 'nav-active' : null"
+            class="navbar-link color---figma-error-600"
+            >Login</a
+          >
         </li>
       </ul>
 
