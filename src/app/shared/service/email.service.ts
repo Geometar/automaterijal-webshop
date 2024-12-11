@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import { catchError, Observable, throwError, timeoutWith } from 'rxjs';
 import { Kontakt } from '../data-models/model/kontakt';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environment/environment';
 
-const DOMAIN_URL = 'https://localhost:8443' + '/api/email';
+const DOMAIN_URL = environment.apiUrl + '/api/email';
 const PORUKA_URL = '/poruka';
 
 const TIMEOUT = 15000;
