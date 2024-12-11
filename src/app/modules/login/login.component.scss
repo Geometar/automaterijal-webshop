@@ -42,7 +42,11 @@
 
   &-right {
     flex: 1;
-    background: linear-gradient(135deg, var(--figma-primary-600), var(--figma-primary-400));
+    background: linear-gradient(135deg, rgb(29 56 151 / 80%), rgb(147 249 245 / 80%)),
+      url("/images/navigation/background.svg");
+    background-repeat: no-repeat, no-repeat;
+    background-size: cover, cover; /* Ensures both layers scale properly */
+    background-position: center, center; /* Centers both the gradient and the SVG */
     border-radius: 1%;
     color: #fff;
     text-align: center;
@@ -100,7 +104,6 @@
         }
       }
     }
-
 
     &-button {
       text-align: center;
