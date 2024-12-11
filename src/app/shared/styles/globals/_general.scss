@@ -124,3 +124,12 @@ textarea:focus {
   outline: #000 dotted 2px;
   outline-offset: .05em;
 }
+
+.header-margin {
+	&--top {
+		margin-top: 71px;
+	}
+	&--bottom {
+		padding-bottom: 71px !important;
+	}
+}

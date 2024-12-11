@@ -1,18 +1,17 @@
-<section class="hero login-container">
-  <div class="login-form__inner">
-    <h3>Web shop</h3>
-    <p>Dobrodosli u virtualnu prodavnicu</p>
+<section class="header-margin--top login login-container">
+  <div class="header-margin--bottom login-left">
+    <h3>Dobrodosli u prodavnicu Automaterijala</h3>
     <form class="login-form__container" [formGroup]="loginForm">
       <autom-input-fields
         [clearBtn]="true"
-        [formControlName]="'userName'"
-        [id]="'userName'"
+        [formControlName]="'username'"
+        [id]="'username'"
         [label]="'Korisnicko ime'"
         [required]="true"
         [size]="sizeEnum.FULL"
         [type]="inputTypeEnums.TEXT"
         [validators]="[{ required: true }]"
-        (emitSelected)="setSelectionValue('userName', $event)"
+        (emitSelected)="setSelectionValue('username', $event)"
         (keydown.enter)="login()"
         ngDefaultControl
       ></autom-input-fields>
@@ -29,11 +28,9 @@
         (keydown.enter)="login()"
         ngDefaultControl
       ></autom-input-fields>
-    </form>
-    <!-- Login button -->
-    <div class="login-form__container">
+      <a href="#" class="forgot-password">Zaboravio sifru?</a>
       <autom-button
-        class="login-button"
+        class="login-form-button"
         [disabled]="!loginForm.valid || disableLoginBtn"
         [iconPrefix]="loginInProgress"
         [iconSource]="buttonIcon"
@@ -41,7 +38,13 @@
         [theme]="buttonTheme.DEFAULT"
         [type]="buttonTypes.PRIMARY"
         (clickEvent)="login()"
+        ngDefaultControl
       ></autom-button>
-    </div>
+    </form>
+  </div>
+  <div class="header-margin--bottom login-right">
+    <h3>Nemas nalog?</h3>
+    <p>Napravi svoj nalog i uzivaj u dodatnim pogodnostima.</p>
+    <button class="sign-up-btn">Kreiraj</button>
   </div>
 </section>

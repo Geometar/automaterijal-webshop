@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { ButtonComponent } from '../../shared/components/button/button.component';
 import { FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { InputFieldsComponent } from '../../shared/components/input-fields/input-fields.component';
@@ -15,6 +15,7 @@ import { ButtonThemes, ButtonTypes, InputTypeEnum, SaveButtonIcons, SizeEnum } f
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
+  encapsulation: ViewEncapsulation.None
 })
 export class LoginComponent {
 
@@ -34,7 +35,7 @@ export class LoginComponent {
 
   constructor(private fb: UntypedFormBuilder) {
     this.loginForm = this.fb.group({
-      userName: ['', Validators.required],
+      username: ['', Validators.required],
       password: ['', Validators.required],
     });
   }
