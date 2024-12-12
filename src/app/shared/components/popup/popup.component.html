@@ -29,11 +29,6 @@
     class="popup-container__body"
     [class.popup-container--rounded]="rounded"
   >
-    <!-- <conti-loading-overlay
-      *ngIf="loading"
-      class="popup-container--loading"
-      [attr.data-loading]="loading ? 'active' : 'done'"
-    ></conti-loading-overlay> -->
     <ng-content *ngIf="!loading" select="[custom-body]"></ng-content>
   </body>
 

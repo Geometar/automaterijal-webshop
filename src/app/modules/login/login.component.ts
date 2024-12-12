@@ -1,6 +1,9 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { takeWhile } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 
 // Automaterijal imports
 import { InputFieldsComponent } from '../../shared/components/input-fields/input-fields.component';
@@ -11,6 +14,11 @@ import { ButtonThemes, ButtonTypes, InputTypeEnum, SaveButtonIcons, SizeEnum } f
 
 // Constants
 import { EMAIL_ADDRESS } from '../../shared/data-models/constants/input.constants';
+
+// Services
+import { Account, Credentials } from '../../shared/data-models/model';
+import { AccountService } from '../../shared/auth/service/account.service';
+import { LoginService } from '../../shared/service/login.service';
 
 @Component({
   selector: 'app-login',
@@ -26,7 +34,9 @@ import { EMAIL_ADDRESS } from '../../shared/data-models/constants/input.constant
   styleUrl: './login.component.scss',
   encapsulation: ViewEncapsulation.None
 })
-export class LoginComponent {
+export class LoginComponent implements OnDestroy {
+  authenticationToken = '';
+  user?: Account;
 
   // Forms
   loginForm: UntypedFormGroup;
@@ -47,10 +57,13 @@ export class LoginComponent {
   showForgotPassword = false;
   showLogin = true;
 
+  private alive = true;
+
   // Validator patterns
   emailAddressPattern = EMAIL_ADDRESS;
 
-  constructor(private fb: UntypedFormBuilder) {
+  constructor(private accountService: AccountService, private fb: UntypedFormBuilder, private loginService: LoginService,
+    private router: Router) {
     this.loginForm = this.fb.group({
       username: ['', Validators.required],
       password: ['', Validators.required],
@@ -68,6 +81,32 @@ export class LoginComponent {
     })
   }
 
+  logout(): void {
+    this.authenticationToken = '';
+    this.loginService.logout();
+  }
+
+  login(): void {
+    const credentials = { username: this.loginForm.controls['username'].value, password: this.loginForm.controls['password'].value } as Credentials;
+    this.loginService.login(credentials).pipe(takeWhile(() => this.alive)).subscribe({
+      next: (account: Account | null) => {
+        this.accountService.authenticate(account);
+        this.user = account!;
+
+        this.getToken();
+        this.routeToPage();
+
+      },
+      error: (err: HttpErrorResponse) => {
+
+      }
+    })
+  }
+
+  ngOnDestroy(): void {
+    this.alive = false;
+  }
+
   setSelectionValue(control: string, value: string): void {
     this.loginForm.controls[control].setValue(value);
   }
@@ -80,9 +119,14 @@ export class LoginComponent {
     this.forgotPasswordForm.controls[control].setValue(value);
   }
 
-  login(): void {
-    console.log('Korisnik je pokusao da se uloguje')!
+  routeToPage(): void {
+    this.router.navigateByUrl('/home');
   }
+
+  getToken(): void {
+    this.authenticationToken = this.loginService.getToken();
+  }
+
   kreirajNalog(): void {
     console.log('Korisnik je pokusao da se kreira nalog')!
   }
