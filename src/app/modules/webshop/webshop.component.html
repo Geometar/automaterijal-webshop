@@ -1,26 +1,5 @@
-<section class="header-margin--top height-100vh">
-  <div class="container webshop">
-    <div class="webshop__navigation">
-      <autom-button
-        [iconSource]="'car'"
-        [iconPrefix]="true"
-        [iconColor]="colorEnum.INFO_25"
-        [type]="buttonType.PRIMARY"
-        [theme]="buttonTheme.LIGHT_ORANGE"
-        [label]="'Izaberi vozilo'"
-      >
-      </autom-button>
-      <autom-input-fields
-        class="search-input"
-        [size]="sizeEnum.FULL"
-        [preIcon]="'search'"
-        [round]="true"
-        [placeholder]="'Unesite kataloski ili OE broj'"
-      ></autom-input-fields>
-      <autom-button [label]="'Pretrazi'"> </autom-button>
-    </div>
-  </div>
-  <div class="container">
+<section class="header-margin--top height-100vh webshop">
+  <div class="webshop-container">
     <!-- Levi deo -->
     <aside class="left-menu">
       <h2>Kategorije</h2>
@@ -29,12 +8,9 @@
           <div class="menu-item" (click)="toggleSubMenu(category)">
             <span class="icon">{{ category.icon }}</span>
             {{ category.name }}
-            <span
-              *ngIf="category.subcategories.length"
-              class="arrow"
-              [class.open]="category.open"
-              >▼</span
-            >
+            <span *ngIf="category.subcategories.length" class="arrow"
+              ><autom-icon [source]="iconEnum.PLUS"></autom-icon
+            ></span>
           </div>
 
           <!-- Podkategorije -->
@@ -46,8 +22,8 @@
                   class="arrow"
                   [class.open]="sub.open"
                   *ngIf="sub.subcategories?.length"
-                  >▼</span
-                >
+                  ><autom-icon [source]="iconEnum.PLUS"></autom-icon
+                ></span>
               </div>
 
               <!-- Pod-pod-kategorije -->
@@ -62,6 +38,35 @@
       </ul>
     </aside>
     <!-- Desni deo -->
-    <div class="right-content"></div>
+    <div class="right-content">
+      <div>
+        <div class="webshop__navigation">
+          <autom-button
+            [iconSource]="'car'"
+            [iconPrefix]="true"
+            [iconColor]="colorEnum.INFO_25"
+            [type]="buttonType.PRIMARY"
+            [theme]="buttonTheme.LIGHT_ORANGE"
+            [label]="'Izaberi vozilo'"
+          >
+          </autom-button>
+          <autom-input-fields
+            class="search-input"
+            [size]="sizeEnum.FULL"
+            [preIcon]="'search'"
+            [round]="true"
+            [placeholder]="'Unesite kataloski ili OE broj'"
+          ></autom-input-fields>
+          <autom-button [label]="'Pretrazi'"> </autom-button>
+        </div>
+      </div>
+      <div class="right-content--empty">
+        <autom-icon [source]="iconEnum.SEARCH"></autom-icon>
+        <h3>
+          Ukucajte termin za pretragu ili pronadjite odgovarajuci artikal preko
+          vaseg vozila
+        </h3>
+      </div>
+    </div>
   </div>
 </section>
