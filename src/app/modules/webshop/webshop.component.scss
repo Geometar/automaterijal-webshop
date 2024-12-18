@@ -10,3 +10,81 @@
     }
   }
 }
+
+/* Levi deo */
+.left-menu {
+  width: 320px;
+  padding: 10px;
+
+  h2 {
+    margin-bottom: 10px;
+    font-size: 20px;
+    color: #333;
+  }
+
+  ul {
+    list-style: none;
+
+    li {
+      border-bottom: 1px solid #e6e6e6;
+
+      /* Remove border for the last item */
+      &:last-child {
+        border-bottom: none;
+      }
+      .menu-item {
+        display: flex;
+        align-items: center; /* Poravnanje po sredini */
+        padding: 10px 0;
+      
+        .icon {
+          margin-right: 10px; /* Razmak između ikone i teksta */
+        }
+      
+        .arrow {
+          margin-left: auto; /* Gura strelicu skroz desno */
+          transition: transform 0.3s ease;
+          &.open {
+            transform: rotate(180deg);
+          }
+        }
+      
+        &:hover {
+          cursor: pointer;
+          background-color: #e6e6e6;
+        }
+      }
+
+      /* Podgrupe sa animacijom */
+      .submenu {
+        list-style: none;
+        padding-left: 20px;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out;
+
+        li {
+          padding: 5px 0;
+        }
+
+        &.open {
+          max-height: 600px; /* Adjust based on your submenu content */
+        }
+
+        .subsubmenu {
+      
+          &:hover {
+            cursor: pointer;
+            background-color: #e6e6e6;
+          }
+
+        }
+      }
+    }
+  }
+}
+
+/* Animacija za otvaranje podgrupe */
+li.open .submenu {
+  max-height: 200px; /* Podešeno za animaciju */
+}

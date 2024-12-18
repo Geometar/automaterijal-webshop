@@ -1,5 +1,5 @@
-import { Component, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, HostListener, Inject, OnInit, PLATFORM_ID, ViewEncapsulation } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 
 // Automaterijal import
@@ -28,19 +28,23 @@ export class NavigationComponent implements OnInit {
   fixedHeaderClass = false;
   mobileSidebarOpen = false;
 
-  constructor(private router: Router) { }
+  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: object) { }
 
   ngOnInit(): void {
-    this.router.events.subscribe(event => {
-      if (event instanceof NavigationEnd) {
-        this.currentUrl = event.urlAfterRedirects;
-        window.scrollTo(0, 0);
-      }
-    });
+    if (isPlatformBrowser(this.platformId)) {
+      this.router.events.subscribe(event => {
+        if (event instanceof NavigationEnd) {
+          this.currentUrl = event.urlAfterRedirects;
+          window.scrollTo(0, 0);
+        }
+      });
+    }
   }
 
   @HostListener('window:scroll')
   onScroll(): void {
-    this.fixedHeaderClass = window.scrollY > 90;
+    if (isPlatformBrowser(this.platformId)) {
+      this.fixedHeaderClass = window.scrollY > 90;
+    }
   }
 }

@@ -511,3 +511,9 @@
 		max-height: unset;
 	}
 }
+
+.height {
+	&-100vh {
+		height: 100vh;
+	}
+}

@@ -1,4 +1,4 @@
-<section class="header-margin--top">
+<section class="header-margin--top height-100vh">
   <div class="container webshop">
     <div class="webshop__navigation">
       <autom-button
@@ -19,5 +19,49 @@
       ></autom-input-fields>
       <autom-button [label]="'Pretrazi'"> </autom-button>
     </div>
+  </div>
+  <div class="container">
+    <!-- Levi deo -->
+    <aside class="left-menu">
+      <h2>Kategorije</h2>
+      <ul>
+        <li *ngFor="let category of categories">
+          <div class="menu-item" (click)="toggleSubMenu(category)">
+            <span class="icon">{{ category.icon }}</span>
+            {{ category.name }}
+            <span
+              *ngIf="category.subcategories.length"
+              class="arrow"
+              [class.open]="category.open"
+              >▼</span
+            >
+          </div>
+
+          <!-- Podkategorije -->
+          <ul class="submenu" [class.open]="category.open">
+            <li *ngFor="let sub of category.subcategories">
+              <div class="menu-item" (click)="toggleSubMenu(sub)">
+                {{ sub.name }}
+                <span
+                  class="arrow"
+                  [class.open]="sub.open"
+                  *ngIf="sub.subcategories?.length"
+                  >▼</span
+                >
+              </div>
+
+              <!-- Pod-pod-kategorije -->
+              <ul class="submenu" [class.open]="sub.open">
+                <li class="subsubmenu" *ngFor="let subSub of sub.subcategories">
+                  {{ subSub.name }}
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </aside>
+    <!-- Desni deo -->
+    <div class="right-content"></div>
   </div>
 </section>
