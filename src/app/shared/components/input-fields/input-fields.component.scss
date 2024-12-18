@@ -58,6 +58,10 @@ input[type='search' i]::-webkit-search-cancel-button {
 	display: none;
 }
 
+.round-input {
+	border-radius: var(--border-radius-l);
+}
+
 // TODO: Activate these properties in case Figma design starts supporting it
 // input:-webkit-autofill,
 // input:-webkit-autofill:hover,

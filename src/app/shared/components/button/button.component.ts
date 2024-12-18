@@ -8,7 +8,7 @@ import { AutomIconComponent } from '../autom-icon/autom-icon.component';
 import { ButtonCounter } from '../../data-models/interface';
 
 // Enums
-import { ButtonThemes, ButtonTypes, IconButtonThemes, PositionEnum } from '../../data-models/enums';
+import { ButtonThemes, ButtonTypes, ColorEnum, IconButtonThemes, PositionEnum } from '../../data-models/enums';
 
 @Component({
   selector: 'autom-button',
@@ -25,6 +25,7 @@ export class ButtonComponent {
   @Input() iconOnlyMode? = false;
   @Input() iconPrefix? = false;
   @Input() iconSource?: string | null = null;
+  @Input() iconColor: ColorEnum = ColorEnum.RICH_BLACK;
   @Input() label? = 'button';
   @Input() tabindex: number | null = null;
   // mandatory inputs

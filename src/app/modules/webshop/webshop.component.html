@@ -1,0 +1,23 @@
+<section class="header-margin--top">
+  <div class="container webshop">
+    <div class="webshop__navigation">
+      <autom-button
+        [iconSource]="'car'"
+        [iconPrefix]="true"
+        [iconColor]="colorEnum.INFO_25"
+        [type]="buttonType.PRIMARY"
+        [theme]="buttonTheme.LIGHT_ORANGE"
+        [label]="'Izaberi vozilo'"
+      >
+      </autom-button>
+      <autom-input-fields
+        class="search-input"
+        [size]="sizeEnum.FULL"
+        [preIcon]="'search'"
+        [round]="true"
+        [placeholder]="'Unesite kataloski ili OE broj'"
+      ></autom-input-fields>
+      <autom-button [label]="'Pretrazi'"> </autom-button>
+    </div>
+  </div>
+</section>

@@ -137,6 +137,33 @@
         }
       }
     }
+
+
+    &[theme~="light-orange"] {
+      // :normal
+      background: var(--figma-highlight-orange);
+      border-color: var(--figma-error-500);
+      color: var(--figma-base-white);
+
+      autom-icon svg path {
+        stroke: var(--figma-base-white) !important;
+      }
+
+      &:hover {
+        background: var(--figma-error-700);
+        border-color: var(--figma-error-700);
+      }
+
+      &:disabled {
+        background: var(--figma-error-50);
+        border-color: var(--figma-error-100);
+        color: var(--figma-base-white);
+
+        autom-icon svg path {
+          stroke: var(--figma-error-50);
+        }
+      }
+    }
   }
 
   &--secondary {

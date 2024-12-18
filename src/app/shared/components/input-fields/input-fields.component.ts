@@ -83,6 +83,7 @@ export class InputFieldsComponent implements AfterViewInit, OnChanges, OnInit {
   @Input() prefix = '';
   @Input() preIcon = '';
   @Input() readonly = false;
+  @Input() round = false;
   @Input() required = false;
   @Input() resetField = false;
   @Input() roundOff = false;
