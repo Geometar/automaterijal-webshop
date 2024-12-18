@@ -34,7 +34,7 @@ export class NavigationComponent implements OnInit {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         this.currentUrl = event.urlAfterRedirects;
-        console.log('Current URL:', this.currentUrl);
+        window.scrollTo(0, 0);
       }
     });
   }
