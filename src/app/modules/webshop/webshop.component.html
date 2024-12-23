@@ -1,46 +1,8 @@
 <section class="header-margin--top height-100vh webshop">
   <div class="webshop-container">
-    <!-- Levi deo -->
-    <aside class="left-menu">
-      <h2>Kategorije</h2>
-      <ul>
-        <li *ngFor="let category of categories">
-          <div class="menu-item" (click)="toggleSubMenu(category)">
-            <span class="icon">{{ category.icon }}</span>
-            {{ category.name }}
-            <span *ngIf="category.subcategories.length" class="arrow"
-              ><autom-icon [source]="iconEnum.PLUS"></autom-icon
-            ></span>
-          </div>
-
-          <!-- Podkategorije -->
-          <ul class="submenu" [class.open]="category.open">
-            <li *ngFor="let sub of category.subcategories">
-              <div class="menu-item" (click)="toggleSubMenu(sub)">
-                {{ sub.name }}
-                <span
-                  class="arrow"
-                  [class.open]="sub.open"
-                  *ngIf="sub.subcategories?.length"
-                  ><autom-icon [source]="iconEnum.PLUS"></autom-icon
-                ></span>
-              </div>
-
-              <!-- Pod-pod-kategorije -->
-              <ul class="submenu" [class.open]="sub.open">
-                <li class="subsubmenu" *ngFor="let subSub of sub.subcategories">
-                  {{ subSub.name }}
-                </li>
-              </ul>
-            </li>
-          </ul>
-        </li>
-      </ul>
-    </aside>
-    <!-- Desni deo -->
-    <div class="right-content">
+    <div class="webshop__navigation">
       <div>
-        <div class="webshop__navigation">
+        <div class="webshop__navigation-search">
           <autom-button
             [iconSource]="'car'"
             [iconPrefix]="true"
@@ -56,17 +18,39 @@
             [preIcon]="'search'"
             [round]="true"
             [placeholder]="'Unesite kataloski ili OE broj'"
+            (emitSelected)="searchTerm = $event"
           ></autom-input-fields>
-          <autom-button [label]="'Pretrazi'"> </autom-button>
+          <autom-button [label]="'Pretrazi'" (clickEvent)="getRoba()">
+          </autom-button>
         </div>
       </div>
-      <div class="right-content--empty">
-        <autom-icon [source]="iconEnum.SEARCH"></autom-icon>
-        <h3>
-          Ukucajte termin za pretragu ili pronadjite odgovarajuci artikal preko
-          vaseg vozila
-        </h3>
+      <div class="util__flex--center">
+        <nav class="navbar autom-margin--bottom__xs">
+          <ul class="navbar-list">
+            <li class="navbar-item">
+              <a class="webshop-navbar-link">Sve</a>
+            </li>
+            <li class="navbar-item">
+              <a class="webshop-navbar-link">Maziva</a>
+            </li>
+            <li class="navbar-item">
+              <a class="webshop-navbar-link">Alati</a>
+            </li>
+            <li class="navbar-item">
+              <a class="webshop-navbar-link">Aditivi</a>
+            </li>
+            <li class="navbar-item">
+              <a class="webshop-navbar-link">Odrzavanje vozila</a>
+            </li>
+          </ul>
+        </nav>
       </div>
+    </div>
+  </div>
+  <div class="util__flex--center webshop__empty-container">
+    <div class="webshop__empty-data">
+      <autom-icon [source]="iconEnum.SEARCH"></autom-icon>
+      <p>Pretrazite po kataloskom broju, vozilu ili izaberite kategoriju</p>
     </div>
   </div>
 </section>
