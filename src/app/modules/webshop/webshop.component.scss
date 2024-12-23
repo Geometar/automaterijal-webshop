@@ -1,6 +1,6 @@
 .webshop {
   &__navigation {
-    background-color: var(--figma-grey-200);
+    background: linear-gradient(135deg, #132530, #1b455e);
     &-search {
       display: flex;
       justify-content: center;
@@ -21,7 +21,7 @@
 
   &-navbar-link {
     font-size: var(--text-m);
-    color: var(--rich-black-fogra-29);
+    color: var(--figma-grey-25);
     padding-block: 10px;
     transition: var(--transition-1);
   }
