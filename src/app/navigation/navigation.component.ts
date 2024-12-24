@@ -20,7 +20,7 @@ export class NavigationComponent implements OnInit {
 
   currentUrl: string = '';
 
-  //Enums
+  // Enums
   colorEnum = ColorEnum;
   iconEnum = IconsEnum;
 

@@ -1,9 +1,12 @@
 import { Component } from '@angular/core';
 
+// Component imports
+import { TableComponent } from '../../../shared/components/table/table.component';
+
 @Component({
-  selector: 'app-webshop-roba',
+  selector: 'webshop-roba',
   standalone: true,
-  imports: [],
+  imports: [TableComponent],
   templateUrl: './webshop-roba.component.html',
   styleUrl: './webshop-roba.component.scss'
 })

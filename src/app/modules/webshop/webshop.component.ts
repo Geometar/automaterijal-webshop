@@ -6,6 +6,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 // Components imports
 import { WebshopEmptyComponent } from './webshop-empty/webshop-empty.component';
 import { WebshopNavComponent } from './webshop-nav/webshop-nav.component';
+import { WebshopRobaComponent } from './webshop-roba/webshop-roba.component';
 
 // Data models
 import { Filter, RobaPage } from '../../shared/data-models/model/roba';
@@ -19,7 +20,8 @@ import { RobaService } from '../../shared/service/roba.service';
   imports: [
     CommonModule,
     WebshopEmptyComponent,
-    WebshopNavComponent
+    WebshopNavComponent,
+    WebshopRobaComponent
   ],
   templateUrl: './webshop.component.html',
   styleUrl: './webshop.component.scss',

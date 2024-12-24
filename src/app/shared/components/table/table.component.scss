@@ -1,0 +1,85 @@
+.product-table {
+  width: 100%;
+
+  .product-row {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid #ddd;
+    padding: 16px;
+  }
+
+  .row-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+
+    .image-container img {
+      width: 100px;
+      height: auto;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    .details-container {
+      flex: 2;
+      padding: 0 16px;
+
+      h3 {
+        font-size: 18px;
+        margin: 0 0 8px;
+      }
+
+      p {
+        font-size: 14px;
+        color: #555;
+        margin: 0 0 16px;
+      }
+
+      .specifications {
+        width: 100%;
+        font-size: 14px;
+        color: #666;
+
+        td {
+          padding: 4px 8px;
+        }
+
+        td:first-child {
+          font-weight: bold;
+        }
+      }
+    }
+
+    .pricing-container {
+      text-align: left;
+
+      .price {
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 8px;
+      }
+
+      .item-avaliable {
+        position: relative; /* Ensure ::before is positioned relative to this element */
+        width: 130px;
+        padding-left: 20px;
+      }
+
+      .item-avaliable::before {
+        background: #00ba9c;
+        border-radius: 50%;
+        content: "";
+        height: 6px;
+        left: 0;
+        position: absolute;
+        top: 8px;
+        width: 6px;
+      }
+
+      button {
+        text-transform: none;
+      }
+    }
+  }
+}

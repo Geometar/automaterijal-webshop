@@ -1,0 +1,45 @@
+<div class="container product-table">
+  <div class="product-row" *ngFor="let row of paginatedData">
+    <div class="row-container">
+      <!-- Image Section -->
+      <div class="image-container">
+        <img [src]="row.imageUrl" alt="Product Image" />
+      </div>
+
+      <!-- Details Section -->
+      <div class="details-container">
+        <h3>{{ row.proizvodjac }} {{ row.naziv }}</h3>
+        <p>Kataloski broj: {{ row.katbr }}</p>
+        <table *ngIf="row.specifications?.length" class="specifications">
+          <tr *ngFor="let spec of row.specifications">
+            <td>{{ spec.key }}</td>
+            <td>{{ spec.value }}</td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Pricing Section -->
+      <div class="pricing-container">
+        <div *ngIf="row.stanje > 0" class="item-avaliable">Ima na stanju</div>
+        <p class="price">{{ row.price | rsdCurrency }}</p>
+        <autom-button
+          [iconPrefix]="true"
+          [iconSource]="iconEnum.SHOPPING_CART"
+          [iconColor]="colorEnum.INFO_25"
+          [label]="'Dodaj u korpu'"
+          mat-raised-button
+          color="primary"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- Paginator -->
+  <mat-paginator
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[5, 10, 25]"
+    [length]="dataSource.length"
+    (page)="onPageChange($event)"
+  >
+  </mat-paginator>
+</div>
