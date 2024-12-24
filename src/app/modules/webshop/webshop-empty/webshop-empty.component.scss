@@ -1,0 +1,22 @@
+.webshop {
+  &__empty {
+    &-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 50%;
+    }
+    &-data {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      p {
+        color: var(--figma-error-300) !important;
+        font-size: var(--text-xl);
+        font-weight: var(--fw-600);
+      }
+    }
+  }
+}

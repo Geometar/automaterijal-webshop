@@ -1,0 +1,44 @@
+<div class="webshop webshop-container">
+  <div class="webshop__navigation">
+    <div>
+      <div class="webshop__navigation-search util__flex--center">
+        <autom-button
+          [iconSource]="'car'"
+          [iconPrefix]="true"
+          [iconColor]="colorEnum.INFO_25"
+          [type]="buttonType.PRIMARY"
+          [theme]="buttonTheme.LIGHT_ORANGE"
+          [label]="'Izaberi vozilo'"
+        >
+        </autom-button>
+        <autom-input-fields
+          class="search-input"
+          [size]="sizeEnum.FULL"
+          [preIcon]="'search'"
+          [round]="true"
+          [placeholder]="'Unesite kataloski ili OE broj'"
+          (emitSelected)="searchTerm = $event"
+        ></autom-input-fields>
+        <autom-button [label]="'Pretrazi'" (clickEvent)="emitValue()">
+        </autom-button>
+      </div>
+    </div>
+    <div class="util__flex--center">
+      <nav class="navbar autom-margin--bottom__xs">
+        <ul class="navbar-list">
+          <li
+            class="navbar-item util__flex--center gap-5 webshop__navbar"
+            *ngFor="let nav of navigationTitles"
+          >
+            <autom-icon
+              class="webshop__navbar-icon"
+              [source]="nav.svg"
+              [color]="colorEnum.GREY_400"
+            ></autom-icon>
+            <a class="webshop__navbar__link">{{ nav.title }}</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>

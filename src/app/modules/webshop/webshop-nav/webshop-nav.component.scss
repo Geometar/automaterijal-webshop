@@ -1,0 +1,65 @@
+.webshop {
+  &__navigation {
+    background: linear-gradient(135deg, #132530, #1b455e);
+    &-search {
+      height: 100px;
+      gap: 10px;
+
+      .search-input {
+        width: 400px;
+      }
+    }
+  }
+
+  &-container {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+  }
+  &__navbar {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    transition: var(--transition-1);
+
+    &:hover {
+      .webshop__navbar-icon .mat-icon svg path {
+        stroke: var(--bittersweet);
+      }
+      .webshop__navbar-icon .mat-icon svg line {
+        stroke: var(--bittersweet);
+      }
+
+      .webshop__navbar__link {
+        color: var(--bittersweet);
+      }
+    }
+
+    &-icon {
+      width: 20px;
+      height: 20px;
+
+      .mat-icon {
+        width: 20px;
+        height: 20px;
+      }
+
+      .mat-icon svg path {
+        stroke: var(--figma-grey-25);
+        transition: var(--transition-1);
+      }
+
+      .mat-icon svg line {
+        stroke: var(--figma-grey-25);
+        transition: var(--transition-1);
+      }
+    }
+
+    &__link {
+      font-size: var(--text-sm);
+      color: var(--figma-grey-25);
+      transition: var(--transition-1);
+    }
+  }
+}

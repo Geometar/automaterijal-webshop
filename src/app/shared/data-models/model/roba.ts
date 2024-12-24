@@ -1,3 +1,7 @@
+import { Page } from "./page";
+import { Proizvodjac } from "./proizvodjac";
+import { Slika } from "./slika";
+
 export class Filter {
   proizvodjacId?: string;
   proizvodjac?: string;
@@ -10,29 +14,6 @@ export class Filter {
     this.proizvodjac = '';
     this.raspolozivost = 'Svi artikli';
   }
-}
-
-
-export class Page {
-  last?: boolean;
-  totalPages?: number;
-  totalElements?: number;
-  numberOfElements?: number;
-  first?: boolean;
-  sort?: string;
-  size?: number;
-  number?: number;
-}
-
-export class Proizvodjac {
-  proid?: string;
-  naziv?: string;
-}
-
-export class Slika {
-  slikeByte?: string | ArrayBuffer;
-  slikeUrl?: string;
-  isUrl?: boolean;
 }
 
 export class RobaTehnickiOpis {
