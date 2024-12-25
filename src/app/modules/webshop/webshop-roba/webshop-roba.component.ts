@@ -1,4 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+
+// Data Models
+import { Magacin } from '../../../shared/data-models/model/roba';
 
 // Component imports
 import { TableComponent } from '../../../shared/components/table/table.component';
@@ -11,5 +14,6 @@ import { TableComponent } from '../../../shared/components/table/table.component
   styleUrl: './webshop-roba.component.scss'
 })
 export class WebshopRobaComponent {
+  @Input() magacin: Magacin | null = null;
 
 }

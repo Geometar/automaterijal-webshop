@@ -6,6 +6,7 @@ export enum InputTypeEnum {
 	EMAIL = 'email',
 	NUMBER = 'number',
 	PASSWORD = 'password',
+	QUANTITY = 'quantity',
 	SEARCH = 'search',
 	TEXT = 'text',
 	TIMEPICKER = 'time'

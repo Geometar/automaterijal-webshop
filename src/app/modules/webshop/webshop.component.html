@@ -1,5 +1,10 @@
-<section class="header-margin--top height-100vh">
+<section class="header-margin--top">
   <webshop-nav (emitEvent)="getRoba($event)"></webshop-nav>
-  <webshop-empty></webshop-empty>
-  <webshop-roba></webshop-roba>
+  <webshop-empty
+    *ngIf="currentState === state.SHOW_EMPTY_CONTAINER"
+  ></webshop-empty>
+  <webshop-roba
+    *ngIf="currentState === state.SHOW_ARTICLES"
+    [magacin]="magacinData"
+  ></webshop-roba>
 </section>

@@ -4,7 +4,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 50%;
+      height: calc(100vh - 220px);
     }
     &-data {
       display: flex;

@@ -111,6 +111,50 @@
     />
   </ng-container>
 
+  <!-- Number Input Container -->
+  <ng-container *ngIf="type === inputTypes.QUANTITY">
+    <div class="number-input">
+      <input
+        #automInput
+        [attr.data-e2e-selector]="selector || label"
+        [class.autom-error-input]="inputHasErrorGetter"
+        [class.autom-error-input--animation]="
+          inputHasErrorGetter && errorAnimationTrigger
+        "
+        [class.autom-input__pre-icon]="preIcon || prefix"
+        [formControlName]="'formCtrl'"
+        [id]="id"
+        [max]="max"
+        [min]="min"
+        [pattern]="pattern"
+        [placeholder]="placeholder"
+        [readonly]="readonly"
+        [required]="required"
+        [step]="step"
+        [type]="inputTypes.NUMBER"
+        [value]="value"
+        (blur)="numberHandler(true)"
+        (keydown)="numberHandler()"
+        (keyup)="numberHandler()"
+        (paste)="numberHandler()"
+      />
+      <div class="arrows">
+        <a (click)="value = +value + step"
+          ><autom-icon
+            class="quantity-arrow"
+            [source]="iconEnum.ARROW_UP"
+          ></autom-icon
+        ></a>
+        <a (click)="value = +value - step"
+          ><autom-icon
+            class="quantity-arrow"
+            [source]="iconEnum.ARROW_DOWN"
+          ></autom-icon
+        ></a>
+      </div>
+    </div>
+  </ng-container>
+
   <!-- Password Input Container -->
   <ng-container *ngIf="type === inputTypes.PASSWORD">
     <input

@@ -1,5 +1,5 @@
 .product-table {
-  width: 100%;
+  max-width: 1050px;
 
   .product-row {
     display: flex;
@@ -14,11 +14,19 @@
     align-items: flex-start;
     gap: 16px;
 
+    .image-container {
+      align-items: center;
+      display: flex;
+      height: 200px;
+      justify-content: center;
+      overflow: hidden; /* Ovo osigurava da ništa ne prelazi granice */
+      width: 200px;
+    }
+    
     .image-container img {
-      width: 100px;
-      height: auto;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+      max-height: 100%;
+      max-width: 100%;
+      object-fit: contain; /* Zadržava razmeru slike unutar zadanih granica */
     }
 
     .details-container {
@@ -37,12 +45,12 @@
       }
 
       .specifications {
-        width: 100%;
+        width: 500px;
         font-size: 14px;
         color: #666;
 
         td {
-          padding: 4px 8px;
+          padding: 2px 8px;
         }
 
         td:first-child {
@@ -58,23 +66,32 @@
         font-size: 20px;
         font-weight: bold;
         margin-bottom: 8px;
+        text-align: right;
       }
 
-      .item-avaliable {
-        position: relative; /* Ensure ::before is positioned relative to this element */
-        width: 130px;
+      .item-status {
+        font-size: 12px;
         padding-left: 20px;
+        position: relative; /* Ensure ::before is positioned relative to this element */
+        text-align: right;
       }
-
-      .item-avaliable::before {
-        background: #00ba9c;
+      
+      .item-status::before {
         border-radius: 50%;
         content: "";
         height: 6px;
-        left: 0;
+        left: 150px;
         position: absolute;
-        top: 8px;
+        top: 9px;
         width: 6px;
+      }
+      
+      .item-status.green::before {
+        background: #00ba9c; /* Green for available */
+      }
+      
+      .item-status.red::before {
+        background: #ff4d4d; /* Red for not available */
       }
 
       button {

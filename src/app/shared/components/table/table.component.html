@@ -3,42 +3,73 @@
     <div class="row-container">
       <!-- Image Section -->
       <div class="image-container">
-        <img [src]="row.imageUrl" alt="Product Image" />
+        <img [src]="row.slika?.slikeUrl" alt="Product Image" />
       </div>
 
       <!-- Details Section -->
       <div class="details-container">
-        <h3>{{ row.proizvodjac }} {{ row.naziv }}</h3>
-        <p>Kataloski broj: {{ row.katbr }}</p>
-        <table *ngIf="row.specifications?.length" class="specifications">
-          <tr *ngFor="let spec of row.specifications">
-            <td>{{ spec.key }}</td>
-            <td>{{ spec.value }}</td>
-          </tr>
+        <h3>{{ row?.proizvodjac?.naziv }} {{ row.naziv }}</h3>
+        <p>
+          Kataloski broj:
+          <span class="color--figma-primary-800 display--inline font-medium">{{
+            row.katbr
+          }}</span>
+        </p>
+        <table class="specifications">
+          <tbody>
+            <tr *ngFor="let spec of row.tehnickiOpis">
+              <td>{{ spec.oznaka }}[{{ spec.jedinica }}]</td>
+              <td class="autom-align__right">{{ spec.vrednost }}</td>
+            </tr>
+            <tr *ngIf="!row.tehnickiOpis?.length">
+              <td colspan="2">No specifications available</td>
+            </tr>
+          </tbody>
         </table>
       </div>
 
       <!-- Pricing Section -->
       <div class="pricing-container">
-        <div *ngIf="row.stanje > 0" class="item-avaliable">Ima na stanju</div>
-        <p class="price">{{ row.price | rsdCurrency }}</p>
-        <autom-button
-          [iconPrefix]="true"
-          [iconSource]="iconEnum.SHOPPING_CART"
-          [iconColor]="colorEnum.INFO_25"
-          [label]="'Dodaj u korpu'"
-          mat-raised-button
-          color="primary"
-        />
+        <div
+          [ngClass]="{
+            'item-status': true,
+            green: row.stanje! > 0,
+            red: row.stanje! === 0
+          }"
+        >
+          {{ row.stanje! > 0 ? "Ima na stanju" : "Nema na stanju" }}
+        </div>
+        <p class="price">{{ row.cena! | rsdCurrency }}</p>
+        <div class="util__flex--center">
+          <autom-input-fields
+            [min]="1"
+            [clearBtn]="false"
+            [max]="row.stanje!"
+            [customClass]="'quantity-size'"
+            [type]="inputTypeEnum.QUANTITY"
+            [size]="sizeEnum.MEDIUM"
+            [step]="1"
+            [value]="1"
+          ></autom-input-fields>
+          <autom-button
+            [iconPrefix]="true"
+            [iconSource]="iconEnum.SHOPPING_CART"
+            [iconColor]="colorEnum.INFO_25"
+            [label]="'Dodaj u korpu'"
+            mat-raised-button
+            color="primary"
+          />
+        </div>
       </div>
     </div>
   </div>
 
   <!-- Paginator -->
   <mat-paginator
+    [pageIndex]="currentPage"
     [pageSize]="pageSize"
-    [pageSizeOptions]="[5, 10, 25]"
-    [length]="dataSource.length"
+    [pageSizeOptions]="[10, 15, 25]"
+    [length]="totalElements"
     (page)="onPageChange($event)"
   >
   </mat-paginator>

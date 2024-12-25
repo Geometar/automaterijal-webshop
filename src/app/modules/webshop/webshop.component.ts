@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -9,10 +9,16 @@ import { WebshopNavComponent } from './webshop-nav/webshop-nav.component';
 import { WebshopRobaComponent } from './webshop-roba/webshop-roba.component';
 
 // Data models
-import { Filter, RobaPage } from '../../shared/data-models/model/roba';
+import { Filter, Magacin } from '../../shared/data-models/model/roba';
 
 // Services
+import { PictureService } from '../../shared/service/utils/picture.service';
 import { RobaService } from '../../shared/service/roba.service';
+
+export enum WebShopState {
+  SHOW_ARTICLES,
+  SHOW_EMPTY_CONTAINER,
+}
 
 @Component({
   selector: 'app-webshop',
@@ -26,9 +32,12 @@ import { RobaService } from '../../shared/service/roba.service';
   templateUrl: './webshop.component.html',
   styleUrl: './webshop.component.scss',
 })
-export class WebshopComponent implements OnDestroy {
+export class WebshopComponent implements OnDestroy, OnInit {
   private destroy$ = new Subject<void>();
 
+  // Enums
+  state = WebShopState;
+  currentState = WebShopState.SHOW_ARTICLES;
 
   // Paging and Sorting elements
   rowsPerPage = 10;
@@ -36,9 +45,18 @@ export class WebshopComponent implements OnDestroy {
   sort = null;
   filter: Filter = new Filter();
 
-  constructor(private robaService: RobaService) { }
+  // Data
+  magacinData: Magacin | null = null;
+
+
+  constructor(private robaService: RobaService, private pictureService: PictureService) { }
 
   /** Angular lifecycle hooks start */
+
+  // TODO: Remove after setting the table
+  ngOnInit(): void {
+    this.getRoba('123');
+  }
 
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -53,8 +71,10 @@ export class WebshopComponent implements OnDestroy {
       this.sort, this.rowsPerPage, this.pageIndex, searchTerm, this.filter
     ).pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (robaPaged: RobaPage) => {
-          console.log(robaPaged);
+        next: (response: Magacin) => {
+          this.pictureService.convertByteToImage(response.robaDto!.content);
+          this.magacinData = response;
+          this.currentState = this.state.SHOW_ARTICLES;
         },
         error: (err: HttpErrorResponse) => {
           const error = err.error.details || err.error;

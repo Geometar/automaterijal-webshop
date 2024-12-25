@@ -1,6 +1,6 @@
-import { Page } from "./page";
 import { Proizvodjac } from "./proizvodjac";
 import { Slika } from "./slika";
+import { PaginatedResponse } from "./page";
 
 export class Filter {
   proizvodjacId?: string;
@@ -49,12 +49,9 @@ export class TecDocDokumentacija {
 }
 
 export class Magacin {
-  robaDto?: RobaPage;
   podgrupe?: string[];
   proizvodjaci?: Proizvodjac[];
-}
-export class RobaPage extends Page {
-  content?: Roba[] = [];
+  robaDto?: PaginatedResponse<Roba>;
 }
 
 export class Roba {

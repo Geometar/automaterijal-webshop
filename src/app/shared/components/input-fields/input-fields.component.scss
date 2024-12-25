@@ -62,6 +62,7 @@ input[type='search' i]::-webkit-search-cancel-button {
 	border-radius: var(--border-radius-l);
 }
 
+
 // TODO: Activate these properties in case Figma design starts supporting it
 // input:-webkit-autofill,
 // input:-webkit-autofill:hover,
@@ -70,3 +71,59 @@ input[type='search' i]::-webkit-search-cancel-button {
 // 	-webkit-box-shadow: 0 0 0 var(--space-l) var(--figma-primary-50) inset !important;
 // 	box-shadow: 0 0 0 var(--space-l) var(--figma-primary-50) inset !important;
 // }
+
+// Quantity customer settings
+.number-input {
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  display: inline-flex;
+  height: 36px; /* Adjust height as needed */
+  overflow: hidden;
+  width: 80px; /* Adjust width as needed */
+}
+
+.number-input input {
+  -moz-appearance: textfield;
+  -webkit-appearance: none;
+  appearance: textfield;
+  border: none;
+  font-size: 16px;
+  outline: none;
+  text-align: center;
+  width: 50px; /* Input width */
+}
+
+.number-input input::-webkit-inner-spin-button,
+.number-input input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+.arrows {
+  align-items: center;
+  border-left: 1px solid #ccc;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 30px;
+
+}
+
+.arrows .quantity-arrow {
+  align-items: center;
+  display: flex;
+  height: 18px !important; /* Ensure these dimensions are applied */
+  justify-content: center;
+  width: 18px !important;
+}
+
+.arrows .quantity-arrow .mat-icon,
+.arrows .quantity-arrow autom-icon {
+  font-size: 18px !important; /* For Material icons */
+  height: 18px !important;
+  width: 18px !important;
+}
+
+.quantity-size {
+	min-width: unset;
+	width: 100px;
+}

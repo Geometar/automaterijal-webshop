@@ -1,59 +1,69 @@
 import { CommonModule, CurrencyPipe } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
 
 // Enums
-import { ButtonThemes, ButtonTypes, ColorEnum, IconsEnum, SizeEnum } from '../../data-models/enums';
+import { ButtonThemes, ButtonTypes, ColorEnum, IconsEnum, InputTypeEnum, SizeEnum } from '../../data-models/enums';
 import { RsdCurrencyPipe } from '../../pipe/rsd-currency.pipe';
 
 // Component imports
 import { ButtonComponent } from '../button/button.component';
+import { InputFieldsComponent } from '../input-fields/input-fields.component';
+
+// Data models
+import { Roba } from '../../data-models/model/roba';
+import { isPaginatedResponse, PaginatedResponse } from '../../data-models/model/page';
 
 
 @Component({
   selector: 'autom-table',
   standalone: true,
-  imports: [CommonModule, MatTableModule, MatPaginatorModule, ButtonComponent, RsdCurrencyPipe],
+  imports: [CommonModule, MatTableModule, MatPaginatorModule, ButtonComponent, RsdCurrencyPipe, InputFieldsComponent],
   providers: [CurrencyPipe],
   templateUrl: './table.component.html',
   styleUrl: './table.component.scss'
 })
-export class TableComponent {
+export class TableComponent implements OnChanges {
+  @Input() data: PaginatedResponse<Roba> | Roba[] | null = null;
 
   // Enums
   buttonTheme = ButtonThemes;
   buttonType = ButtonTypes;
   colorEnum = ColorEnum;
   iconEnum = IconsEnum;
+  inputTypeEnum = InputTypeEnum;
   sizeEnum = SizeEnum;
 
   // Complete data source
-  dataSource = [
-    {
-      imageUrl: 'https://via.placeholder.com/100',
-      proizvodjac: 'MAHLE',
-      naziv: 'ORIGINAL Oil filter',
-      katbr: 'OX388D',
-      specifications: [
-        { key: 'Filter type', value: 'Filter Insert' },
-        { key: 'Height [mm]', value: '140.7' },
-        { key: 'Inner Diameter 2 [mm]', value: '29' },
-        { key: 'Diameter [mm]', value: '71.5, 72' },
-      ],
-      stanje: 2,
-      price: 6,
-    },
-    // Add more rows as needed...
-  ];
+  dataSource = [];
 
   // Pagination variables
   pageSize = 5; // Default items per page
   currentPage = 0; // Current page index
-  paginatedData: any[] = []; // Data to display on the current page
+  totalElements = 0; // Default total items
+  paginatedData: Roba[] = []; // Data to display on the current page
 
   ngOnInit() {
     this.updatePaginatedData();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (!changes['data'].firstChange) {
+      this.updatePaginationVariables();
+      this.updatePaginatedData();
+    }
+  }
+
+  updatePaginationVariables(): void {
+    if (!this.isAlreadyPaginated()) {
+      return;
+    }
+
+    const responseEntity = this.data as PaginatedResponse<Roba>;
+    this.pageSize = responseEntity.size;
+    this.currentPage = responseEntity.number;
+    this.totalElements = responseEntity.numberOfElements;
   }
 
   onPageChange(event: PageEvent) {
@@ -63,9 +73,20 @@ export class TableComponent {
   }
 
   updatePaginatedData() {
+    if (!this.data) {
+      this.paginatedData = [];
+      return;
+    }
+
     const startIndex = this.currentPage * this.pageSize;
     const endIndex = startIndex + this.pageSize;
-    this.paginatedData = this.dataSource.slice(startIndex, endIndex);
+    this.paginatedData = this.isAlreadyPaginated() ? (this.data as PaginatedResponse<Roba>).content : (this.data as Roba[]).slice(startIndex, endIndex);
+  }
+
+  private isAlreadyPaginated(): boolean {
+    return isPaginatedResponse<Roba>(this.data);
   }
 
 }
+// Type helper to check if a type extends an interface
+type IsAssignable<T, U> = T extends U ? true : false;
