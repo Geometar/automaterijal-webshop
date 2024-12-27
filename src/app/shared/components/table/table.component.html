@@ -40,6 +40,7 @@
           {{ row.stanje! > 0 ? "Ima na stanju" : "Nema na stanju" }}
         </div>
         <p class="price">{{ row.cena! | rsdCurrency }}</p>
+        <p class="autom-align__right">Cena sa pdv-om</p>
         <div class="util__flex--center">
           <autom-input-fields
             [min]="1"

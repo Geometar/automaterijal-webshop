@@ -1,1 +1,7 @@
-<autom-table [data]="magacin?.robaDto!"></autom-table>
+<div class="webshop-container-roba">
+  <webshop-category
+    [manufactures]="magacin?.proizvodjaci"
+    [categories]="magacin?.podgrupe"
+  ></webshop-category>
+  <autom-table [data]="magacin?.robaDto!"></autom-table>
+</div>

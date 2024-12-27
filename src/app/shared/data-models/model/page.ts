@@ -33,6 +33,6 @@ export function isPaginatedResponse<T>(obj: any): obj is PaginatedResponse<T> {
     typeof obj.pageable === "object" &&
     typeof obj.totalElements === "number" &&
     typeof obj.totalPages === "number" &&
-    typeof obj.content === "object"
+    Array.isArray(obj.content)
   );
 }

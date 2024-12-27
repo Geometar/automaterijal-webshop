@@ -1,6 +1,6 @@
-import { Proizvodjac } from "./proizvodjac";
-import { Slika } from "./slika";
+import { Manufacture } from "./proizvodjac";
 import { PaginatedResponse } from "./page";
+import { Slika } from "./slika";
 
 export class Filter {
   proizvodjacId?: string;
@@ -50,7 +50,7 @@ export class TecDocDokumentacija {
 
 export class Magacin {
   podgrupe?: string[];
-  proizvodjaci?: Proizvodjac[];
+  proizvodjaci?: Manufacture[];
   robaDto?: PaginatedResponse<Roba>;
 }
 
@@ -67,7 +67,7 @@ export class Roba {
   rabat?: number;
   kolicina?: number;
   uKorpi = false;
-  proizvodjac?: Proizvodjac;
+  proizvodjac?: Manufacture;
   proizvodjacLogo?: string | ArrayBuffer;
   tehnickiOpis?: RobaTehnickiOpis[];
   tdBrojevi?: Map<string, RobaBrojevi[]>;

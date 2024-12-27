@@ -49,7 +49,7 @@ export class TableComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (!changes['data'].firstChange) {
+    if (changes['data']) {
       this.updatePaginationVariables();
       this.updatePaginatedData();
     }

@@ -5,11 +5,12 @@ import { Magacin } from '../../../shared/data-models/model/roba';
 
 // Component imports
 import { TableComponent } from '../../../shared/components/table/table.component';
+import { WebshopCategoryComponent } from '../webshop-category/webshop-category.component';
 
 @Component({
   selector: 'webshop-roba',
   standalone: true,
-  imports: [TableComponent],
+  imports: [TableComponent, WebshopCategoryComponent],
   templateUrl: './webshop-roba.component.html',
   styleUrl: './webshop-roba.component.scss'
 })

@@ -1,4 +1,4 @@
-export class Proizvodjac {
+export class Manufacture {
   proid?: string;
   naziv?: string;
 }

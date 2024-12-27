@@ -1,1 +1,27 @@
-<p>webshop-category works!</p>
+<div
+  *ngIf="
+    (categories && categories.length) || (manufactures && manufactures.length)
+  "
+  class="sidebar"
+>
+  <div class="filter-section">
+    <div *ngIf="categories && categories.length">
+      <h3 (click)="toggleSection(filterEnum.CATEGORY)">
+        Kategorije
+        <span>{{ openCategoriesFilters ? "-" : "+" }}</span>
+      </h3>
+      <ul *ngIf="openCategoriesFilters" class="filter-list">
+        <li *ngFor="let item of categories">{{ item }}</li>
+      </ul>
+    </div>
+    <div *ngIf="manufactures && manufactures.length">
+      <h3 (click)="toggleSection(filterEnum.MANUFACTURE)">
+        Proizvodjaci
+        <span>{{ openManufacturesFilters ? "-" : "+" }}</span>
+      </h3>
+      <ul *ngIf="openManufacturesFilters" class="filter-list">
+        <li *ngFor="let item of manufactures">{{ item.naziv }}</li>
+      </ul>
+    </div>
+  </div>
+</div>
