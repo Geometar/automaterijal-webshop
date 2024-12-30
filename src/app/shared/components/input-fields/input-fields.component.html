@@ -78,6 +78,7 @@
       (change)="emitSelectedValue()"
       (keydown)="emitSelectedValue()"
       (keyup)="emitSelectedValue()"
+      (keyup.enter)="onEnter()"
     />
   </ng-container>
 
@@ -201,6 +202,7 @@
   <autom-icon
     *ngIf="suffixIcon"
     class="custom-label--icon"
+    [class.round-input]="round"
     [source]="suffixIcon"
     (click)="suffixIconActionEvent(suffixIconAction)"
   ></autom-icon>

@@ -13,14 +13,13 @@
         </autom-button>
         <autom-input-fields
           class="search-input"
-          [size]="sizeEnum.FULL"
-          [preIcon]="'search'"
-          [round]="true"
           [placeholder]="'Unesite kataloski ili OE broj'"
+          [round]="true"
+          [size]="sizeEnum.FULL"
+          [suffixIcon]="'search'"
+          (customActionEvent)="emitValue()"
           (emitSelected)="searchTerm = $event"
         ></autom-input-fields>
-        <autom-button [label]="'Pretrazi'" (clickEvent)="emitValue()">
-        </autom-button>
       </div>
     </div>
     <div class="util__flex--center">

@@ -1,0 +1,19 @@
+.loader {
+  width: 60px;
+  animation: rotation 1s linear infinite;
+  border-bottom-color: var(--figma-highlight-teal);
+  border-radius: 50%;
+  border: 5px solid #FFF;
+  box-sizing: border-box;
+  display: inline-block;
+  height: 60px;
+  }
+
+  @keyframes rotation {
+  0% {
+      transform: rotate(0deg);
+  }
+  100% {
+      transform: rotate(360deg);
+  }
+  } 

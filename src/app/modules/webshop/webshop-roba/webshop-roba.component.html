@@ -3,5 +3,10 @@
     [manufactures]="magacin?.proizvodjaci"
     [categories]="magacin?.podgrupe"
   ></webshop-category>
-  <autom-table [data]="magacin?.robaDto!"></autom-table>
+  <autom-table
+    [data]="magacin?.robaDto!"
+    [pageIndex]="pageIndex"
+    [pageSize]="pageSize"
+    (emitTablePage)="handleTablePageEvent($event)"
+  ></autom-table>
 </div>

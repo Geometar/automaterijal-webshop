@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subject, takeUntil } from 'rxjs';
+import { finalize, Subject, takeUntil } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 
 // Components imports
@@ -10,10 +10,12 @@ import { WebshopRobaComponent } from './webshop-roba/webshop-roba.component';
 
 // Data models
 import { Filter, Magacin } from '../../shared/data-models/model/roba';
+import { TablePage } from '../../shared/data-models/model/page';
 
 // Services
 import { PictureService } from '../../shared/service/utils/picture.service';
 import { RobaService } from '../../shared/service/roba.service';
+import { SpinnerComponent } from '../../shared/components/spinner/spinner.component';
 
 export enum WebShopState {
   SHOW_ARTICLES,
@@ -25,6 +27,7 @@ export enum WebShopState {
   standalone: true,
   imports: [
     CommonModule,
+    SpinnerComponent,
     WebshopEmptyComponent,
     WebshopNavComponent,
     WebshopRobaComponent
@@ -32,31 +35,30 @@ export enum WebShopState {
   templateUrl: './webshop.component.html',
   styleUrl: './webshop.component.scss',
 })
-export class WebshopComponent implements OnDestroy, OnInit {
+export class WebshopComponent implements OnDestroy {
   private destroy$ = new Subject<void>();
 
   // Enums
   state = WebShopState;
-  currentState = WebShopState.SHOW_ARTICLES;
+  currentState = WebShopState.SHOW_EMPTY_CONTAINER;
 
   // Paging and Sorting elements
-  rowsPerPage = 10;
   pageIndex = 0;
+  rowsPerPage = 10;
+  searchTerm = '';
   sort = null;
   filter: Filter = new Filter();
 
   // Data
   magacinData: Magacin | null = null;
 
+  // Misc
+  loading = false;
+
 
   constructor(private robaService: RobaService, private pictureService: PictureService) { }
 
   /** Angular lifecycle hooks start */
-
-  // TODO: Remove after setting the table
-  ngOnInit(): void {
-    this.getRoba('123');
-  }
 
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -66,10 +68,11 @@ export class WebshopComponent implements OnDestroy, OnInit {
 
   /** Event start */
 
-  getRoba(searchTerm: string): void {
+  getRoba(): void {
+    this.loading = true;
     this.robaService.pronadjiSvuRobu(
-      this.sort, this.rowsPerPage, this.pageIndex, searchTerm, this.filter
-    ).pipe(takeUntil(this.destroy$))
+      this.sort, this.rowsPerPage, this.pageIndex, this.searchTerm, this.filter
+    ).pipe(takeUntil(this.destroy$), finalize(() => this.loading = false))
       .subscribe({
         next: (response: Magacin) => {
           this.pictureService.convertByteToImage(response.robaDto!.content);
@@ -83,4 +86,17 @@ export class WebshopComponent implements OnDestroy, OnInit {
   }
 
   /** Event end */
+
+  // Setters start
+  setRobaSearchTerm(searchTerm: string): void {
+    this.searchTerm = searchTerm;
+    this.getRoba()
+  }
+  setRobaPageData(tableEvent: TablePage): void {
+    this.pageIndex = tableEvent.pageIndex;
+    this.rowsPerPage = tableEvent.pageSize;
+    this.getRoba()
+  }
+
+  // Setters end
 }

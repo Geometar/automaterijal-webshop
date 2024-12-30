@@ -27,6 +27,11 @@ export interface PaginatedResponse<T> {
   totalPages: number;
 }
 
+export class TablePage {
+  pageSize = 10;
+  pageIndex = 0
+}
+
 export function isPaginatedResponse<T>(obj: any): obj is PaginatedResponse<T> {
   return (
     obj &&

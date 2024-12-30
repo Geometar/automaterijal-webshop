@@ -1,7 +1,8 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 // Data Models
 import { Magacin } from '../../../shared/data-models/model/roba';
+import { TablePage } from '../../../shared/data-models/model/page';
 
 // Component imports
 import { TableComponent } from '../../../shared/components/table/table.component';
@@ -16,5 +17,12 @@ import { WebshopCategoryComponent } from '../webshop-category/webshop-category.c
 })
 export class WebshopRobaComponent {
   @Input() magacin: Magacin | null = null;
+  @Input() pageIndex = 0;
+  @Input() pageSize = 10;
+  @Output() emitTablePage = new EventEmitter<TablePage>();
+
+  handleTablePageEvent(tablePage: TablePage): void {
+    this.emitTablePage.emit(tablePage);
+  }
 
 }

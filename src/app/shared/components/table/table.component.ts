@@ -1,5 +1,5 @@
 import { CommonModule, CurrencyPipe } from '@angular/common';
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
 
@@ -13,7 +13,7 @@ import { InputFieldsComponent } from '../input-fields/input-fields.component';
 
 // Data models
 import { Roba } from '../../data-models/model/roba';
-import { isPaginatedResponse, PaginatedResponse } from '../../data-models/model/page';
+import { isPaginatedResponse, PaginatedResponse, TablePage } from '../../data-models/model/page';
 
 
 @Component({
@@ -26,6 +26,9 @@ import { isPaginatedResponse, PaginatedResponse } from '../../data-models/model/
 })
 export class TableComponent implements OnChanges {
   @Input() data: PaginatedResponse<Roba> | Roba[] | null = null;
+  @Input() pageIndex = 0;
+  @Input() pageSize = 10;
+  @Output() emitTablePage = new EventEmitter<TablePage>();
 
   // Enums
   buttonTheme = ButtonThemes;
@@ -39,8 +42,6 @@ export class TableComponent implements OnChanges {
   dataSource = [];
 
   // Pagination variables
-  pageSize = 5; // Default items per page
-  currentPage = 0; // Current page index
   totalElements = 0; // Default total items
   paginatedData: Roba[] = []; // Data to display on the current page
 
@@ -62,13 +63,18 @@ export class TableComponent implements OnChanges {
 
     const responseEntity = this.data as PaginatedResponse<Roba>;
     this.pageSize = responseEntity.size;
-    this.currentPage = responseEntity.number;
-    this.totalElements = responseEntity.numberOfElements;
+    this.totalElements = responseEntity.totalElements;
   }
 
   onPageChange(event: PageEvent) {
     this.pageSize = event.pageSize;
-    this.currentPage = event.pageIndex;
+    this.pageIndex = event.pageIndex;
+    this.emitTablePage.emit(
+      {
+        pageIndex: this.pageIndex,
+        pageSize: this.pageSize
+      } as TablePage
+    )
     this.updatePaginatedData();
   }
 
@@ -78,7 +84,7 @@ export class TableComponent implements OnChanges {
       return;
     }
 
-    const startIndex = this.currentPage * this.pageSize;
+    const startIndex = this.pageIndex * this.pageSize;
     const endIndex = startIndex + this.pageSize;
     this.paginatedData = this.isAlreadyPaginated() ? (this.data as PaginatedResponse<Roba>).content : (this.data as Roba[]).slice(startIndex, endIndex);
   }

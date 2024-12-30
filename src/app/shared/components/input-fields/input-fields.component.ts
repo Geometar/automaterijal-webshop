@@ -501,4 +501,10 @@ export class InputFieldsComponent implements AfterViewInit, OnChanges, OnInit {
       });
     }
   }
+
+  onEnter(): void {
+    this.customActionEvent.emit({
+      value: this.form!.controls['formCtrl'].value
+    });
+  }
 }

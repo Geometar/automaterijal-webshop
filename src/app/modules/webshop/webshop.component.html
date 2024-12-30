@@ -1,10 +1,16 @@
 <section class="header-margin--top">
-  <webshop-nav (emitEvent)="getRoba($event)"></webshop-nav>
+  <webshop-nav (emitEvent)="setRobaSearchTerm($event)"></webshop-nav>
   <webshop-empty
-    *ngIf="currentState === state.SHOW_EMPTY_CONTAINER"
+    *ngIf="currentState === state.SHOW_EMPTY_CONTAINER && !loading"
   ></webshop-empty>
   <webshop-roba
-    *ngIf="currentState === state.SHOW_ARTICLES"
+    *ngIf="currentState === state.SHOW_ARTICLES && !loading"
     [magacin]="magacinData"
+    [pageIndex]="pageIndex"
+    [pageSize]="rowsPerPage"
+    (emitTablePage)="setRobaPageData($event)"
   ></webshop-roba>
+  <div *ngIf="loading" class="spinner">
+    <spinner></spinner>
+  </div>
 </section>
