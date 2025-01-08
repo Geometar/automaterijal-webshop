@@ -3,6 +3,21 @@
   width: 250px;
 }
 
+.filter-container {
+  border-top: 5px solid var(--figma-primary-700);
+  border-radius: 4px;
+  .autom-label {
+    font-size: inherit !important;
+    color: var(--rich-black-fogra-29) !important;
+  }
+}
+
+.filter-section {
+  gap: 25px;
+  display: flex;
+  flex-direction: column;
+}
+
 .filter-section h3 {
   border-radius: 5px;
   cursor: pointer;
@@ -29,5 +44,12 @@
   &:hover {
     background-color: var(--figma-grey-25);
     color: var(--figma-highlight-orange);
+  }
+}
+
+.filter-selection {
+  .autom-checkbox__vertical {
+    height: 340px;
+    overflow-y: auto;
   }
 }

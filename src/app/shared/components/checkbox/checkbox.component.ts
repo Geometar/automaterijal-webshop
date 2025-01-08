@@ -14,7 +14,7 @@ import { CheckboxModel, IconModel, TooltipModel } from '../../data-models/interf
 import { OrientationEnum, SizeEnum } from '../../data-models/enums';
 
 @Component({
-  selector: 'app-checkbox',
+  selector: 'autom-checkbox',
   standalone: true,
   imports: [
     AutomLabelComponent,

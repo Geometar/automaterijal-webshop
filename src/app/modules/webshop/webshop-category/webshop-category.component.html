@@ -5,23 +5,34 @@
   class="sidebar"
 >
   <div class="filter-section">
-    <div *ngIf="categories && categories.length">
-      <h3 (click)="toggleSection(filterEnum.CATEGORY)">
-        Kategorije
-        <span>{{ openCategoriesFilters ? "-" : "+" }}</span>
-      </h3>
-      <ul *ngIf="openCategoriesFilters" class="filter-list">
-        <li *ngFor="let item of categories">{{ item }}</li>
-      </ul>
+    <div class="filter-container">
+      <autom-radio-button
+        [label]="'Raspolozivost'"
+        [options]="radioOptions"
+        [theme]="orientation.VERTICAL"
+      ></autom-radio-button>
     </div>
-    <div *ngIf="manufactures && manufactures.length">
-      <h3 (click)="toggleSection(filterEnum.MANUFACTURE)">
-        Proizvodjaci
-        <span>{{ openManufacturesFilters ? "-" : "+" }}</span>
-      </h3>
-      <ul *ngIf="openManufacturesFilters" class="filter-list">
-        <li *ngFor="let item of manufactures">{{ item.naziv }}</li>
-      </ul>
+    <div class="filter-container" *ngIf="categories && categories.length">
+      <autom-checkbox
+        *ngIf="openCategoriesFilters"
+        class="filter-selection"
+        [label]="'Kategorije'"
+        [items]="categoriesCheckBoxModels"
+        [size]="sizeEnum.AUTO"
+        [theme]="orientation.VERTICAL"
+        [horizontal]="false"
+      ></autom-checkbox>
+    </div>
+    <div class="filter-container" *ngIf="manufactures && manufactures.length">
+      <autom-checkbox
+        *ngIf="openManufacturesFilters"
+        [label]="'Proizvodjaci'"
+        class="filter-selection"
+        [items]="manufacturesCheckBoxModels"
+        [size]="sizeEnum.AUTO"
+        [theme]="orientation.VERTICAL"
+        [horizontal]="false"
+      ></autom-checkbox>
     </div>
   </div>
 </div>

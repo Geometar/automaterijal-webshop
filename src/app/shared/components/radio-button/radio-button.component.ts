@@ -14,7 +14,7 @@ import { IconModel, RadioOption } from '../../data-models/interface';
 import { ColorEnum, OrientationEnum, SizeEnum, TooltipPositionEnum } from '../../data-models/enums';
 
 @Component({
-  selector: 'app-radio-button',
+  selector: 'autom-radio-button',
   standalone: true,
   imports: [CommonModule, AutomIconComponent, AutomLabelComponent, MatRadioModule, AutomTooltipDirective],
   templateUrl: './radio-button.component.html',

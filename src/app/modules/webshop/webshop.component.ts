@@ -35,12 +35,12 @@ export enum WebShopState {
   templateUrl: './webshop.component.html',
   styleUrl: './webshop.component.scss',
 })
-export class WebshopComponent implements OnDestroy {
+export class WebshopComponent implements OnDestroy, OnInit {
   private destroy$ = new Subject<void>();
 
   // Enums
   state = WebShopState;
-  currentState = WebShopState.SHOW_EMPTY_CONTAINER;
+  currentState = WebShopState.SHOW_ARTICLES;
 
   // Paging and Sorting elements
   pageIndex = 0;
@@ -59,6 +59,10 @@ export class WebshopComponent implements OnDestroy {
   constructor(private robaService: RobaService, private pictureService: PictureService) { }
 
   /** Angular lifecycle hooks start */
+
+  ngOnInit(): void {
+    this.getRoba();
+  }
 
   ngOnDestroy(): void {
     this.destroy$.next();

@@ -32,13 +32,11 @@
     [value]="item.checked.toString()"
     (change)="onChange($event, item, i)"
   >
-    <ng-template #displaylabel>
-      <autom-label
-        [attr.data-e2e-selector]="item.value"
-        [label]="item.value"
-        [labelIcons]="labelIcons"
-        [required]="item.required!"
-      ></autom-label>
-    </ng-template>
+    <autom-label
+      [attr.data-e2e-selector]="item.value"
+      [label]="item.value"
+      [labelIcons]="labelIcons"
+      [required]="item.required!"
+    ></autom-label>
   </mat-checkbox>
 </div>
