@@ -62,7 +62,8 @@ export class WebshopNavComponent {
 
   constructor(private urlHelperService: UrlHelperService) { }
 
-  emitValue(): void {
-    this.urlHelperService.addOrUpdateQueryParams({ searchTerm: this.searchTerm.trim() });
+  emitValue(searchTerm: any): void {
+    this.searchTerm = searchTerm?.value ? searchTerm?.value.trim() : '';
+    this.searchTerm ? this.urlHelperService.addOrUpdateQueryParams({ searchTerm: this.searchTerm }) : this.urlHelperService.clearQueryParams();
   }
 }

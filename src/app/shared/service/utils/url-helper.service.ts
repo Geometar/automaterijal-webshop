@@ -51,4 +51,14 @@ export class UrlHelperService {
     });
     return params;
   }
+
+  /**
+ * Clears all query parameters in the current URL
+ */
+  clearQueryParams(): void {
+    this.router.navigate([], {
+      queryParams: {}, // Pass an empty object to clear all query parameters
+      queryParamsHandling: '', // This ensures existing parameters are not merged
+    });
+  }
 }

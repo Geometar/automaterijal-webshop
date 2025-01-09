@@ -21,7 +21,7 @@
         [size]="sizeEnum.AUTO"
         [theme]="orientation.VERTICAL"
         [horizontal]="false"
-        (emitCheckbox)="adjustCategoriesFilters($event)"
+        (emitCheckbox)="adjustCategoriesFilters()"
       ></autom-checkbox>
     </div>
     <div class="filter-container" *ngIf="manufactures && manufactures.length">

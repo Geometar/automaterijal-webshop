@@ -60,6 +60,9 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
     if (changes['manufactures']) {
       this.fillManufactures();
     }
+    if (changes['filter']) {
+      this.adjustCompleteFilters();
+    }
   }
 
   ngOnInit(): void {
@@ -76,28 +79,30 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
   }
 
   fillCategories(): void {
+    this.categoriesCheckBoxModels = [];
     if (this.categories?.length) {
       const filteredGroups = this.filter.grupe ?? [];
       this.categories.forEach((categorie: string) => {
         this.categoriesCheckBoxModels.push({ value: categorie, key: categorie, checked: filteredGroups.includes(categorie) } as CheckboxModel)
       })
-    } else {
-      this.categoriesCheckBoxModels = [];
     }
   }
 
   fillManufactures(): void {
+    this.manufacturesCheckBoxModels = [];
     if (this.manufactures?.length) {
       this.manufactures.forEach((manufacture: Manufacture) => {
         this.manufacturesCheckBoxModels.push({ value: manufacture.naziv, key: manufacture.proid, checked: false } as CheckboxModel)
       })
-    } else {
-      this.manufacturesCheckBoxModels = [];
     }
   }
 
   // Start of: Emit handle
-  adjustCategoriesFilters(data: CheckboxModel): void {
+  adjustCategoriesFilters(): void {
+    this.urlHelperService.addOrUpdateQueryParams({ grupe: this.categoriesCheckBoxModels.filter((value: CheckboxModel) => value.checked).map((value: CheckboxModel) => value.key) })
+  }
+
+  adjustCompleteFilters(): void {
     this.urlHelperService.addOrUpdateQueryParams({ grupe: this.categoriesCheckBoxModels.filter((value: CheckboxModel) => value.checked).map((value: CheckboxModel) => value.key) })
   }
 }

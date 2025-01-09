@@ -5,9 +5,13 @@
     [manufactures]="magacin?.proizvodjaci"
   ></webshop-category>
   <autom-table
+    *ngIf="!loading"
     [data]="magacin?.robaDto!"
     [pageIndex]="pageIndex"
     [pageSize]="pageSize"
     (emitTablePage)="handleTablePageEvent($event)"
   ></autom-table>
+  <div *ngIf="loading" class="spinner">
+    <spinner></spinner>
+  </div>
 </div>

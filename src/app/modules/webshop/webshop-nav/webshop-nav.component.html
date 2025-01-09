@@ -18,7 +18,7 @@
           [size]="sizeEnum.FULL"
           [suffixIcon]="'search'"
           [value]="searchTerm"
-          (customActionEvent)="emitValue()"
+          (customActionEvent)="emitValue($event)"
           (emitSelected)="searchTerm = $event"
         ></autom-input-fields>
       </div>

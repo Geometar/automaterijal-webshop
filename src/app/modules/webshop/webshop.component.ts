@@ -55,6 +55,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
 
   // Misc
   loading = false;
+  internalLoading = false;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -73,16 +74,23 @@ export class WebshopComponent implements OnDestroy, OnInit {
         finalize(() => (this.loading = false))
       )
       .subscribe((params) => {
-        if (params == null || params['searchTerm'] == null) {
+        let internalLoading = false;
+        if (params == null || !params['searchTerm']) {
           this.currentState = WebShopState.SHOW_EMPTY_CONTAINER;
           return;
         }
 
         this.currentState = WebShopState.SHOW_ARTICLES;
-        this.searchTerm = params['searchTerm'];
-        this.filter.grupe = params['grupe'];
-        this.getRoba();
+        if (this.searchTerm === '' || params['searchTerm'] === this.searchTerm) {
+          this.filter.grupe = params['grupe'];
+          this.searchTerm = params['searchTerm'];
+          internalLoading = true;
+        } else {
+          this.searchTerm = params['searchTerm'];
+          this.filter = new Filter();
+        }
 
+        this.getRoba(internalLoading);
       });
   }
 
@@ -94,8 +102,9 @@ export class WebshopComponent implements OnDestroy, OnInit {
 
   /** Event start */
 
-  getRoba(): void {
-    this.loading = true;
+  getRoba(internalLoading = false): void {
+    this.loading = !internalLoading;
+    this.internalLoading = internalLoading;
     this.robaService
       .pronadjiSvuRobu(
         this.sort,
@@ -106,7 +115,10 @@ export class WebshopComponent implements OnDestroy, OnInit {
       )
       .pipe(
         takeUntil(this.destroy$),
-        finalize(() => (this.loading = false))
+        finalize(() => {
+          this.loading = false;
+          this.internalLoading = false;
+        })
       )
       .subscribe({
         next: (response: Magacin) => {

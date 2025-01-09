@@ -6,6 +6,7 @@
   <webshop-roba
     *ngIf="currentState === state.SHOW_ARTICLES && !loading"
     [filter]="filter"
+    [loading]="internalLoading"
     [magacin]="magacinData"
     [pageIndex]="pageIndex"
     [pageSize]="rowsPerPage"

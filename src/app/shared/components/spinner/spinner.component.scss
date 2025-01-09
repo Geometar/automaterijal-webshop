@@ -1,9 +1,10 @@
 .loader {
   width: 60px;
   animation: rotation 1s linear infinite;
-  border-bottom-color: var(--figma-highlight-teal);
   border-radius: 50%;
-  border: 5px solid #FFF;
+  border: 6px solid #FFF;
+  border-bottom-color: var(--figma-primary-600);
+  border-left-color: var(--figma-primary-600);
   box-sizing: border-box;
   display: inline-block;
   height: 60px;
