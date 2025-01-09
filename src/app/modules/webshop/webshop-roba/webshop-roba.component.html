@@ -1,7 +1,8 @@
 <div class="webshop-container-roba">
   <webshop-category
-    [manufactures]="magacin?.proizvodjaci"
     [categories]="magacin?.podgrupe"
+    [filter]="filter"
+    [manufactures]="magacin?.proizvodjaci"
   ></webshop-category>
   <autom-table
     [data]="magacin?.robaDto!"

@@ -1,7 +1,6 @@
 import {
   Component,
-  EventEmitter,
-  Output,
+  Input,
   ViewEncapsulation,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -20,6 +19,9 @@ import {
 import { AutomIconComponent } from '../../../shared/components/autom-icon/autom-icon.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { InputFieldsComponent } from '../../../shared/components/input-fields/input-fields.component';
+
+// Service
+import { UrlHelperService } from '../../../shared/service/utils/url-helper.service';
 
 export class NavTitles {
   title: string = '';
@@ -40,7 +42,7 @@ export class NavTitles {
   encapsulation: ViewEncapsulation.None,
 })
 export class WebshopNavComponent {
-  @Output() emitEvent = new EventEmitter<string>();
+  @Input() searchTerm = '';
 
   // Enums
   buttonTheme = ButtonThemes;
@@ -48,8 +50,6 @@ export class WebshopNavComponent {
   colorEnum = ColorEnum;
   iconEnum = IconsEnum;
   sizeEnum = SizeEnum;
-
-  searchTerm: string = '';
 
   navigationTitles: NavTitles[] = [
     { title: 'Pretraga', svg: IconsEnum.SEARCH } as NavTitles,
@@ -60,7 +60,9 @@ export class WebshopNavComponent {
     { title: 'Enterijer', svg: IconsEnum.CAR_ENTERIER } as NavTitles,
   ];
 
+  constructor(private urlHelperService: UrlHelperService) { }
+
   emitValue(): void {
-    this.emitEvent.emit(this.searchTerm.trim());
+    this.urlHelperService.addOrUpdateQueryParams({ searchTerm: this.searchTerm.trim() });
   }
 }

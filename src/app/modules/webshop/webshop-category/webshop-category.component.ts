@@ -7,10 +7,14 @@ import { RadioButtonComponent } from '../../../shared/components/radio-button/ra
 
 // Data models
 import { CheckboxModel, RadioOption } from '../../../shared/data-models/interface';
+import { Filter } from '../../../shared/data-models/model/roba';
 import { Manufacture } from '../../../shared/data-models/model/proizvodjac';
 
 // Enums
 import { OrientationEnum, SizeEnum } from '../../../shared/data-models/enums';
+
+// Service
+import { UrlHelperService } from '../../../shared/service/utils/url-helper.service';
 
 export enum FilterEnum {
   CATEGORY, MANUFACTURE
@@ -26,6 +30,7 @@ export enum FilterEnum {
 })
 export class WebshopCategoryComponent implements OnChanges, OnInit {
   @Input() categories: string[] | undefined = [];
+  @Input() filter: Filter = new Filter();
   @Input() manufactures: Manufacture[] | undefined = [];
 
   // Misc
@@ -43,6 +48,8 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
   filterEnum = FilterEnum;
   orientation = OrientationEnum;
   sizeEnum = SizeEnum;
+
+  constructor(private urlHelperService: UrlHelperService) { }
 
   // Start of: Angular life cycles
 
@@ -62,15 +69,17 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
   // End of: Angular life cycles
 
   fillAvailability(): void {
+    const selected = this.filter.naStanju ? 'Ima na stanju' : 'Svi artikli';
     ['Svi artikli', 'Ima na stanju'].forEach((value: string) => {
-      this.radioOptions.push({ key: value, value: value } as RadioOption)
+      this.radioOptions.push({ key: value, value: value, checked: value === selected } as RadioOption)
     })
   }
 
   fillCategories(): void {
     if (this.categories?.length) {
+      const filteredGroups = this.filter.grupe ?? [];
       this.categories.forEach((categorie: string) => {
-        this.categoriesCheckBoxModels.push({ value: categorie, key: categorie, checked: false } as CheckboxModel)
+        this.categoriesCheckBoxModels.push({ value: categorie, key: categorie, checked: filteredGroups.includes(categorie) } as CheckboxModel)
       })
     } else {
       this.categoriesCheckBoxModels = [];
@@ -87,16 +96,8 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
     }
   }
 
-  toggleSection(id: FilterEnum): void {
-    switch (id) {
-      case this.filterEnum.CATEGORY: {
-        this.openCategoriesFilters = !this.openCategoriesFilters;
-        break;
-      }
-      case this.filterEnum.MANUFACTURE: {
-        this.openManufacturesFilters = !this.openManufacturesFilters;
-        break;
-      }
-    }
+  // Start of: Emit handle
+  adjustCategoriesFilters(data: CheckboxModel): void {
+    this.urlHelperService.addOrUpdateQueryParams({ grupe: this.categoriesCheckBoxModels.filter((value: CheckboxModel) => value.checked).map((value: CheckboxModel) => value.key) })
   }
 }

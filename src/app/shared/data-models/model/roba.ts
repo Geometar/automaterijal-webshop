@@ -3,14 +3,15 @@ import { PaginatedResponse } from "./page";
 import { Slika } from "./slika";
 
 export class Filter {
-  proizvodjacId?: string;
-  proizvodjac?: string;
-  raspolozivost?: string;
-  naStanju?: boolean;
-  grupa?: string;
+  grupe?: string[];
+  naStanju?: boolean = false;
   pretrazitiGrupe?: boolean;
+  proizvodjac?: string;
+  proizvodjacId?: string;
+  raspolozivost?: string = 'Svi artikli';
 
   Filter() {
+    this.naStanju = false;
     this.proizvodjac = '';
     this.raspolozivost = 'Svi artikli';
   }

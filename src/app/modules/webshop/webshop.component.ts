@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { finalize, Subject, takeUntil } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
 
 // Components imports
 import { WebshopEmptyComponent } from './webshop-empty/webshop-empty.component';
@@ -30,7 +31,7 @@ export enum WebShopState {
     SpinnerComponent,
     WebshopEmptyComponent,
     WebshopNavComponent,
-    WebshopRobaComponent
+    WebshopRobaComponent,
   ],
   templateUrl: './webshop.component.html',
   styleUrl: './webshop.component.scss',
@@ -40,7 +41,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
 
   // Enums
   state = WebShopState;
-  currentState = WebShopState.SHOW_ARTICLES;
+  currentState = WebShopState.SHOW_EMPTY_CONTAINER;
 
   // Paging and Sorting elements
   pageIndex = 0;
@@ -55,13 +56,34 @@ export class WebshopComponent implements OnDestroy, OnInit {
   // Misc
   loading = false;
 
-
-  constructor(private robaService: RobaService, private pictureService: PictureService) { }
+  constructor(
+    private activatedRoute: ActivatedRoute,
+    private pictureService: PictureService,
+    private robaService: RobaService
+  ) { }
 
   /** Angular lifecycle hooks start */
 
   ngOnInit(): void {
-    this.getRoba();
+    this.filter = new Filter();
+    // Subscribe to queryParams observable
+    this.activatedRoute.queryParams
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => (this.loading = false))
+      )
+      .subscribe((params) => {
+        if (params == null || params['searchTerm'] == null) {
+          this.currentState = WebShopState.SHOW_EMPTY_CONTAINER;
+          return;
+        }
+
+        this.currentState = WebShopState.SHOW_ARTICLES;
+        this.searchTerm = params['searchTerm'];
+        this.filter.grupe = params['grupe'];
+        this.getRoba();
+
+      });
   }
 
   ngOnDestroy(): void {
@@ -74,9 +96,18 @@ export class WebshopComponent implements OnDestroy, OnInit {
 
   getRoba(): void {
     this.loading = true;
-    this.robaService.pronadjiSvuRobu(
-      this.sort, this.rowsPerPage, this.pageIndex, this.searchTerm, this.filter
-    ).pipe(takeUntil(this.destroy$), finalize(() => this.loading = false))
+    this.robaService
+      .pronadjiSvuRobu(
+        this.sort,
+        this.rowsPerPage,
+        this.pageIndex,
+        this.searchTerm,
+        this.filter
+      )
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => (this.loading = false))
+      )
       .subscribe({
         next: (response: Magacin) => {
           this.pictureService.convertByteToImage(response.robaDto!.content);
@@ -85,7 +116,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
         },
         error: (err: HttpErrorResponse) => {
           const error = err.error.details || err.error;
-        }
+        },
       });
   }
 
@@ -94,12 +125,12 @@ export class WebshopComponent implements OnDestroy, OnInit {
   // Setters start
   setRobaSearchTerm(searchTerm: string): void {
     this.searchTerm = searchTerm;
-    this.getRoba()
+    this.getRoba();
   }
   setRobaPageData(tableEvent: TablePage): void {
     this.pageIndex = tableEvent.pageIndex;
     this.rowsPerPage = tableEvent.pageSize;
-    this.getRoba()
+    this.getRoba();
   }
 
   // Setters end

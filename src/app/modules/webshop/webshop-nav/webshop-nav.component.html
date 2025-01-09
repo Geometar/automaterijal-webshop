@@ -17,6 +17,7 @@
           [round]="true"
           [size]="sizeEnum.FULL"
           [suffixIcon]="'search'"
+          [value]="searchTerm"
           (customActionEvent)="emitValue()"
           (emitSelected)="searchTerm = $event"
         ></autom-input-fields>

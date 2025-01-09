@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 // Data Models
-import { Magacin } from '../../../shared/data-models/model/roba';
+import { Filter, Magacin } from '../../../shared/data-models/model/roba';
 import { TablePage } from '../../../shared/data-models/model/page';
 
 // Component imports
@@ -16,6 +16,7 @@ import { WebshopCategoryComponent } from '../webshop-category/webshop-category.c
   styleUrl: './webshop-roba.component.scss'
 })
 export class WebshopRobaComponent {
+  @Input() filter: Filter = new Filter();
   @Input() magacin: Magacin | null = null;
   @Input() pageIndex = 0;
   @Input() pageSize = 10;

@@ -1,14 +1,14 @@
 <section class="header-margin--top">
-  <webshop-nav (emitEvent)="setRobaSearchTerm($event)"></webshop-nav>
+  <webshop-nav [searchTerm]="searchTerm"></webshop-nav>
   <webshop-empty
     *ngIf="currentState === state.SHOW_EMPTY_CONTAINER && !loading"
   ></webshop-empty>
   <webshop-roba
     *ngIf="currentState === state.SHOW_ARTICLES && !loading"
+    [filter]="filter"
     [magacin]="magacinData"
     [pageIndex]="pageIndex"
     [pageSize]="rowsPerPage"
-    (emitTablePage)="setRobaPageData($event)"
   ></webshop-roba>
   <div *ngIf="loading" class="spinner">
     <spinner></spinner>
