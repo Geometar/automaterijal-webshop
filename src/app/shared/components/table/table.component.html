@@ -9,10 +9,16 @@
       <!-- Details Section -->
       <div class="details-container">
         <h3>{{ row?.proizvodjac?.naziv }} {{ row.naziv }}</h3>
-        <p>
+        <p class="autom-margin__none">
           Kataloski broj:
           <span class="color--figma-primary-800 display--inline font-medium">{{
             row.katbr
+          }}</span>
+        </p>
+        <p>
+          Kategorija:
+          <span class="color--figma-primary-800 display--inline font-medium">{{
+            row.podGrupaNaziv
           }}</span>
         </p>
         <table class="specifications">

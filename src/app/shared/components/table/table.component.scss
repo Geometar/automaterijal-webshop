@@ -22,7 +22,7 @@
       overflow: hidden; /* Ovo osigurava da ništa ne prelazi granice */
       width: 200px;
     }
-    
+
     .image-container img {
       max-height: 100%;
       max-width: 100%;
@@ -75,7 +75,7 @@
         position: relative; /* Ensure ::before is positioned relative to this element */
         text-align: right;
       }
-      
+
       .item-status::before {
         border-radius: 50%;
         content: "";
@@ -85,11 +85,11 @@
         top: 9px;
         width: 6px;
       }
-      
+
       .item-status.green::before {
         background: #00ba9c; /* Green for available */
       }
-      
+
       .item-status.red::before {
         background: #ff4d4d; /* Red for not available */
       }

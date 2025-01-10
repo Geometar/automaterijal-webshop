@@ -55,23 +55,24 @@ export class Magacin {
 }
 
 export class Roba {
-  robaid?: number;
-  slika?: Slika;
+  aplikacije?: Map<string, RobaAplikacija[]>;
+  asociraniArtikli: Roba[] = [];
+  cena?: number;
+  dokumentacija?: Map<string, TecDocDokumentacija[]>;
+  dozvoljenoZaAnonimusa?: boolean;
   katbr?: string;
   katbrpro?: string;
-  dozvoljenoZaAnonimusa?: boolean;
-  naziv?: string;
-  tekst?: string;
-  stanje?: number;
-  cena?: number;
-  rabat?: number;
   kolicina?: number;
-  uKorpi = false;
+  naziv?: string;
+  podGrupaNaziv?: string;
   proizvodjac?: Manufacture;
   proizvodjacLogo?: string | ArrayBuffer;
-  tehnickiOpis?: RobaTehnickiOpis[];
+  rabat?: number;
+  robaid?: number;
+  slika?: Slika;
+  stanje?: number;
   tdBrojevi?: Map<string, RobaBrojevi[]>;
-  aplikacije?: Map<string, RobaAplikacija[]>;
-  dokumentacija?: Map<string, TecDocDokumentacija[]>;
-  asociraniArtikli: Roba[] = [];
+  tehnickiOpis?: RobaTehnickiOpis[];
+  tekst?: string;
+  uKorpi = false;
 }
