@@ -43,6 +43,7 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
 
   // Radio Models
   radioOptions: RadioOption[] = [];
+  radioOptionKeys = ['Svi artikli', 'Ima na stanju'];
 
   // Enums
   filterEnum = FilterEnum;
@@ -73,7 +74,7 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
 
   fillAvailability(): void {
     const selected = this.filter.naStanju ? 'Ima na stanju' : 'Svi artikli';
-    ['Svi artikli', 'Ima na stanju'].forEach((value: string) => {
+    this.radioOptionKeys.forEach((value: string) => {
       this.radioOptions.push({ key: value, value: value, checked: value === selected } as RadioOption)
     })
   }
@@ -91,8 +92,9 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
   fillManufactures(): void {
     this.manufacturesCheckBoxModels = [];
     if (this.manufactures?.length) {
+      const filterManufactures = this.filter.proizvodjaci ?? [];
       this.manufactures.forEach((manufacture: Manufacture) => {
-        this.manufacturesCheckBoxModels.push({ value: manufacture.naziv, key: manufacture.proid, checked: false } as CheckboxModel)
+        this.manufacturesCheckBoxModels.push({ value: manufacture.naziv, key: manufacture.proid, checked: filterManufactures.includes(manufacture.proid!) } as CheckboxModel)
       })
     }
   }
@@ -102,7 +104,17 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
     this.urlHelperService.addOrUpdateQueryParams({ grupe: this.categoriesCheckBoxModels.filter((value: CheckboxModel) => value.checked).map((value: CheckboxModel) => value.key) })
   }
 
+  adjustManufactureFilters(): void {
+    this.urlHelperService.addOrUpdateQueryParams({ proizvodjaci: this.manufacturesCheckBoxModels.filter((value: CheckboxModel) => value.checked).map((value: CheckboxModel) => value.key) })
+  }
+
   adjustCompleteFilters(): void {
     this.urlHelperService.addOrUpdateQueryParams({ grupe: this.categoriesCheckBoxModels.filter((value: CheckboxModel) => value.checked).map((value: CheckboxModel) => value.key) })
+  }
+
+  adjustAvailability(): void {
+    const selectedCheckbox = this.radioOptions.find((value: RadioOption) => value.checked);
+    const allAvailability = selectedCheckbox?.key === this.radioOptionKeys[0];
+    this.urlHelperService.addOrUpdateQueryParams({ naStanju: !allAvailability });
   }
 }

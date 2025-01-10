@@ -74,23 +74,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
         finalize(() => (this.loading = false))
       )
       .subscribe((params) => {
-        let internalLoading = false;
-        if (params == null || !params['searchTerm']) {
-          this.currentState = WebShopState.SHOW_EMPTY_CONTAINER;
-          return;
-        }
-
-        this.currentState = WebShopState.SHOW_ARTICLES;
-        if (this.searchTerm === '' || params['searchTerm'] === this.searchTerm) {
-          this.filter.grupe = params['grupe'];
-          this.searchTerm = params['searchTerm'];
-          internalLoading = true;
-        } else {
-          this.searchTerm = params['searchTerm'];
-          this.filter = new Filter();
-        }
-
-        this.getRoba(internalLoading);
+        this.handleQueryParams(params);
       });
   }
 
@@ -146,4 +130,46 @@ export class WebshopComponent implements OnDestroy, OnInit {
   }
 
   // Setters end
+
+  // Start of: Private methods
+
+
+  /**
+   * Handles query parameters and updates the component's state accordingly.
+   * @param params The query parameters.
+   */
+  private handleQueryParams(params: any): void {
+    if (!params?.['searchTerm']) {
+      this.currentState = WebShopState.SHOW_EMPTY_CONTAINER;
+      return;
+    }
+
+    this.currentState = WebShopState.SHOW_ARTICLES;
+
+    let internalLoading = false;
+    const isSameSearchTerm = params['searchTerm'] === this.searchTerm;
+    const shouldResetFilter = this.searchTerm === '' || !isSameSearchTerm;
+
+    if (shouldResetFilter) {
+      this.searchTerm = params['searchTerm'];
+      this.filter = new Filter();
+    } else {
+      this.updateFilterFromParams(params);
+      internalLoading = true;
+    }
+
+    this.getRoba(internalLoading);
+  }
+
+  /**
+   * Updates the filter object with the provided query parameters.
+   * @param params The query parameters.
+   */
+  private updateFilterFromParams(params: any): void {
+    this.filter.grupe = params['grupe'];
+    this.filter.naStanju = !!params['naStanju'];
+    this.filter.proizvodjaci = params['proizvodjaci'];
+  }
+
+  // End of: Private methods
 }

@@ -28,8 +28,8 @@ export class RobaService {
     if (searchValue) {
       parameterObject['searchTerm'] = searchValue;
     }
-    if (filter.proizvodjacId) {
-      parameterObject['proizvodjac'] = filter.proizvodjacId;
+    if (filter.proizvodjaci && filter.proizvodjaci.length) {
+      parameterObject['proizvodjaci'] = filter.proizvodjaci;
     }
     parameterObject['naStanju'] = filter.naStanju;
 

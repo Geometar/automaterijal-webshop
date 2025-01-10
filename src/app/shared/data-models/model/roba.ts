@@ -6,13 +6,12 @@ export class Filter {
   grupe?: string[];
   naStanju?: boolean = false;
   pretrazitiGrupe?: boolean;
-  proizvodjac?: string;
+  proizvodjaci?: string[];
   proizvodjacId?: string;
   raspolozivost?: string = 'Svi artikli';
 
   Filter() {
     this.naStanju = false;
-    this.proizvodjac = '';
     this.raspolozivost = 'Svi artikli';
   }
 }
