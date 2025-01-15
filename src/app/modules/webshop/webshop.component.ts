@@ -66,6 +66,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
   /** Angular lifecycle hooks start */
 
   ngOnInit(): void {
+    let init = true;
     this.filter = new Filter();
     // Subscribe to queryParams observable
     this.activatedRoute.queryParams
@@ -74,7 +75,8 @@ export class WebshopComponent implements OnDestroy, OnInit {
         finalize(() => (this.loading = false))
       )
       .subscribe((params) => {
-        this.handleQueryParams(params);
+        this.handleQueryParams(params, init);
+        init = false;
       });
   }
 
@@ -135,10 +137,11 @@ export class WebshopComponent implements OnDestroy, OnInit {
 
 
   /**
-   * Handles query parameters and updates the component's state accordingly.
-   * @param params The query parameters.
-   */
-  private handleQueryParams(params: any): void {
+  * Handles query parameters and updates the component's state accordingly.
+  * @param params The query parameters.
+  * @param isInitialLoad Flag to determine if this is the initial load.
+  */
+  private handleQueryParams(params: any, isInitialLoad: boolean = false): void {
     if (!params?.['searchTerm']) {
       this.currentState = WebShopState.SHOW_EMPTY_CONTAINER;
       return;
@@ -148,7 +151,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
 
     let internalLoading = false;
     const isSameSearchTerm = params['searchTerm'] === this.searchTerm;
-    const shouldResetFilter = this.searchTerm === '' || !isSameSearchTerm;
+    const shouldResetFilter = !isInitialLoad && (this.searchTerm === '' || !isSameSearchTerm);
 
     if (shouldResetFilter) {
       this.searchTerm = params['searchTerm'];
@@ -166,9 +169,18 @@ export class WebshopComponent implements OnDestroy, OnInit {
    * @param params The query parameters.
    */
   private updateFilterFromParams(params: any): void {
-    this.filter.grupe = params['grupe'];
+    this.filter.grupe = this.splitParams(params['grupe']);
     this.filter.naStanju = !!params['naStanju'];
-    this.filter.proizvodjaci = params['proizvodjaci'];
+    this.filter.proizvodjaci = this.splitParams(params['proizvodjaci']);
+    this.searchTerm = params['searchTerm'];
+  }
+
+  private splitParams(param: string): string[] {
+    if (!param) {
+      return [];
+    }
+
+    return param.includes(',') ? param.split(',') : [param];
   }
 
   // End of: Private methods

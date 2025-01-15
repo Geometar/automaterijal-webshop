@@ -1,5 +1,5 @@
 import { CommonModule, CurrencyPipe } from '@angular/common';
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewEncapsulation } from '@angular/core';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
 
@@ -10,22 +10,28 @@ import { RsdCurrencyPipe } from '../../pipe/rsd-currency.pipe';
 // Component imports
 import { ButtonComponent } from '../button/button.component';
 import { InputFieldsComponent } from '../input-fields/input-fields.component';
+import { Chip, ChipsComponent } from '../chips/chips.component';
 
 // Data models
-import { Roba } from '../../data-models/model/roba';
+import { Filter, Roba } from '../../data-models/model/roba';
 import { isPaginatedResponse, PaginatedResponse, TablePage } from '../../data-models/model/page';
+
+// Services
+import { UrlHelperService } from '../../service/utils/url-helper.service';
 
 
 @Component({
   selector: 'autom-table',
   standalone: true,
-  imports: [CommonModule, MatTableModule, MatPaginatorModule, ButtonComponent, RsdCurrencyPipe, InputFieldsComponent],
+  imports: [CommonModule, MatTableModule, MatPaginatorModule, ButtonComponent, RsdCurrencyPipe, InputFieldsComponent, ChipsComponent],
   providers: [CurrencyPipe],
   templateUrl: './table.component.html',
-  styleUrl: './table.component.scss'
+  styleUrl: './table.component.scss',
+  encapsulation: ViewEncapsulation.None
 })
 export class TableComponent implements OnChanges {
   @Input() data: PaginatedResponse<Roba> | Roba[] | null = null;
+  @Input() filter: Filter = new Filter();
   @Input() pageIndex = 0;
   @Input() pageSize = 10;
   @Output() emitTablePage = new EventEmitter<TablePage>();
@@ -45,6 +51,10 @@ export class TableComponent implements OnChanges {
   totalElements = 0; // Default total items
   paginatedData: Roba[] = []; // Data to display on the current page
 
+  filterChips: Chip[] = [];
+
+  constructor(private urlHelperService: UrlHelperService) { }
+
   ngOnInit() {
     this.updatePaginatedData();
   }
@@ -53,6 +63,18 @@ export class TableComponent implements OnChanges {
     if (changes['data']) {
       this.updatePaginationVariables();
       this.updatePaginatedData();
+    }
+    if (changes['filter']) {
+      this.processFilter();
+    }
+  }
+
+  processFilter(): void {
+    if (this.filter.grupe?.length) {
+      this.filterChips.push({ label: 'Grupe', values: this.filter.grupe } as Chip)
+    }
+    if (this.filter.proizvodjaci?.length) {
+      this.filterChips.push({ label: 'Proizvodjaci', values: this.filter.proizvodjaci } as Chip)
     }
   }
 
@@ -93,6 +115,8 @@ export class TableComponent implements OnChanges {
     return isPaginatedResponse<Roba>(this.data);
   }
 
+  removeFilter(chip: Chip): void {
+    this.urlHelperService.removeQueryParam(chip.label);
+  }
+
 }
-// Type helper to check if a type extends an interface
-type IsAssignable<T, U> = T extends U ? true : false;

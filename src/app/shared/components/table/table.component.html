@@ -1,4 +1,9 @@
 <div class="container product-table">
+  <autom-chips
+    *ngIf="filterChips.length"
+    [chips]="filterChips"
+    (emitEvent)="removeFilter($event)"
+  ></autom-chips>
   <div class="product-row" *ngFor="let row of paginatedData">
     <div class="row-container">
       <!-- Image Section -->

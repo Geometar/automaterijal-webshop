@@ -1,16 +1,24 @@
 <div class="webshop-container-roba">
   <webshop-category
+    *ngIf="magacin?.podgrupe?.length"
     [categories]="magacin?.podgrupe"
     [filter]="filter"
     [manufactures]="magacin?.proizvodjaci"
   ></webshop-category>
   <autom-table
-    *ngIf="!loading"
+    *ngIf="!loading && magacin?.robaDto?.content?.length"
     [data]="magacin?.robaDto!"
+    [filter]="filter"
     [pageIndex]="pageIndex"
     [pageSize]="pageSize"
     (emitTablePage)="handleTablePageEvent($event)"
   ></autom-table>
+  <div
+    *ngIf="!magacin?.robaDto?.content?.length"
+    class="util__flex--center util__height no-result"
+  >
+    <h5>🔍 Nema rezultata za : "{{ searchTerm }}".</h5>
+  </div>
   <div *ngIf="loading" class="spinner">
     <spinner></spinner>
   </div>

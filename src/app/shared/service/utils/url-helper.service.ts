@@ -30,6 +30,25 @@ export class UrlHelperService {
     });
   }
 
+
+  /**
+   * Removes a query parameter from the current URL
+   * @param paramName The name of the query parameter to remove
+   */
+  removeQueryParam(paramName: string): void {
+    const queryParams = { ...this.activatedRoute.snapshot.queryParams }; // Get the current query parameters
+
+    const value = paramName.toLowerCase();
+    if (queryParams.hasOwnProperty(value)) {
+      delete queryParams[value]; // Remove the specified parameter
+    }
+
+    this.router.navigate([], {
+      queryParams,
+      queryParamsHandling: '', // Do not merge with existing query parameters
+    });
+  }
+
   /**
    * Reads query parameters from the current route
    * @returns An object containing all query parameters

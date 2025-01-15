@@ -113,6 +113,9 @@
 }
 
 .util {
+  &__height {
+    height: calc(100vh - 208px);
+  }
   &__flex {
     &--wrap {
       display: flex;

@@ -1,0 +1,13 @@
+<mat-chip-set class="chip" cdkDropList cdkDropListOrientation="horizontal">
+  @for (chip of chips; track chip.label) {
+  <mat-chip (click)="remove(chip)"
+    >{{ chip.label }}:
+    {{
+      chip.values.join(", ").length > 25
+        ? chip.values.join(", ").slice(0, 25) + "..."
+        : chip.values.join(", ")
+    }}
+    <autom-icon [source]="iconSource.X"></autom-icon>
+  </mat-chip>
+  }
+</mat-chip-set>

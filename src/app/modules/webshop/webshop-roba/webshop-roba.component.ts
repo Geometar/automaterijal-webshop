@@ -23,6 +23,7 @@ export class WebshopRobaComponent {
   @Input() magacin: Magacin | null = null;
   @Input() pageIndex = 0;
   @Input() pageSize = 10;
+  @Input() searchTerm = '';
   @Output() emitTablePage = new EventEmitter<TablePage>();
 
   handleTablePageEvent(tablePage: TablePage): void {

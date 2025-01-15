@@ -117,4 +117,5 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
     const allAvailability = selectedCheckbox?.key === this.radioOptionKeys[0];
     this.urlHelperService.addOrUpdateQueryParams({ naStanju: !allAvailability });
   }
+  // End of: Emit handle
 }
