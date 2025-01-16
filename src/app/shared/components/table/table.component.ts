@@ -123,7 +123,7 @@ export class TableComponent implements OnChanges {
       this.urlHelperService.removeQueryParam('proizvodjaci');
       this.urlHelperService.removeQueryParam('mandatoryproid');
     } else {
-      this.urlHelperService.removeQueryParam(chip.label);
+      this.urlHelperService.removeQueryParam(chip.label.toLowerCase());
     }
   }
 

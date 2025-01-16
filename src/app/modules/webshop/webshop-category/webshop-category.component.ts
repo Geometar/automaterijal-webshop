@@ -109,7 +109,18 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
   }
 
   adjustCompleteFilters(): void {
-    this.urlHelperService.addOrUpdateQueryParams({ podgrupe: this.categoriesCheckBoxModels.filter((value: CheckboxModel) => value.checked).map((value: CheckboxModel) => value.key) })
+    if (this.manufactures?.length) {
+      this.manufactures.forEach((manufacture: Manufacture) => {
+        const filterManufactures = this.filter.proizvodjaci ?? [];
+        this.manufacturesCheckBoxModels.push({ value: manufacture.naziv, key: manufacture.proid, checked: filterManufactures.includes(manufacture.proid!) } as CheckboxModel)
+      })
+    }
+    if (this.categories?.length) {
+      const filteredSubGroups = this.filter.podgrupe ?? [];
+      this.categories.forEach((categorie: string) => {
+        this.categoriesCheckBoxModels.push({ value: categorie, key: categorie, checked: filteredSubGroups.includes(categorie) } as CheckboxModel)
+      })
+    }
   }
 
   adjustAvailability(): void {

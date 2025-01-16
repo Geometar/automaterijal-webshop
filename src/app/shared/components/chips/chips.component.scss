@@ -5,4 +5,16 @@
     top: 3px;
     width: 18px;
   }
+
+  .label {
+    align-items: center;
+    color: var(--figma-error-700);
+    display: flex;
+    font-weight: 600;
+  }
+
+  .value {
+    color: var(--figma-error-600);
+    font-weight: 500;
+  }
 }

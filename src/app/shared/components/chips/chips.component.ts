@@ -1,8 +1,13 @@
 import { Component, EventEmitter, Input, Output, ViewEncapsulation } from '@angular/core';
-import { MatChipsModule } from '@angular/material/chips';
-import { AutomIconComponent } from '../autom-icon/autom-icon.component';
-import { IconsEnum } from '../../data-models/enums';
 import { CommonModule } from '@angular/common';
+import { MatLabel } from '@angular/material/form-field';
+
+// Enums
+import { IconsEnum } from '../../data-models/enums';
+
+// Component Import
+import { AutomIconComponent } from '../autom-icon/autom-icon.component';
+import { MatChipsModule } from '@angular/material/chips';
 
 export interface Chip {
   label: string;
@@ -12,7 +17,7 @@ export interface Chip {
 @Component({
   selector: 'autom-chips',
   standalone: true,
-  imports: [CommonModule, MatChipsModule, AutomIconComponent],
+  imports: [CommonModule, MatChipsModule, MatLabel, AutomIconComponent],
   templateUrl: './chips.component.html',
   styleUrl: './chips.component.scss',
   encapsulation: ViewEncapsulation.None
