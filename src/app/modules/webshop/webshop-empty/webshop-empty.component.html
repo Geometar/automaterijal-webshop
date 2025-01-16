@@ -1,6 +1,18 @@
-<div class="util__flex--center webshop__empty-container">
-  <div class="webshop__empty-data">
-    <autom-icon [source]="iconEnum.SEARCH"></autom-icon>
-    <p>Pretrazite po kataloskom broju, vozilu ili izaberite kategoriju</p>
+<section class="container">
+  <h1 class="heading">FILTRIRAJ PO PROIZVODJACIMA</h1>
+  <div class="product-grid">
+    <div
+      class="product--card"
+      *ngFor="let brand of brands"
+      (click)="filterByBrand(brand.id!)"
+    >
+      <div class="image-wrapper">
+        <img [src]="brand.src" [alt]="brand.alt" loading="lazy" />
+      </div>
+      <div class="line">
+        <span class="dot"></span>
+      </div>
+      <p class="product-label">{{ brand.label }}</p>
+    </div>
   </div>
-</div>
+</section>

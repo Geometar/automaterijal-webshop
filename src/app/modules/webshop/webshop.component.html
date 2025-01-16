@@ -1,5 +1,5 @@
 <section class="header-margin--top">
-  <webshop-nav [searchTerm]="searchTerm"></webshop-nav>
+  <webshop-nav [filter]="filter" [searchTerm]="searchTerm"></webshop-nav>
   <webshop-empty
     *ngIf="currentState === state.SHOW_EMPTY_CONTAINER && !loading"
   ></webshop-empty>

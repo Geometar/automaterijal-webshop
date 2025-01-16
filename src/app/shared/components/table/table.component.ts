@@ -70,8 +70,11 @@ export class TableComponent implements OnChanges {
   }
 
   processFilter(): void {
-    if (this.filter.grupe?.length) {
-      this.filterChips.push({ label: 'Grupe', values: this.filter.grupe } as Chip)
+    if (this.filter.mandatoryProid?.length) {
+      this.filterChips.push({ label: 'Proizvodjaci', values: this.filter.mandatoryProid } as Chip)
+    }
+    if (this.filter.podgrupe?.length) {
+      this.filterChips.push({ label: 'Podgrupe', values: this.filter.podgrupe } as Chip)
     }
     if (this.filter.proizvodjaci?.length) {
       this.filterChips.push({ label: 'Proizvodjaci', values: this.filter.proizvodjaci } as Chip)
@@ -116,7 +119,12 @@ export class TableComponent implements OnChanges {
   }
 
   removeFilter(chip: Chip): void {
-    this.urlHelperService.removeQueryParam(chip.label);
+    if (chip.label === 'Proizvodjaci') {
+      this.urlHelperService.removeQueryParam('proizvodjaci');
+      this.urlHelperService.removeQueryParam('mandatoryproid');
+    } else {
+      this.urlHelperService.removeQueryParam(chip.label);
+    }
   }
 
 }

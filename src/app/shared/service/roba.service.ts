@@ -31,10 +31,13 @@ export class RobaService {
     if (filter.proizvodjaci && filter.proizvodjaci.length) {
       parameterObject['proizvodjaci'] = filter.proizvodjaci;
     }
+    if (filter.mandatoryProid && filter.mandatoryProid.length) {
+      parameterObject['mandatoryProid'] = filter.mandatoryProid;
+    }
     parameterObject['naStanju'] = filter.naStanju;
 
-    if (filter.grupe) {
-      parameterObject['grupe'] = filter.grupe;
+    if (filter.podgrupe) {
+      parameterObject['podgrupe'] = filter.podgrupe;
     }
     if (filter.pretrazitiGrupe) {
       parameterObject['pretrazitiGrupe'] = filter.pretrazitiGrupe;

@@ -13,7 +13,13 @@
 
       <!-- Details Section -->
       <div class="details-container">
-        <h3>{{ row?.proizvodjac?.naziv }} {{ row.naziv }}</h3>
+        <h3>
+          {{
+            row?.naziv?.includes(row?.proizvodjac?.naziv!)
+              ? row.naziv
+              : row?.proizvodjac?.naziv + " " + row.naziv
+          }}
+        </h3>
         <p class="autom-margin__none">
           Kataloski broj:
           <span class="color--figma-primary-800 display--inline font-medium">{{

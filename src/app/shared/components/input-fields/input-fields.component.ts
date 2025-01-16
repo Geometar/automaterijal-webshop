@@ -493,13 +493,10 @@ export class InputFieldsComponent implements AfterViewInit, OnChanges, OnInit {
   }
 
   suffixIconActionEvent(event: string): void {
-    // Do not trigger emitter if there is no action
-    if (event) {
-      this.customActionEvent.emit({
-        event,
-        value: this.form!.controls['formCtrl'].value
-      });
-    }
+    this.customActionEvent.emit({
+      value: this.form!.controls['formCtrl'].value
+    });
+
   }
 
   onEnter(): void {

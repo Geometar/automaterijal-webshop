@@ -3,11 +3,11 @@ import { PaginatedResponse } from "./page";
 import { Slika } from "./slika";
 
 export class Filter {
-  grupe?: string[];
+  mandatoryProid?: string[];
   naStanju?: boolean = false;
+  podgrupe?: string[];
   pretrazitiGrupe?: boolean;
   proizvodjaci?: string[];
-  proizvodjacId?: string;
   raspolozivost?: string = 'Svi artikli';
 
   Filter() {

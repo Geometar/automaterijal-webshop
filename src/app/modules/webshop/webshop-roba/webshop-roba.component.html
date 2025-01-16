@@ -14,7 +14,7 @@
     (emitTablePage)="handleTablePageEvent($event)"
   ></autom-table>
   <div
-    *ngIf="!magacin?.robaDto?.content?.length"
+    *ngIf="!magacin?.robaDto?.content?.length && !loading"
     class="util__flex--center util__height no-result"
   >
     <h5>🔍 Nema rezultata za : "{{ searchTerm }}".</h5>

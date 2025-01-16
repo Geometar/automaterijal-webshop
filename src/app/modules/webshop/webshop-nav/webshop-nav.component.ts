@@ -5,6 +5,8 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+// Data models
+import { Filter } from '../../../shared/data-models/model/roba';
 
 // Enums
 import {
@@ -43,6 +45,7 @@ export class NavTitles {
 })
 export class WebshopNavComponent {
   @Input() searchTerm = '';
+  @Input() filter = new Filter();
 
   // Enums
   buttonTheme = ButtonThemes;
@@ -64,6 +67,6 @@ export class WebshopNavComponent {
 
   emitValue(searchTerm: any): void {
     this.searchTerm = searchTerm?.value ? searchTerm?.value.trim() : '';
-    this.searchTerm ? this.urlHelperService.addOrUpdateQueryParams({ searchTerm: this.searchTerm }) : this.urlHelperService.clearQueryParams();
+    this.searchTerm || !!this.filter.mandatoryProid ? this.urlHelperService.addOrUpdateQueryParams({ searchTerm: this.searchTerm }) : this.urlHelperService.clearQueryParams();
   }
 }

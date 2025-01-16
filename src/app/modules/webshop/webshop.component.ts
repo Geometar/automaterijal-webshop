@@ -135,44 +135,111 @@ export class WebshopComponent implements OnDestroy, OnInit {
 
   // Start of: Private methods
 
-
   /**
-  * Handles query parameters and updates the component's state accordingly.
-  * @param params The query parameters.
-  * @param isInitialLoad Flag to determine if this is the initial load.
-  */
+   * Handles query parameters and updates the component's state accordingly.
+   * @param params The query parameters.
+   * @param isInitialLoad Flag to determine if this is the initial load.
+   */
   private handleQueryParams(params: any, isInitialLoad: boolean = false): void {
-    if (!params?.['searchTerm']) {
+    const searchTerm = params['searchTerm'] || '';
+    const mandatoryProid = params['mandatoryproid'] || '';
+    const mandatoryOnInit = !!mandatoryProid && isInitialLoad;
+
+    if (this.shouldShowEmptyContainer(searchTerm, mandatoryProid, mandatoryOnInit)) {
       this.currentState = WebShopState.SHOW_EMPTY_CONTAINER;
       return;
     }
 
     this.currentState = WebShopState.SHOW_ARTICLES;
 
-    let internalLoading = false;
-    const isSameSearchTerm = params['searchTerm'] === this.searchTerm;
-    const shouldResetFilter = !isInitialLoad && (this.searchTerm === '' || !isSameSearchTerm);
+    const newFilter = this.createFilterFromParams(params);
+    const isSameSearchTerm = searchTerm === this.searchTerm;
+    const filtersChanged = this.haveFiltersChanged(this.filter, newFilter);
 
-    if (shouldResetFilter) {
-      this.searchTerm = params['searchTerm'];
-      this.filter = new Filter();
-    } else {
-      this.updateFilterFromParams(params);
-      internalLoading = true;
+    if (!isInitialLoad && isSameSearchTerm && !filtersChanged) {
+      return;
     }
 
-    this.getRoba(internalLoading);
+    this.updateState(searchTerm, newFilter, isInitialLoad, isSameSearchTerm, !!mandatoryProid);
+    this.getRoba(isInitialLoad || filtersChanged);
   }
 
   /**
-   * Updates the filter object with the provided query parameters.
-   * @param params The query parameters.
+   * Updates the component's state based on query parameters.
    */
-  private updateFilterFromParams(params: any): void {
-    this.filter.grupe = this.splitParams(params['grupe']);
-    this.filter.naStanju = !!params['naStanju'];
-    this.filter.proizvodjaci = this.splitParams(params['proizvodjaci']);
-    this.searchTerm = params['searchTerm'];
+  private updateState(
+    searchTerm: string,
+    newFilter: Filter,
+    isInitialLoad: boolean,
+    isSameSearchTerm: boolean,
+    isMandatoryFilterOn: boolean
+  ): void {
+    this.searchTerm = searchTerm;
+
+    if (!isInitialLoad && !isMandatoryFilterOn && (!this.searchTerm || !isSameSearchTerm)) {
+      this.filter = new Filter();
+    } else {
+      this.filter = newFilter;
+      if (!isSameSearchTerm && isMandatoryFilterOn) {
+        this.filter.podgrupe = [];
+      }
+    }
+  }
+
+  /**
+   * Creates a filter object from the provided query parameters.
+   * @param params The query parameters.
+   * @returns A new Filter object.
+   */
+  private createFilterFromParams(params: any): Filter {
+    const filter = new Filter();
+    filter.podgrupe = this.splitParams(params['podgrupe']);
+    filter.mandatoryProid = this.splitParams(params['mandatoryproid']);
+    filter.naStanju = params['naStanju'] === 'true';
+    filter.proizvodjaci = this.splitParams(params['proizvodjaci']);
+    return filter;
+  }
+
+  /**
+ * Compares two filter objects for equality.
+ * @param oldFilter The existing filter.
+ * @param newFilter The new filter to compare.
+ * @returns True if the filters are different, otherwise false.
+ */
+  private haveFiltersChanged(oldFilter: Filter, newFilter: Filter): boolean {
+    // Deep comparison to check for differences
+    return !this.deepEqual(oldFilter, newFilter);
+  }
+
+  /**
+  * Performs a deep equality check on two objects.
+  * @param obj1 The first object to compare.
+  * @param obj2 The second object to compare.
+  * @returns True if objects are equal, otherwise false.
+  */
+  private deepEqual(obj1: any, obj2: any): boolean {
+    if (obj1 === obj2) {
+      return true; // Same reference or value
+    }
+
+    if (typeof obj1 !== 'object' || typeof obj2 !== 'object' || obj1 === null || obj2 === null) {
+      return false; // Primitive or one is null
+    }
+
+    const keys1 = Object.keys(obj1).sort();
+    const keys2 = Object.keys(obj2).sort();
+
+    if (keys1.length !== keys2.length) {
+      return false; // Different number of keys
+    }
+
+    for (let key of keys1) {
+      if (!keys2.includes(key) || !this.deepEqual(obj1[key], obj2[key])) {
+        return false; // Key missing or values not equal
+      }
+    }
+
+    return true;
   }
 
   private splitParams(param: string): string[] {
@@ -181,6 +248,13 @@ export class WebshopComponent implements OnDestroy, OnInit {
     }
 
     return param.includes(',') ? param.split(',') : [param];
+  }
+
+  /**
+   * Checks whether the component should display an empty container.
+   */
+  private shouldShowEmptyContainer(searchTerm: string, mandatoryProid: string, mandatoryOnInit: boolean): boolean {
+    return !searchTerm && !mandatoryProid && !mandatoryOnInit;
   }
 
   // End of: Private methods

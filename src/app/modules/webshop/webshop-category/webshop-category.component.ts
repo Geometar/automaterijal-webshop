@@ -82,9 +82,9 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
   fillCategories(): void {
     this.categoriesCheckBoxModels = [];
     if (this.categories?.length) {
-      const filteredGroups = this.filter.grupe ?? [];
+      const filteredSubGroups = this.filter.podgrupe ?? [];
       this.categories.forEach((categorie: string) => {
-        this.categoriesCheckBoxModels.push({ value: categorie, key: categorie, checked: filteredGroups.includes(categorie) } as CheckboxModel)
+        this.categoriesCheckBoxModels.push({ value: categorie, key: categorie, checked: filteredSubGroups.includes(categorie) } as CheckboxModel)
       })
     }
   }
@@ -101,7 +101,7 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
 
   // Start of: Emit handle
   adjustCategoriesFilters(): void {
-    this.urlHelperService.addOrUpdateQueryParams({ grupe: this.categoriesCheckBoxModels.filter((value: CheckboxModel) => value.checked).map((value: CheckboxModel) => value.key) })
+    this.urlHelperService.addOrUpdateQueryParams({ podgrupe: this.categoriesCheckBoxModels.filter((value: CheckboxModel) => value.checked).map((value: CheckboxModel) => value.key) })
   }
 
   adjustManufactureFilters(): void {
@@ -109,7 +109,7 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
   }
 
   adjustCompleteFilters(): void {
-    this.urlHelperService.addOrUpdateQueryParams({ grupe: this.categoriesCheckBoxModels.filter((value: CheckboxModel) => value.checked).map((value: CheckboxModel) => value.key) })
+    this.urlHelperService.addOrUpdateQueryParams({ podgrupe: this.categoriesCheckBoxModels.filter((value: CheckboxModel) => value.checked).map((value: CheckboxModel) => value.key) })
   }
 
   adjustAvailability(): void {
