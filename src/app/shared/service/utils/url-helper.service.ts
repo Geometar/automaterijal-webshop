@@ -41,6 +41,8 @@ export class UrlHelperService {
     const value = paramName.toLowerCase();
     if (queryParams.hasOwnProperty(value)) {
       delete queryParams[value]; // Remove the specified parameter
+    } else {
+      return;
     }
 
     this.router.navigate([], {
