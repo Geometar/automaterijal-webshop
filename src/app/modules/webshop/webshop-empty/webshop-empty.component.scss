@@ -1,13 +1,16 @@
 .container {
-  padding: 20px;
-  max-width: 1200px;
+  display: flex;
   margin: 0 auto;
+  max-width: 1200px;
+  padding: 20px;
+;
 }
 
 .heading {
+  color: #1b455e;
+  font-size: 1.4rem ! IMPORTANT;
+  margin-bottom: 0px !important;
   text-align: center;
-  font-size: 1.5rem !important;
-  margin-bottom: 20px !important;
 }
 
 /* Grid Layout */
@@ -24,10 +27,24 @@
   border-radius: 8px;
   border: 1px solid #ddd;
   cursor: pointer;
+  height: 200px;
   padding: 10px;
   text-align: center;
   transition: transform 0.3s, box-shadow 0.3s;
   width: 150px;
+}
+
+/* Card Styles */
+.category--card {
+  background-color: #b2b2b21a;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  height: 200px;
+  padding: 10px;
+  text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+  width: 240px;
 }
 
 .product--card:hover {
@@ -35,16 +52,36 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+.category--card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
 /* Image Wrapper to Center Images */
 .image-wrapper {
-  display: flex;
-  justify-content: center;
   align-items: center;
+  display: flex;
   height: 100px; /* Adjust to your needs */
-  margin-bottom: 10px;
+  justify-content: center;
+  margin-bottom: 30px;
 }
 
 .image-wrapper img {
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+
+.category-image-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 120px; /* Adjust to your needs */
+  margin-bottom: 10px;
+}
+
+.category-image-wrapper img {
   max-height: 100%;
   max-width: 100%;
   object-fit: contain;

@@ -143,9 +143,10 @@ export class WebshopComponent implements OnDestroy, OnInit {
   private handleQueryParams(params: any, isInitialLoad: boolean = false): void {
     const searchTerm = params['searchTerm'] || '';
     const mandatoryProid = params['mandatoryproid'] || '';
+    const mandatoryGrupe = params['grupe'] || '';
     const mandatoryOnInit = !!mandatoryProid && isInitialLoad;
 
-    if (this.shouldShowEmptyContainer(searchTerm, mandatoryProid, mandatoryOnInit)) {
+    if (this.shouldShowEmptyContainer(searchTerm, mandatoryProid, mandatoryGrupe, mandatoryOnInit)) {
       this.currentState = WebShopState.SHOW_EMPTY_CONTAINER;
       return;
     }
@@ -160,7 +161,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
       return;
     }
 
-    this.updateState(searchTerm, newFilter, isInitialLoad, isSameSearchTerm, !!mandatoryProid);
+    this.updateState(searchTerm, newFilter, isInitialLoad, isSameSearchTerm, !!mandatoryProid || !!mandatoryGrupe);
     this.getRoba(isInitialLoad || filtersChanged);
   }
 
@@ -193,9 +194,10 @@ export class WebshopComponent implements OnDestroy, OnInit {
    */
   private createFilterFromParams(params: any): Filter {
     const filter = new Filter();
-    filter.podgrupe = this.splitParams(params['podgrupe']);
+    filter.grupe = this.splitParams(params['grupe']);
     filter.mandatoryProid = this.splitParams(params['mandatoryproid']);
     filter.naStanju = params['naStanju'] === 'true';
+    filter.podgrupe = this.splitParams(params['podgrupe']);
     filter.proizvodjaci = this.splitParams(params['proizvodjaci']);
     return filter;
   }
@@ -253,8 +255,8 @@ export class WebshopComponent implements OnDestroy, OnInit {
   /**
    * Checks whether the component should display an empty container.
    */
-  private shouldShowEmptyContainer(searchTerm: string, mandatoryProid: string, mandatoryOnInit: boolean): boolean {
-    return !searchTerm && !mandatoryProid && !mandatoryOnInit;
+  private shouldShowEmptyContainer(searchTerm: string, mandatoryProid: string, mandatoryGrupe: string, mandatoryOnInit: boolean): boolean {
+    return !searchTerm && !mandatoryProid && !mandatoryGrupe && !mandatoryOnInit;
   }
 
   // End of: Private methods

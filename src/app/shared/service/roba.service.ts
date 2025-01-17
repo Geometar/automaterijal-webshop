@@ -21,24 +21,33 @@ export class RobaService {
     const parameterObject = {} as any;
     parameterObject['pageSize'] = pageSize;
     parameterObject['page'] = page;
+    parameterObject['naStanju'] = filter.naStanju;
+
     if (sort) {
       parameterObject['sortBy'] = sort.active.toLocaleUpperCase();
       parameterObject['sortDirection'] = sort.direction.toLocaleUpperCase();
     }
+
     if (searchValue) {
       parameterObject['searchTerm'] = searchValue;
     }
+
     if (filter.proizvodjaci && filter.proizvodjaci.length) {
       parameterObject['proizvodjaci'] = filter.proizvodjaci;
     }
+
     if (filter.mandatoryProid && filter.mandatoryProid.length) {
       parameterObject['mandatoryProid'] = filter.mandatoryProid;
     }
-    parameterObject['naStanju'] = filter.naStanju;
 
     if (filter.podgrupe) {
       parameterObject['podgrupe'] = filter.podgrupe;
     }
+
+    if (filter.grupe) {
+      parameterObject['grupe'] = filter.grupe;
+    }
+
     if (filter.pretrazitiGrupe) {
       parameterObject['pretrazitiGrupe'] = filter.pretrazitiGrupe;
     }

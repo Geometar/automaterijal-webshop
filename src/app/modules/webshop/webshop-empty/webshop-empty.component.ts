@@ -40,7 +40,24 @@ export class WebshopEmptyComponent {
     { src: '/images/brands/energizer.png', alt: 'Energizer', label: 'Energizer', id: 'ENERG' },
   ];
 
+  categories = [
+    { src: '/images/groups/maziva-putnicki.png', alt: 'Maziva', label: 'Maziva - putnicki program', id: 'MPU' },
+    { src: '/images/groups/maziva-teretni.png', alt: 'Maziva', label: 'Maziva - teretni program', id: 'MTR' },
+    { src: '/images/groups/maziva-obradametala.png', alt: 'Maziva', label: 'Maziva - Obrada metala', id: 'MOM' },
+    { src: '/images/groups/maziva-industrija.png', alt: 'Maziva', label: 'Maziva - Industrijski program', id: 'MIZ' },
+    { src: '/images/groups/maziva-ostalo.png', alt: 'Maziva', label: 'Maziva - ostalo', id: 'MOS' },
+    { src: '/images/groups/alati.png', alt: 'Alati', label: 'Alati', id: 'ALATI' },
+    { src: '/images/groups/kozmetika.png', alt: 'Maziva', label: 'Kozmetika', id: 'NAZI' },
+    { src: '/images/groups/odrzavanje-vozila.png', alt: 'Maziva', label: 'Odrzavanje vozila', id: 'OD' },
+    { src: '/images/groups/oprema-auta.png', alt: 'Maziva', label: 'Praktična auto oprema.', id: 'UD' },
+    { src: '/images/groups/auto_enterijer.png', alt: 'Maziva', label: 'Auto Enterijer', id: 'UNIDO' },
+  ];
+
   filterByBrand(id: string): void {
     this.urlHelperService.addOrUpdateQueryParams({ "mandatoryproid": id });
+  }
+
+  filterByCategory(id: string): void {
+    this.urlHelperService.addOrUpdateQueryParams({ "grupe": id });
   }
 }
