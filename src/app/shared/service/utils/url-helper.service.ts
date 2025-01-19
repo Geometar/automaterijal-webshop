@@ -82,4 +82,15 @@ export class UrlHelperService {
       queryParamsHandling: '', // This ensures existing parameters are not merged
     });
   }
+
+  /**
+   * Checks if a specific query parameter exists and has data
+   * @param paramName The name of the query parameter to check
+   * @returns True if the query parameter exists and has data, otherwise false
+   */
+  hasQueryParam(paramName: string): boolean {
+    const queryParams = this.activatedRoute.snapshot.queryParams;
+    const value = queryParams[paramName];
+    return value !== undefined && value !== null && value.trim() !== '';
+  }
 }

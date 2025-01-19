@@ -18,4 +18,10 @@
     <autom-icon [source]="iconSource.X"></autom-icon>
   </mat-chip>
   }
+  <autom-button
+    [label]="'Resetuj filtere'"
+    [theme]="buttonThemes.DARK_RED"
+    [type]="buttonTypes.TERNARY"
+    (clickEvent)="removeAll()"
+  ></autom-button>
 </mat-chip-set>

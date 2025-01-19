@@ -12,8 +12,12 @@ import { ButtonComponent } from '../button/button.component';
 import { InputFieldsComponent } from '../input-fields/input-fields.component';
 import { Chip, ChipsComponent } from '../chips/chips.component';
 
+// Constants 
+import { CATEGORIES_EMPTY_CONTAINER } from '../../data-models/constants/webshop.constants';
+
 // Data models
 import { Filter, Roba } from '../../data-models/model/roba';
+import { Categories } from '../../data-models/model/webshop';
 import { isPaginatedResponse, PaginatedResponse, TablePage } from '../../data-models/model/page';
 
 // Services
@@ -47,6 +51,9 @@ export class TableComponent implements OnChanges {
   // Complete data source
   dataSource = [];
 
+  // Misc
+  categories = CATEGORIES_EMPTY_CONTAINER;
+
   // Pagination variables
   totalElements = 0; // Default total items
   paginatedData: Roba[] = []; // Data to display on the current page
@@ -78,6 +85,10 @@ export class TableComponent implements OnChanges {
     }
     if (this.filter.proizvodjaci?.length) {
       this.filterChips.push({ label: 'Proizvodjaci', values: this.filter.proizvodjaci } as Chip)
+    }
+    if (this.filter.grupe?.length) {
+      const chosenCategories = this.categories.filter((data: Categories) => this.filter.grupe!.includes(data.id!)).map((data: Categories) => data.label);
+      this.filterChips.push({ label: 'Grupe', values: chosenCategories } as Chip)
     }
   }
 
@@ -119,6 +130,12 @@ export class TableComponent implements OnChanges {
   }
 
   removeFilter(chip: Chip): void {
+    // If Grupe or Mandatory Proid is removed, cleare all filters
+    if (chip.label === 'Grupe' || (chip.label === 'Proizvodjaci' && this.urlHelperService.hasQueryParam('mandatoryproid'))) {
+      this.urlHelperService.clearQueryParams();
+      return;
+    }
+
     if (chip.label === 'Proizvodjaci') {
       this.urlHelperService.removeQueryParam('proizvodjaci');
       this.urlHelperService.removeQueryParam('mandatoryproid');

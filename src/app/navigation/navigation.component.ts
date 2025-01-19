@@ -34,7 +34,8 @@ export class NavigationComponent implements OnInit {
     if (isPlatformBrowser(this.platformId)) {
       this.router.events.subscribe(event => {
         if (event instanceof NavigationEnd) {
-          this.currentUrl = event.urlAfterRedirects;
+          const parsedUrl = new URL(event.urlAfterRedirects, window.location.origin);
+          this.currentUrl = parsedUrl.pathname;
           window.scrollTo(0, 0);
         }
       });
