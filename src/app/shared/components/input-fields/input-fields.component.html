@@ -123,7 +123,7 @@
         [id]="id"
         [max]="max"
         [min]="min"
-        [pattern]="pattern"
+        [pattern]="'^[0-9]*$'"
         [placeholder]="placeholder"
         [readonly]="readonly"
         [required]="required"
@@ -135,19 +135,23 @@
         (keyup)="numberHandler()"
         (paste)="numberHandler()"
       />
+
       <div class="arrows">
-        <a (click)="value = +value + step"
-          ><autom-icon
+        <!-- Arrow Up -->
+        <a [class.disabled]="value >= max" (click)="increaseQuantity()">
+          <autom-icon
             class="quantity-arrow"
             [source]="iconEnum.ARROW_UP"
-          ></autom-icon
-        ></a>
-        <a (click)="value = +value - step"
-          ><autom-icon
+          ></autom-icon>
+        </a>
+
+        <!-- Arrow Down -->
+        <a [class.disabled]="value <= 1" (click)="decreaseQuantity()">
+          <autom-icon
             class="quantity-arrow"
             [source]="iconEnum.ARROW_DOWN"
-          ></autom-icon
-        ></a>
+          ></autom-icon>
+        </a>
       </div>
     </div>
   </ng-container>

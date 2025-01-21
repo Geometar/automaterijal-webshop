@@ -1,0 +1,89 @@
+<div class="row-container">
+  <!-- Image Section -->
+  <div class="image-container">
+    <img [src]="data!.slika!.slikeUrl" alt="Product Image" />
+  </div>
+
+  <!-- Details Section -->
+  <div class="details-container">
+    <h3>
+      {{
+        data.naziv?.includes(data.proizvodjac!.naziv!)
+          ? data.naziv
+          : data.proizvodjac?.naziv + " " + data.naziv
+      }}
+    </h3>
+    <p class="autom-margin__none">
+      Kataloski broj:
+      <span class="color--figma-primary-800 display--inline font-medium">{{
+        data!.katbr
+      }}</span>
+    </p>
+    <p>
+      Kategorija:
+      <span class="color--figma-primary-800 display--inline font-medium">{{
+        data!.podGrupaNaziv
+      }}</span>
+    </p>
+    <table class="specifications">
+      <tbody>
+        <tr *ngFor="let spec of data.tehnickiOpis">
+          <td>
+            {{ spec.oznaka }}
+            <span *ngIf="spec.jedinica" class="display--inline">[</span
+            >{{ spec.jedinica }}
+            <span *ngIf="spec.jedinica" class="display--inline">]</span>
+          </td>
+          <td class="autom-align__right">{{ spec.vrednost }}</td>
+        </tr>
+        <tr *ngIf="!data.tehnickiOpis?.length">
+          <td colspan="2">No specifications available</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pricing Section -->
+  <div class="pricing-container">
+    <div
+      [ngClass]="{
+        'item-status': true,
+        green: data.stanje! > 0,
+        red: data.stanje! === 0
+      }"
+    >
+      {{ data.stanje! > 0 ? "Ima na stanju" : "Nema na stanju" }}
+    </div>
+    <p class="price">{{ data.cena! | rsdCurrency }}</p>
+    <p class="autom-align__right">Cena sa pdv-om</p>
+    <div class="util__flex--center">
+      <autom-input-fields
+        [clearBtn]="false"
+        [customClass]="'quantity-size'"
+        [max]="data!.stanje!"
+        [min]="1"
+        [roundOff]="true"
+        [size]="sizeEnum.MEDIUM"
+        [type]="inputTypeEnum.QUANTITY"
+        [validators]="[
+          { name: 'max', value: data.stanje },
+          { name: 'min', value: 1 }
+        ]"
+        [step]="1"
+        [value]="1"
+        (emitSelected)="modifyQuantity($event)"
+        ngDefaultControl
+      ></autom-input-fields>
+      <autom-button
+        [disabled]="!data.stanje"
+        [iconColor]="colorEnum.INFO_25"
+        [iconPrefix]="true"
+        [iconSource]="iconEnum.SHOPPING_CART"
+        [label]="'Dodaj u korpu'"
+        mat-raised-button
+        color="primary"
+        (clickEvent)="addToShopingCart()"
+      />
+    </div>
+  </div>
+</div>

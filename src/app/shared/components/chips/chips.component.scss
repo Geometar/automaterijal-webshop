@@ -1,9 +1,16 @@
 .chip {
+  align-items: center;
+  display: flex;
   .autom-icon {
     height: 18px;
     position: relative;
     top: 3px;
     width: 18px;
+  }
+  
+  .mdc-evolution-chip-set__chips {
+    align-items: center;
+    margin-left: 0 !important;
   }
 
   .label {

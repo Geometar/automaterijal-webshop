@@ -98,6 +98,11 @@ input[type='search' i]::-webkit-search-cancel-button {
   -webkit-appearance: none;
 }
 
+a.disabled {
+  opacity: 0.5; /* Makes it look grayed out */
+  pointer-events: none;
+}
+
 .arrows {
   align-items: center;
   border-left: 1px solid #ccc;

@@ -174,7 +174,7 @@ export class InputFieldsComponent implements AfterViewInit, OnChanges, OnInit {
         break;
 
       case ctrl.hasError('maxlength'):
-        message = 'Maksimalan broj je ' + this.validatorMaxLength;
+        message = 'Min: ' + this.validatorMaxLength;
         break;
 
       case ctrl.hasError('minlength'):
@@ -182,11 +182,11 @@ export class InputFieldsComponent implements AfterViewInit, OnChanges, OnInit {
         break;
 
       case ctrl.hasError('max'):
-        message = 'Maksimalan broj je ' + this.validatorMaxValue;
+        message = 'Max: ' + this.validatorMaxValue;
         break;
 
       case ctrl.hasError('min'):
-        message = 'Minimalan broj je ' + this.validatorMinValue;
+        message = 'Mix: ' + this.validatorMinValue;
         break;
 
       case ctrl.hasError('pattern'):
@@ -365,11 +365,26 @@ export class InputFieldsComponent implements AfterViewInit, OnChanges, OnInit {
       let value = this.form?.controls['formCtrl']?.value;
 
       if (this.roundOff) value = Math.round(+value).toString();
+      const isNumber = this.type === InputTypeEnum.NUMBER || this.type === InputTypeEnum.QUANTITY;
 
-      this.emitSelected.emit(value);
+      this.emitSelected.emit(isNumber ? +value : value);
       this.form!.controls['formCtrl'].setValue(value);
       this.form!.controls['formCtrl'].updateValueAndValidity();
     }
+  }
+
+  increaseQuantity(): void {
+    const value = +this.form?.controls['formCtrl'].value + 1;
+    this.value = value;
+    this.form?.controls['formCtrl'].setValue(value);
+    this.emitSelected.emit(value);
+  }
+
+  decreaseQuantity(): void {
+    const value = this.form?.controls['formCtrl'].value - 1;
+    this.value = value;
+    this.form?.controls['formCtrl'].setValue(value);
+    this.emitSelected.emit(value);
   }
 
   resetForm(): void {

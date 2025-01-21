@@ -3,14 +3,9 @@ import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewE
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
 
-// Enums
-import { ButtonThemes, ButtonTypes, ColorEnum, IconsEnum, InputTypeEnum, SizeEnum } from '../../data-models/enums';
-import { RsdCurrencyPipe } from '../../pipe/rsd-currency.pipe';
-
 // Component imports
-import { ButtonComponent } from '../button/button.component';
-import { InputFieldsComponent } from '../input-fields/input-fields.component';
 import { Chip, ChipsComponent } from '../chips/chips.component';
+import { RowComponent } from './row/row.component';
 
 // Constants 
 import { CATEGORIES_EMPTY_CONTAINER } from '../../data-models/constants/webshop.constants';
@@ -27,7 +22,7 @@ import { UrlHelperService } from '../../service/utils/url-helper.service';
 @Component({
   selector: 'autom-table',
   standalone: true,
-  imports: [CommonModule, MatTableModule, MatPaginatorModule, ButtonComponent, RsdCurrencyPipe, InputFieldsComponent, ChipsComponent],
+  imports: [CommonModule, MatTableModule, MatPaginatorModule, ChipsComponent, RowComponent],
   providers: [CurrencyPipe],
   templateUrl: './table.component.html',
   styleUrl: './table.component.scss',
@@ -39,14 +34,6 @@ export class TableComponent implements OnChanges {
   @Input() pageIndex = 0;
   @Input() pageSize = 10;
   @Output() emitTablePage = new EventEmitter<TablePage>();
-
-  // Enums
-  buttonTheme = ButtonThemes;
-  buttonType = ButtonTypes;
-  colorEnum = ColorEnum;
-  iconEnum = IconsEnum;
-  inputTypeEnum = InputTypeEnum;
-  sizeEnum = SizeEnum;
 
   // Complete data source
   dataSource = [];
@@ -143,5 +130,4 @@ export class TableComponent implements OnChanges {
       this.urlHelperService.removeQueryParam(chip.label.toLowerCase());
     }
   }
-
 }

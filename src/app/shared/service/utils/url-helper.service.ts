@@ -37,18 +37,20 @@ export class UrlHelperService {
    */
   removeQueryParam(paramName: string): void {
     const queryParams = { ...this.activatedRoute.snapshot.queryParams }; // Get the current query parameters
+    const targetParam = paramName.toLowerCase(); // Convert the parameter name to lowercase
 
-    const value = paramName.toLowerCase();
-    if (queryParams.hasOwnProperty(value)) {
-      delete queryParams[value]; // Remove the specified parameter
-    } else {
-      return;
+    // Find the key in queryParams matching targetParam in a case-insensitive way
+    const matchedKey = Object.keys(queryParams).find(
+      key => key.toLowerCase() === targetParam
+    );
+
+    if (matchedKey) {
+      delete queryParams[matchedKey]; // Remove the matched parameter
+      this.router.navigate([], {
+        queryParams,
+        queryParamsHandling: '', // Do not merge with existing query parameters
+      });
     }
-
-    this.router.navigate([], {
-      queryParams,
-      queryParamsHandling: '', // Do not merge with existing query parameters
-    });
   }
 
   /**
