@@ -148,6 +148,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
 
     if (this.shouldShowEmptyContainer(searchTerm, mandatoryProid, mandatoryGrupe, mandatoryOnInit)) {
       this.currentState = WebShopState.SHOW_EMPTY_CONTAINER;
+      this.searchTerm = searchTerm;
       return;
     }
 
