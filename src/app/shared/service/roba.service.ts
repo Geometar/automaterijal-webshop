@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Sort } from '@angular/material/sort';
-import { Filter, Magacin } from '../data-models/model/roba';
+import { Filter, Magacin, Roba } from '../data-models/model/roba';
 import { catchError, Observable, throwError } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environment/environment';
@@ -15,6 +15,16 @@ const ROBA_URL = '/roba';
 export class RobaService {
 
   constructor(private http: HttpClient, private helperService: ServiceHelpersService) { }
+
+  public fetchDetails(robaId: number): Observable<Roba> {
+    const fullUrl = DOMAIN_URL + ROBA_URL + '/' + robaId;
+
+    return this.http
+      .get<Roba>(fullUrl)
+      .pipe(
+        catchError((error: any) => throwError(error))
+      );
+  }
 
 
   public pronadjiSvuRobu(sort: Sort | null, pageSize: number, page: number, searchValue: string, filter: Filter): Observable<Magacin> {

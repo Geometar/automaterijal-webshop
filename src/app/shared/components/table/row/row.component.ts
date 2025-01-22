@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 // Data models
 import { Roba } from '../../../data-models/model/roba';
@@ -18,7 +19,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 @Component({
   selector: 'row',
   standalone: true,
-  imports: [InputFieldsComponent, ButtonComponent, CommonModule, RsdCurrencyPipe, FormsModule, ReactiveFormsModule],
+  imports: [InputFieldsComponent, ButtonComponent, CommonModule, RsdCurrencyPipe, FormsModule, ReactiveFormsModule, RouterModule],
   providers: [CurrencyPipe],
   templateUrl: './row.component.html',
   styleUrl: './row.component.scss'
@@ -50,4 +51,6 @@ export class RowComponent {
   addToShopingCart(): void {
     console.log(this.quantity);
   }
+
+
 }

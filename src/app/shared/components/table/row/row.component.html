@@ -6,7 +6,7 @@
 
   <!-- Details Section -->
   <div class="details-container">
-    <h3>
+    <h3 [routerLink]="['/webshop', data.robaid]">
       {{
         data.naziv?.includes(data.proizvodjac!.naziv!)
           ? data.naziv
