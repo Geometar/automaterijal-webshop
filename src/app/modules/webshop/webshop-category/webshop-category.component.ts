@@ -3,6 +3,7 @@ import { Component, Input, OnChanges, OnInit, SimpleChanges, ViewEncapsulation }
 
 // Component imported
 import { CheckboxComponent } from '../../../shared/components/checkbox/checkbox.component';
+import { InputFieldsComponent } from '../../../shared/components/input-fields/input-fields.component';
 import { RadioButtonComponent } from '../../../shared/components/radio-button/radio-button.component';
 
 // Data models
@@ -11,7 +12,7 @@ import { Filter } from '../../../shared/data-models/model/roba';
 import { Manufacture } from '../../../shared/data-models/model/proizvodjac';
 
 // Enums
-import { OrientationEnum, SizeEnum } from '../../../shared/data-models/enums';
+import { IconsEnum, InputTypeEnum, OrientationEnum, SizeEnum } from '../../../shared/data-models/enums';
 
 // Service
 import { UrlHelperService } from '../../../shared/service/utils/url-helper.service';
@@ -23,7 +24,7 @@ export enum FilterEnum {
 @Component({
   selector: 'webshop-category',
   standalone: true,
-  imports: [CommonModule, CheckboxComponent, RadioButtonComponent],
+  imports: [CommonModule, CheckboxComponent, RadioButtonComponent, InputFieldsComponent],
   templateUrl: './webshop-category.component.html',
   styleUrl: './webshop-category.component.scss',
   encapsulation: ViewEncapsulation.None
@@ -45,10 +46,23 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
   radioOptions: RadioOption[] = [];
   radioOptionKeys = ['Svi artikli', 'Ima na stanju'];
 
+  // Pre Filters
+  manufacturerPreFilter = '';
+
   // Enums
   filterEnum = FilterEnum;
+  iconEnums = IconsEnum;
+  inputTypeEnum = InputTypeEnum;
   orientation = OrientationEnum;
   sizeEnum = SizeEnum;
+
+  get filteredManufactures(): CheckboxModel[] {
+    this.manufacturesCheckBoxModels.filter((data: CheckboxModel) => {
+      console.log(data.value.toLowerCase().includes(this.manufacturerPreFilter.toLowerCase()));
+      return data.value.toLowerCase().includes(this.manufacturerPreFilter.toLowerCase());
+    });
+    return this.manufacturesCheckBoxModels.filter((data: CheckboxModel) => data.value.toLowerCase().includes(this.manufacturerPreFilter.toLowerCase()));
+  }
 
   constructor(private urlHelperService: UrlHelperService) { }
 
@@ -100,6 +114,7 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
   }
 
   // Start of: Emit handle
+
   adjustCategoriesFilters(): void {
     this.urlHelperService.addOrUpdateQueryParams({ podgrupe: this.categoriesCheckBoxModels.filter((value: CheckboxModel) => value.checked).map((value: CheckboxModel) => value.key) })
   }
@@ -127,4 +142,12 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
     this.urlHelperService.addOrUpdateQueryParams({ naStanju: !allAvailability });
   }
   // End of: Emit handle
+
+  // Start of: Filter categories
+
+  preFilterManufactures(filterTerm: string): void {
+    this.manufacturerPreFilter = filterTerm;
+  }
+
+  // End of: Filter categories
 }

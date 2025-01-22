@@ -38,6 +38,12 @@
         margin: 0 0 8px;
       }
 
+      h3:hover {
+        text-decoration: underline;
+        cursor: pointer;
+        color: var(--figma-grey-600);
+      }
+
       p {
         font-size: 14px;
         color: #555;

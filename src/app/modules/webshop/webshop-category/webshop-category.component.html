@@ -26,11 +26,23 @@
       ></autom-checkbox>
     </div>
     <div class="filter-container" *ngIf="manufactures && manufactures.length">
+      <div class="filter-prefilter" *ngIf="manufactures.length > 7">
+        <autom-input-fields
+          [placeholder]="'Filter proizvodjaca'"
+          [suffixIcon]="iconEnums.FILTER"
+          [type]="inputTypeEnum.SEARCH"
+          (emitSelected)="preFilterManufactures($event)"
+        ></autom-input-fields>
+      </div>
       <autom-checkbox
         *ngIf="openManufacturesFilters"
         class="filter-selection"
         [horizontal]="false"
-        [items]="manufacturesCheckBoxModels"
+        [items]="
+          manufacturerPreFilter
+            ? filteredManufactures
+            : manufacturesCheckBoxModels
+        "
         [label]="'Proizvodjaci'"
         [size]="sizeEnum.AUTO"
         [theme]="orientation.VERTICAL"

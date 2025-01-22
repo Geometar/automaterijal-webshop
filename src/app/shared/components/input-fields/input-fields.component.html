@@ -47,13 +47,7 @@
     </div>
   </ng-container>
   <!-- Email, Search and Text Input Container -->
-  <ng-container
-    *ngIf="
-      type === inputTypes.EMAIL ||
-      type === inputTypes.SEARCH ||
-      type === inputTypes.TEXT
-    "
-  >
+  <ng-container *ngIf="type === inputTypes.EMAIL || type === inputTypes.TEXT">
     <input
       #automInput
       class="autom-input__text"
@@ -75,6 +69,32 @@
       [type]="type"
       [value]="value"
       (keyup.enter)="onEnter()"
+    />
+  </ng-container>
+  <!-- Email, Search and Text Input Container -->
+  <ng-container *ngIf="type === inputTypes.SEARCH">
+    <input
+      #automInput
+      class="autom-input__text"
+      [attr.data-e2e-selector]="selector || label || placeholder"
+      [attr.maxLength]="maxLength"
+      [autofocus]="autofocus"
+      [class.autom-error-input]="inputHasErrorGetter"
+      [class.autom-error-input--animation]="
+        inputHasErrorGetter && errorAnimationTrigger
+      "
+      [class.autom-input__pre-icon]="preIcon || prefix"
+      [class.round-input]="round"
+      [formControlName]="'formCtrl'"
+      [id]="id"
+      [pattern]="pattern"
+      [placeholder]="placeholder"
+      [readonly]="readonly"
+      [required]="required"
+      [type]="type"
+      [value]="value"
+      (keydown)="emitSelectedValue()"
+      (keyup)="emitSelectedValue()"
     />
   </ng-container>
 
