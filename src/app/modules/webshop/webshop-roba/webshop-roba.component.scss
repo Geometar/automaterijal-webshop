@@ -17,6 +17,9 @@
 
 .no-result {
   flex-direction: column;
-  gap: 20px;
+  gap: 10px;
   width: 1050px;
+  h5 {
+    width: 500px;
+  }
 }

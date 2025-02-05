@@ -18,7 +18,20 @@
     class="util__flex--center util__height no-result"
   >
     <h5>🔍 Nema rezultata za : "{{ searchTerm }}".</h5>
+    <h5 *ngIf="filter.mandatoryProid && filter.mandatoryProid.length">
+      ✅ Filtrirano po proizvodjacu : {{ filter.mandatoryProid }}.
+    </h5>
+    <h5 *ngIf="filter.proizvodjaci && filter.proizvodjaci.length">
+      ✅ Filtrirano po proizvodjacu : {{ filter.proizvodjaci }}.
+    </h5>
+    <h5 *ngIf="filter.grupe && filter.grupe.length">
+      ✅ Filtrirano po grupi : {{ filter.grupe }}.
+    </h5>
+    <h5 *ngIf="filter.podgrupe && filter.podgrupe.length">
+      ✅ Filtrirano po kategoriji : {{ filter.podgrupe }}.
+    </h5>
     <autom-button
+      class="autom-margin--top__s"
       [label]="'Resetuj pretragu'"
       [theme]="buttonThemes.DEFAULT"
       [type]="buttonTypes.PRIMARY"

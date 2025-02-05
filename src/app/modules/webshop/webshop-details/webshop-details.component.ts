@@ -117,7 +117,6 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   }
 
   // End of: Events 
-
   fillDocumentation() {
     if (!this.data.dokumentacija) {
       return;
