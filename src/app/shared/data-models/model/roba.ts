@@ -37,7 +37,7 @@ export class RobaAplikacija {
   ccm?: string;
 }
 
-export class TecDocDokumentacija {
+export interface TecDocDokumentacija {
   docFileTypeName?: string;
   docId?: string;
   docLinkId?: number;
@@ -45,8 +45,8 @@ export class TecDocDokumentacija {
   docTypeId?: number;
   docTypeName?: string;
   docUrl?: string;
-  saniraniUrl?: string;
   dokument?: string | ArrayBuffer;
+  saniraniUrl?: string;
 }
 
 export class Magacin {
@@ -59,7 +59,7 @@ export class Roba {
   aplikacije?: Map<string, RobaAplikacija[]>;
   asociraniArtikli: Roba[] = [];
   cena?: number;
-  dokumentacija?: Map<string, TecDocDokumentacija[]>;
+  dokumentacija?: Object;
   dozvoljenoZaAnonimusa?: boolean;
   katbr?: string;
   katbrpro?: string;
@@ -68,11 +68,11 @@ export class Roba {
   podGrupaNaziv?: string;
   proizvodjac?: Manufacture;
   proizvodjacLogo?: string | ArrayBuffer;
-  rabat?: number;
+  rabat: number = 0;
   robaid?: number;
   slika?: Slika;
-  stanje?: number;
-  tdBrojevi?: Map<string, RobaBrojevi[]>;
+  stanje: number = 0;
+  tdBrojevi?: RobaBrojevi[];
   tehnickiOpis?: RobaTehnickiOpis[];
   tekst?: string;
   uKorpi = false;

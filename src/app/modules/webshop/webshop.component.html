@@ -11,6 +11,7 @@
     [pageIndex]="pageIndex"
     [pageSize]="rowsPerPage"
     [searchTerm]="searchTerm"
+    (emitTablePage)="setRobaPageData($event)"
   ></webshop-roba>
   <div *ngIf="loading" class="spinner">
     <spinner></spinner>

@@ -8,11 +8,18 @@ export class PictureService {
 
   constructor() { }
 
-  convertByteToImage(roba: Roba[]): void {
+  convertByteToImageArray(roba: Roba[]): void {
     roba.forEach(r => {
-      if (!r.slika?.isUrl && r.slika?.slikeByte) {
-        r.slika.slikeUrl = 'data:image/jpeg;base64,' + r.slika.slikeByte;
-      }
+      this.convertByteToImage(r);
     });
+  }
+
+  convertByteToImage(r: Roba): void {
+    if (!r.slika?.isUrl && r.slika?.slikeByte) {
+      r.slika.slikeUrl = 'data:image/jpeg;base64,' + r.slika.slikeByte;
+    }
+    if (r.proizvodjacLogo && !r.proizvodjacLogo.toString().includes('data:image/jpeg;base64')) {
+      r.proizvodjacLogo = 'data:image/jpeg;base64,' + r.proizvodjacLogo;
+    }
   }
 }

@@ -1,1 +1,135 @@
-<p>webshop-details works!</p>
+<section *ngIf="!loading" class="section">
+  <div class="product-container">
+    <div class="product-header">
+      <h1 class="product-title">
+        {{ data.proizvodjac?.naziv }} {{ data.naziv }}
+      </h1>
+      <p class="product-article">Kat br: {{ data.katbr }}</p>
+    </div>
+
+    <div class="product-details">
+      <div class="product-image">
+        <img class="product-logo" [src]="data!.proizvodjacLogo" />
+        <img
+          class="product-img"
+          [src]="data!.slika!.slikeUrl"
+          alt="MAHLE ORIGINAL OX 388D"
+        />
+      </div>
+      <div *ngIf="data.tehnickiOpis?.length" class="product-description">
+        <h3>Description</h3>
+        <ul class="description-list">
+          <li *ngFor="let data of data.tehnickiOpis">
+            <span class="label"
+              >{{ data.oznaka
+              }}<span *ngIf="data.jedinica" class="label display--inline"
+                >[{{ data.jedinica }}]:</span
+              ></span
+            >
+            <span class="value">{{ data.vrednost }}</span>
+          </li>
+        </ul>
+      </div>
+      <div class="product-stock-price">
+        <p class="stock-status" *ngIf="data.stanje > 0">
+          <span class="status-indicator"></span> Na stanju
+        </p>
+        <p class="stock-status" *ngIf="data.stanje === 0">
+          <span class="status-indicator-not"></span> Nema na stanju
+        </p>
+        <div class="price-info">
+          <p class="discount" *ngIf="data.rabat > 0">{{ data.rabat }}</p>
+          <p class="price">{{ data.cena! | rsdCurrency }}</p>
+          <p class="vat-info">cena sa PDV-pm</p>
+        </div>
+        <div class="product-actions">
+          <div class="quantity-control">
+            <autom-input-fields
+              [clearBtn]="false"
+              [customClass]="'quantity-size'"
+              [max]="data!.stanje!"
+              [min]="1"
+              [roundOff]="true"
+              [size]="sizeEnum.MEDIUM"
+              [type]="inputTypeEnum.QUANTITY"
+              [validators]="[
+                { name: 'max', value: data.stanje },
+                { name: 'min', value: 1 }
+              ]"
+              [step]="1"
+              [value]="1"
+              (emitSelected)="modifyQuantity($event)"
+              ngDefaultControl
+            ></autom-input-fields>
+          </div>
+          <autom-button
+            [disabled]="!data.stanje"
+            [iconColor]="colorEnum.INFO_25"
+            [iconPrefix]="true"
+            [iconSource]="iconEnum.SHOPPING_CART"
+            [label]="'Dodaj u korpu'"
+            mat-raised-button
+            color="primary"
+            (clickEvent)="addToShopingCart()"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="documentKeys.length !== 0" class="product-container">
+    <div class="documentation" *ngFor="let key of documentKeys">
+      <h3 class="product-title">{{ key }}</h3>
+      <div class="util__flex--center autom-flex-wrap--column">
+        <!-- PDF -->
+        <div
+          class="documentation--section-padding"
+          *ngFor="let document of getDocumentByKey(key)"
+        >
+          <div
+            *ngIf="document.docFileTypeName!.toUpperCase().indexOf('PDF') > -1"
+          >
+            <span (click)="openPdf(document)">
+              <autom-icon [source]="iconEnum.FILE_SEARCH"></autom-icon>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="util__flex--center autom-flex-wrap--column">
+        <!-- Youtube -->
+        <div
+          class="documentation--section-padding"
+          *ngFor="let document of getDocumentByKey(key)"
+        >
+          <div
+            *ngIf="document.docFileTypeName!.toUpperCase().indexOf('URL') > -1"
+          >
+            <youtube-player [videoId]="document.saniraniUrl"></youtube-player>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="oeNumbers.size > 0" class="product-container documentation">
+    <div class="oe-title">OE brojevi</div>
+    <div class="oe-subtitle">
+      OE referentni brojevi koji su uporedivi sa originalnim brojem rezervnog
+      dela:
+    </div>
+    <div class="oe-grid">
+      <ng-container *ngFor="let oe of oeNumbers | keyvalue">
+        <a
+          href="#"
+          class="oe-item"
+          [routerLink]="['/webshop']"
+          [queryParams]="{ searchTerm: oe.key }"
+        >
+          {{ oe.key }} - {{ oe.value }}
+        </a>
+      </ng-container>
+    </div>
+  </div>
+</section>
+{{ loading }}
+<div *ngIf="loading" class="spinner">
+  <spinner></spinner>
+</div>

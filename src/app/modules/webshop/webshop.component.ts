@@ -108,7 +108,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
       )
       .subscribe({
         next: (response: Magacin) => {
-          this.pictureService.convertByteToImage(response.robaDto!.content);
+          this.pictureService.convertByteToImageArray(response.robaDto!.content);
           this.magacinData = response;
           this.currentState = this.state.SHOW_ARTICLES;
         },

@@ -58,7 +58,6 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
 
   get filteredManufactures(): CheckboxModel[] {
     this.manufacturesCheckBoxModels.filter((data: CheckboxModel) => {
-      console.log(data.value.toLowerCase().includes(this.manufacturerPreFilter.toLowerCase()));
       return data.value.toLowerCase().includes(this.manufacturerPreFilter.toLowerCase());
     });
     return this.manufacturesCheckBoxModels.filter((data: CheckboxModel) => data.value.toLowerCase().includes(this.manufacturerPreFilter.toLowerCase()));

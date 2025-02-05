@@ -1,0 +1,230 @@
+
+
+.spinner {
+  align-items: center;
+  display: flex;
+  height: calc(100vh - 220px);
+  justify-content: center;
+  width: 100%;
+}
+
+.product-container {
+  max-width: 1200px;
+  margin: 30px auto;
+  font-family: Arial, sans-serif;
+  color: #333;
+
+  .product-img {
+    max-height: 350px;
+    max-width: 350px;
+  }
+
+  .product-logo {
+    max-height: 40px;
+  }
+
+  .product-header {
+    text-align: left;
+    margin-bottom: 20px;
+
+    .product-title {
+      font-size: 22px !important;
+      font-weight: 500;
+    }
+
+    .product-subtitle {
+      font-size: 16px;
+      color: #666;
+    }
+
+    .product-article {
+      color: var(--figma-grey-700);
+      font-size: 14px;
+      font-weight: 600;
+    }
+  }
+
+  .product-details {
+    display: flex;
+    gap: 20px;
+
+    .product-image {
+      flex: 1.5;
+      img {
+        max-width: 100%;
+      }
+    }
+
+    .product-description {
+      font-family: Arial, sans-serif;
+      color: #333;
+      padding: 15px;
+      flex: 1.5;
+    
+      h3 {
+        font-size: 18px;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 5px;
+      }
+    
+      .description-list {
+        list-style: none;
+        padding: 0;
+    
+        li {
+          display: flex;
+          justify-content: space-between;
+          padding: 10px 0;
+          border-bottom: 1px solid #eee;
+    
+          &:last-child {
+            border-bottom: none;
+          }
+    
+          .label {
+            color: var(--figma-grey-800);
+            flex: 1;
+            font-size: 13px;
+            font-weight: 500;
+            text-align: left;
+          }
+    
+          .value {
+            color: var(--figma-grey-800);
+            flex: 1;
+            font-size: 13px;
+            font-weight: 500;
+            text-align: right;
+          }
+        }
+      }
+    
+      .more-link {
+        display: inline-block;
+        margin-top: 10px;
+        color: #007bff;
+        text-decoration: none;
+        font-size: 14px;
+    
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+
+    .product-stock-price {
+      font-family: Arial, sans-serif;
+      color: #333;
+      padding: 20px;
+      max-width: 400px;
+      margin: 0 auto;
+    
+      .stock-status {
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        margin-bottom: 10px;
+    
+        .status-indicator {
+          width: 10px;
+          height: 10px;
+          background-color: #28a745; /* zelena boja */
+          border-radius: 50%;
+          margin-right: 8px;
+        }
+    
+        .status-indicator-not {
+          width: 10px;
+          height: 10px;
+          background-color: var(--figma-error-600); /* zelena boja */
+          border-radius: 50%;
+          margin-right: 8px;
+        }
+      }
+    
+      .price-info {
+        margin-bottom: 20px;
+    
+        .discount {
+          font-size: 12px;
+          color: #d32f2f;
+          margin-bottom: 5px;
+        }
+    
+        .price {
+          font-size: 24px;
+          font-weight: bold;
+          color: #000;
+          margin-bottom: 5px;
+        }
+    
+        .vat-info {
+          font-size: 12px;
+          color: #666;
+        }
+      }
+    
+      .product-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    
+        .quantity-control {
+          display: flex;
+          align-items: center;
+    
+          input {
+            width: 60px;
+            padding: 5px;
+            font-size: 14px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+          }
+        }
+      }
+    }
+  }
+}
+
+.documentation {
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  border-top: 5px solid var(--bittersweet);
+  padding: 15px;
+
+  &--section-padding {
+    padding: 20px;
+  }
+  .mat-icon {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+.oe-title {
+  font-size: 22px !important;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+.oe-subtitle {
+  font-size: 14px;
+  color: gray;
+  margin-bottom: 15px;
+}
+.oe-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 10px;
+}
+.oe-item {
+  color: var( --figma-primary-800);
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.oe-item:hover {
+  color: var( --figma-primary-500);
+  text-decoration: und;
+}
