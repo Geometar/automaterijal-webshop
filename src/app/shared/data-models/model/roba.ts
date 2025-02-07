@@ -45,7 +45,7 @@ export interface TecDocDokumentacija {
   docTypeId?: number;
   docTypeName?: string;
   docUrl?: string;
-  dokument?: string | ArrayBuffer;
+  dokument?: string;
   saniraniUrl?: string;
 }
 

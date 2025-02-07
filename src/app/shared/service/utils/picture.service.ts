@@ -22,4 +22,8 @@ export class PictureService {
       r.proizvodjacLogo = 'data:image/jpeg;base64,' + r.proizvodjacLogo;
     }
   }
+
+  convertByteToImageByte(value: string): string {
+    return !value.includes('data:image/jpeg;base64') ? 'data:image/jpeg;base64,' + value : value;
+  }
 }

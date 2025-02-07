@@ -76,36 +76,51 @@
       </div>
     </div>
   </div>
-  <div *ngIf="documentKeys.length !== 0" class="product-container">
-    <div class="documentation" *ngFor="let key of documentKeys">
+  <div
+    *ngIf="documentKeys && documentKeys.length !== 0"
+    class="product-container documentation documentation--section"
+  >
+    <div *ngFor="let key of documentKeys">
       <h3 class="product-title">{{ key }}</h3>
       <div class="util__flex--center autom-flex-wrap--column">
         <!-- PDF -->
-        <div
-          class="documentation--section-padding"
-          *ngFor="let document of getDocumentByKey(key)"
-        >
+        <ng-container *ngFor="let document of getDocumentByKey(key)">
           <div
+            class="documentation--section-padding"
             *ngIf="document.docFileTypeName!.toUpperCase().indexOf('PDF') > -1"
           >
-            <span (click)="openPdf(document)">
-              <autom-icon [source]="iconEnum.FILE_SEARCH"></autom-icon>
-            </span>
+            <ng-container>
+              <span (click)="openPdf(document)">
+                <autom-icon
+                  [tooltip]="pdfToolTip"
+                  [source]="iconEnum.FILE_SEARCH"
+                ></autom-icon>
+              </span>
+            </ng-container>
           </div>
-        </div>
+        </ng-container>
       </div>
       <div class="util__flex--center autom-flex-wrap--column">
         <!-- Youtube -->
-        <div
-          class="documentation--section-padding"
-          *ngFor="let document of getDocumentByKey(key)"
-        >
+        <ng-container *ngFor="let document of getDocumentByKey(key)">
           <div
+            class="documentation--section-padding"
             *ngIf="document.docFileTypeName!.toUpperCase().indexOf('URL') > -1"
           >
             <youtube-player [videoId]="document.saniraniUrl"></youtube-player>
           </div>
-        </div>
+        </ng-container>
+      </div>
+      <div class="util__flex--center autom-flex-wrap--column">
+        <!-- JPEG -->
+        <ng-container *ngFor="let document of getDocumentByKey(key)">
+          <div
+            class="documentation--section-padding"
+            *ngIf="document.docFileTypeName!.toUpperCase().indexOf('JPEG') > -1"
+          >
+            <img [src]="document.dokument" />
+          </div>
+        </ng-container>
       </div>
     </div>
   </div>
@@ -129,7 +144,6 @@
     </div>
   </div>
 </section>
-{{ loading }}
 <div *ngIf="loading" class="spinner">
   <spinner></spinner>
 </div>

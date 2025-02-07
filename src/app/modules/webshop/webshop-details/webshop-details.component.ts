@@ -4,10 +4,26 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { finalize, Subject, takeUntil } from 'rxjs';
 
 // Enums
-import { ButtonThemes, ButtonTypes, ColorEnum, IconsEnum, InputTypeEnum, SizeEnum } from '../../../shared/data-models/enums';
+import {
+  ButtonThemes,
+  ButtonTypes,
+  ColorEnum,
+  IconsEnum,
+  InputTypeEnum,
+  SizeEnum,
+  TooltipPositionEnum,
+  TooltipSubPositionsEnum,
+  TooltipThemeEnum,
+  TooltipTypesEnum,
+} from '../../../shared/data-models/enums';
 
 // Data Models
-import { Roba, RobaBrojevi, TecDocDokumentacija } from '../../../shared/data-models/model/roba';
+import {
+  Roba,
+  RobaBrojevi,
+  TecDocDokumentacija,
+} from '../../../shared/data-models/model/roba';
+import { TooltipModel } from '../../../shared/data-models/interface';
 
 // Components imports
 import { AutomIconComponent } from '../../../shared/components/autom-icon/autom-icon.component';
@@ -26,11 +42,20 @@ import { TecdocService } from '../../../shared/service/tecdoc.service';
 @Component({
   selector: 'app-webshop-details',
   standalone: true,
-  imports: [InputFieldsComponent, CommonModule, SpinnerComponent, RsdCurrencyPipe, ButtonComponent, YouTubePlayer, AutomIconComponent, RouterLink],
+  imports: [
+    InputFieldsComponent,
+    CommonModule,
+    SpinnerComponent,
+    RsdCurrencyPipe,
+    ButtonComponent,
+    YouTubePlayer,
+    AutomIconComponent,
+    RouterLink,
+  ],
   providers: [CurrencyPipe],
   templateUrl: './webshop-details.component.html',
   styleUrl: './webshop-details.component.scss',
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
 })
 export class WebshopDetailsComponent implements OnInit, OnDestroy {
   id: number | null = null;
@@ -47,6 +72,13 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   // Misc
   loading = false;
   quantity: number = 1;
+  pdfToolTip = {
+    position: TooltipPositionEnum.TOP,
+    subPosition: TooltipSubPositionsEnum.SUB_CENTER,
+    theme: TooltipThemeEnum.DARK,
+    tooltipText: 'PDF Document',
+    type: TooltipTypesEnum.TEXT,
+  } as TooltipModel;
 
   // Data
   documentKeys: string[] = [];
@@ -77,7 +109,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
 
   /** End of: Angular lifecycle hooks */
 
-  // Start of: Events 
+  // Start of: Events
 
   fetchData(id: number): void {
     this.loading = true;
@@ -93,7 +125,6 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
           this.data = response;
           this.fillDocumentation();
           this.fillOeNumbers();
-
         },
         error: (err: HttpErrorResponse) => {
           const error = err.error.details || err.error;
@@ -103,36 +134,50 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   }
 
   openPdf(doc: TecDocDokumentacija) {
-    this.tecDocService.getDocumentBytes(doc.docId!)
-      .pipe(
-        takeUntil(this.destroy$)
-      )
+    this.tecDocService
+      .getDocumentBytes(doc.docId!)
+      .pipe(takeUntil(this.destroy$))
       .subscribe((res: ArrayBuffer) => {
         if (res) {
           const blob = new Blob([res], { type: 'application/pdf' });
           const url = URL.createObjectURL(blob);
           window.open(url); // Open in a new tab
         }
-      })
+      });
   }
 
-  // End of: Events 
+  // End of: Events
   fillDocumentation() {
     if (!this.data.dokumentacija) {
       return;
     }
 
     for (const data of Object.entries(this.data.dokumentacija!)) {
-      (data[1] as TecDocDokumentacija[]).forEach((value: TecDocDokumentacija) => {
-        if (value.docFileTypeName!.toUpperCase().indexOf('URL') > -1 && value.docUrl) {
-          // Updated regex to handle youtube-nocookie.com and standard YouTube URLs
-          const videoIdMatch = value.docUrl.match(/(?:youtube(-nocookie)?\.com\/embed\/|youtube\.com\/watch\?v=|youtu\.be\/)([^&?]+)/);
+      (data[1] as TecDocDokumentacija[]).forEach(
+        (value: TecDocDokumentacija) => {
+          if (
+            value.docFileTypeName!.toUpperCase().indexOf('URL') > -1 &&
+            value.docUrl
+          ) {
+            // Updated regex to handle youtube-nocookie.com and standard YouTube URLs
+            const videoIdMatch = value.docUrl.match(
+              /(?:youtube(-nocookie)?\.com\/embed\/|youtube\.com\/watch\?v=|youtu\.be\/)([^&?]+)/
+            );
 
-          if (videoIdMatch && videoIdMatch[2]) {
-            value.saniraniUrl = videoIdMatch[2]; // Extract and store only the video ID
+            if (videoIdMatch && videoIdMatch[2]) {
+              value.saniraniUrl = videoIdMatch[2]; // Extract and store only the video ID
+            }
+          }
+          if (
+            value.docFileTypeName!.toUpperCase().indexOf('JPEG') > -1 &&
+            value.dokument
+          ) {
+            value.dokument = this.pictureService.convertByteToImageByte(
+              value.dokument
+            );
           }
         }
-      })
+      );
     }
 
     if (this.data.dokumentacija != null) {
@@ -151,11 +196,11 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       const manufactures: string[] = this.oeNumbers.get(value.fabrBroj!) ?? [];
       manufactures.push(value.proizvodjac!);
       this.oeNumbers.set(value.fabrBroj!, manufactures);
-    })
+    });
   }
 
   getDocumentByKey(key: string): TecDocDokumentacija[] {
-    return this.fetchDocument(key)
+    return this.fetchDocument(key);
   }
 
   fetchDocument(key: string): TecDocDokumentacija[] {
@@ -164,9 +209,8 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
         return data[1] as TecDocDokumentacija[];
       }
     }
-    return []
+    return [];
   }
-
 
   modifyQuantity(quantity: number): void {
     if (quantity < 1) {

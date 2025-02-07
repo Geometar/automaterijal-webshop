@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ViewEncapsulation } from '@angular/core';
 
 // Enums
 import { TooltipPositionEnum, TooltipSubPositionsEnum, TooltipThemeEnum, TooltipTypesEnum } from '../../data-models/enums/tooltip.enum';
@@ -10,7 +10,8 @@ import { AutomTooltipDirective } from './autom-tooltip.directive';
   standalone: true,
   imports: [AutomTooltipDirective],
   templateUrl: './autom-tooltip.component.html',
-  styleUrl: './autom-tooltip.component.scss'
+  styleUrl: './autom-tooltip.component.scss',
+  encapsulation: ViewEncapsulation.None
 })
 export class AutomTooltipComponent {
   @Input() isVisible = false;

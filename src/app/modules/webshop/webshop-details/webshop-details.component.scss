@@ -194,8 +194,14 @@
   border-top: 5px solid var(--bittersweet);
   padding: 15px;
 
+  &--section {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
   &--section-padding {
-    padding: 20px;
+    padding: 10px;
   }
   .mat-icon {
     width: 30px;

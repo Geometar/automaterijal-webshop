@@ -1,6 +1,5 @@
 import {
   ApplicationRef,
-  ComponentFactoryResolver,
   ComponentRef,
   Directive,
   ElementRef,
@@ -9,7 +8,8 @@ import {
   Injector,
   Input,
   OnDestroy,
-  Inject
+  Inject,
+  ViewContainerRef
 } from '@angular/core';
 import { DOCUMENT, DatePipe } from '@angular/common';
 
@@ -53,8 +53,7 @@ export class AutomTooltipDirective implements OnDestroy {
   constructor(
     // eslint-disable-next-line no-unused-vars
     private appRef: ApplicationRef,
-    // eslint-disable-next-line no-unused-vars
-    private componentFactoryResolver: ComponentFactoryResolver,
+    private viewContainerRef: ViewContainerRef,
     // eslint-disable-next-line no-unused-vars
     private date: DatePipe,
     // eslint-disable-next-line no-unused-vars
@@ -109,12 +108,11 @@ export class AutomTooltipDirective implements OnDestroy {
   }
 
   initTooltipView(): void {
-    const componentFactory = this.componentFactoryResolver.resolveComponentFactory(AutomTooltipComponent);
-    this.componentRef = componentFactory.create(this.injector);
-    this.appRef.attachView(this.componentRef.hostView);
-    this.tooltipElement = (this.componentRef.hostView as EmbeddedViewRef<any>).rootNodes[0] as HTMLElement;
+    const componentRef = this.viewContainerRef.createComponent(AutomTooltipComponent);
+    this.tooltipElement = (componentRef.hostView as EmbeddedViewRef<any>).rootNodes[0] as HTMLElement;
     this.document.body.appendChild(this.tooltipElement);
     this.tooltipElement.setAttribute('class', 'tooltip-container');
+    this.componentRef = componentRef;
   }
 
   createTooltip(): void {
@@ -266,6 +264,7 @@ export class AutomTooltipDirective implements OnDestroy {
 
   createArrow(): void {
     this.arrowElement = this.document.createElement('div');
+    this.arrowElement.setAttribute('class', 'pointing-arrow');
     this.tooltipElement?.appendChild(this.arrowElement);
     this.arrow = this.arrowElement;
   }
