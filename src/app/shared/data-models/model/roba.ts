@@ -50,7 +50,7 @@ export interface TecDocDokumentacija {
 }
 
 export class Magacin {
-  podgrupe?: string[];
+  categories?: object;
   proizvodjaci?: Manufacture[];
   robaDto?: PaginatedResponse<Roba>;
 }

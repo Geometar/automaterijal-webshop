@@ -1,6 +1,6 @@
 <div
   *ngIf="
-    (categories && categories.length) || (manufactures && manufactures.length)
+    (categories && categories !== null) || (manufactures && manufactures.length)
   "
   class="sidebar"
 >
@@ -13,17 +13,14 @@
         (emitSelected)="adjustAvailability()"
       ></autom-radio-button>
     </div>
-    <div class="filter-container" *ngIf="categories && categories.length">
-      <autom-checkbox
+    <div class="filter-container" *ngIf="categories && categories !== null">
+      <checkbox-group
         *ngIf="openCategoriesFilters"
         class="filter-selection"
-        [horizontal]="false"
         [items]="categoriesCheckBoxModels"
         [label]="'Kategorije'"
-        [size]="sizeEnum.AUTO"
-        [theme]="orientation.VERTICAL"
-        (emitCheckbox)="adjustCategoriesFilters()"
-      ></autom-checkbox>
+        (clickEvent)="adjustCategoriesFilters()"
+      ></checkbox-group>
     </div>
     <div class="filter-container" *ngIf="manufactures && manufactures.length">
       <div class="filter-prefilter" *ngIf="manufactures.length > 7">

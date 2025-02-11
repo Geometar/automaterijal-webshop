@@ -128,7 +128,6 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
         },
         error: (err: HttpErrorResponse) => {
           const error = err.error.details || err.error;
-          console.log('Error: ', error);
         },
       });
   }

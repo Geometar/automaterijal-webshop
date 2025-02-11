@@ -1,6 +1,6 @@
 .sidebar {
   padding: 10px;
-  width: 250px;
+  width: 300px;
 }
 
 .filter-container {
@@ -54,6 +54,10 @@
 
 .filter-selection {
   .autom-checkbox__vertical {
+    max-height: 340px;
+    overflow-y: auto;
+  }
+  .grouped-checkbox {
     max-height: 340px;
     overflow-y: auto;
   }

@@ -1,0 +1,345 @@
+.grouped-checkbox {
+  .parent {
+    margin-top: 12px;
+  }
+
+  .parent-label {
+    font-weight: 600;
+  }
+
+  .child {
+    margin: 0 15px;
+  }
+
+  .autom-checkbox {
+    margin-right: var(--space-xs);
+  
+    &__card {
+      align-items: center;
+      align-self: stretch;
+      background: var(--figma-base-white);
+      border-radius: var(--space-xs);
+      border: var(--space-default) solid var(--figma-grey-200);
+      box-sizing: border-box;
+      cursor: pointer;
+      display: flex;
+      flex-direction: row;
+      flex-grow: 0;
+      height: calc(var(--space-xxs) * 13);
+      margin-top: 0;
+      padding: var(--space-s);
+      position: relative;
+      width: calc(var(--space-s) * 20);
+  
+      & .mat-checkbox-inner-container {
+        margin: unset;
+        margin-right: var(--space-xs);
+      }
+  
+      &:hover,
+      &--active {
+        background-color: var(--figma-primary-50);
+        border: var(--space-default) solid var(--figma-primary-300);
+      }
+  
+      &--disabled {
+        background-color: var(--figma-grey-50) !important;
+        border: var(--space-default) solid var(--figma-grey-200) !important;
+        cursor: default;
+        pointer-events: none;
+      }
+    }
+  
+    &--auto {
+      width: auto;
+    }
+  
+    &--full {
+      width: var(--size-full);
+    }
+  
+    &--extra-small {
+      width: var(--size-extra-small);
+    }
+  
+    &--small {
+      width: var(--size-small);
+    }
+  
+    &--medium {
+      width: var(--size-medium);
+    }
+  
+    &--large {
+      width: var(--size-large);
+    }
+  
+    &-group {
+      &__card {
+        &--horizontal,
+        &--vertical {
+          align-items: flex-start;
+          display: flex;
+          flex-wrap: wrap;
+          gap: calc(var(--space-xxs) * 3);
+        }
+  
+        &--horizontal {
+          flex-direction: row;
+        }
+  
+        &--vertical {
+          flex-direction: column;
+        }
+      }
+    }
+  
+    &__vertical {
+      align-items: flex-start;
+      display: flex;
+      flex-direction: column;
+  
+      mat-checkbox {
+        margin: var(--space-xxs) 0;
+      }
+  
+      .autom-label {
+        margin: 0;
+      }
+    }
+  
+    &__wrapper {
+      margin: 0;
+      min-width: calc(var(--space-xxs) * 50);
+      padding: 0;
+      position: relative;
+    }
+  
+    .autom-label {
+      font-weight: normal;
+    }
+  
+    .mat-checkbox-label {
+      color: var(--figma-grey-700);
+      font-size: var(--text-sm);
+      font-weight: var(--font-weight-regular);
+    }
+  
+    .mat-checkbox-frame {
+      background-color: var(--figma-base-white);
+      border: var(--space-default) solid var(--figma-grey-300) !important;
+      border-radius: calc(var(--space-xxxs) * 3) !important;
+      height: calc(var(--space-xxs) * 5);
+      width: calc(var(--space-xxs) * 5);
+    }
+  
+    &__checked {
+      .mat-checkbox-frame {
+        background-color: var(--figma-primary-50);
+        border: var(--space-default) solid var(--figma-primary-600) !important;
+      }
+    }
+  
+    &__disabled {
+      .mat-checkbox-frame {
+        background-color: var(--figma-grey-100);
+        border: var(--space-default) solid var(--figma-grey-200) !important;
+      }
+    }
+  
+    .mat-checkbox-checked:not(.mat-checkbox-disabled).mat-accent .mat-ripple-element,
+    .mat-checkbox:active:not(.mat-checkbox-disabled).mat-accent .mat-ripple-element {
+      background: var(--figma-primary-600) !important;
+    }
+  
+    .mat-checkbox-background {
+      background-color: transparent !important;
+    }
+  
+    .mat-checkbox-inner-container {
+      height: calc(var(--space-xxs) * 5);
+      width: calc(var(--space-xxs) * 5);
+    }
+  
+    .mat-checkbox-checkmark-path {
+      stroke: var(--figma-primary-600) !important;
+    }
+  
+    .mat-checkbox-mixedmark {
+      background-color: var(--figma-primary-600) !important;
+    }
+  
+    &__disabled {
+      .mat-checkbox-checkmark-path {
+        stroke: var(--figma-grey-200) !important;
+      }
+    }
+  }
+  
+
+}
+
+.autom-checkbox {
+  margin-right: var(--space-xs);
+
+  &__card {
+    align-items: center;
+    align-self: stretch;
+    background: var(--figma-base-white);
+    border-radius: var(--space-xs);
+    border: var(--space-default) solid var(--figma-grey-200);
+    box-sizing: border-box;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    flex-grow: 0;
+    height: calc(var(--space-xxs) * 13);
+    margin-top: 0;
+    padding: var(--space-s);
+    position: relative;
+    width: calc(var(--space-s) * 20);
+
+    & .mat-checkbox-inner-container {
+      margin: unset;
+      margin-right: var(--space-xs);
+    }
+
+    &:hover,
+    &--active {
+      background-color: var(--figma-primary-50);
+      border: var(--space-default) solid var(--figma-primary-300);
+    }
+
+    &--disabled {
+      background-color: var(--figma-grey-50) !important;
+      border: var(--space-default) solid var(--figma-grey-200) !important;
+      cursor: default;
+      pointer-events: none;
+    }
+  }
+
+  &--auto {
+    width: auto;
+  }
+
+  &--full {
+    width: var(--size-full);
+  }
+
+  &--extra-small {
+    width: var(--size-extra-small);
+  }
+
+  &--small {
+    width: var(--size-small);
+  }
+
+  &--medium {
+    width: var(--size-medium);
+  }
+
+  &--large {
+    width: var(--size-large);
+  }
+
+  &-group {
+    &__card {
+      &--horizontal,
+      &--vertical {
+        align-items: flex-start;
+        display: flex;
+        flex-wrap: wrap;
+        gap: calc(var(--space-xxs) * 3);
+      }
+
+      &--horizontal {
+        flex-direction: row;
+      }
+
+      &--vertical {
+        flex-direction: column;
+      }
+    }
+  }
+
+  &__vertical {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+
+    mat-checkbox {
+      margin: var(--space-xxs) 0;
+    }
+
+    .autom-label {
+      margin: 0;
+    }
+  }
+
+  &__wrapper {
+    margin: 0;
+    min-width: calc(var(--space-xxs) * 50);
+    padding: 0;
+    position: relative;
+  }
+
+  .autom-label {
+    font-weight: normal;
+  }
+
+  .mat-checkbox-label {
+    color: var(--figma-grey-700);
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-regular);
+  }
+
+  .mat-checkbox-frame {
+    background-color: var(--figma-base-white);
+    border: var(--space-default) solid var(--figma-grey-300) !important;
+    border-radius: calc(var(--space-xxxs) * 3) !important;
+    height: calc(var(--space-xxs) * 5);
+    width: calc(var(--space-xxs) * 5);
+  }
+
+  &__checked {
+    .mat-checkbox-frame {
+      background-color: var(--figma-primary-50);
+      border: var(--space-default) solid var(--figma-primary-600) !important;
+    }
+  }
+
+  &__disabled {
+    .mat-checkbox-frame {
+      background-color: var(--figma-grey-100);
+      border: var(--space-default) solid var(--figma-grey-200) !important;
+    }
+  }
+
+  .mat-checkbox-checked:not(.mat-checkbox-disabled).mat-accent .mat-ripple-element,
+  .mat-checkbox:active:not(.mat-checkbox-disabled).mat-accent .mat-ripple-element {
+    background: var(--figma-primary-600) !important;
+  }
+
+  .mat-checkbox-background {
+    background-color: transparent !important;
+  }
+
+  .mat-checkbox-inner-container {
+    height: calc(var(--space-xxs) * 5);
+    width: calc(var(--space-xxs) * 5);
+  }
+
+  .mat-checkbox-checkmark-path {
+    stroke: var(--figma-primary-600) !important;
+  }
+
+  .mat-checkbox-mixedmark {
+    background-color: var(--figma-primary-600) !important;
+  }
+
+  &__disabled {
+    .mat-checkbox-checkmark-path {
+      stroke: var(--figma-grey-200) !important;
+    }
+  }
+}

@@ -1,0 +1,28 @@
+<autom-label *ngIf="label" [label]="label"></autom-label>
+
+<section class="grouped-checkbox">
+  <ng-container *ngFor="let task of tasks(); let taskIndex = index">
+    <span class="parent">
+      <mat-checkbox
+        [checked]="task.completed"
+        [indeterminate]="partiallyComplete()[taskIndex]"
+        (change)="update($event.checked, taskIndex)"
+      >
+        <b class="parent-label">{{ task.name }}</b>
+      </mat-checkbox>
+    </span>
+    <span class="child">
+      <ul>
+        <li *ngFor="let subtask of task.subtasks; let subtaskIndex = index">
+          <mat-checkbox
+            class="autom-checkbox"
+            [checked]="subtask.completed"
+            (change)="update($event.checked, taskIndex, subtaskIndex)"
+          >
+            {{ subtask.name }}
+          </mat-checkbox>
+        </li>
+      </ul>
+    </span>
+  </ng-container>
+</section>

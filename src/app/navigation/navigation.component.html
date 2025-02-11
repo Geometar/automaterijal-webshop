@@ -42,7 +42,7 @@
           <a
             routerLink="/home"
             class="navbar-link"
-            [ngClass]="currentUrl === '/home' ? 'nav-active' : null"
+            [ngClass]="currentUrl.includes('/home') ? 'nav-active' : null"
             >Home</a
           >
         </li>
@@ -51,7 +51,7 @@
           <a
             routerLink="/onama"
             class="navbar-link"
-            [ngClass]="currentUrl === '/onama' ? 'nav-active' : null"
+            [ngClass]="currentUrl.includes('/onama') ? 'nav-active' : null"
             >O nama</a
           >
         </li>
@@ -60,7 +60,7 @@
           <a
             routerLink="/kontakt"
             class="navbar-link"
-            [ngClass]="currentUrl === '/kontakt' ? 'nav-active' : null"
+            [ngClass]="currentUrl.includes('/kontakt') ? 'nav-active' : null"
             >Kontakt</a
           >
         </li>
@@ -69,7 +69,7 @@
           <a
             href="/webshop"
             class="navbar-link"
-            [ngClass]="currentUrl === '/webshop' ? 'nav-active' : null"
+            [ngClass]="currentUrl.includes('/webshop') ? 'nav-active' : null"
             >Webshop</a
           >
         </li>
@@ -77,7 +77,7 @@
         <li class="navbar-item">
           <a
             href="/login"
-            [ngClass]="currentUrl === '/login' ? 'nav-active' : null"
+            [ngClass]="currentUrl.includes('/login') ? 'nav-active' : null"
             class="navbar-link color--figma-error-600"
             >Login</a
           >

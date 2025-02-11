@@ -1,7 +1,7 @@
 <div class="webshop-container-roba">
   <webshop-category
-    *ngIf="magacin?.podgrupe?.length"
-    [categories]="magacin?.podgrupe"
+    *ngIf="magacin?.categories"
+    [categories]="magacin?.categories"
     [filter]="filter"
     [manufactures]="magacin?.proizvodjaci"
   ></webshop-category>
