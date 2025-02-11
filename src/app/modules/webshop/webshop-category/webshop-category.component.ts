@@ -10,6 +10,7 @@ import {
 
 // Component imported
 import { CheckboxComponent } from '../../../shared/components/checkbox/checkbox.component';
+import { CheckboxGroupComponent, Task } from '../../../shared/components/checkbox-group/checkbox-group.component';
 import { InputFieldsComponent } from '../../../shared/components/input-fields/input-fields.component';
 import { RadioButtonComponent } from '../../../shared/components/radio-button/radio-button.component';
 
@@ -31,7 +32,6 @@ import {
 
 // Service
 import { UrlHelperService } from '../../../shared/service/utils/url-helper.service';
-import { CheckboxGroupComponent, Task } from '../../../shared/components/checkbox-group/checkbox-group.component';
 
 export enum FilterEnum {
   CATEGORY,
@@ -97,10 +97,10 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
   // Start of: Angular life cycles
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['categories'] && changes['categories'].firstChange) {
+    if (changes['categories']) {
       this.fillCategories();
     }
-    if (changes['manufactures'] && changes['manufactures'].firstChange) {
+    if (changes['manufactures']) {
       this.fillManufactures();
     }
     if (changes['filter'] && changes['filter'].firstChange) {
