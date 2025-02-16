@@ -1,12 +1,15 @@
 import {
   Component,
+  EventEmitter,
   Input,
+  Output,
   ViewEncapsulation,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 // Data models
 import { Filter } from '../../../shared/data-models/model/roba';
+import { TDVehicleDetails } from '../../../shared/data-models/model/tecdoc';
 
 // Enums
 import {
@@ -21,6 +24,7 @@ import {
 import { AutomIconComponent } from '../../../shared/components/autom-icon/autom-icon.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { InputFieldsComponent } from '../../../shared/components/input-fields/input-fields.component';
+import { VehicleSelectionPopupComponent } from '../../../shared/components/ui/vehicle-selection-popup/vehicle-selection-popup.component';
 
 // Service
 import { UrlHelperService } from '../../../shared/service/utils/url-helper.service';
@@ -34,10 +38,11 @@ export class NavTitles {
   selector: 'webshop-nav',
   standalone: true,
   imports: [
-    ButtonComponent,
-    InputFieldsComponent,
-    CommonModule,
     AutomIconComponent,
+    ButtonComponent,
+    CommonModule,
+    InputFieldsComponent,
+    VehicleSelectionPopupComponent
   ],
   templateUrl: './webshop-nav.component.html',
   styleUrl: './webshop-nav.component.scss',
@@ -46,6 +51,7 @@ export class NavTitles {
 export class WebshopNavComponent {
   @Input() searchTerm = '';
   @Input() filter = new Filter();
+  @Output() selectedVehicleDetails = new EventEmitter<TDVehicleDetails>();
 
   // Enums
   buttonTheme = ButtonThemes;
@@ -62,6 +68,9 @@ export class WebshopNavComponent {
     { title: 'Odrzavanje Vozila', svg: IconsEnum.SPONGE } as NavTitles,
     { title: 'Enterijer', svg: IconsEnum.CAR_ENTERIER } as NavTitles,
   ];
+
+  // Misc
+  chooseVehicleVisible = false;
 
   constructor(private urlHelperService: UrlHelperService) { }
 

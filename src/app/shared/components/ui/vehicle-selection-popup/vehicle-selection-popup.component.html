@@ -1,0 +1,60 @@
+<autom-popup
+  class="vehicle-selection"
+  [height]="sizeEnum.AUTO"
+  [position]="positionEnum.CENTER"
+  [rounded]="true"
+  [subPosition]="positionEnum.CENTER"
+  [width]="sizeEnum.LARGE"
+>
+  <div custom-header class="page-details__header">
+    <div class="page-details__title--row">
+      <h3 class="h3">
+        {{ title }}
+      </h3>
+    </div>
+
+    <autom-icon
+      mat-dialog-close
+      [color]="colorEnum.GREY_400"
+      [source]="iconsEnum.X"
+      (click)="closePopupModal.emit()"
+    ></autom-icon>
+  </div>
+  <div
+    custom-body
+    class="page-details__body page-details__height--auto body util__flex--center autom-flex-direction--column"
+  >
+    <typeahead
+      class="element-width"
+      [data]="typeaheadManufactures"
+      [disabled]="loadingManufactures"
+      [label]="'Izaberite proizvodjaca'"
+      (emit)="selectedManufacturer($event)"
+    ></typeahead>
+    <typeahead
+      class="element-width"
+      [data]="typeaheadModels"
+      [disabled]="loadingModels"
+      [label]="'Izaberite model'"
+      (emit)="selectedModels($event)"
+    ></typeahead>
+    <typeahead
+      class="element-width"
+      [data]="typeaheadType"
+      [disabled]="loadingType"
+      [label]="'Izaberite tip'"
+      (emit)="selectedType($event)"
+    ></typeahead>
+    <autom-button
+      class="element-width"
+      [disabled]="!selectedManufacture || !selectedModel || !selectedVehicleId"
+      [label]="'Izaberi vozilo'"
+      [iconPrefix]="true"
+      [iconSource]="iconsEnum.SEARCH"
+      [iconColor]="colorEnum.GREY_100"
+      [type]="buttonType.PRIMARY"
+      [theme]="buttonTheme.LIGHT_ORANGE"
+      (clickEvent)="selectedVehicle()"
+    ></autom-button>
+  </div>
+</autom-popup>

@@ -1,0 +1,25 @@
+.vehicle-selection {
+  .popup-container__header {
+    border-top: 15px solid var(--figma-info-700);
+    border-radius: calc(var(--space-xxs)* 2.5);
+  }
+  .body {
+    padding: 40px;
+  }
+
+  .popup-container__body {
+    justify-content: center;
+  }
+
+  .element-width {
+    width: 450px;
+  }
+
+  .button__content-wrapper {
+    width: 420px;
+  }
+
+  .button--primary {
+    height: 45px;
+  }
+}

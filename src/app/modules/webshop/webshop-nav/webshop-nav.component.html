@@ -9,6 +9,7 @@
           [type]="buttonType.PRIMARY"
           [theme]="buttonTheme.LIGHT_ORANGE"
           [label]="'Izaberi vozilo'"
+          (clickEvent)="chooseVehicleVisible = true"
         >
         </autom-button>
         <autom-input-fields
@@ -42,3 +43,10 @@
     </div>
   </div>
 </div>
+
+<vehicle-selection-popup
+  *ngIf="chooseVehicleVisible"
+  (closePopupModal)="chooseVehicleVisible = false"
+  (emitVehicle)="selectedVehicleDetails.emit($event)"
+>
+</vehicle-selection-popup>

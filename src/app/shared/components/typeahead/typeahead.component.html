@@ -1,0 +1,32 @@
+<form class="typeahead-form">
+  <mat-form-field class="typeahead-full-width">
+    <mat-label>{{ label }}</mat-label>
+    <input
+      matInput
+      aria-label="State"
+      [formControl]="stateCtrl"
+      [matAutocomplete]="auto"
+      (blur)="onInputBlur()"
+      (focus)="showAllOptions()"
+    />
+    <mat-autocomplete
+      (optionSelected)="onOptionSelected($event)"
+      #auto="matAutocomplete"
+    >
+      <mat-option
+        *ngFor="let state of filteredStates | async"
+        [value]="state.value"
+      >
+        <img
+          *ngIf="state.img"
+          [src]="state.img"
+          alt=""
+          class="typeahead-option-img"
+          height="25"
+          loading="lazy"
+        />
+        <span>{{ state.value }}</span>
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+</form>

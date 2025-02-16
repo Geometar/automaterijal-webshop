@@ -1,5 +1,9 @@
 <section class="header-margin--top">
-  <webshop-nav [filter]="filter" [searchTerm]="searchTerm"></webshop-nav>
+  <webshop-nav
+    [filter]="filter"
+    [searchTerm]="searchTerm"
+    (selectedVehicleDetails)="selectVehicleDetailsEventHandle($event)"
+  ></webshop-nav>
   <webshop-empty
     *ngIf="currentState === state.SHOW_EMPTY_CONTAINER && !loading"
   ></webshop-empty>
@@ -13,6 +17,8 @@
     [searchTerm]="searchTerm"
     (emitTablePage)="setRobaPageData($event)"
   ></webshop-roba>
+  <webshop-vehicles *ngIf="currentState === state.SHOW_VEHICLE_DETAILS">
+  </webshop-vehicles>
   <div *ngIf="loading" class="spinner">
     <spinner></spinner>
   </div>

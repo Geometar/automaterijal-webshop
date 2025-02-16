@@ -69,6 +69,12 @@
 	&.grey-400 svg path {
 		stroke: var(--figma-grey-400);
 	}
+	
+	&.grey-400:hover {
+		svg path {
+			stroke: var(--figma-error-600);
+		}
+	} 
 
 	&.grey-500 svg path {
 		stroke: var(--figma-grey-500);

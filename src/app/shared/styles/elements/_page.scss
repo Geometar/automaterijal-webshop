@@ -1,0 +1,121 @@
+.page-details {
+	&__header {
+		align-items: center;
+		align-self: center;
+		display: flex;
+		flex-direction: row;
+		flex-grow: 0;
+		flex-shrink: 0;
+		justify-content: space-between;
+		padding: calc(var(--space-s) * 1.5);
+		width: 100%;
+	}
+
+	// todo: rename to &--height to align with BEM notation
+	&__height {
+		&--auto {
+			height: var(--size-auto);
+		}
+
+		&--full {
+			height: calc(100vh - var(--space-xs) * 20);
+		}
+
+		&--extra-small {
+			height: calc(var(--size-small) - calc(var(--space-xs) * 15));
+		}
+
+		&--small {
+			height: calc(var(--size-small) - calc(var(--space-xs) * 10));
+		}
+
+		&--medium {
+			height: calc(var(--size-medium) - calc(var(--space-xs) * 10));
+		}
+
+		&--large {
+			height: calc(var(--size-large) - calc(var(--space-xs) * 10));
+		}
+
+		&--extra-large {
+			height: calc(var(--size-extra-large) - calc(var(--space-xs) * 10));
+		}
+	}
+
+	// todo: rename to &--width to align with BEM notation
+	&__width {
+		&--auto {
+			width: var(--size-auto);
+		}
+
+		&--full {
+			width: var(--size-full);
+		}
+
+		&--full-vw {
+			width: var(--size-full-vw);
+		}
+
+		&--small {
+			width: var(--size-small);
+		}
+
+		&--medium {
+			width: var(--size-medium);
+		}
+
+		&--large {
+			width: var(--size-large);
+		}
+
+		&--extra-large {
+			width: var(--size-extra-large);
+		}
+	}
+
+	&__header,
+	&__footer {
+		height: calc(var(--space-xs) * 10);
+	}
+
+	&__body {
+		overflow-y: auto;
+
+		> form {
+			padding: var(--space-s) 0;
+		}
+	}
+
+	&__footer {
+		align-items: center;
+		background-color: var(--figma-base-white);
+		border-top: var(--space-default) solid var(--figma-grey-200);
+		bottom: 0;
+		display: flex;
+		flex-direction: row;
+		flex-shrink: 0;
+		left: 0;
+		justify-content: flex-end;
+		padding: var(--space-s) calc(var(--space-s) * 1.5);
+		position: absolute;
+		width: 100%;
+		z-index: var(--z-index-3);
+
+		&-button {
+			margin-left: var(--space-xs);
+		}
+
+		&-col {
+			align-items: center;
+			display: flex;
+		}
+
+		&-row {
+			justify-content: space-between;
+		}
+	}
+}
+
+::ng-deep conti-text-field {
+	width: 100%;
+}

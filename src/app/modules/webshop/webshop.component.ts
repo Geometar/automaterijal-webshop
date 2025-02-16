@@ -8,10 +8,12 @@ import { ActivatedRoute } from '@angular/router';
 import { WebshopEmptyComponent } from './webshop-empty/webshop-empty.component';
 import { WebshopNavComponent } from './webshop-nav/webshop-nav.component';
 import { WebshopRobaComponent } from './webshop-roba/webshop-roba.component';
+import { WebshopVehiclesComponent } from './webshop-vehicles/webshop-vehicles.component';
 
 // Data models
 import { Filter, Magacin } from '../../shared/data-models/model/roba';
 import { TablePage } from '../../shared/data-models/model/page';
+import { TDVehicleDetails } from '../../shared/data-models/model/tecdoc';
 
 // Services
 import { PictureService } from '../../shared/service/utils/picture.service';
@@ -21,6 +23,7 @@ import { SpinnerComponent } from '../../shared/components/spinner/spinner.compon
 export enum WebShopState {
   SHOW_ARTICLES,
   SHOW_EMPTY_CONTAINER,
+  SHOW_VEHICLE_DETAILS
 }
 
 @Component({
@@ -32,6 +35,7 @@ export enum WebShopState {
     WebshopEmptyComponent,
     WebshopNavComponent,
     WebshopRobaComponent,
+    WebshopVehiclesComponent
   ],
   templateUrl: './webshop.component.html',
   styleUrl: './webshop.component.scss',
@@ -52,6 +56,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
 
   // Data
   magacinData: Magacin | null = null;
+  selectedVehicleDetails: TDVehicleDetails | null = null;
 
   // Misc
   loading = false;
@@ -164,6 +169,11 @@ export class WebshopComponent implements OnDestroy, OnInit {
 
     this.updateState(searchTerm, newFilter, isInitialLoad, isSameSearchTerm, !!mandatoryProid || !!mandatoryGrupe);
     this.getRoba(isInitialLoad || filtersChanged);
+  }
+
+  selectVehicleDetailsEventHandle(selectedVehicle: TDVehicleDetails): void {
+    this.selectedVehicleDetails = selectedVehicle;
+    this.currentState = this.state.SHOW_VEHICLE_DETAILS;
   }
 
   /**

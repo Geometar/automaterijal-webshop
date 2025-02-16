@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewChecked, AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, Output, ViewChild } from '@angular/core';
 
 import { DragDropModule } from '@angular/cdk/drag-drop';
 
@@ -15,7 +15,7 @@ import { ButtonComponent } from '../button/button.component';
 import { PositionEnum, SizeEnum } from '../../data-models/enums';
 
 @Component({
-  selector: 'app-popup',
+  selector: 'autom-popup',
   standalone: true,
   imports: [
     CommonModule,
