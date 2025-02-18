@@ -47,6 +47,6 @@
 <vehicle-selection-popup
   *ngIf="chooseVehicleVisible"
   (closePopupModal)="chooseVehicleVisible = false"
-  (emitVehicle)="selectedVehicleDetails.emit($event)"
+  (emitVehicle)="handleSelectedVehicle($event)"
 >
 </vehicle-selection-popup>

@@ -6,6 +6,9 @@ import { HttpClient } from '@angular/common/http';
 // Data models
 import { TDManufacture, TDModels, TDVehicleDetails } from '../data-models/model/tecdoc';
 
+// Services
+import { ServiceHelpersService } from './utils/service-helpers.service';
+
 const DOMAIN_URL = environment.apiUrl + '/api/tecdoc';
 
 @Injectable({
@@ -13,7 +16,7 @@ const DOMAIN_URL = environment.apiUrl + '/api/tecdoc';
 })
 export class TecdocService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private helperService: ServiceHelpersService) { }
 
   public getDocumentBytes(dokument: string): Observable<ArrayBuffer> {
     const fullUrl = DOMAIN_URL + '/dokument/' + dokument;
@@ -44,6 +47,19 @@ export class TecdocService {
 
     return this.http
       .get<TDVehicleDetails[]>(fullUrl)
+      .pipe(catchError((error: any) => throwError(() => new Error(error))));
+  }
+
+  public getLinkageTargets(id: number, type: string): Observable<TDVehicleDetails[]> {
+    const fullUrl = DOMAIN_URL + '/linkageTargets';
+    const parameterObject = {} as any;
+    parameterObject['tecdocTargetType'] = type;
+    parameterObject['tecdocTargetId'] = id;
+
+    const parametersString = this.helperService.formatQueryParameters(parameterObject);
+
+    return this.http
+      .get<TDVehicleDetails[]>(fullUrl + parametersString)
       .pipe(catchError((error: any) => throwError(() => new Error(error))));
   }
 }

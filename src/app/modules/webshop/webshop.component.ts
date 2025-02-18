@@ -19,6 +19,7 @@ import { TDVehicleDetails } from '../../shared/data-models/model/tecdoc';
 import { PictureService } from '../../shared/service/utils/picture.service';
 import { RobaService } from '../../shared/service/roba.service';
 import { SpinnerComponent } from '../../shared/components/spinner/spinner.component';
+import { TecdocService } from '../../shared/service/tecdoc.service';
 
 export enum WebShopState {
   SHOW_ARTICLES,
@@ -65,7 +66,8 @@ export class WebshopComponent implements OnDestroy, OnInit {
   constructor(
     private activatedRoute: ActivatedRoute,
     private pictureService: PictureService,
-    private robaService: RobaService
+    private robaService: RobaService,
+    private tecdocService: TecdocService
   ) { }
 
   /** Angular lifecycle hooks start */
@@ -123,6 +125,31 @@ export class WebshopComponent implements OnDestroy, OnInit {
       });
   }
 
+  getTDVehicleDetails(tecdocId: number, tecdocType: string): void {
+    this.loading = true;
+    this.tecdocService
+      .getLinkageTargets(
+        tecdocId,
+        tecdocType,
+      )
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.loading = false;
+          this.internalLoading = false;
+        })
+      )
+      .subscribe({
+        next: (vehicleDetails: TDVehicleDetails[]) => {
+          this.selectedVehicleDetails = vehicleDetails[0];
+          this.currentState = this.state.SHOW_VEHICLE_DETAILS;
+        },
+        error: (err: HttpErrorResponse) => {
+          const error = err.error.details || err.error;
+        },
+      });
+  }
+
   /** Event end */
 
   // Setters start
@@ -150,14 +177,21 @@ export class WebshopComponent implements OnDestroy, OnInit {
     const mandatoryProid = params['mandatoryproid'] || '';
     const mandatoryGrupe = params['grupe'] || '';
     const mandatoryOnInit = !!mandatoryProid && isInitialLoad;
+    const tecdocType = params['tecdocType'] || '';
+    const tecdocId = params['tecdocId'] || '';
+    const showTdVehicleDetails = !!tecdocType && !!tecdocId;
 
-    if (this.shouldShowEmptyContainer(searchTerm, mandatoryProid, mandatoryGrupe, mandatoryOnInit)) {
+    if (this.shouldShowEmptyContainer(searchTerm, mandatoryProid, mandatoryGrupe, mandatoryOnInit, tecdocId, tecdocType)) {
       this.currentState = WebShopState.SHOW_EMPTY_CONTAINER;
       this.searchTerm = searchTerm;
       return;
     }
 
-    this.currentState = WebShopState.SHOW_ARTICLES;
+    if (showTdVehicleDetails && !isInitialLoad) {
+      return;
+    }
+
+    this.currentState = showTdVehicleDetails ? WebShopState.SHOW_VEHICLE_DETAILS : WebShopState.SHOW_ARTICLES;
 
     const newFilter = this.createFilterFromParams(params);
     const isSameSearchTerm = searchTerm === this.searchTerm;
@@ -168,7 +202,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
     }
 
     this.updateState(searchTerm, newFilter, isInitialLoad, isSameSearchTerm, !!mandatoryProid || !!mandatoryGrupe);
-    this.getRoba(isInitialLoad || filtersChanged);
+    showTdVehicleDetails ? this.getTDVehicleDetails(tecdocId, tecdocType) : this.getRoba(isInitialLoad || filtersChanged);
   }
 
   selectVehicleDetailsEventHandle(selectedVehicle: TDVehicleDetails): void {
@@ -266,8 +300,8 @@ export class WebshopComponent implements OnDestroy, OnInit {
   /**
    * Checks whether the component should display an empty container.
    */
-  private shouldShowEmptyContainer(searchTerm: string, mandatoryProid: string, mandatoryGrupe: string, mandatoryOnInit: boolean): boolean {
-    return !searchTerm && !mandatoryProid && !mandatoryGrupe && !mandatoryOnInit;
+  private shouldShowEmptyContainer(searchTerm: string, mandatoryProid: string, mandatoryGrupe: string, mandatoryOnInit: boolean, tecdocTargetId: number, vehicleModelType: string): boolean {
+    return !searchTerm && !mandatoryProid && !mandatoryGrupe && !mandatoryOnInit && !tecdocTargetId && !vehicleModelType;
   }
 
   // End of: Private methods

@@ -42,7 +42,7 @@ export class NavTitles {
     ButtonComponent,
     CommonModule,
     InputFieldsComponent,
-    VehicleSelectionPopupComponent
+    VehicleSelectionPopupComponent,
   ],
   templateUrl: './webshop-nav.component.html',
   styleUrl: './webshop-nav.component.scss',
@@ -76,6 +76,18 @@ export class WebshopNavComponent {
 
   emitValue(searchTerm: any): void {
     this.searchTerm = searchTerm?.value ? searchTerm?.value.trim() : '';
-    this.searchTerm || !!this.filter.mandatoryProid ? this.urlHelperService.addOrUpdateQueryParams({ searchTerm: this.searchTerm }) : this.urlHelperService.clearQueryParams();
+    this.searchTerm || !!this.filter.mandatoryProid
+      ? this.urlHelperService.addOrUpdateQueryParams({
+        searchTerm: this.searchTerm,
+      })
+      : this.urlHelperService.clearQueryParams();
+  }
+
+  handleSelectedVehicle(vehicleDetails: TDVehicleDetails): void {
+    this.urlHelperService.setQueryParams({
+      tecdocType: vehicleDetails.linkageTargetType,
+      tecdocId: vehicleDetails.linkageTargetId,
+    });
+    this.selectedVehicleDetails.emit(vehicleDetails);
   }
 }

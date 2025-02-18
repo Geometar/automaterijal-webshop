@@ -30,6 +30,28 @@ export class UrlHelperService {
     });
   }
 
+  /**
+ * Clears all existing query parameters and sets new ones
+ * @param params Object containing new query parameters
+ */
+  setQueryParams(params: { [key: string]: any }): void {
+    const queryParams: { [key: string]: string | string[] } = {};
+
+    Object.keys(params).forEach((key) => {
+      const value = params[key];
+      if (Array.isArray(value)) {
+        queryParams[key] = value.join(','); // Handle arrays as comma-separated values
+      } else if (value !== null && value !== undefined) {
+        queryParams[key] = String(value); // Convert non-array values to strings
+      }
+    });
+
+    this.router.navigate([], {
+      queryParams,
+      queryParamsHandling: '', // Clear existing parameters and replace with new ones
+    });
+  }
+
 
   /**
    * Removes a query parameter from the current URL
