@@ -1,3 +1,13 @@
+export class AssemblyGroup {
+  assemblyGroupNodeId?: number;
+  assemblyGroupName?: string;
+  assemblyGroupType?: string;
+  parentNodeId?: number | null;
+  children?: number | null;
+  count?: number;
+}
+
+
 export class TDManufacture {
   favoriteFlag?: number;
   id?: number;

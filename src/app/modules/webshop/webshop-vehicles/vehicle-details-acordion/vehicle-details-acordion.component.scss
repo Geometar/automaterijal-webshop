@@ -1,0 +1,53 @@
+.expansion-panel {
+  height: 80px !important;
+  background-color: white;
+  border-bottom: 3px solid var(--figma-accent-yellow-700);
+  &--header {
+  }
+
+  .mat-expansion-indicator svg {
+    width: 45px;
+    height: 45px;
+  }
+}
+
+.tech-data-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+  padding: 15px;
+}
+
+.tech-section {
+  flex: 1;
+  min-width: 250px;
+}
+
+.tech-section h3 {
+  font-size: 16px;
+  margin-bottom: 10px;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 5px;
+}
+
+.tech-items {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.tech-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  border-bottom: 1px solid #eee;
+  padding: 5px 0;
+}
+
+.tech-key {
+  font-weight: bold;
+}
+
+.tech-value {
+  color: #555;
+}

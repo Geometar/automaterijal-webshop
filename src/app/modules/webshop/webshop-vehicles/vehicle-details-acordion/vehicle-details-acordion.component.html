@@ -1,0 +1,35 @@
+<mat-accordion>
+  <mat-expansion-panel
+    (opened)="panelOpenState.set(true)"
+    (closed)="panelOpenState.set(false)"
+  >
+    <mat-expansion-panel-header class="expansion-panel">
+      <mat-panel-title class="expansion-panel--header">
+        <img [src]="(vehicleDetails?.vehicleImages)![0].imageURL200" />
+      </mat-panel-title>
+      <mat-panel-description>
+        {{ vehicleDetails?.mfrName }} {{ vehicleDetails?.hmdMfrModelName }}
+        {{ vehicleDetails?.description }} | {{ vehicleDetails?.engineType }}
+        {{ vehicleDetails?.horsePowerTo }}HP /
+        {{ vehicleDetails?.kiloWattsTo }}KW |
+        {{ vehicleDetails?.beginYearMonth }} -
+        {{ vehicleDetails?.endYearMonth || "trenutno" }}
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <!-- Horizontalna sekcija sa tehničkim podacima -->
+    <div class="tech-data-container">
+      <ng-container *ngFor="let section of techData">
+        <div class="tech-section">
+          <h3>{{ section.title }}</h3>
+          <div class="tech-items">
+            <div *ngFor="let item of section.items" class="tech-item">
+              <span class="tech-key">{{ item.key }}</span>
+              <span class="tech-value">{{ item.value }}</span>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </mat-expansion-panel>
+</mat-accordion>

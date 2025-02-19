@@ -50,6 +50,14 @@ export class TecdocService {
       .pipe(catchError((error: any) => throwError(() => new Error(error))));
   }
 
+  public getAssemblyGroups(id: number, type: string): Observable<AssignedNodesOptions[]> {
+    const fullUrl = DOMAIN_URL + '/assemblygroup/' + id + '/' + type;
+
+    return this.http
+      .get<AssignedNodesOptions[]>(fullUrl)
+      .pipe(catchError((error: any) => throwError(() => new Error(error))));
+  }
+
   public getLinkageTargets(id: number, type: string): Observable<TDVehicleDetails[]> {
     const fullUrl = DOMAIN_URL + '/linkageTargets';
     const parameterObject = {} as any;
