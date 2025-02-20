@@ -2,4 +2,11 @@
   <vehicle-details-accordion
     [vehicleDetails]="vehicleDetails"
   ></vehicle-details-accordion>
+  <assembly-groups
+    *ngIf="!assemblyGroupLoading"
+    [assemblyGroups]="assemblyGroups"
+  ></assembly-groups>
+  <div *ngIf="assemblyGroupLoading" class="spinner">
+    <spinner></spinner>
+  </div>
 </section>

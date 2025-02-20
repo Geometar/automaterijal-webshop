@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewEncapsulation } from '@angular/core';
 import { finalize, Subject, takeUntil } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 
@@ -6,20 +6,30 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { VehicleDetailsAcordionComponent } from './vehicle-details-acordion/vehicle-details-acordion.component';
 
 // Data models
-import { TDVehicleDetails } from '../../../shared/data-models/model/tecdoc';
+import { AssemblyGroup, TDVehicleDetails } from '../../../shared/data-models/model/tecdoc';
 
 // Service
 import { TecdocService } from '../../../shared/service/tecdoc.service';
+import { AssemblyGroupsComponent } from './assembly-groups/assembly-groups.component';
+import { SpinnerComponent } from '../../../shared/components/spinner/spinner.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'webshop-vehicles',
   standalone: true,
-  imports: [VehicleDetailsAcordionComponent],
+  imports: [SpinnerComponent, VehicleDetailsAcordionComponent, AssemblyGroupsComponent, CommonModule],
   templateUrl: './webshop-vehicles.component.html',
-  styleUrl: './webshop-vehicles.component.scss'
+  styleUrl: './webshop-vehicles.component.scss',
+  encapsulation: ViewEncapsulation.None
 })
-export class WebshopVehiclesComponent implements OnInit, OnDestroy {
+export class WebshopVehiclesComponent implements OnInit, OnDestroy, OnChanges {
   @Input() vehicleDetails?: TDVehicleDetails;
+
+  // Data
+  assemblyGroups: AssemblyGroup[] = [];
+
+  // Misc
+  assemblyGroupLoading = true;
 
   private destroy$ = new Subject<void>();
 
@@ -29,6 +39,12 @@ export class WebshopVehiclesComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     if (this.vehicleDetails?.mfrId) {
+      this.getAssemblyGroup();
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (!changes['vehicleDetails'].firstChange) {
       this.getAssemblyGroup();
     }
   }
@@ -43,6 +59,7 @@ export class WebshopVehiclesComponent implements OnInit, OnDestroy {
   // Start of: Events
 
   getAssemblyGroup(): void {
+    this.assemblyGroupLoading = true;
     this.tecdocService
       .getAssemblyGroups(
         this.vehicleDetails?.linkageTargetId!,
@@ -51,11 +68,12 @@ export class WebshopVehiclesComponent implements OnInit, OnDestroy {
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => {
+          this.assemblyGroupLoading = false;
         })
       )
       .subscribe({
-        next: (response: AssignedNodesOptions[]) => {
-          console.log(response);
+        next: (response: AssemblyGroup[]) => {
+          this.assemblyGroups = response;
         },
         error: (err: HttpErrorResponse) => {
           const error = err.error.details || err.error;

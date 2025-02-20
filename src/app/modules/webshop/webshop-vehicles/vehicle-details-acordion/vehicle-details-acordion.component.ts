@@ -1,7 +1,11 @@
-import { Component, Input, OnInit, signal, ViewEncapsulation } from '@angular/core';
-import { MatExpansionModule } from '@angular/material/expansion';
+import { Component, Input, OnChanges, OnInit, signal, SimpleChanges, ViewEncapsulation } from '@angular/core';
+
+// Data models
 import { TDVehicleDetails } from '../../../../shared/data-models/model/tecdoc';
+
+// Component imported
 import { CommonModule } from '@angular/common';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 @Component({
   selector: 'vehicle-details-accordion',
@@ -11,8 +15,10 @@ import { CommonModule } from '@angular/common';
   styleUrl: './vehicle-details-acordion.component.scss',
   encapsulation: ViewEncapsulation.None
 })
-export class VehicleDetailsAcordionComponent implements OnInit {
+export class VehicleDetailsAcordionComponent implements OnInit, OnChanges {
   @Input() vehicleDetails?: TDVehicleDetails;
+
+  vehicleImg: string | undefined = '';
 
   techData: any[] = [];
 
@@ -21,12 +27,26 @@ export class VehicleDetailsAcordionComponent implements OnInit {
   /** Start of: Angular lifecycle hooks */
 
   ngOnInit(): void {
+    this.initVehicleImg();
     this.populateTechDocData();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (!changes['vehicleDetails'].firstChange) {
+      this.initVehicleImg();
+      this.populateTechDocData();
+    }
   }
 
   /** End of: Angular lifecycle hooks */
 
   /** Start of: Init methods */
+
+  initVehicleImg(): void {
+    if (this.vehicleDetails?.vehicleImages?.length) {
+      this.vehicleImg = this.vehicleDetails.vehicleImages[0].imageURL200 ? this.vehicleDetails.vehicleImages[0].imageURL200 : this.vehicleDetails.vehicleImages[0].imageURL100;
+    }
+  }
 
   populateTechDocData(): void {
     if (this.vehicleDetails) {

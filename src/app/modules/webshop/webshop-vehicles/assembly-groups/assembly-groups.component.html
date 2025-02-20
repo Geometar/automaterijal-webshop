@@ -1,0 +1,45 @@
+<div class="assembly-groups-container">
+  <h2></h2>
+  <div
+    class="assembly-group-card"
+    *ngFor="let group of structuredGroups"
+    [ngClass]="{
+      expanded: isExpanded(group.assemblyGroupNodeId!),
+      collapsing: !isExpanded(group.assemblyGroupNodeId!)
+    }"
+    [id]="'group-' + group.assemblyGroupNodeId"
+  >
+    <div class="card-header">
+      <h3><span class="icon">📦</span> {{ group.assemblyGroupName }}</h3>
+    </div>
+    <div class="card-body">
+      <ul
+        class="child-list"
+        [id]="'content-' + group.assemblyGroupNodeId"
+        [ngClass]="{ collapsing: !isExpanded(group.assemblyGroupNodeId!) }"
+      >
+        <li
+          *ngFor="
+            let child of expandedCards.has(group.assemblyGroupNodeId!)
+              ? group.childrenNodes
+              : group.childrenNodes?.slice(0, 5)
+          "
+        >
+          {{ child.assemblyGroupName }}
+        </li>
+      </ul>
+    </div>
+    <div class="card-footer" *ngIf="group.childrenNodes!.length > 5">
+      <autom-button
+        class="show-all-btn"
+        [label]="
+          expandedCards.has(group.assemblyGroupNodeId!)
+            ? 'Prikaži manje'
+            : 'Prikaži sve'
+        "
+        (click)="toggleShowAll(group.assemblyGroupNodeId!)"
+      >
+      </autom-button>
+    </div>
+  </div>
+</div>

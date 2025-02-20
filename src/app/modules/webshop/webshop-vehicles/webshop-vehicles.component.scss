@@ -1,4 +1,10 @@
 .vehicle-details {
-  height: 100vh;
   padding: 20px;
+
+  .spinner {
+    align-items: center;
+    display: flex;
+    height: calc(100vh - 420px);
+    justify-content: center;
+  }
 }

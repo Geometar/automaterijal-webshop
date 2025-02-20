@@ -5,6 +5,9 @@ export class AssemblyGroup {
   parentNodeId?: number | null;
   children?: number | null;
   count?: number;
+
+  // UI Only
+  childrenNodes?: AssemblyGroup[];
 }
 
 

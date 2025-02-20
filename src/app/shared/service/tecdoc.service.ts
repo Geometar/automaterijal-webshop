@@ -4,7 +4,7 @@ import { catchError, Observable, throwError } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 
 // Data models
-import { TDManufacture, TDModels, TDVehicleDetails } from '../data-models/model/tecdoc';
+import { AssemblyGroup, TDManufacture, TDModels, TDVehicleDetails } from '../data-models/model/tecdoc';
 
 // Services
 import { ServiceHelpersService } from './utils/service-helpers.service';
@@ -50,11 +50,11 @@ export class TecdocService {
       .pipe(catchError((error: any) => throwError(() => new Error(error))));
   }
 
-  public getAssemblyGroups(id: number, type: string): Observable<AssignedNodesOptions[]> {
+  public getAssemblyGroups(id: number, type: string): Observable<AssemblyGroup[]> {
     const fullUrl = DOMAIN_URL + '/assemblygroup/' + id + '/' + type;
 
     return this.http
-      .get<AssignedNodesOptions[]>(fullUrl)
+      .get<AssemblyGroup[]>(fullUrl)
       .pipe(catchError((error: any) => throwError(() => new Error(error))));
   }
 
