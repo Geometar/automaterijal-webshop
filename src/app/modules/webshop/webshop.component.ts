@@ -20,11 +20,25 @@ import { PictureService } from '../../shared/service/utils/picture.service';
 import { RobaService } from '../../shared/service/roba.service';
 import { SpinnerComponent } from '../../shared/components/spinner/spinner.component';
 import { TecdocService } from '../../shared/service/tecdoc.service';
+import { WebshopLogicService } from '../../shared/service/utils/webshop-logic.service';
+import { WebshopStateService } from '../../shared/service/utils/webshop-state.service';
 
 export enum WebShopState {
+  SHOW_ARTICLES_WITH_VEHICLE_DETAILS,
   SHOW_ARTICLES,
   SHOW_EMPTY_CONTAINER,
-  SHOW_VEHICLE_DETAILS
+  SHOW_VEHICLE_DETAILS,
+}
+interface QueryParams {
+  assembleGroupId?: string;
+  grupe?: string;
+  mandatoryproid?: string;
+  naStanju?: string;
+  podgrupe?: string;
+  proizvodjaci?: string;
+  searchTerm?: string;
+  tecdocId?: string;
+  tecdocType?: string;
 }
 
 @Component({
@@ -36,7 +50,7 @@ export enum WebShopState {
     WebshopEmptyComponent,
     WebshopNavComponent,
     WebshopRobaComponent,
-    WebshopVehiclesComponent
+    WebshopVehiclesComponent,
   ],
   templateUrl: './webshop.component.html',
   styleUrl: './webshop.component.scss',
@@ -56,8 +70,11 @@ export class WebshopComponent implements OnDestroy, OnInit {
   filter: Filter = new Filter();
 
   // Data
+  assembleGroupId: string = '';
   magacinData: Magacin | null = null;
   selectedVehicleDetails: TDVehicleDetails | null = null;
+  tecdocId: number | null = null;
+  tecdocType: string | null = null;
 
   // Misc
   loading = false;
@@ -65,9 +82,11 @@ export class WebshopComponent implements OnDestroy, OnInit {
 
   constructor(
     private activatedRoute: ActivatedRoute,
+    private logicService: WebshopLogicService,
     private pictureService: PictureService,
     private robaService: RobaService,
-    private tecdocService: TecdocService
+    private stateService: WebshopStateService,
+    private tecdocService: TecdocService,
   ) { }
 
   /** Angular lifecycle hooks start */
@@ -115,9 +134,49 @@ export class WebshopComponent implements OnDestroy, OnInit {
       )
       .subscribe({
         next: (response: Magacin) => {
-          this.pictureService.convertByteToImageArray(response.robaDto!.content);
+          this.pictureService.convertByteToImageArray(
+            response.robaDto!.content
+          );
           this.magacinData = response;
           this.currentState = this.state.SHOW_ARTICLES;
+        },
+        error: (err: HttpErrorResponse) => {
+          const error = err.error.details || err.error;
+        },
+      });
+  }
+
+  getArticlesByAssembleGroup(
+    linkageTargetId: number,
+    linkageTargetType: string,
+    assembleGroupId: string,
+    internalLoading = false
+  ): void {
+    this.loading = !internalLoading;
+    this.internalLoading = internalLoading;
+
+    this.tecdocService
+      .getAssociatedArticles(
+        linkageTargetId,
+        linkageTargetType,
+        assembleGroupId,
+        this.rowsPerPage,
+        this.pageIndex,
+        this.filter
+      )
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.loading = false;
+          this.internalLoading = false;
+        })
+      )
+      .subscribe({
+        next: (response: Magacin) => {
+          this.pictureService.convertByteToImageArray(
+            response.robaDto!.content
+          );
+          this.magacinData = response;
         },
         error: (err: HttpErrorResponse) => {
           const error = err.error.details || err.error;
@@ -128,10 +187,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
   getTDVehicleDetails(tecdocId: number, tecdocType: string): void {
     this.loading = true;
     this.tecdocService
-      .getLinkageTargets(
-        tecdocId,
-        tecdocType,
-      )
+      .getLinkageTargets(tecdocId, tecdocType)
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => {
@@ -142,7 +198,6 @@ export class WebshopComponent implements OnDestroy, OnInit {
       .subscribe({
         next: (vehicleDetails: TDVehicleDetails[]) => {
           this.selectedVehicleDetails = vehicleDetails[0];
-          this.currentState = this.state.SHOW_VEHICLE_DETAILS;
         },
         error: (err: HttpErrorResponse) => {
           const error = err.error.details || err.error;
@@ -153,6 +208,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
   /** Event end */
 
   // Setters start
+
   setRobaSearchTerm(searchTerm: string): void {
     this.searchTerm = searchTerm;
     this.getRoba();
@@ -160,7 +216,13 @@ export class WebshopComponent implements OnDestroy, OnInit {
   setRobaPageData(tableEvent: TablePage): void {
     this.pageIndex = tableEvent.pageIndex;
     this.rowsPerPage = tableEvent.pageSize;
-    this.getRoba();
+    this.currentState === this.state.SHOW_ARTICLES_WITH_VEHICLE_DETAILS ? this.getArticlesByAssembleGroup(this.tecdocId!, this.tecdocType!, this.assembleGroupId) :
+      this.getRoba();
+  }
+
+  selectVehicleDetailsEventHandle(selectedVehicle: TDVehicleDetails): void {
+    this.selectedVehicleDetails = selectedVehicle;
+    this.currentState = this.state.SHOW_VEHICLE_DETAILS;
   }
 
   // Setters end
@@ -172,136 +234,168 @@ export class WebshopComponent implements OnDestroy, OnInit {
    * @param params The query parameters.
    * @param isInitialLoad Flag to determine if this is the initial load.
    */
-  private handleQueryParams(params: any, isInitialLoad: boolean = false): void {
-    const searchTerm = params['searchTerm'] || '';
-    const mandatoryProid = params['mandatoryproid'] || '';
-    const mandatoryGrupe = params['grupe'] || '';
-    const mandatoryOnInit = !!mandatoryProid && isInitialLoad;
-    const tecdocType = params['tecdocType'] || '';
-    const tecdocId = params['tecdocId'] || '';
-    const showTdVehicleDetails = !!tecdocType && !!tecdocId;
+  private handleQueryParams(params: QueryParams, isInitialLoad: boolean = false): void {
+    // Extract and safely parse all parameters
+    const searchTerm = params.searchTerm || '';
+    const tecdocType = params.tecdocType || '';
+    const tecdocId = params.tecdocId ? +params.tecdocId : null;
+    const assembleGroupId = params.assembleGroupId || '';
 
-    if (this.shouldShowEmptyContainer(searchTerm, mandatoryProid, mandatoryGrupe, mandatoryOnInit, tecdocId, tecdocType)) {
-      this.currentState = WebShopState.SHOW_EMPTY_CONTAINER;
-      this.searchTerm = searchTerm;
+    const mandatoryProid = params.mandatoryproid || '';
+    const mandatoryGrupe = params.grupe || '';
+
+    // Create a filter object from parameters
+    const filter = this.logicService.createFilterFromParams(params);
+    const filtersChanged = this.logicService.haveFiltersChanged(this.filter, filter);
+
+    // Determine if parameters are empty and an empty container should be shown
+    const isEmptyParams = this.stateService.shouldShowEmptyContainer(
+      searchTerm,
+      mandatoryProid,
+      mandatoryGrupe,
+      tecdocId,
+      tecdocType,
+    );
+
+    if (isEmptyParams) {
+      this.updateState(WebShopState.SHOW_EMPTY_CONTAINER, searchTerm);
       return;
     }
 
-    if (showTdVehicleDetails && !isInitialLoad) {
-      return;
+    // Determine if we need to fetch new vehicle details
+    const shouldFetchNewVehicleDetails = this.shouldFetchVehicleDetails(tecdocType, tecdocId);
+
+    if (shouldFetchNewVehicleDetails && tecdocId !== null) {
+      this.getTDVehicleDetails(tecdocId, tecdocType);
     }
 
-    this.currentState = showTdVehicleDetails ? WebShopState.SHOW_VEHICLE_DETAILS : WebShopState.SHOW_ARTICLES;
+    // Determine if an assemble group is selected
+    const assembleGroupSelected = !!assembleGroupId;
 
-    const newFilter = this.createFilterFromParams(params);
-    const isSameSearchTerm = searchTerm === this.searchTerm;
-    const filtersChanged = this.haveFiltersChanged(this.filter, newFilter);
+    // Determine the state of the webshop
+    this.currentState = this.determineWebShopState({
+      showVehicleDetails: !!tecdocId && !!tecdocType,
+      assembleGroupSelected
+    });
 
-    if (!isInitialLoad && isSameSearchTerm && !filtersChanged) {
-      return;
-    }
+    // Update state based on new parameters
+    this.updateStateBasedOnQueryParams({
+      searchTerm,
+      filter,
+      isInitialLoad,
+      filtersChanged,
+      assembleGroupId,
+    });
 
-    this.updateState(searchTerm, newFilter, isInitialLoad, isSameSearchTerm, !!mandatoryProid || !!mandatoryGrupe);
-    showTdVehicleDetails ? this.getTDVehicleDetails(tecdocId, tecdocType) : this.getRoba(isInitialLoad || filtersChanged);
-  }
-
-  selectVehicleDetailsEventHandle(selectedVehicle: TDVehicleDetails): void {
-    this.selectedVehicleDetails = selectedVehicle;
-    this.currentState = this.state.SHOW_VEHICLE_DETAILS;
+    // Fetch data based on the current state
+    this.fetchDataBasedOnCurrentState({
+      tecdocType,
+      tecdocId,
+      assembleGroupId,
+      filtersChanged,
+      isInitialLoad,
+    });
   }
 
   /**
    * Updates the component's state based on query parameters.
    */
-  private updateState(
-    searchTerm: string,
-    newFilter: Filter,
-    isInitialLoad: boolean,
-    isSameSearchTerm: boolean,
-    isMandatoryFilterOn: boolean
-  ): void {
-    this.searchTerm = searchTerm;
+  private updateStateBasedOnQueryParams({
+    searchTerm,
+    filter,
+    isInitialLoad,
+    filtersChanged,
+    assembleGroupId,
+  }: {
+    searchTerm: string;
+    filter: Filter;
+    isInitialLoad: boolean;
+    filtersChanged: boolean;
+    assembleGroupId: string;
+  }): void {
+    const isSearchTermChanged = searchTerm !== this.searchTerm;
+    const isMandatoryFilterActive = !!filter.mandatoryProid!.length || !!filter.grupe!.length;
 
-    if (!isInitialLoad && !isMandatoryFilterOn && (!this.searchTerm || !isSameSearchTerm)) {
+    if (!isInitialLoad && !isMandatoryFilterActive && (isSearchTermChanged || (!assembleGroupId && filtersChanged))) {
       this.filter = new Filter();
     } else {
-      this.filter = newFilter;
-      if (!isSameSearchTerm && isMandatoryFilterOn) {
-        this.filter.podgrupe = [];
-      }
+      this.filter = filter;
     }
+
+    this.searchTerm = searchTerm;
+    this.assembleGroupId = assembleGroupId;
   }
 
   /**
-   * Creates a filter object from the provided query parameters.
-   * @param params The query parameters.
-   * @returns A new Filter object.
+   * Fetches data based on the current component state.
    */
-  private createFilterFromParams(params: any): Filter {
-    const filter = new Filter();
-    filter.grupe = this.splitParams(params['grupe']);
-    filter.mandatoryProid = this.splitParams(params['mandatoryproid']);
-    filter.naStanju = params['naStanju'] === 'true';
-    filter.podgrupe = this.splitParams(params['podgrupe']);
-    filter.proizvodjaci = this.splitParams(params['proizvodjaci']);
-    return filter;
+  private fetchDataBasedOnCurrentState({
+    tecdocType,
+    tecdocId,
+    assembleGroupId,
+    filtersChanged,
+    isInitialLoad,
+  }: {
+    tecdocType: string;
+    tecdocId: number | null;
+    assembleGroupId: string;
+    filtersChanged: boolean;
+    isInitialLoad: boolean;
+  }): void {
+    switch (this.currentState) {
+      case WebShopState.SHOW_VEHICLE_DETAILS:
+        if (tecdocId !== null && (!this.selectedVehicleDetails || this.selectedVehicleDetails.linkageTargetId !== tecdocId)) {
+          this.getTDVehicleDetails(tecdocId, tecdocType);
+        }
+        break;
+      case WebShopState.SHOW_ARTICLES_WITH_VEHICLE_DETAILS:
+        if (tecdocId !== null) {
+          this.getArticlesByAssembleGroup(tecdocId, tecdocType, assembleGroupId, isInitialLoad || filtersChanged);
+        }
+        break;
+      case WebShopState.SHOW_ARTICLES:
+        this.getRoba(isInitialLoad || filtersChanged);
+        break;
+    }
   }
 
   /**
- * Compares two filter objects for equality.
- * @param oldFilter The existing filter.
- * @param newFilter The new filter to compare.
- * @returns True if the filters are different, otherwise false.
- */
-  private haveFiltersChanged(oldFilter: Filter, newFilter: Filter): boolean {
-    // Deep comparison to check for differences
-    return !this.deepEqual(oldFilter, newFilter);
-  }
-
-  /**
-  * Performs a deep equality check on two objects.
-  * @param obj1 The first object to compare.
-  * @param obj2 The second object to compare.
-  * @returns True if objects are equal, otherwise false.
-  */
-  private deepEqual(obj1: any, obj2: any): boolean {
-    if (obj1 === obj2) {
-      return true; // Same reference or value
-    }
-
-    if (typeof obj1 !== 'object' || typeof obj2 !== 'object' || obj1 === null || obj2 === null) {
-      return false; // Primitive or one is null
-    }
-
-    const keys1 = Object.keys(obj1).sort();
-    const keys2 = Object.keys(obj2).sort();
-
-    if (keys1.length !== keys2.length) {
-      return false; // Different number of keys
-    }
-
-    for (let key of keys1) {
-      if (!keys2.includes(key) || !this.deepEqual(obj1[key], obj2[key])) {
-        return false; // Key missing or values not equal
-      }
-    }
-
-    return true;
-  }
-
-  private splitParams(param: string): string[] {
-    if (!param) {
-      return [];
-    }
-
-    return param.includes(',') ? param.split(',') : [param];
-  }
-
-  /**
-   * Checks whether the component should display an empty container.
+   * Determines if a new vehicle detail fetch is required.
    */
-  private shouldShowEmptyContainer(searchTerm: string, mandatoryProid: string, mandatoryGrupe: string, mandatoryOnInit: boolean, tecdocTargetId: number, vehicleModelType: string): boolean {
-    return !searchTerm && !mandatoryProid && !mandatoryGrupe && !mandatoryOnInit && !tecdocTargetId && !vehicleModelType;
+  private shouldFetchVehicleDetails(tecdocType: string, tecdocId: number | null): boolean {
+    return (
+      tecdocId !== null &&
+      (!this.selectedVehicleDetails ||
+        this.selectedVehicleDetails.linkageTargetType !== tecdocType ||
+        this.selectedVehicleDetails.linkageTargetId !== tecdocId)
+    );
+  }
+
+  /**
+   * Determines the correct state for the WebShop based on conditions.
+   */
+  private determineWebShopState({
+    showVehicleDetails,
+    assembleGroupSelected
+  }: {
+    showVehicleDetails: boolean;
+    assembleGroupSelected: boolean
+  }): WebShopState {
+    if (assembleGroupSelected) {
+      return WebShopState.SHOW_ARTICLES_WITH_VEHICLE_DETAILS;
+    }
+    if (showVehicleDetails) {
+      return WebShopState.SHOW_VEHICLE_DETAILS;
+    }
+    return WebShopState.SHOW_ARTICLES;
+  }
+
+  /**
+   * Updates the current state and assigns a search term.
+   */
+  private updateState(newState: WebShopState, searchTerm: string): void {
+    this.currentState = newState;
+    this.searchTerm = searchTerm;
   }
 
   // End of: Private methods

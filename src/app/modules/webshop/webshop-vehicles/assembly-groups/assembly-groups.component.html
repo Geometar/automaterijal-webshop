@@ -1,5 +1,14 @@
+<div class="util__flex--center">
+  <autom-input-fields
+    class="filter-groups"
+    [label]="'Filtriraj grupe'"
+    [preIcon]="iconEnum.FILTER"
+    [round]="true"
+    [type]="inputType.SEARCH"
+    (emitSelected)="filterStructuredGroups($event)"
+  ></autom-input-fields>
+</div>
 <div class="assembly-groups-container">
-  <h2></h2>
   <div
     class="assembly-group-card"
     *ngFor="let group of structuredGroups"
@@ -10,7 +19,9 @@
     [id]="'group-' + group.assemblyGroupNodeId"
   >
     <div class="card-header">
-      <h3><span class="icon">📦</span> {{ group.assemblyGroupName }}</h3>
+      <h3 (click)="searchForArticlesWithAssembleGroup(group)">
+        <span class="icon">📦</span> {{ group.assemblyGroupName }}
+      </h3>
     </div>
     <div class="card-body">
       <ul
@@ -24,6 +35,7 @@
               ? group.childrenNodes
               : group.childrenNodes?.slice(0, 5)
           "
+          (click)="searchForArticlesWithAssembleGroup(child)"
         >
           {{ child.assemblyGroupName }}
         </li>

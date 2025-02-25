@@ -1,17 +1,21 @@
-import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { trigger, style, animate, transition } from '@angular/animations';
-
-// Data Models
-import { AssemblyGroup } from '../../../../shared/data-models/model/tecdoc';
 
 // Component imported
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { CommonModule } from '@angular/common';
+import { InputFieldsComponent } from '../../../../shared/components/input-fields/input-fields.component';
+
+// Data Models
+import { AssemblyGroup } from '../../../../shared/data-models/model/tecdoc';
+
+// Enums
+import { IconsEnum, InputTypeEnum } from '../../../../shared/data-models/enums';
 
 @Component({
   selector: 'assembly-groups',
   standalone: true,
-  imports: [CommonModule, ButtonComponent],
+  imports: [CommonModule, ButtonComponent, InputFieldsComponent],
   templateUrl: './assembly-groups.component.html',
   styleUrl: './assembly-groups.component.scss',
   encapsulation: ViewEncapsulation.None,
@@ -26,10 +30,16 @@ import { CommonModule } from '@angular/common';
 })
 export class AssemblyGroupsComponent implements OnInit {
   @Input() assemblyGroups: AssemblyGroup[] = [];
+  @Output() event = new EventEmitter<number>()
+
+  // Enums
+  iconEnum = IconsEnum;
+  inputType = InputTypeEnum;
 
   structuredGroups: AssemblyGroup[] = [];
   expandedNodes: Set<number> = new Set();
   expandedCards: Set<number> = new Set();
+
 
   // Start of: Angular lifecycle
 
@@ -52,6 +62,32 @@ export class AssemblyGroupsComponent implements OnInit {
     });
     return rootGroups;
   }
+
+  filterStructuredGroups(searchTerm: string): void {
+    if (!searchTerm) {
+      this.structuredGroups = this.buildHierarchy(this.assemblyGroups);
+      return;
+    }
+
+    const matchesSearch = (group: AssemblyGroup): boolean => {
+      return group.assemblyGroupName!.toLowerCase().includes(searchTerm.toLowerCase());
+    };
+
+    const filterGroups = (groups: AssemblyGroup[]): AssemblyGroup[] => {
+      return groups
+        .map(group => {
+          const filteredChildren = filterGroups(group.childrenNodes!);
+          if (matchesSearch(group) || filteredChildren.length > 0) {
+            return { ...group, childrenNodes: filteredChildren };
+          }
+          return null;
+        })
+        .filter(group => group !== null) as AssemblyGroup[];
+    };
+
+    this.structuredGroups = filterGroups(this.buildHierarchy(this.assemblyGroups));
+  }
+
 
   toggleShowAll(cardId: number) {
     const element = document.getElementById(`group-${cardId}`);
@@ -84,5 +120,9 @@ export class AssemblyGroupsComponent implements OnInit {
 
   isExpanded(cardId: number): boolean {
     return this.expandedCards.has(cardId);
+  }
+
+  searchForArticlesWithAssembleGroup(data: AssemblyGroup): void {
+    this.event.emit(data.assemblyGroupNodeId);
   }
 }

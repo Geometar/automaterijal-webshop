@@ -4,7 +4,8 @@ import { catchError, Observable, throwError } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 
 // Data models
-import { AssemblyGroup, TDManufacture, TDModels, TDVehicleDetails } from '../data-models/model/tecdoc';
+import { AssemblyGroupDetails, TDManufacture, TDModels, TDVehicleDetails } from '../data-models/model/tecdoc';
+import { Filter, Magacin } from '../data-models/model/roba';
 
 // Services
 import { ServiceHelpersService } from './utils/service-helpers.service';
@@ -50,11 +51,11 @@ export class TecdocService {
       .pipe(catchError((error: any) => throwError(() => new Error(error))));
   }
 
-  public getAssemblyGroups(id: number, type: string): Observable<AssemblyGroup[]> {
+  public getAssemblyGroups(id: number, type: string): Observable<AssemblyGroupDetails> {
     const fullUrl = DOMAIN_URL + '/assemblygroup/' + id + '/' + type;
 
     return this.http
-      .get<AssemblyGroup[]>(fullUrl)
+      .get<AssemblyGroupDetails>(fullUrl)
       .pipe(catchError((error: any) => throwError(() => new Error(error))));
   }
 
@@ -68,6 +69,31 @@ export class TecdocService {
 
     return this.http
       .get<TDVehicleDetails[]>(fullUrl + parametersString)
+      .pipe(catchError((error: any) => throwError(() => new Error(error))));
+  }
+
+  public getAssociatedArticles(id: number, type: string, assembleGroupId: string, pageSize: number, page: number, filter: Filter): Observable<Magacin> {
+    const fullUrl = DOMAIN_URL + '/articles';
+    const parameterObject = {} as any;
+    parameterObject['assembleGroupId'] = assembleGroupId;
+    parameterObject['naStanju'] = filter.naStanju;
+    parameterObject['page'] = page;
+    parameterObject['pageSize'] = pageSize;
+    parameterObject['tecdocTargetId'] = id;
+    parameterObject['tecdocTargetType'] = type;
+
+    if (filter.proizvodjaci && filter.proizvodjaci.length) {
+      parameterObject['proizvodjaci'] = filter.proizvodjaci;
+    }
+
+    if (filter.podgrupe) {
+      parameterObject['podgrupe'] = filter.podgrupe;
+    }
+
+    const parametersString = this.helperService.formatQueryParameters(parameterObject);
+
+    return this.http
+      .get<Magacin>(fullUrl + parametersString)
       .pipe(catchError((error: any) => throwError(() => new Error(error))));
   }
 }

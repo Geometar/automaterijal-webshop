@@ -3,10 +3,11 @@
     [vehicleDetails]="vehicleDetails"
   ></vehicle-details-accordion>
   <assembly-groups
-    *ngIf="!assemblyGroupLoading"
+    *ngIf="!assemblyGroupLoading && showAssemblyGroups"
     [assemblyGroups]="assemblyGroups"
+    (event)="getArticlesByAssembleGroup($event)"
   ></assembly-groups>
-  <div *ngIf="assemblyGroupLoading" class="spinner">
+  <div *ngIf="assemblyGroupLoading && showAssemblyGroups" class="spinner">
     <spinner></spinner>
   </div>
 </section>

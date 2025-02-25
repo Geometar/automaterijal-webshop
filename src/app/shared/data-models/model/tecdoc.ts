@@ -10,6 +10,20 @@ export class AssemblyGroup {
   childrenNodes?: AssemblyGroup[];
 }
 
+export class GenericArticles {
+  assemblyGroup?: string;
+  designation?: string;
+  genericArticleId?: number;
+  masterDesignation?: string;
+  searchTreeNodeId?: number;
+  usageDesignation?: string;
+}
+
+export class AssemblyGroupDetails {
+  assemblyGroupFacetCounts: AssemblyGroup[] = [];
+  genericArticles: GenericArticles[] = [];
+}
+
 
 export class TDManufacture {
   favoriteFlag?: number;

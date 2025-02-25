@@ -1,39 +1,65 @@
-import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  SimpleChanges,
+  ViewEncapsulation,
+} from '@angular/core';
 import { finalize, Subject, takeUntil } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 
 // Component imported
+import { AssemblyGroupsComponent } from './assembly-groups/assembly-groups.component';
+import { CommonModule } from '@angular/common';
+import { SpinnerComponent } from '../../../shared/components/spinner/spinner.component';
 import { VehicleDetailsAcordionComponent } from './vehicle-details-acordion/vehicle-details-acordion.component';
 
 // Data models
-import { AssemblyGroup, TDVehicleDetails } from '../../../shared/data-models/model/tecdoc';
+import {
+  AssemblyGroup,
+  AssemblyGroupDetails,
+  TDVehicleDetails,
+} from '../../../shared/data-models/model/tecdoc';
+import { Magacin } from '../../../shared/data-models/model/roba';
 
 // Service
 import { TecdocService } from '../../../shared/service/tecdoc.service';
-import { AssemblyGroupsComponent } from './assembly-groups/assembly-groups.component';
-import { SpinnerComponent } from '../../../shared/components/spinner/spinner.component';
-import { CommonModule } from '@angular/common';
+import { UrlHelperService } from '../../../shared/service/utils/url-helper.service';
 
 @Component({
   selector: 'webshop-vehicles',
   standalone: true,
-  imports: [SpinnerComponent, VehicleDetailsAcordionComponent, AssemblyGroupsComponent, CommonModule],
+  imports: [
+    AssemblyGroupsComponent,
+    CommonModule,
+    SpinnerComponent,
+    VehicleDetailsAcordionComponent,
+  ],
   templateUrl: './webshop-vehicles.component.html',
   styleUrl: './webshop-vehicles.component.scss',
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
 })
 export class WebshopVehiclesComponent implements OnInit, OnDestroy, OnChanges {
+  @Input() showAssemblyGroups = true;
   @Input() vehicleDetails?: TDVehicleDetails;
 
   // Data
+  assembleGroupData: AssemblyGroupDetails = {} as AssemblyGroupDetails;
   assemblyGroups: AssemblyGroup[] = [];
+  magacinData: Magacin | null = null;
 
   // Misc
   assemblyGroupLoading = true;
+  robaLoading = true;
 
   private destroy$ = new Subject<void>();
 
-  constructor(private tecdocService: TecdocService) { }
+  constructor(
+    private tecdocService: TecdocService,
+    private urlHelperService: UrlHelperService
+  ) { }
 
   /** Start of: Angular lifecycle hooks */
 
@@ -44,7 +70,7 @@ export class WebshopVehiclesComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (!changes['vehicleDetails'].firstChange) {
+    if (changes['vehicleDetails'] && !changes['vehicleDetails'].firstChange) {
       this.getAssemblyGroup();
     }
   }
@@ -72,8 +98,9 @@ export class WebshopVehiclesComponent implements OnInit, OnDestroy, OnChanges {
         })
       )
       .subscribe({
-        next: (response: AssemblyGroup[]) => {
-          this.assemblyGroups = response;
+        next: (response: AssemblyGroupDetails) => {
+          this.assembleGroupData = response;
+          this.assemblyGroups = response.assemblyGroupFacetCounts;
         },
         error: (err: HttpErrorResponse) => {
           const error = err.error.details || err.error;
@@ -83,4 +110,7 @@ export class WebshopVehiclesComponent implements OnInit, OnDestroy, OnChanges {
 
   // End of: Events
 
+  getArticlesByAssembleGroup(assembleGroupId: number): void {
+    this.urlHelperService.addOrUpdateQueryParams({ assembleGroupId: assembleGroupId })
+  }
 }

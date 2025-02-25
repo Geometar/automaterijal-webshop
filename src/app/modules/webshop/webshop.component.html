@@ -4,11 +4,25 @@
     [searchTerm]="searchTerm"
     (selectedVehicleDetails)="selectVehicleDetailsEventHandle($event)"
   ></webshop-nav>
+  <webshop-vehicles
+    *ngIf="
+      (currentState === state.SHOW_VEHICLE_DETAILS ||
+        currentState === state.SHOW_ARTICLES_WITH_VEHICLE_DETAILS) &&
+      !loading
+    "
+    [showAssemblyGroups]="currentState === state.SHOW_VEHICLE_DETAILS"
+    [vehicleDetails]="selectedVehicleDetails!"
+  >
+  </webshop-vehicles>
   <webshop-empty
     *ngIf="currentState === state.SHOW_EMPTY_CONTAINER && !loading"
   ></webshop-empty>
   <webshop-roba
-    *ngIf="currentState === state.SHOW_ARTICLES && !loading"
+    *ngIf="
+      (currentState === state.SHOW_ARTICLES ||
+        currentState === state.SHOW_ARTICLES_WITH_VEHICLE_DETAILS) &&
+      !loading
+    "
     [filter]="filter"
     [loading]="internalLoading"
     [magacin]="magacinData"
@@ -17,11 +31,6 @@
     [searchTerm]="searchTerm"
     (emitTablePage)="setRobaPageData($event)"
   ></webshop-roba>
-  <webshop-vehicles
-    *ngIf="currentState === state.SHOW_VEHICLE_DETAILS"
-    [vehicleDetails]="selectedVehicleDetails!"
-  >
-  </webshop-vehicles>
   <div *ngIf="loading" class="spinner">
     <spinner></spinner>
   </div>
