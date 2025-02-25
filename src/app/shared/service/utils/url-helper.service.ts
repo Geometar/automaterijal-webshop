@@ -76,6 +76,28 @@ export class UrlHelperService {
   }
 
   /**
+ * Removes multiple query parameters from the current URL.
+ * @param paramNames An array of query parameter names to remove.
+ */
+  removeQueryParams(paramNames: string[]): void {
+    const queryParams = { ...this.activatedRoute.snapshot.queryParams }; // Copy current query params
+    const lowerCaseParams = paramNames.map(param => param.toLowerCase()); // Convert to lowercase for case-insensitivity
+
+    // Remove all matching keys
+    Object.keys(queryParams).forEach(key => {
+      if (lowerCaseParams.includes(key.toLowerCase())) {
+        delete queryParams[key];
+      }
+    });
+
+    // Update the URL without the removed parameters
+    this.router.navigate([], {
+      queryParams,
+      queryParamsHandling: '', // Do not merge with existing query parameters
+    });
+  }
+
+  /**
    * Reads query parameters from the current route
    * @returns An object containing all query parameters
    */

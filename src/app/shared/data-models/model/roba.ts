@@ -18,9 +18,10 @@ export class Filter {
 }
 
 export class RobaTehnickiOpis {
-  oznaka?: number;
-  vrednost?: number;
-  jedinica?: number;
+  jedinica?: string;
+  oznaka?: string;
+  type?: string;
+  vrednost?: string;
 }
 export class RobaBrojevi {
   fabrBroj?: string;

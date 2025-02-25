@@ -31,6 +31,7 @@ export enum WebShopState {
 }
 interface QueryParams {
   assembleGroupId?: string;
+  assemblyGroupName?: string;
   grupe?: string;
   mandatoryproid?: string;
   naStanju?: string;
@@ -71,6 +72,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
 
   // Data
   assembleGroupId: string = '';
+  assemblyGroupName: string = '';
   magacinData: Magacin | null = null;
   selectedVehicleDetails: TDVehicleDetails | null = null;
   tecdocId: number | null = null;
@@ -243,6 +245,8 @@ export class WebshopComponent implements OnDestroy, OnInit {
 
     const mandatoryProid = params.mandatoryproid || '';
     const mandatoryGrupe = params.grupe || '';
+
+    this.assemblyGroupName = params.assemblyGroupName || '';
 
     // Create a filter object from parameters
     const filter = this.logicService.createFilterFromParams(params);

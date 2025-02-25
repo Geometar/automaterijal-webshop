@@ -1,9 +1,14 @@
 <div class="webshop-container-roba">
   <webshop-category
-    *ngIf="magacin?.categories"
-    [categories]="magacin?.categories"
+    *ngIf="
+      magacin &&
+      magacin.categories &&
+      magacin.proizvodjaci &&
+      magacin.proizvodjaci.length
+    "
+    [categories]="magacin.categories"
     [filter]="filter"
-    [manufactures]="magacin?.proizvodjaci"
+    [manufactures]="magacin.proizvodjaci"
   ></webshop-category>
   <autom-table
     *ngIf="!loading && magacin?.robaDto?.content?.length"
@@ -17,7 +22,12 @@
     *ngIf="!magacin?.robaDto?.content?.length && !loading"
     class="util__flex--center util__height no-result"
   >
-    <h5>🔍 Nema rezultata za : "{{ searchTerm }}".</h5>
+    <h5 *ngIf="searchTerm">🔍 Nema rezultata za : "{{ searchTerm }}".</h5>
+    <h5 *ngIf="vehicleDetails && vehicleDetails?.linkageTargetId">
+      ✅ Filtrirano po vozilu : {{ vehicleDetails.mfrName }}
+      {{ vehicleDetails.hmdMfrModelName }} {{ vehicleDetails.description }}.
+    </h5>
+    <h5 *ngIf="assemblyGroupName">✅ Kategorija : {{ assemblyGroupName }}</h5>
     <h5 *ngIf="filter.mandatoryProid && filter.mandatoryProid.length">
       ✅ Filtrirano po proizvodjacu : {{ filter.mandatoryProid }}.
     </h5>

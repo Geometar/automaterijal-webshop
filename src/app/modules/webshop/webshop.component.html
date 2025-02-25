@@ -23,12 +23,14 @@
         currentState === state.SHOW_ARTICLES_WITH_VEHICLE_DETAILS) &&
       !loading
     "
+    [assemblyGroupName]="assemblyGroupName"
     [filter]="filter"
     [loading]="internalLoading"
     [magacin]="magacinData"
     [pageIndex]="pageIndex"
     [pageSize]="rowsPerPage"
     [searchTerm]="searchTerm"
+    [vehicleDetails]="selectedVehicleDetails"
     (emitTablePage)="setRobaPageData($event)"
   ></webshop-roba>
   <div *ngIf="loading" class="spinner">

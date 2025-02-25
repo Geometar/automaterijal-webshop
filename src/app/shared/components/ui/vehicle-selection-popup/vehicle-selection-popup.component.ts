@@ -217,7 +217,7 @@ export class VehicleSelectionPopupComponent implements OnInit, OnDestroy {
 
   selectedType(typeaheadItem: TypeaheadItem): void {
     this.selectedVehicleId = +typeaheadItem.key!;
-    this.selectedVehicleDetails = this.vehicleDetailsOptions.filter((value: TDVehicleDetails) => value.linkageTargetId)[0];
+    this.selectedVehicleDetails = this.vehicleDetailsOptions.filter((value: TDVehicleDetails) => value.linkageTargetId === typeaheadItem.key)[0];
   }
 
   selectedVehicle(): void {

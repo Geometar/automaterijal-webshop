@@ -28,13 +28,18 @@
     <table class="specifications">
       <tbody>
         <tr *ngFor="let spec of data.tehnickiOpis">
-          <td>
+          <td [class.color--figma-highlight-orange]="spec.type === 'A'">
             {{ spec.oznaka }}
             <span *ngIf="spec.jedinica" class="display--inline">[</span
             >{{ spec.jedinica }}
             <span *ngIf="spec.jedinica" class="display--inline">]</span>
           </td>
-          <td class="autom-align__right">{{ spec.vrednost }}</td>
+          <td
+            class="autom-align__right"
+            [class.color--figma-highlight-orange]="spec.type === 'A'"
+          >
+            {{ spec.vrednost }}
+          </td>
         </tr>
         <tr *ngIf="!data.tehnickiOpis?.length">
           <td colspan="2">No specifications available</td>

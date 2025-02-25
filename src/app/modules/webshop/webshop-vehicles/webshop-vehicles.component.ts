@@ -110,7 +110,7 @@ export class WebshopVehiclesComponent implements OnInit, OnDestroy, OnChanges {
 
   // End of: Events
 
-  getArticlesByAssembleGroup(assembleGroupId: number): void {
-    this.urlHelperService.addOrUpdateQueryParams({ assembleGroupId: assembleGroupId })
+  getArticlesByAssembleGroup(assemblyGroup: AssemblyGroup): void {
+    this.urlHelperService.addOrUpdateQueryParams({ assembleGroupId: assemblyGroup.assemblyGroupNodeId, assemblyGroupName: assemblyGroup.assemblyGroupName })
   }
 }

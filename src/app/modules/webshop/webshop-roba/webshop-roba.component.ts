@@ -3,6 +3,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 // Data Models
 import { Filter, Magacin } from '../../../shared/data-models/model/roba';
 import { TablePage } from '../../../shared/data-models/model/page';
+import { TDVehicleDetails } from '../../../shared/data-models/model/tecdoc';
 
 // Component imports
 import { ButtonComponent } from "../../../shared/components/button/button.component";
@@ -25,12 +26,14 @@ import { UrlHelperService } from '../../../shared/service/utils/url-helper.servi
   styleUrl: './webshop-roba.component.scss',
 })
 export class WebshopRobaComponent {
+  @Input() assemblyGroupName: string = '';
   @Input() filter: Filter = new Filter();
   @Input() loading = false;
   @Input() magacin: Magacin | null = null;
   @Input() pageIndex = 0;
   @Input() pageSize = 10;
   @Input() searchTerm = '';
+  @Input() vehicleDetails: TDVehicleDetails | null = null;
   @Output() emitTablePage = new EventEmitter<TablePage>();
 
   // Enums
@@ -44,6 +47,6 @@ export class WebshopRobaComponent {
   }
 
   resetSearchTerm(): void {
-    this.urlHelperService.removeQueryParam('searchTerm');
+    this.urlHelperService.removeQueryParams(['searchTerm', 'assembleGroupId', 'assemblyGroupName']);
   }
 }

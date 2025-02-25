@@ -30,7 +30,7 @@ import { IconsEnum, InputTypeEnum } from '../../../../shared/data-models/enums';
 })
 export class AssemblyGroupsComponent implements OnInit {
   @Input() assemblyGroups: AssemblyGroup[] = [];
-  @Output() event = new EventEmitter<number>()
+  @Output() event = new EventEmitter<AssemblyGroup>()
 
   // Enums
   iconEnum = IconsEnum;
@@ -123,6 +123,6 @@ export class AssemblyGroupsComponent implements OnInit {
   }
 
   searchForArticlesWithAssembleGroup(data: AssemblyGroup): void {
-    this.event.emit(data.assemblyGroupNodeId);
+    this.event.emit(data);
   }
 }
