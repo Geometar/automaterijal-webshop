@@ -327,8 +327,8 @@ export class WebshopComponent implements OnDestroy, OnInit {
   }): void {
     const isSearchTermChanged = searchTerm !== this.searchTerm;
     const isMandatoryFilterActive = !!filter.mandatoryProid!.length || !!filter.grupe!.length;
-
-    if (!isInitialLoad && !isMandatoryFilterActive && (isSearchTermChanged || (!assembleGroupId && filtersChanged))) {
+    const isResetNeeded = this.currentState === this.state.SHOW_ARTICLES ? isSearchTermChanged : false;
+    if (!isInitialLoad && !isMandatoryFilterActive && isResetNeeded) {
       this.filter = new Filter();
     } else {
       this.filter = filter;

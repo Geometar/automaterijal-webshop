@@ -19,10 +19,16 @@
         data!.katbr
       }}</span>
     </p>
-    <p>
+    <p class="autom-margin__none">
       Kategorija:
       <span class="color--figma-primary-800 display--inline font-medium">{{
         data!.podGrupaNaziv
+      }}</span>
+    </p>
+    <p>
+      Stanje:
+      <span class="color--figma-primary-800 display--inline font-medium">{{
+        data!.stanje
       }}</span>
     </p>
     <table class="specifications">
@@ -53,29 +59,31 @@
     <div
       [ngClass]="{
         'item-status': true,
-        green: data.podGrupa !== 0 && data.stanje! > 0,
-        red: data.podGrupa !== 0 && data.stanje! === 0,
-        yellow: data.podGrupa === 0
+        green: data.podGrupa !== 1000000 && data.stanje! > 0,
+        red: data.podGrupa !== 1000000 && data.stanje! === 0,
+        yellow: data.podGrupa === 1000000
       }"
     >
       {{ data.stanje! > 0 ? "Ima na stanju" : "Nema na stanju" }}
     </div>
-    <p *ngIf="data.podGrupa !== 0" class="price">
-      {{ data.cena! | rsdCurrency }}
+    <p *ngIf="data.podGrupa !== 1000000" class="price">
+      {{ data.cena ? (data.cena! | rsdCurrency) : (0 | rsdCurrency) }}
     </p>
-    <p *ngIf="data.podGrupa !== 0" class="autom-align__right">Cena sa pdv-om</p>
+    <p *ngIf="data.podGrupa !== 1000000" class="autom-align__right">
+      Cena sa pdv-om
+    </p>
     <div class="util__flex--center">
-      <div *ngIf="data.podGrupa === 0" class="helper-article">
-        <span>Ovo je pomoćni artikal iz TecDoc-a.</span>
+      <div *ngIf="data.podGrupa === 1000000" class="helper-article">
+        <span>Ovaj artikal se nalazi u TecDoc katalogu.</span>
         <br />
-        <span>Nikada nije bio dostupan na stanju.</span>
+        <span>Za dostupnost, molimo vas da nas kontaktirate.</span>
       </div>
 
       <autom-input-fields
-        *ngIf="data.podGrupa !== 0"
+        *ngIf="data.podGrupa !== 1000000"
         [clearBtn]="false"
         [customClass]="'quantity-size'"
-        [max]="data!.stanje!"
+        [max]="data!.stanje"
         [min]="1"
         [roundOff]="true"
         [size]="sizeEnum.MEDIUM"
@@ -90,7 +98,7 @@
         ngDefaultControl
       ></autom-input-fields>
       <autom-button
-        *ngIf="data.podGrupa !== 0"
+        *ngIf="data.podGrupa !== 1000000"
         mat-raised-button
         color="primary"
         [disabled]="!data.stanje"

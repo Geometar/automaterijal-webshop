@@ -130,16 +130,21 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
     if (this.categories != null) {
       const filteredSubGroups = this.filter.podgrupe ?? [];
       this.categoriesCheckBoxModels = Object.keys(this.categories).map((key) => {
+        const subtasks = this.categories[key].map((item: any) => ({
+          name: item.naziv,
+          completed: filteredSubGroups.length ? filteredSubGroups.includes(item.id.toString()) : false,
+          id: item.id,
+          grupa: item.grupa
+        }));
+
+        // Check if all subtasks are completed
+        const allCompleted = subtasks.length > 0 && subtasks.every((subtask: any) => subtask.completed);
+
         return {
           name: key,
-          completed: false,
+          completed: allCompleted,
           id: key,
-          subtasks: this.categories[key].map((item: any) => ({
-            name: item.naziv,
-            completed: filteredSubGroups.length ? filteredSubGroups.includes(item.id.toString()) : false,
-            id: item.id,
-            grupa: item.grupa
-          }))
+          subtasks
         };
       });
     }
