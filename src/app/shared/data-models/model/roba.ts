@@ -66,6 +66,7 @@ export class Roba {
   katbrpro?: string;
   kolicina?: number;
   naziv?: string;
+  podGrupa?: number;
   podGrupaNaziv?: string;
   proizvodjac?: Manufacture;
   proizvodjacLogo?: string | ArrayBuffer;

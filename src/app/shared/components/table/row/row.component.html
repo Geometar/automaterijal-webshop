@@ -53,16 +53,26 @@
     <div
       [ngClass]="{
         'item-status': true,
-        green: data.stanje! > 0,
-        red: data.stanje! === 0
+        green: data.podGrupa !== 0 && data.stanje! > 0,
+        red: data.podGrupa !== 0 && data.stanje! === 0,
+        yellow: data.podGrupa === 0
       }"
     >
       {{ data.stanje! > 0 ? "Ima na stanju" : "Nema na stanju" }}
     </div>
-    <p class="price">{{ data.cena! | rsdCurrency }}</p>
-    <p class="autom-align__right">Cena sa pdv-om</p>
+    <p *ngIf="data.podGrupa !== 0" class="price">
+      {{ data.cena! | rsdCurrency }}
+    </p>
+    <p *ngIf="data.podGrupa !== 0" class="autom-align__right">Cena sa pdv-om</p>
     <div class="util__flex--center">
+      <div *ngIf="data.podGrupa === 0" class="helper-article">
+        <span>Ovo je pomoćni artikal iz TecDoc-a.</span>
+        <br />
+        <span>Nikada nije bio dostupan na stanju.</span>
+      </div>
+
       <autom-input-fields
+        *ngIf="data.podGrupa !== 0"
         [clearBtn]="false"
         [customClass]="'quantity-size'"
         [max]="data!.stanje!"
@@ -80,13 +90,14 @@
         ngDefaultControl
       ></autom-input-fields>
       <autom-button
+        *ngIf="data.podGrupa !== 0"
+        mat-raised-button
+        color="primary"
         [disabled]="!data.stanje"
         [iconColor]="colorEnum.INFO_25"
         [iconPrefix]="true"
         [iconSource]="iconEnum.SHOPPING_CART"
         [label]="'Dodaj u korpu'"
-        mat-raised-button
-        color="primary"
         (clickEvent)="addToShopingCart()"
       />
     </div>

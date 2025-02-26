@@ -79,8 +79,9 @@ export class WebshopComponent implements OnDestroy, OnInit {
   tecdocType: string | null = null;
 
   // Misc
-  loading = false;
+  activeRequests = 0;
   internalLoading = false;
+  loading = false;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -156,6 +157,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
   ): void {
     this.loading = !internalLoading;
     this.internalLoading = internalLoading;
+    this.activeRequests++; // Increase active requests count
 
     this.tecdocService
       .getAssociatedArticles(
@@ -168,10 +170,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
       )
       .pipe(
         takeUntil(this.destroy$),
-        finalize(() => {
-          this.loading = false;
-          this.internalLoading = false;
-        })
+        finalize(() => this.finalizeLoading()) // Use shared finalize method
       )
       .subscribe({
         next: (response: Magacin) => {
@@ -188,14 +187,12 @@ export class WebshopComponent implements OnDestroy, OnInit {
 
   getTDVehicleDetails(tecdocId: number, tecdocType: string): void {
     this.loading = true;
+    this.activeRequests++; // Increase active requests count
     this.tecdocService
       .getLinkageTargets(tecdocId, tecdocType)
       .pipe(
         takeUntil(this.destroy$),
-        finalize(() => {
-          this.loading = false;
-          this.internalLoading = false;
-        })
+        finalize(() => this.finalizeLoading()) // Use shared finalize method
       )
       .subscribe({
         next: (vehicleDetails: TDVehicleDetails[]) => {
@@ -230,6 +227,17 @@ export class WebshopComponent implements OnDestroy, OnInit {
   // Setters end
 
   // Start of: Private methods
+
+  /**
+ * Handles finalize logic, only setting loading = false when all requests complete.
+ */
+  private finalizeLoading(): void {
+    this.activeRequests--; // Decrease active requests count
+    if (this.activeRequests === 0) {
+      this.loading = false;
+      this.internalLoading = false;
+    }
+  }
 
   /**
    * Handles query parameters and updates the component's state accordingly.

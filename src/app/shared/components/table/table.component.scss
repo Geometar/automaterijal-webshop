@@ -80,6 +80,7 @@
         padding-left: 20px;
         position: relative; /* Ensure ::before is positioned relative to this element */
         text-align: right;
+        width: 250px;
       }
 
       .item-status::before {
@@ -98,6 +99,10 @@
 
       .item-status.red::before {
         background: #ff4d4d; /* Red for not available */
+      }
+
+      .item-status.yellow::before {
+        background: var(--figma-accent-yellow-500); /* Red for not available */
       }
 
       button {
