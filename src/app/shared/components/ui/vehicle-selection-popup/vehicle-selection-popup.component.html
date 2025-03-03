@@ -24,30 +24,44 @@
     custom-body
     class="page-details__body page-details__height--auto body util__flex--center autom-flex-direction--column"
   >
+    <autom-select
+      *ngIf="vehicleSelectModel.length"
+      class="element-width"
+      [label]="'Prethodno izabrano'"
+      [selectionList]="vehicleSelectModel"
+      (emitSelected)="selectVehicleFromHistory($event)"
+    >
+    </autom-select>
     <typeahead
       class="element-width"
       [data]="typeaheadManufactures"
-      [disabled]="loadingManufactures"
+      [disabled]="loadingManufactures || !!searchHistorySelected?.key"
       [label]="'Izaberite proizvodjaca'"
+      [selectedItem]="taSelectedManufacture"
       (emit)="selectedManufacturer($event)"
     ></typeahead>
     <typeahead
       class="element-width"
       [data]="typeaheadModels"
-      [disabled]="loadingModels"
+      [disabled]="loadingModels || !!searchHistorySelected?.key"
+      [selectedItem]="taSelectedModel"
       [label]="'Izaberite model'"
       (emit)="selectedModels($event)"
     ></typeahead>
     <typeahead
       class="element-width"
       [data]="typeaheadType"
-      [disabled]="loadingType"
+      [disabled]="loadingType || !!searchHistorySelected?.key"
       [label]="'Izaberite tip'"
+      [selectedItem]="taSelectedType"
       (emit)="selectedType($event)"
     ></typeahead>
     <autom-button
       class="element-width"
-      [disabled]="!selectedManufacture || !selectedModel || !selectedVehicleId"
+      [disabled]="
+        !searchHistorySelected?.key &&
+        (!selectedManufacture || !selectedModel || !selectedVehicleId)
+      "
       [label]="'Izaberi vozilo'"
       [iconPrefix]="true"
       [iconSource]="iconsEnum.SEARCH"

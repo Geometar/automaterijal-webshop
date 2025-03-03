@@ -89,7 +89,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
     private pictureService: PictureService,
     private robaService: RobaService,
     private stateService: WebshopStateService,
-    private tecdocService: TecdocService,
+    private tecdocService: TecdocService
   ) { }
 
   /** Angular lifecycle hooks start */

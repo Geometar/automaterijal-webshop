@@ -36,12 +36,11 @@ export class TypeaheadComponent implements OnChanges {
   @Input() data: TypeaheadItem[] = [];
   @Input() disabled = false;
   @Input() label = '';
-  @Output() emit = new EventEmitter<TypeaheadItem>();
+  @Input() selectedItem: TypeaheadItem | null = null;
+  @Output() emit = new EventEmitter<TypeaheadItem | null>();
 
   stateCtrl = new FormControl({ value: '', disabled: this.disabled });
   filteredStates: Observable<TypeaheadItem[]>;
-
-  private lastSelectedItem: TypeaheadItem | null = null;
 
   constructor() {
     this.filteredStates = this.stateCtrl.valueChanges.pipe(
@@ -59,8 +58,15 @@ export class TypeaheadComponent implements OnChanges {
     }
 
     if (changes['data'] && this.data.length === 0) {
-      this.lastSelectedItem = null;
       this.stateCtrl.setValue('', { emitEvent: true });
+    }
+
+    if (changes['selectedItem']) {
+      if (this.selectedItem) {
+        this.stateCtrl.setValue(this.selectedItem.value || '', { emitEvent: false });
+      } else {
+        this.stateCtrl.setValue('', { emitEvent: true });
+      }
     }
   }
 
@@ -71,22 +77,24 @@ export class TypeaheadComponent implements OnChanges {
   onOptionSelected(event: MatAutocompleteSelectedEvent): void {
     const selectedItem = this.data.find(item => item.value === event.option.value);
     if (selectedItem) {
-      this.lastSelectedItem = selectedItem;
       this.emit.emit(selectedItem);
     }
   }
 
   onInputBlur(): void {
     setTimeout(() => {
-      const currentValue = this.stateCtrl.value;
+      const currentValue = this.stateCtrl.value?.trim();
       const selectedItem = this.data.find(item => item.value === currentValue);
 
       if (selectedItem) {
-        this.lastSelectedItem = selectedItem; // Update the last selected item
-      } else if (this.lastSelectedItem) {
-        this.stateCtrl.setValue(this.lastSelectedItem.value!); // Reset to the last selected item
+        this.stateCtrl.setValue(selectedItem.value!); // ✅ Keep valid selection
+      } else if (this.selectedItem) {
+        this.stateCtrl.setValue(this.selectedItem.value!, { emitEvent: false }); // 🔄 Revert to last selected item
+      } else {
+        this.stateCtrl.setValue('', { emitEvent: true }); // ❌ Clear input if no selection
+        this.emit.emit(null); // 🔔 Notify parent that selection was removed
       }
-    }, 250);
+    }, 150);
   }
 
   private _filterStates(value: string): TypeaheadItem[] {

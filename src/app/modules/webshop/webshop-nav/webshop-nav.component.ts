@@ -88,6 +88,10 @@ export class WebshopNavComponent {
       tecdocType: vehicleDetails.linkageTargetType,
       tecdocId: vehicleDetails.linkageTargetId,
     });
+
+    if (!vehicleDetails.description) {
+      return;
+    }
     this.selectedVehicleDetails.emit(vehicleDetails);
   }
 }

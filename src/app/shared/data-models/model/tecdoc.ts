@@ -130,3 +130,11 @@ export class Engine {
   id?: number;
   code?: string;
 }
+
+export class TecdocSearchHistory {
+  constructor(
+    public id: number,
+    public type: string,
+    public description: string
+  ) { }
+}
