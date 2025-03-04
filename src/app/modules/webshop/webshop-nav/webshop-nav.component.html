@@ -24,21 +24,24 @@
         ></autom-input-fields>
       </div>
     </div>
-    <div class="util__flex--center">
-      <nav class="navbar autom-margin--bottom__xs">
-        <ul class="navbar-list">
-          <li
-            class="navbar-item util__flex--center gap-5 webshop__navbar"
-            *ngFor="let nav of navigationTitles"
-          >
-            <autom-icon
-              class="webshop__navbar-icon"
-              [source]="nav.svg"
-              [color]="colorEnum.GREY_400"
-            ></autom-icon>
-            <a class="webshop__navbar__link">{{ nav.title }}</a>
+    <div *ngIf="secondNavigation" class="util__flex--center">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li [class.active]="!thirdNavigation">
+            <a (click)="goToMainPage()">Početna</a>
           </li>
-        </ul>
+          <li [class.active]="!thirdNavigation" *ngIf="secondNavigation">
+            <a
+              *ngIf="thirdNavigation; else activeSecond"
+              (click)="goToSecondPage()"
+              >{{ secondNavigation }}</a
+            >
+            <ng-template #activeSecond>{{ secondNavigation }}</ng-template>
+          </li>
+          <li class="active" *ngIf="thirdNavigation">
+            {{ thirdNavigation }}
+          </li>
+        </ol>
       </nav>
     </div>
   </div>

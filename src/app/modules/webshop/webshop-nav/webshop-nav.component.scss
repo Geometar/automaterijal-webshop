@@ -16,50 +16,39 @@
     justify-content: center;
     flex-direction: column;
   }
-  &__navbar {
+  .breadcrumb {
+    list-style: none;
     display: flex;
     align-items: center;
-    gap: 5px;
-    cursor: pointer;
-    transition: var(--transition-1);
-
-    &:hover {
-      .webshop__navbar-icon .mat-icon svg path {
-        stroke: var(--bittersweet);
-      }
-      .webshop__navbar-icon .mat-icon svg line {
-        stroke: var(--bittersweet);
-      }
-
-      .webshop__navbar__link {
-        color: var(--bittersweet);
-      }
-    }
-
-    &-icon {
-      width: 20px;
-      height: 20px;
-
-      .mat-icon {
-        width: 20px;
-        height: 20px;
-      }
-
-      .mat-icon svg path {
-        stroke: var(--figma-grey-25);
-        transition: var(--transition-1);
-      }
-
-      .mat-icon svg line {
-        stroke: var(--figma-grey-25);
-        transition: var(--transition-1);
-      }
-    }
-
-    &__link {
-      font-size: var(--text-sm);
-      color: var(--figma-grey-25);
-      transition: var(--transition-1);
-    }
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+  }
+  
+  .breadcrumb li {
+    display: flex;
+    align-items: center;
+  }
+  
+  .breadcrumb li:not(:last-child)::after {
+    content: " > ";
+    margin: 0 8px;
+    color: rgba(255, 255, 255, 0.5);
+  }
+  
+  .breadcrumb li a {
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.9);
+    transition: color 0.3s ease, opacity 0.3s ease;
+  }
+  
+  .breadcrumb li a:hover {
+    color: #ffcc00;
+    opacity: 1;
+  }
+  
+  .breadcrumb li.active {
+    color: #ffcc00;
+    font-weight: bold;
+    cursor: auto;
   }
 }

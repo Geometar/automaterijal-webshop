@@ -47,6 +47,6 @@ export class WebshopRobaComponent {
   }
 
   resetSearchTerm(): void {
-    this.urlHelperService.removeQueryParams(['searchTerm', 'assembleGroupId', 'assemblyGroupName']);
+    this.urlHelperService.removeQueryParams(['searchTerm', 'podgrupe', 'proizvodjaci', 'naStanju']);
   }
 }

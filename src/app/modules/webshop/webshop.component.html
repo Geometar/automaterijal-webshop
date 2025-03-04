@@ -1,14 +1,15 @@
 <section class="header-margin--top">
   <webshop-nav
+    [assemblyGroupName]="assemblyGroupName"
     [filter]="filter"
     [searchTerm]="searchTerm"
-    (selectedVehicleDetails)="selectVehicleDetailsEventHandle($event)"
+    [selectedVehicle]="selectedVehicleDetails"
+    (selectedVehicleDetailsEmit)="selectVehicleDetailsEventHandle($event)"
   ></webshop-nav>
   <webshop-vehicles
     *ngIf="
-      (currentState === state.SHOW_VEHICLE_DETAILS ||
-        currentState === state.SHOW_ARTICLES_WITH_VEHICLE_DETAILS) &&
-      !loading
+      currentState === state.SHOW_ARTICLES_WITH_VEHICLE_DETAILS ||
+      (currentState === state.SHOW_VEHICLE_DETAILS && !loading)
     "
     [showAssemblyGroups]="currentState === state.SHOW_VEHICLE_DETAILS"
     [vehicleDetails]="selectedVehicleDetails!"

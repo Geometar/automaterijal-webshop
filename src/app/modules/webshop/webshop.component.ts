@@ -247,8 +247,8 @@ export class WebshopComponent implements OnDestroy, OnInit {
   private handleQueryParams(params: QueryParams, isInitialLoad: boolean = false): void {
     // Extract and safely parse all parameters
     const searchTerm = params.searchTerm || '';
-    const tecdocType = params.tecdocType || '';
-    const tecdocId = params.tecdocId ? +params.tecdocId : null;
+    const tecdocType = this.tecdocType = params.tecdocType || '';
+    const tecdocId = this.tecdocId = params.tecdocId ? +params.tecdocId : null;
     const assembleGroupId = params.assembleGroupId || '';
 
     const mandatoryProid = params.mandatoryproid || '';
@@ -260,6 +260,10 @@ export class WebshopComponent implements OnDestroy, OnInit {
     const filter = this.logicService.createFilterFromParams(params);
     const filtersChanged = this.logicService.haveFiltersChanged(this.filter, filter);
 
+    if (filtersChanged) {
+      this.pageIndex = 0;
+    }
+
     // Determine if parameters are empty and an empty container should be shown
     const isEmptyParams = this.stateService.shouldShowEmptyContainer(
       searchTerm,
@@ -269,7 +273,12 @@ export class WebshopComponent implements OnDestroy, OnInit {
       tecdocType,
     );
 
+    if (!tecdocId) {
+      this.selectedVehicleDetails = null;
+    }
+
     if (isEmptyParams) {
+      this.filter = filter;
       this.updateState(WebShopState.SHOW_EMPTY_CONTAINER, searchTerm);
       return;
     }
@@ -295,7 +304,6 @@ export class WebshopComponent implements OnDestroy, OnInit {
       searchTerm,
       filter,
       isInitialLoad,
-      filtersChanged,
       assembleGroupId,
     });
 
@@ -316,13 +324,11 @@ export class WebshopComponent implements OnDestroy, OnInit {
     searchTerm,
     filter,
     isInitialLoad,
-    filtersChanged,
     assembleGroupId,
   }: {
     searchTerm: string;
     filter: Filter;
     isInitialLoad: boolean;
-    filtersChanged: boolean;
     assembleGroupId: string;
   }): void {
     const isSearchTermChanged = searchTerm !== this.searchTerm;

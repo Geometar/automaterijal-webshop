@@ -103,8 +103,11 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
     if (changes['manufactures']) {
       this.fillManufactures();
     }
-    if (changes['filter'] && changes['filter'].firstChange) {
-      this.adjustCompleteFilters();
+    if (changes['filter']) {
+      if (changes['filter'].firstChange) {
+        this.adjustCompleteFilters();
+      }
+      this.checkAvailability();
     }
   }
 
@@ -123,6 +126,15 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
         checked: value === selected,
       } as RadioOption);
     });
+  }
+
+  checkAvailability(): void {
+    if (this.radioOptions && this.radioOptions.length) {
+      const selected = this.filter.naStanju ? 'Ima na stanju' : 'Svi artikli';
+      this.radioOptions.forEach((value: RadioOption) => {
+        value.checked = value.value === selected
+      })
+    }
   }
 
   fillCategories(): void {
