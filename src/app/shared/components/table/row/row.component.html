@@ -6,7 +6,10 @@
 
   <!-- Details Section -->
   <div class="details-container">
-    <h3 [routerLink]="['/webshop', data.robaid]">
+    <h3
+      [class.disabled]="data.podGrupa === 1000000"
+      [routerLink]="['/webshop', data.robaid]"
+    >
       {{
         data.naziv?.includes(data.proizvodjac!.naziv!)
           ? data.naziv

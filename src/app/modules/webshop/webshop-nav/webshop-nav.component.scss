@@ -11,6 +11,13 @@
     }
   }
 
+  .autom-warning {
+    position: absolute;
+    top: 35px;
+    left: 80px;
+    color: var(--figma-grey-25);
+  }
+
   &-container {
     display: flex;
     justify-content: center;

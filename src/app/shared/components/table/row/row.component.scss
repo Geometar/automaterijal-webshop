@@ -10,3 +10,10 @@
   padding: 10px 15px; // Unutrašnji razmak za preglednost
   text-align: center; // Centriran tekst
 }
+
+.disabled {
+  color: var(--figma-grey-500);  /* Greyish color */
+  pointer-events: none; /* Makes it non-clickable */
+  text-decoration: none;
+  cursor: default;
+}

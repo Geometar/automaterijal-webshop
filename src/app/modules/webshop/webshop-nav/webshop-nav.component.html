@@ -19,6 +19,11 @@
           [size]="sizeEnum.FULL"
           [suffixIcon]="'search'"
           [value]="searchTerm"
+          [warning]="
+            selectedVehicle?.linkageTargetId
+              ? 'Pretraga ce resetovati izabrano vozilo'
+              : ''
+          "
           (customActionEvent)="emitValue($event)"
           (emitSelected)="searchTerm = $event"
         ></autom-input-fields>
