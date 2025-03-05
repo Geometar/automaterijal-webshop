@@ -12,8 +12,14 @@
 }
 
 .disabled {
-  color: var(--figma-grey-500);  /* Greyish color */
+  color: var(--figma-grey-500); /* Greyish color */
   pointer-events: none; /* Makes it non-clickable */
   text-decoration: none;
   cursor: default;
+}
+
+.in-cart {
+  left: -64px;
+  position: relative;
+  bottom: 115px;
 }

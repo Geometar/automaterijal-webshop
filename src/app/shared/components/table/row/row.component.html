@@ -81,10 +81,10 @@
         <br />
         <span>Za dostupnost, molimo vas da nas kontaktirate.</span>
       </div>
-
       <autom-input-fields
         *ngIf="data.podGrupa !== 1000000"
         [clearBtn]="false"
+        [disableInput]="!data.stanje"
         [customClass]="'quantity-size'"
         [max]="data!.stanje"
         [min]="1"
@@ -109,8 +109,16 @@
         [iconPrefix]="true"
         [iconSource]="iconEnum.SHOPPING_CART"
         [label]="'Dodaj u korpu'"
-        (clickEvent)="addToShopingCart()"
+        (clickEvent)="addToShoppingCart(data)"
       />
+    </div>
+    <div *ngIf="isInCart(data.robaid ?? 0)" class="util__flex--center">
+      <autom-icon
+        class="in-cart"
+        [color]="colorEnum.GREEN_700"
+        [source]="iconEnum.SHOPPING_BAG"
+        [tooltip]="{ tooltipText: 'Artikal je u korpi' }"
+      ></autom-icon>
     </div>
   </div>
 </div>

@@ -79,3 +79,16 @@ export class Roba {
   tekst?: string;
   uKorpi = false;
 }
+
+export class CartItem {
+  discount?: number;
+  image?: Slika;
+  manufacturer?: Manufacture;
+  name?: string;
+  partNumber?: string;
+  quantity?: number;
+  robaId?: number;
+  stock?: number;
+  totalPrice?: number;
+  unitPrice?: number;
+}

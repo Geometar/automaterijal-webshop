@@ -129,6 +129,32 @@
   }
 }
 
+/* Success Snackbar */
+.snackbar-success {
+  background-color: #388e3c !important; /* Green background */
+  color: white !important;
+  font-weight: bold;
+}
+
+/* Error Snackbar */
+.snackbar-error {
+  background-color: #d32f2f !important; /* Red background */
+  color: white !important;
+  font-weight: bold;
+}
+
+/* Auto-close Snackbar */
+.snackbar-auto {
+  background-color: #323232 !important; /* Dark background */
+  color: white !important;
+}
+
+/* Manual-close Snackbar */
+.snackbar-manual {
+  background-color: #424242 !important; /* Slightly lighter dark background */
+  color: white !important;
+}
+
 @keyframes shake {
   25% {
     transform: translateX(var(--space-xxs));

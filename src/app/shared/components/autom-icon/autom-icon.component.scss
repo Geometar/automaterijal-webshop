@@ -58,10 +58,6 @@
 		stroke: var(--figma-green-600);
 	}
 
-	&.green-700 svg path {
-		stroke: var(--figma-green-700);
-	}
-
 	&.grey-100 svg path {
 		stroke: var(--figma-grey-100) !important;
 	}
@@ -79,6 +75,10 @@
 			stroke: var(--figma-error-600);
 		}
 	} 
+
+	&.green-700 svg path {
+		stroke: var(--figma-accent-green-700);
+	}
 
 	&.grey-500 svg path {
 		stroke: var(--figma-grey-500);

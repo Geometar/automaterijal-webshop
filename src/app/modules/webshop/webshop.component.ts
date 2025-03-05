@@ -16,6 +16,7 @@ import { TablePage } from '../../shared/data-models/model/page';
 import { TDVehicleDetails } from '../../shared/data-models/model/tecdoc';
 
 // Services
+import { CartStateService } from '../../shared/service/utils/cart-state.service';
 import { PictureService } from '../../shared/service/utils/picture.service';
 import { RobaService } from '../../shared/service/roba.service';
 import { SpinnerComponent } from '../../shared/components/spinner/spinner.component';
@@ -85,11 +86,12 @@ export class WebshopComponent implements OnDestroy, OnInit {
 
   constructor(
     private activatedRoute: ActivatedRoute,
+    private cartStateService: CartStateService,
     private logicService: WebshopLogicService,
     private pictureService: PictureService,
     private robaService: RobaService,
     private stateService: WebshopStateService,
-    private tecdocService: TecdocService
+    private tecdocService: TecdocService,
   ) { }
 
   /** Angular lifecycle hooks start */
@@ -140,6 +142,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
           this.pictureService.convertByteToImageArray(
             response.robaDto!.content
           );
+          this.cartStateService.updateStockFromCart(response?.robaDto?.content!);
           this.magacinData = response;
           this.currentState = this.state.SHOW_ARTICLES;
         },
