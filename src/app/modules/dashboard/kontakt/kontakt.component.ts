@@ -1,4 +1,4 @@
-import { Component, OnDestroy, } from '@angular/core';
+import { Component, OnDestroy, ViewEncapsulation, } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { catchError, finalize, takeWhile, throwError } from 'rxjs';
 
@@ -9,7 +9,7 @@ import { InputFieldsComponent } from '../../../shared/components/input-fields/in
 import { TextAreaComponent } from '../../../shared/components/text-area/text-area.component';
 
 // Enums
-import { ColorEnum, IconsEnum, InputTypeEnum } from '../../../shared/data-models/enums';
+import { ButtonThemes, ColorEnum, IconsEnum, InputTypeEnum } from '../../../shared/data-models/enums';
 
 // Constants
 import { EMAIL_ADDRESS } from '../../../shared/data-models/constants/input.constants';
@@ -31,7 +31,8 @@ import { EmailService } from '../../../shared/service/email.service';
     ReactiveFormsModule,
     TextAreaComponent],
   templateUrl: './kontakt.component.html',
-  styleUrl: './kontakt.component.scss'
+  styleUrl: './kontakt.component.scss',
+  encapsulation: ViewEncapsulation.None
 })
 export class KontaktComponent implements OnDestroy {
   colorEnum = ColorEnum;
@@ -39,9 +40,12 @@ export class KontaktComponent implements OnDestroy {
   inputType = InputTypeEnum;
 
   // Misc
-  private alive = true;
-  public porukaJePoslata = false;
-  public ucitavanje = false;
+  alive = true;
+  porukaJePoslata = false;
+  ucitavanje = false;
+
+  // Enums
+  buttonThemes = ButtonThemes;
 
   kontaktForma: UntypedFormGroup;
 

@@ -164,6 +164,35 @@
         }
       }
     }
+
+
+
+
+    &[theme~="orange"] {
+      // :normal
+      background: var(--figma-accent-yellow-700);
+      border-color: var(--figma-accent-yellow-700);
+      color: var(--figma-base-white);
+
+      autom-icon svg path {
+        stroke: var(--figma-base-white) !important;
+      }
+
+      &:hover {
+        background: var(--figma-accent-green-700);
+        border-color: var(--figma-accent-green-700);
+      }
+
+      &:disabled {
+        background: var(--figma-accent-yellow-100);
+        border-color: var(--figma-accent-yellow-300);
+        color: var(--figma-base-white);
+
+        autom-icon svg path {
+          stroke: var(--figma-error-50);
+        }
+      }
+    }
   }
 
   &--secondary {

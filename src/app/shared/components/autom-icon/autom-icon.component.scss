@@ -36,10 +36,14 @@
 		}
 	}
 
-
 	&.info-25 svg path {
 		stroke: var(--figma-info-25);
 		fill: var(--figma-info-25);
+	}
+
+	&.info-700 svg path {
+		fill: white;
+		stroke: var(--figma-info-700);
 	}
 
 	&.error-600 svg path {
@@ -98,6 +102,11 @@
 
 	&.orange svg path {
 		stroke: var(--figma-warning-600);
+	}
+
+	&.yellow-700 svg path {
+		stroke: var(--figma-accent-yellow-700);
+    fill: white;
 	}
 
 	&.primary-600 svg path {
