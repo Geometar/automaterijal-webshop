@@ -10,12 +10,14 @@ import { InputFieldsComponent } from '../../../../shared/components/input-fields
 import { AssemblyGroup } from '../../../../shared/data-models/model/tecdoc';
 
 // Enums
-import { IconsEnum, InputTypeEnum } from '../../../../shared/data-models/enums';
+import { ColorEnum, IconsEnum, InputTypeEnum } from '../../../../shared/data-models/enums';
+import { AutomIconComponent } from '../../../../shared/components/autom-icon/autom-icon.component';
+import { UrlHelperService } from '../../../../shared/service/utils/url-helper.service';
 
 @Component({
   selector: 'assembly-groups',
   standalone: true,
-  imports: [CommonModule, ButtonComponent, InputFieldsComponent],
+  imports: [CommonModule, ButtonComponent, InputFieldsComponent, AutomIconComponent],
   templateUrl: './assembly-groups.component.html',
   styleUrl: './assembly-groups.component.scss',
   encapsulation: ViewEncapsulation.None,
@@ -35,19 +37,40 @@ export class AssemblyGroupsComponent implements OnInit {
   // Enums
   iconEnum = IconsEnum;
   inputType = InputTypeEnum;
+  colorEnum = ColorEnum;
 
   structuredGroups: AssemblyGroup[] = [];
   expandedNodes: Set<number> = new Set();
   expandedCards: Set<number> = new Set();
 
+  // View mode
+  showLayerView = true;
+  showListView = false;
+
+  constructor(private urlHelperService: UrlHelperService) { }
 
   // Start of: Angular lifecycle
 
   ngOnInit() {
     this.structuredGroups = this.buildHierarchy(this.assemblyGroups);
+    if (this.urlHelperService.hasQueryParam('listView')) {
+      this.showListViewHandler();
+    }
   }
 
   // End of: Angular lifecycle
+
+  showLayerViewHandler(): void {
+    this.showLayerView = true;
+    this.showListView = false;
+    this.urlHelperService.removeQueryParam('listView');
+  }
+
+  showListViewHandler(): void {
+    this.showListView = true;
+    this.showLayerView = false;
+    this.urlHelperService.addOrUpdateQueryParams({ listView: true })
+  }
 
   buildHierarchy(groups: AssemblyGroup[]): AssemblyGroup[] {
     const parentMap = new Map<number, AssemblyGroup>();
@@ -65,6 +88,8 @@ export class AssemblyGroupsComponent implements OnInit {
 
   filterStructuredGroups(searchTerm: string): void {
     if (!searchTerm) {
+      // Reset: Collapse everything if there was a previous filter
+      this.expandedNodes.clear();
       this.structuredGroups = this.buildHierarchy(this.assemblyGroups);
       return;
     }
@@ -78,6 +103,7 @@ export class AssemblyGroupsComponent implements OnInit {
         .map(group => {
           const filteredChildren = filterGroups(group.childrenNodes!);
           if (matchesSearch(group) || filteredChildren.length > 0) {
+            this.expandedNodes.add(group.assemblyGroupNodeId!); // Expand on match
             return { ...group, childrenNodes: filteredChildren };
           }
           return null;
@@ -116,6 +142,18 @@ export class AssemblyGroupsComponent implements OnInit {
     } else {
       this.expandedCards.add(cardId);
     }
+  }
+
+  toggleList(assemblyGroupId: number) {
+    if (this.expandedNodes.has(assemblyGroupId)) {
+      this.expandedNodes.delete(assemblyGroupId);
+    } else {
+      this.expandedNodes.add(assemblyGroupId);
+    }
+  }
+
+  isListExpanded(cardId: number): boolean {
+    return this.expandedNodes.has(cardId);
   }
 
   isExpanded(cardId: number): boolean {

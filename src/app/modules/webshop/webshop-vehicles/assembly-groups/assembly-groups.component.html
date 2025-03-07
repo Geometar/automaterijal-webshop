@@ -1,4 +1,23 @@
-<div class="util__flex--center">
+<div class="util__flex--center filter-container">
+  <div class="filter-icons">
+    <!-- Grid View Icon -->
+    <autom-icon
+      [source]="iconEnum.THREE_LAYERS"
+      [color]="showLayerView ? colorEnum.YELLOW_700 : colorEnum.RICH_BLACK"
+      [tooltip]="{ tooltipText: 'Mrežni prikaz (Grid View)' }"
+      (click)="showLayerViewHandler()"
+    ></autom-icon>
+
+    <!-- List View Icon -->
+    <autom-icon
+      [source]="iconEnum.ALIGN_LEFT"
+      [color]="showListView ? colorEnum.YELLOW_700 : colorEnum.RICH_BLACK"
+      [tooltip]="{ tooltipText: 'Prikaz kao lista (List View)' }"
+      (click)="showListViewHandler()"
+    ></autom-icon>
+  </div>
+
+  <!-- Search Input (Remains Centered) -->
   <autom-input-fields
     class="filter-groups"
     [label]="'Filtriraj grupe'"
@@ -9,49 +28,82 @@
   ></autom-input-fields>
 </div>
 <div class="assembly-groups-container">
-  <div
-    class="assembly-group-card"
-    *ngFor="let group of structuredGroups"
-    [ngClass]="{
-      expanded: isExpanded(group.assemblyGroupNodeId!),
-      collapsing: !isExpanded(group.assemblyGroupNodeId!)
-    }"
-    [id]="'group-' + group.assemblyGroupNodeId"
-  >
-    <div class="card-header">
-      <h3 (click)="searchForArticlesWithAssembleGroup(group)">
-        <span class="icon">📦</span> {{ group.assemblyGroupName }}
-      </h3>
+  <ng-container *ngIf="showLayerView">
+    <div
+      class="assembly-group-card"
+      *ngFor="let group of structuredGroups"
+      [ngClass]="{
+        expanded: isExpanded(group.assemblyGroupNodeId!),
+        collapsing: !isExpanded(group.assemblyGroupNodeId!)
+      }"
+      [id]="'group-' + group.assemblyGroupNodeId"
+    >
+      <div class="card-header">
+        <h3 (click)="searchForArticlesWithAssembleGroup(group)">
+          <span class="icon">📦</span> {{ group.assemblyGroupName }}
+        </h3>
+      </div>
+      <div class="card-body">
+        <ul
+          class="child-list"
+          [id]="'content-' + group.assemblyGroupNodeId"
+          [ngClass]="{ collapsing: !isExpanded(group.assemblyGroupNodeId!) }"
+        >
+          <li
+            *ngFor="
+              let child of expandedCards.has(group.assemblyGroupNodeId!)
+                ? group.childrenNodes
+                : group.childrenNodes?.slice(0, 5)
+            "
+            (click)="searchForArticlesWithAssembleGroup(child)"
+          >
+            {{ child.assemblyGroupName }}
+          </li>
+        </ul>
+      </div>
+      <div class="card-footer" *ngIf="group.childrenNodes!.length > 5">
+        <autom-button
+          class="show-all-btn"
+          [label]="
+            expandedCards.has(group.assemblyGroupNodeId!)
+              ? 'Prikaži manje'
+              : 'Prikaži sve'
+          "
+          (click)="toggleShowAll(group.assemblyGroupNodeId!)"
+        >
+        </autom-button>
+      </div>
     </div>
-    <div class="card-body">
+  </ng-container>
+
+  <!-- List View -->
+  <ul *ngIf="showListView" class="list-view-container">
+    <li *ngFor="let group of structuredGroups" class="list-item">
+      <div class="list-header" (click)="toggleList(group.assemblyGroupNodeId!)">
+        <span
+          class="arrow"
+          [ngClass]="{ expanded: isListExpanded(group.assemblyGroupNodeId!) }"
+          >▶</span
+        >
+        <span
+          class="list-header-value"
+          (click)="searchForArticlesWithAssembleGroup(group)"
+          >{{ group.assemblyGroupName }}</span
+        >
+      </div>
       <ul
-        class="child-list"
-        [id]="'content-' + group.assemblyGroupNodeId"
-        [ngClass]="{ collapsing: !isExpanded(group.assemblyGroupNodeId!) }"
+        class="nested-list"
+        [ngClass]="{ expanded: isListExpanded(group.assemblyGroupNodeId!) }"
+        *ngIf="isListExpanded(group.assemblyGroupNodeId!)"
       >
         <li
-          *ngFor="
-            let child of expandedCards.has(group.assemblyGroupNodeId!)
-              ? group.childrenNodes
-              : group.childrenNodes?.slice(0, 5)
-          "
+          *ngFor="let child of group.childrenNodes"
+          class="nested-item"
           (click)="searchForArticlesWithAssembleGroup(child)"
         >
           {{ child.assemblyGroupName }}
         </li>
       </ul>
-    </div>
-    <div class="card-footer" *ngIf="group.childrenNodes!.length > 5">
-      <autom-button
-        class="show-all-btn"
-        [label]="
-          expandedCards.has(group.assemblyGroupNodeId!)
-            ? 'Prikaži manje'
-            : 'Prikaži sve'
-        "
-        (click)="toggleShowAll(group.assemblyGroupNodeId!)"
-      >
-      </autom-button>
-    </div>
-  </div>
+    </li>
+  </ul>
 </div>
