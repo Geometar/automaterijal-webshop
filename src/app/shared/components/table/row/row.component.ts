@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
@@ -43,9 +43,9 @@ import { SnackbarService } from '../../../service/utils/snackbar.service';
   ],
   providers: [CurrencyPipe],
   templateUrl: './row.component.html',
-  styleUrl: './row.component.scss',
+  styleUrl: './row.component.scss'
 })
-export class RowComponent {
+export class RowComponent implements OnInit {
   @Input() data!: Roba;
 
   quantity: number = 1;
@@ -58,10 +58,50 @@ export class RowComponent {
   inputTypeEnum = InputTypeEnum;
   sizeEnum = SizeEnum;
 
+  // Data
+  displayedLinkageCriteria: any[] = [];
+  displayedTehnickiOpis: any[] = [];
+
+  // Misc
+  hasMoreThanFiveSpecs = false;
+  showAllSpecs = false;
+
   constructor(
     private cartStateService: CartStateService,
     private snackbarService: SnackbarService
   ) { }
+
+  ngOnInit() {
+    this.updateDisplayedSpecs();
+  }
+
+  updateDisplayedSpecs() {
+    this.displayedLinkageCriteria = this.data.tdLinkageCriteria || [];
+
+    const totalDisplayedCount = this.displayedLinkageCriteria.length;
+
+    // Only trim tehnickiOpis if total items exceed 5
+    if (totalDisplayedCount >= 5) {
+      this.displayedTehnickiOpis = []; // No space for tehnickiOpis
+    } else {
+      const remainingSlots = 5 - totalDisplayedCount;
+      this.displayedTehnickiOpis = this.data.tehnickiOpis
+        ? this.data.tehnickiOpis.slice(0, remainingSlots)
+        : [];
+    }
+
+    // Check if there are more than 5 rows in total
+    this.hasMoreThanFiveSpecs =
+      (this.displayedLinkageCriteria.length + (this.data.tehnickiOpis?.length || 0)) > 5;
+  }
+
+  toggleSpecifications() {
+    this.showAllSpecs = !this.showAllSpecs;
+    this.displayedTehnickiOpis = this.showAllSpecs
+      ? this.data.tehnickiOpis ?? []
+      : this.data.tehnickiOpis!.slice(0, Math.max(0, 5 - this.displayedLinkageCriteria.length));
+  }
+
 
   modifyQuantity(quantity: number): void {
     if (quantity < 1) {

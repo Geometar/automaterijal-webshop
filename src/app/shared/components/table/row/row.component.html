@@ -36,11 +36,12 @@
     </p>
     <table class="specifications">
       <tbody>
-        <tr *ngFor="let spec of data.tdLinkageCriteria">
+        <!-- Mandatory tdLinkageCriteria (show all) -->
+        <tr *ngFor="let spec of displayedLinkageCriteria">
           <td [class.color--figma-highlight-orange]="spec.type === 'A'">
             {{ spec.oznaka }}
-            <span *ngIf="spec.jedinica" class="display--inline">[</span
-            >{{ spec.jedinica }}
+            <span *ngIf="spec.jedinica" class="display--inline">[</span>
+            {{ spec.jedinica }}
             <span *ngIf="spec.jedinica" class="display--inline">]</span>
           </td>
           <td
@@ -50,11 +51,13 @@
             {{ spec.vrednost }}
           </td>
         </tr>
-        <tr *ngFor="let spec of data.tehnickiOpis">
+
+        <!-- Tehnicki Opis (trimmed initially, expands on click) -->
+        <tr *ngFor="let spec of displayedTehnickiOpis">
           <td [class.color--figma-highlight-orange]="spec.type === 'A'">
             {{ spec.oznaka }}
-            <span *ngIf="spec.jedinica" class="display--inline">[</span
-            >{{ spec.jedinica }}
+            <span *ngIf="spec.jedinica" class="display--inline">[</span>
+            {{ spec.jedinica }}
             <span *ngIf="spec.jedinica" class="display--inline">]</span>
           </td>
           <td
@@ -64,11 +67,25 @@
             {{ spec.vrednost }}
           </td>
         </tr>
-        <tr *ngIf="!data.tehnickiOpis?.length">
+
+        <!-- No specifications available -->
+        <tr
+          *ngIf="!data.tehnickiOpis?.length && !data.tdLinkageCriteria?.length"
+        >
           <td colspan="2">No specifications available</td>
         </tr>
       </tbody>
     </table>
+
+    <!-- Expand/Collapse Button -->
+    <div class="spec-toggle-btn" *ngIf="hasMoreThanFiveSpecs">
+      <autom-button
+        [type]="buttonType.TERNARY"
+        [label]="showAllSpecs ? 'Prikaži manje' : 'Prikaži više'"
+        (click)="toggleSpecifications()"
+      >
+      </autom-button>
+    </div>
   </div>
 
   <!-- Pricing Section -->

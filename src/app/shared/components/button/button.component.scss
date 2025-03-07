@@ -280,10 +280,11 @@
 
     &[theme~="default"] {
       // :normal
-      color: var(--figma-grey-700);
+      color: var(--figma-primary-800);
 
       &:hover {
-        color: var(--figma-grey-600);
+        color: var(--figma-primary-600);
+        text-decoration: underline;
       }
 
       &:disabled {
@@ -311,7 +312,7 @@
 
       &:disabled {
         background: transparent;
-        color: var(--figma-grey-300);
+        color: var(--bittersweet);
       }
     }
 
@@ -340,7 +341,6 @@
     &[theme~="light-grey"] {
       // :normal
       color: var(--figma-grey-700);
-      border: var(--space-default) solid var(--figma-grey-300);
 
       &:hover {
         background: var(--figma-grey-50);
