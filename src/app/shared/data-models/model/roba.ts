@@ -75,6 +75,7 @@ export class Roba {
   slika?: Slika;
   stanje: number = 0;
   tdBrojevi?: RobaBrojevi[];
+  tdLinkageCriteria?: RobaTehnickiOpis[];
   tehnickiOpis?: RobaTehnickiOpis[];
   tekst?: string;
   uKorpi = false;
