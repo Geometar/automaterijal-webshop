@@ -1,12 +1,16 @@
-import { Component, HostListener, Inject, OnInit, PLATFORM_ID, ViewEncapsulation } from '@angular/core';
+import { Component, HostListener, Inject, OnDestroy, OnInit, PLATFORM_ID, ViewEncapsulation } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 
 // Automaterijal import
 import { AutomIconComponent } from '../shared/components/autom-icon/autom-icon.component';
 
 // Enums
 import { ColorEnum, IconsEnum } from '../shared/data-models/enums';
+
+// Service
+import { CartStateService } from '../shared/service/utils/cart-state.service';
 
 @Component({
   selector: 'autom-navigation',
@@ -16,9 +20,10 @@ import { ColorEnum, IconsEnum } from '../shared/data-models/enums';
   styleUrl: './navigation.component.scss',
   encapsulation: ViewEncapsulation.None
 })
-export class NavigationComponent implements OnInit {
+export class NavigationComponent implements OnInit, OnDestroy {
 
   currentUrl: string = '';
+  cartSize: number = 0;
 
   // Enums
   colorEnum = ColorEnum;
@@ -28,9 +33,14 @@ export class NavigationComponent implements OnInit {
   fixedHeaderClass = false;
   mobileSidebarOpen = false;
 
-  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: object) { }
+  private destroy$ = new Subject<void>();
+
+  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: object, private cartStateService: CartStateService) { }
+
+  /** Angular lifecycle hooks start */
 
   ngOnInit(): void {
+    this.syncOnCartItemSize();
     if (isPlatformBrowser(this.platformId)) {
       this.router.events.subscribe(event => {
         if (event instanceof NavigationEnd) {
@@ -42,10 +52,27 @@ export class NavigationComponent implements OnInit {
     }
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /** Angular lifecycle hooks end */
+
   @HostListener('window:scroll')
   onScroll(): void {
     if (isPlatformBrowser(this.platformId)) {
       this.fixedHeaderClass = window.scrollY > 90;
     }
+  }
+
+  syncOnCartItemSize(): void {
+    this.cartStateService.cartSize$
+      .pipe(
+        takeUntil(this.destroy$)
+      ).subscribe({
+        next: (cartSize: number) => { this.cartSize = cartSize; },
+        error: () => { this.cartSize = 0; }
+      });
   }
 }

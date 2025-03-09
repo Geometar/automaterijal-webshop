@@ -2,6 +2,7 @@ import { ColorEnum } from '../../data-models/enums/color.enum';
 import { Component, Input, ViewEncapsulation } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MatIconModule, MatIconRegistry } from '@angular/material/icon';
+import { MatBadgeModule } from '@angular/material/badge';
 import { CommonModule } from '@angular/common';
 
 // Directive
@@ -16,15 +17,17 @@ import { TooltipModel } from '../../data-models/interface/tooltip.interface';
 @Component({
   selector: 'autom-icon',
   standalone: true,
-  imports: [CommonModule, MatIconModule, AutomTooltipDirective],
+  imports: [CommonModule, MatIconModule, AutomTooltipDirective, MatBadgeModule],
   templateUrl: './autom-icon.component.html',
   styleUrl: './autom-icon.component.scss',
   encapsulation: ViewEncapsulation.None
 })
 export class AutomIconComponent {
 
+  @Input() badge: number = 0;
   @Input() color: ColorEnum = ColorEnum.RICH_BLACK;
   @Input() disabled = false;
+  @Input() enableBadge = false;
   @Input() euLabels = false;
   @Input() source: string = '';
   @Input() tooltip = {} as TooltipModel;

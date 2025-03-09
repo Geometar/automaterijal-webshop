@@ -1,14 +1,18 @@
 import { Injectable } from '@angular/core';
-import { SessionStorage, SessionStorageService } from 'ngx-webstorage';
-import { CartItem, Roba } from '../../data-models/model/roba';
+import { SessionStorageService } from 'ngx-webstorage';
+import { CartItem } from '../../data-models/model/roba';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CartStateService {
   private storageKey = 'cartItems';
+  cartSize$: BehaviorSubject<number> = new BehaviorSubject(0);
 
-  constructor(private sessionStorage: SessionStorageService) { }
+  constructor(private sessionStorage: SessionStorageService) {
+    this.updateCartSize();
+  }
 
   getAll(): CartItem[] {
     return this.sessionStorage.retrieve(this.storageKey) || [];
@@ -32,15 +36,18 @@ export class CartStateService {
     roba.stanje = this.calculateNewStock(roba.stanje, quantity);
 
     this.sessionStorage.store(this.storageKey, cart);
+    this.updateCartSize();
   }
 
   removeFromCart(itemId: number): void {
     const updatedCart = this.getAll().filter((item) => item.robaId !== itemId);
     this.sessionStorage.store(this.storageKey, updatedCart);
+    this.updateCartSize();
   }
 
   resetCart(): void {
     this.sessionStorage.clear(this.storageKey);
+    this.updateCartSize();
   }
 
   updateQuantity(itemId: number, quantity: number): void {
@@ -53,6 +60,7 @@ export class CartStateService {
     }
 
     this.sessionStorage.store(this.storageKey, cart);
+    this.updateCartSize();
   }
 
   updateStockFromCart(robaList: any[]): void {
@@ -84,6 +92,10 @@ export class CartStateService {
 
   isInCart(itemId: number): boolean {
     return this.getAll().some((item) => item.robaId === itemId);
+  }
+
+  private updateCartSize(): void {
+    this.cartSize$.next(this.getAll().length)
   }
 
   private mapToCartItem(roba: any): CartItem {

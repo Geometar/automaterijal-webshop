@@ -1,6 +1,6 @@
 import { Component, OnDestroy, ViewEncapsulation, } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { catchError, finalize, takeWhile, throwError } from 'rxjs';
+import { catchError, finalize, Subject, takeUntil, throwError } from 'rxjs';
 
 // Automaterijal import
 import { AutomIconComponent } from '../../../shared/components/autom-icon/autom-icon.component';
@@ -40,7 +40,6 @@ export class KontaktComponent implements OnDestroy {
   inputType = InputTypeEnum;
 
   // Misc
-  alive = true;
   porukaJePoslata = false;
   ucitavanje = false;
 
@@ -51,6 +50,8 @@ export class KontaktComponent implements OnDestroy {
 
   // Validator patterns
   emailAddressPattern = EMAIL_ADDRESS;
+
+  private destroy$ = new Subject<void>();
 
   constructor(
     private fb: UntypedFormBuilder, private emailService: EmailService) {
@@ -64,9 +65,14 @@ export class KontaktComponent implements OnDestroy {
     });
   }
 
+  /** Angular lifecycle hooks start */
+
   ngOnDestroy(): void {
-    this.alive = false;
+    this.destroy$.next();
+    this.destroy$.complete();
   }
+
+  /** Angular lifecycle hooks end */
 
   setSelectionValue(controlName: any, value: any) {
     this.kontaktForma.controls[controlName].setValue(value);
@@ -77,7 +83,7 @@ export class KontaktComponent implements OnDestroy {
 
     this.emailService.posaljiPoruku(this.napraviPoruku())
       .pipe(
-        takeWhile(() => this.alive),
+        takeUntil(this.destroy$),
         catchError((error: Response) => throwError(error)),
         finalize(() => this.ucitavanje = false)
       ).subscribe(res => {
