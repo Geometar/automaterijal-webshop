@@ -35,5 +35,10 @@ export const routes: Routes = [
     path: 'webshop/:id',
     loadComponent: () =>
       import('./modules/webshop/webshop-details/webshop-details.component').then((m) => m.WebshopDetailsComponent)
-  }
+  },
+  {
+    path: 'cart',
+    loadComponent: () =>
+      import('./modules/cart/cart.component').then((m) => m.CartComponent)
+  },
 ];

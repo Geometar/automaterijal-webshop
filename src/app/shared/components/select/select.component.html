@@ -1,9 +1,23 @@
-<mat-form-field>
-  <mat-label>{{ label }}</mat-label>
-  <mat-select (selectionChange)="onSelectionChange($event)">
-    <mat-option>--</mat-option>
-    @for (data of selectionList; track data.key) {
-    <mat-option [value]="data">{{ data.value }}</mat-option>
-    }
-  </mat-select>
-</mat-form-field>
+<div class="autom-input-wrapper">
+  <autom-label
+    *ngIf="label"
+    [label]="label"
+    [labelIcons]="labelIcons"
+    [required]="required"
+  ></autom-label>
+  <mat-form-field>
+    <mat-label></mat-label
+    ><mat-select
+      class="mat-select--styled-with-arrow"
+      [placeholder]="placeholder"
+      [required]="required"
+      [(value)]="selectedValue"
+      (selectionChange)="onSelectionChange($event)"
+    >
+      <mat-option *ngIf="!required">--</mat-option>
+      @for (data of selectionList; track data.key) {
+      <mat-option [value]="data">{{ data.value }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+</div>

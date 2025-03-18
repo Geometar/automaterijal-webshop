@@ -3,19 +3,26 @@ import { catchError, Observable, of, shareReplay, Subject, tap } from 'rxjs';
 import { Account } from '../../data-models/model';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environment/environment';
+
+// Services
 import { ServiceHelpersService } from '../../service/utils/service-helpers.service';
+import { AccountStateService } from '../../service/utils/account-state.service';
 
 const PARTNER_URL = environment.apiUrl + '/api/partner';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AccountService {
   private accountCache$?: Observable<Account> | null;
   private authenticationState = new Subject<Account | null>();
   private userIdentity: Account | null = null;
 
-  constructor(private http: HttpClient, private utils: ServiceHelpersService) { }
+  constructor(
+    private accountStateService: AccountStateService,
+    private http: HttpClient,
+    private utils: ServiceHelpersService,
+  ) { }
 
   authenticate(identity: Account | null): void {
     this.accountCache$ = identity ? of(identity) : null;
@@ -28,6 +35,7 @@ export class AccountService {
       this.accountCache$ = this.getAccount().pipe(
         tap((account: Account) => {
           this.userIdentity = account;
+          this.accountStateService.add(account);
           this.authenticate(account);
         }),
         shareReplay()

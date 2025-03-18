@@ -1,7 +1,10 @@
 import { Injectable } from '@angular/core';
 import { SessionStorageService } from 'ngx-webstorage';
-import { CartItem } from '../../data-models/model/roba';
 import { BehaviorSubject } from 'rxjs';
+
+// Data models
+import { Manufacture } from '../../data-models/model/proizvodjac';
+import { CartItem, Roba } from '../../data-models/model/roba';
 
 @Injectable({
   providedIn: 'root',
@@ -9,6 +12,7 @@ import { BehaviorSubject } from 'rxjs';
 export class CartStateService {
   private storageKey = 'cartItems';
   cartSize$: BehaviorSubject<number> = new BehaviorSubject(0);
+  roba$: BehaviorSubject<Roba[]> = new BehaviorSubject([] as Roba[]);
 
   constructor(private sessionStorage: SessionStorageService) {
     this.updateCartSize();
@@ -83,6 +87,14 @@ export class CartStateService {
     }
   }
 
+  isInCart(itemId: number): boolean {
+    return this.getAll().some((item) => item.robaId === itemId);
+  }
+
+  getRobaFromCart(): Roba[] {
+    return this.getAll().map((cartItem: CartItem) => this.mapToRoba(cartItem));
+  }
+
   private calculateNewStock(
     currentStock: number | undefined,
     quantity: number
@@ -90,18 +102,16 @@ export class CartStateService {
     return Math.max((currentStock || 0) - quantity, 0);
   }
 
-  isInCart(itemId: number): boolean {
-    return this.getAll().some((item) => item.robaId === itemId);
-  }
-
   private updateCartSize(): void {
-    this.cartSize$.next(this.getAll().length)
+    const cartItems = this.getAll();
+    this.cartSize$.next(cartItems.length)
+    this.roba$.next(cartItems.map((cartItem: CartItem) => this.mapToRoba(cartItem)));
   }
 
   private mapToCartItem(roba: any): CartItem {
     return {
       discount: roba.rabat || 0,
-      image: roba.proizvodjacLogo || '',
+      image: roba.slika,
       manufacturer: roba.proizvodjac?.naziv || '',
       name: roba.naziv || '',
       partNumber: roba.katbr || '',
@@ -110,6 +120,22 @@ export class CartStateService {
       stock: roba.stanje || 0,
       totalPrice: (roba.cena || 0) * (roba.kolicina || 1),
       unitPrice: roba.cena || 0,
+      technicalDescription: roba.technicalDescription
     };
+  }
+
+  private mapToRoba(cartItem: CartItem): Roba {
+    const retVal: Roba = {} as Roba;
+    retVal.cena = cartItem.unitPrice;
+    retVal.katbr = cartItem.partNumber;
+    retVal.kolicina = cartItem.quantity;
+    retVal.naziv = cartItem.name;
+    retVal.proizvodjac = { naziv: cartItem.manufacturer } as Manufacture;
+    retVal.rabat = cartItem.discount || 0;
+    retVal.robaid = cartItem.robaId;
+    retVal.slika = cartItem.image;
+    retVal.stanje = cartItem.stock!;
+    retVal.tehnickiOpis = cartItem.technicalDescription;
+    return retVal;
   }
 }

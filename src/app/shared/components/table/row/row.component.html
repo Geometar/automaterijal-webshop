@@ -88,8 +88,8 @@
     </div>
   </div>
 
-  <!-- Pricing Section -->
-  <div class="pricing-container">
+  <!-- Add to basket Section -->
+  <div class="pricing-container" *ngIf="showAddToBasket">
     <div
       [ngClass]="{
         'item-status': true,
@@ -100,7 +100,22 @@
     >
       {{ data.stanje! > 0 ? "Ima na stanju" : "Nema na stanju" }}
     </div>
-    <p *ngIf="data.podGrupa !== 1000000" class="price">
+    <p
+      *ngIf="data.podGrupa !== 1000000 && data.rabat"
+      class="sub-price line-through"
+    >
+      {{ data.cena! / (1 - data.rabat / 100) | rsdCurrency }}
+    </p>
+    <p
+      *ngIf="data.podGrupa !== 1000000 && data.rabat"
+      class="sub-price color--bittersweet"
+    >
+      -{{ data.rabat }}%
+    </p>
+    <p
+      *ngIf="data.podGrupa !== 1000000 && data.podGrupa !== 1000000"
+      class="price"
+    >
       {{ data.cena ? (data.cena! | rsdCurrency) : (0 | rsdCurrency) }}
     </p>
     <p *ngIf="data.podGrupa !== 1000000" class="autom-align__right">
@@ -150,6 +165,47 @@
         [source]="iconEnum.SHOPPING_BAG"
         [tooltip]="{ tooltipText: 'Artikal je u korpi' }"
       ></autom-icon>
+    </div>
+  </div>
+
+  <!-- Pricing Section -->
+  <div class="pricing-container" *ngIf="showPriceOnly">
+    <p *ngIf="data.rabat" class="sub-price line-through">
+      {{ data.cena! / (1 - data.rabat / 100) | rsdCurrency }}
+    </p>
+    <p *ngIf="data.rabat" class="sub-price color--bittersweet">
+      -{{ data.rabat }}%
+    </p>
+    <p class="sub-price">
+      {{ data.cena ? (data.cena! | rsdCurrency) : (0 | rsdCurrency) }}
+    </p>
+    <p class="autom-align__right small-explanation">Cena po komadu</p>
+    <div class="util__flex--center">
+      <autom-input-fields
+        [clearBtn]="false"
+        [disableInput]="!data.stanje"
+        [customClass]="'quantity-size'"
+        [max]="data!.stanje"
+        [min]="1"
+        [roundOff]="true"
+        [size]="sizeEnum.MEDIUM"
+        [type]="inputTypeEnum.QUANTITY"
+        [validators]="[
+          { name: 'max', value: data.stanje },
+          { name: 'min', value: 1 }
+        ]"
+        [step]="1"
+        [value]="data.kolicina"
+        (emitSelected)="modifyQuantity($event)"
+        ngDefaultControl
+      ></autom-input-fields>
+
+      <div>
+        <p class="price">
+          {{ data.cena! * data.kolicina! | rsdCurrency }}
+        </p>
+        <p class="autom-align__right autom-margin__none">Ukupno sa pdv-om</p>
+      </div>
     </div>
   </div>
 </div>

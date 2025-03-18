@@ -5,7 +5,7 @@
     (emitEvent)="removeFilter($event)"
   ></autom-chips>
   <div class="product-row" *ngFor="let row of paginatedData">
-    <row [data]="row"></row>
+    <row [data]="row" [showAddToBasket]="true"></row>
   </div>
 
   <!-- Paginator -->

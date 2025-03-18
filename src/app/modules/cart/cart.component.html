@@ -1,0 +1,60 @@
+<section class="header-margin--top cart">
+  <div class="cart_items">
+    <div class="product-row" *ngFor="let row of roba">
+      <row [data]="row" [showPriceOnly]="true"></row>
+    </div>
+  </div>
+
+  <div class="display--flex justify-content--space-between">
+    <div class="information">
+      <div class="display--flex gap-7">
+        <autom-select
+          [label]="'Nacin placanja'"
+          [placeholder]="'Izaberite nacin placanja'"
+          [selectionList]="payingChoices"
+          [required]="true"
+          ngDefaultControl
+        ></autom-select>
+        <autom-select
+          [label]="'Nacin transporta'"
+          [placeholder]="'Izaberite nacin transporta'"
+          [selectionList]="transportChoices"
+          [required]="true"
+          ngDefaultControl
+        ></autom-select>
+      </div>
+      <autom-input-fields
+        [label]="'Adresa isporuke'"
+        [value]="account?.adresa"
+        ngDefaultControl
+      ></autom-input-fields>
+      <autom-text-area
+        [label]="'Komentar'"
+        [placeholder]="'Unesite vas komentar ovde'"
+        ngDefaultControl
+      ></autom-text-area>
+    </div>
+    <div *ngIf="total" class="total">
+      <table>
+        <tr>
+          <td>Bez PDV-a:</td>
+          <td class="price">{{ bezPdv | rsdCurrency }}</td>
+        </tr>
+        <tr>
+          <td>PDV:</td>
+          <td class="price">{{ pdv | rsdCurrency }}</td>
+        </tr>
+        <tr>
+          <td>Ukupno sa PDV-om:</td>
+          <td class="price">{{ total | rsdCurrency }}</td>
+        </tr>
+      </table>
+      <autom-button
+        class="autom-align__right order-btn"
+        [type]="buttonTypes.PRIMARY"
+        [theme]="buttonThemes.LIGHT_ORANGE"
+        [label]="'Potvrdi porudzbinu'"
+      ></autom-button>
+    </div>
+  </div>
+</section>

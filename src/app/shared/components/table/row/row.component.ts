@@ -43,10 +43,12 @@ import { SnackbarService } from '../../../service/utils/snackbar.service';
   ],
   providers: [CurrencyPipe],
   templateUrl: './row.component.html',
-  styleUrl: './row.component.scss'
+  styleUrl: './row.component.scss',
 })
 export class RowComponent implements OnInit {
   @Input() data!: Roba;
+  @Input() showAddToBasket = false;
+  @Input() showPriceOnly = false;
 
   quantity: number = 1;
 
@@ -92,18 +94,26 @@ export class RowComponent implements OnInit {
 
     // Check if there are more than 5 rows in total
     this.hasMoreThanFiveSpecs =
-      (this.displayedLinkageCriteria.length + (this.data.tehnickiOpis?.length || 0)) > 5;
+      this.displayedLinkageCriteria.length +
+      (this.data.tehnickiOpis?.length || 0) >
+      5;
   }
 
   toggleSpecifications() {
     this.showAllSpecs = !this.showAllSpecs;
     this.displayedTehnickiOpis = this.showAllSpecs
       ? this.data.tehnickiOpis ?? []
-      : this.data.tehnickiOpis!.slice(0, Math.max(0, 5 - this.displayedLinkageCriteria.length));
+      : this.data.tehnickiOpis!.slice(
+        0,
+        Math.max(0, 5 - this.displayedLinkageCriteria.length)
+      );
   }
 
-
   modifyQuantity(quantity: number): void {
+    if (this.data.kolicina === quantity) {
+      return;
+    }
+
     if (quantity < 1) {
       this.quantity = 1;
     } else if (quantity > this.data.stanje!) {
@@ -111,6 +121,8 @@ export class RowComponent implements OnInit {
     } else {
       this.quantity = quantity;
     }
+
+    this.cartStateService.updateQuantity(this.data.robaid!, this.quantity);
   }
 
   addToShoppingCart(data: Roba): void {

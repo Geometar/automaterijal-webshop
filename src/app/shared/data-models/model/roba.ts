@@ -92,4 +92,5 @@ export class CartItem {
   stock?: number;
   totalPrice?: number;
   unitPrice?: number;
+  technicalDescription?: RobaTehnickiOpis[];
 }

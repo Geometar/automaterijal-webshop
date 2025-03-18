@@ -2,17 +2,24 @@ import { inject } from '@angular/core';
 import { HttpInterceptorFn } from '@angular/common/http';
 import { SessionStorageService } from 'ngx-webstorage';
 import { environment } from '../../../../environment/environment';
+import { Router } from '@angular/router';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
+
+// Services
+import { AccountStateService } from '../../service/utils/account-state.service';
 
 export const authInterceptor: HttpInterceptorFn = (request, next) => {
-  const sessionStorageService = inject(SessionStorageService); // Inject the SessionStorageService
+  const sessionStorageService = inject(SessionStorageService);
+  const accountStateService = inject(AccountStateService);
+  const router = inject(Router);
 
-  // Check if the request URL should be intercepted
   if (
     !request.url ||
     (request.url.startsWith('http') &&
       !(environment.apiUrl && request.url.startsWith(environment.apiUrl)))
   ) {
-    // Add cache-control headers for non-API requests
     return next(
       request.clone({
         setHeaders: {
@@ -24,17 +31,27 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
     );
   }
 
-  // Retrieve the token from session storage
   const token: string | null = sessionStorageService.retrieve('authenticationToken');
 
-  // Clone the request and add necessary headers
   const modifiedRequest = request.clone({
     setHeaders: {
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      'Cache-Control': 'no-cache, no-store, max-age=0, must-revalidate'
+      'Cache-Control': 'no-cache, no-store, max-age=0, must-revalidate',
     },
   });
 
-  // Pass the modified request to the next handler
-  return next(modifiedRequest);
+  return next(modifiedRequest).pipe(
+    catchError((error: HttpErrorResponse) => {
+      if (error.status === 401 || error.status === 403) {
+        // Optional: check if backend returned a specific error message
+        console.warn('Authentication expired or unauthorized. Logging out.');
+
+        sessionStorageService.clear('authenticationToken');  // Remove authentication token
+        accountStateService.remove(); // Remove logged in user
+        router.navigate(['/login']);   // Redirect to login
+      }
+
+      return throwError(() => error);
+    })
+  );
 };

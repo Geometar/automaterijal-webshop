@@ -10,3 +10,9 @@
 .nav-active {
     color: var(--figma-highlight-orange);  
 }
+
+.icon-active {
+  mat-icon svg path {
+    stroke: var(--figma-highlight-orange) !important;
+  } 
+}

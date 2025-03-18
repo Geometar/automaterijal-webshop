@@ -76,6 +76,7 @@
 
         <li class="navbar-item">
           <a
+            *ngIf="!account?.ppid"
             href="/login"
             [ngClass]="currentUrl.includes('/login') ? 'nav-active' : null"
             class="navbar-link color--figma-error-600"
@@ -98,9 +99,10 @@
         </li>
 
         <li>
-          <a href="#" class="nav-action-btn">
+          <a routerLink="/cart" class="nav-action-btn">
             <autom-icon
-              name="person-outline"
+              routerLink="/cart"
+              [ngClass]="currentUrl.includes('/cart') ? 'icon-active' : null"
               [badge]="cartSize"
               [color]="colorEnum.RICH_BLACK"
               [enableBadge]="true"
@@ -141,8 +143,9 @@
     ></autom-icon>
   </button>
 
-  <button class="action-btn">
+  <button class="action-btn" routerLink="/cart">
     <autom-icon
+      [ngClass]="currentUrl.includes('/cart') ? 'icon-active' : null"
       [badge]="cartSize"
       [color]="colorEnum.RICH_BLACK"
       [enableBadge]="true"
