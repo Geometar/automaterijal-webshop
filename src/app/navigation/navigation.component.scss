@@ -1,20 +1,61 @@
-
+/* ========== LOGO ========== */
 .logo {
   position: absolute;
 }
 
+/* ========== LOGIN STIL ========== */
 .login:hover {
   color: var(--figma-highlight-orange);
 }
 
+/* ========== AKTIVNE NAVIGACIJE ========== */
 .nav-active {
-    color: var(--figma-highlight-orange);  
+  color: var(--figma-highlight-orange);
 }
 
+/* ========== AKTIVNE IKONE ========== */
 .icon-active {
+  color: var(--figma-highlight-orange) !important;
+
   mat-icon svg path {
     stroke: var(--figma-highlight-orange) !important;
-  } 
+  }
+}
 
-  color: var(--figma-highlight-orange) !important;
+/* ========== MATERIAL DROPDOWN MENI (Profil) ========== */.mat-mdc-menu-content {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 8px 0;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+  min-width: 220px;
+  transition: all 0.2s ease-in-out;
+}
+
+.mat-mdc-menu-item {
+  font-size: 15px;
+  font-weight: 500;
+  padding: 12px 18px;
+  margin: 4px 8px;
+  border-radius: 8px;
+  color: #1f2937;
+  transition: background-color 0.2s ease;
+}
+
+.mat-mdc-menu-item:hover {
+  background-color: #f1f5f9;
+  mat-icon svg path {
+    stroke: var(--figma-highlight-orange) !important;
+  }
+}
+
+.mat-mdc-menu-item autom-icon,
+.mat-mdc-menu-item mat-icon {
+  margin-right: 12px;
+  color: #1f2937;
+  font-size: 20px;
+}
+
+.menu-item-align {
+  display: flex;
+  align-items: center;
 }

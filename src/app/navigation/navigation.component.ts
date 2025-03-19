@@ -1,6 +1,21 @@
-import { Component, HostListener, Inject, OnDestroy, OnInit, PLATFORM_ID, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  Inject,
+  OnDestroy,
+  OnInit,
+  PLATFORM_ID,
+  ViewEncapsulation,
+} from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
+import {
+  NavigationEnd,
+  Router,
+  RouterLink,
+  RouterLinkActive,
+} from '@angular/router';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatIconModule } from '@angular/material/icon';
 import { Subject, takeUntil } from 'rxjs';
 
 // Automaterijal import
@@ -10,22 +25,29 @@ import { AutomIconComponent } from '../shared/components/autom-icon/autom-icon.c
 import { Account } from '../shared/data-models/model';
 
 // Enums
-import { ButtonThemes, ButtonTypes, ColorEnum, IconsEnum } from '../shared/data-models/enums';
+import { ColorEnum, IconsEnum } from '../shared/data-models/enums';
 
 // Service
 import { CartStateService } from '../shared/service/utils/cart-state.service';
-import { AccountStateService } from '../shared/service/utils/account-state.service';
+import { AccountService } from '../shared/auth/service/account.service';
+import { LoginService } from '../shared/service/login.service';
 
 @Component({
   selector: 'autom-navigation',
   standalone: true,
-  imports: [AutomIconComponent, CommonModule, RouterLink, RouterLinkActive],
+  imports: [
+    AutomIconComponent,
+    CommonModule,
+    RouterLink,
+    RouterLinkActive,
+    MatMenuModule,
+    MatIconModule,
+  ],
   templateUrl: './navigation.component.html',
   styleUrl: './navigation.component.scss',
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
 })
 export class NavigationComponent implements OnInit, OnDestroy {
-
   currentUrl: string = '';
   cartSize: number = 0;
 
@@ -34,23 +56,45 @@ export class NavigationComponent implements OnInit, OnDestroy {
   iconEnum = IconsEnum;
 
   // Misc
-  account?: Account;
+  account: Account | null = null;
   fixedHeaderClass = false;
+  loggedIn = false;
   mobileSidebarOpen = false;
 
   private destroy$ = new Subject<void>();
 
-  constructor(private accountStateService: AccountStateService, private router: Router, @Inject(PLATFORM_ID) private platformId: object, private cartStateService: CartStateService) { }
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: object,
+    private accountService: AccountService,
+    private cartStateService: CartStateService,
+    private loginService: LoginService,
+    private router: Router
+  ) { }
+
+  @HostListener('window:scroll')
+  onScroll(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      this.fixedHeaderClass = window.scrollY > 90;
+    }
+  }
 
   /** Angular lifecycle hooks start */
 
   ngOnInit(): void {
-    this.account = this.accountStateService.get();
+    this.accountService.identity().subscribe((account: Account | null) => {
+      this.account = account;
+      this.loggedIn = !!account;
+    });
+
     this.syncOnCartItemSize();
+
     if (isPlatformBrowser(this.platformId)) {
-      this.router.events.subscribe(event => {
+      this.router.events.subscribe((event) => {
         if (event instanceof NavigationEnd) {
-          const parsedUrl = new URL(event.urlAfterRedirects, window.location.origin);
+          const parsedUrl = new URL(
+            event.urlAfterRedirects,
+            window.location.origin
+          );
           this.currentUrl = parsedUrl.pathname;
           window.scrollTo(0, 0);
         }
@@ -65,20 +109,19 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
   /** Angular lifecycle hooks end */
 
-  @HostListener('window:scroll')
-  onScroll(): void {
-    if (isPlatformBrowser(this.platformId)) {
-      this.fixedHeaderClass = window.scrollY > 90;
-    }
+  syncOnCartItemSize(): void {
+    this.cartStateService.cartSize$.pipe(takeUntil(this.destroy$)).subscribe({
+      next: (cartSize: number) => {
+        this.cartSize = cartSize;
+      },
+      error: () => {
+        this.cartSize = 0;
+      },
+    });
   }
 
-  syncOnCartItemSize(): void {
-    this.cartStateService.cartSize$
-      .pipe(
-        takeUntil(this.destroy$)
-      ).subscribe({
-        next: (cartSize: number) => { this.cartSize = cartSize; },
-        error: () => { this.cartSize = 0; }
-      });
+  logout() {
+    this.loginService.logout();
+    this.router.navigate(['/login']);
   }
 }

@@ -74,9 +74,8 @@
           >
         </li>
 
-        <li class="navbar-item">
+        <li *ngIf="!loggedIn" class="navbar-item">
           <a
-            *ngIf="!account?.ppid"
             href="/login"
             [ngClass]="currentUrl.includes('/login') ? 'nav-active' : null"
             class="navbar-link color--figma-error-600"
@@ -86,17 +85,48 @@
       </ul>
 
       <ul class="nav-action-list">
-        <li>
-          <button class="nav-action-btn">
-            <autom-icon
-              name="search-outline"
-              [color]="colorEnum.RICH_BLACK"
-              [source]="iconEnum.USER"
-            ></autom-icon>
+        <ul class="nav-action-list">
+          <li *ngIf="loggedIn" class="navbar-item profile-menu-wrapper">
+            <button
+              mat-button
+              [matMenuTriggerFor]="profileMenu"
+              #menuTrigger="matMenuTrigger"
+              class="nav-action-btn nav-btn"
+            >
+              <autom-icon
+                [color]="colorEnum.RICH_BLACK"
+                [source]="iconEnum.USER"
+              ></autom-icon>
+              <span>Profil</span>
+            </button>
 
-            <span class="nav-action-text">Profile</span>
-          </button>
-        </li>
+            <mat-menu
+              #profileMenu="matMenu"
+              class="custom-profile-menu"
+              overlapTrigger="false"
+            >
+              <button mat-menu-item>
+                <div class="menu-item-align">
+                  <autom-icon [source]="iconEnum.SETTINGS"></autom-icon>
+                  <span>Moj profil</span>
+                </div>
+              </button>
+              <button mat-menu-item>
+                <div class="menu-item-align">
+                  <autom-icon [source]="iconEnum.BOOK"></autom-icon>
+                  <span>Porudzbenice</span>
+                </div>
+              </button>
+
+              <button mat-menu-item (click)="logout()">
+                <div class="menu-item-align">
+                  <autom-icon [source]="iconEnum.LOG_OUT"></autom-icon>
+                  <span>Izloguj se</span>
+                </div>
+              </button>
+            </mat-menu>
+          </li>
+        </ul>
 
         <li>
           <a
