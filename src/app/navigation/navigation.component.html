@@ -91,15 +91,27 @@
                 <div class="email">
                   <span class="span">{{ account?.email }}</span>
                 </div>
+
+                <div class="menu-balance">
+                  <span class="label">Stanje:</span>
+                  <span
+                    class="value"
+                    [ngClass]="{ negative: account?.stanje! < 0 }"
+                    >{{ account?.stanje! | rsdCurrency }}</span
+                  >
+                </div>
+
+                <div class="menu-balance">
+                  <span class="label">Van valute:</span>
+                  <span
+                    class="value"
+                    [ngClass]="{ negative: account?.stanjeporoku! < 0 }"
+                    >{{ account?.stanjeporoku! | rsdCurrency }}</span
+                  >
+                </div>
               </div>
 
               <mat-divider></mat-divider>
-              <button mat-menu-item>
-                <div class="menu-item-align">
-                  <autom-icon [source]="iconEnum.SETTINGS"></autom-icon>
-                  <span>Moj profil</span>
-                </div>
-              </button>
               <button mat-menu-item>
                 <div class="menu-item-align">
                   <autom-icon [source]="iconEnum.BOOK"></autom-icon>

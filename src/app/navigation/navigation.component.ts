@@ -7,7 +7,7 @@ import {
   PLATFORM_ID,
   ViewEncapsulation,
 } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { CommonModule, CurrencyPipe, isPlatformBrowser } from '@angular/common';
 import {
   NavigationEnd,
   Router,
@@ -32,6 +32,7 @@ import { ColorEnum, IconsEnum } from '../shared/data-models/enums';
 import { CartStateService } from '../shared/service/utils/cart-state.service';
 import { AccountService } from '../shared/auth/service/account.service';
 import { LoginService } from '../shared/service/login.service';
+import { RsdCurrencyPipe } from '../shared/pipe/rsd-currency.pipe';
 
 @Component({
   selector: 'autom-navigation',
@@ -42,9 +43,11 @@ import { LoginService } from '../shared/service/login.service';
     RouterLink,
     RouterLinkActive,
     MatMenuModule,
+    RsdCurrencyPipe,
     MatIconModule,
     MatDividerModule
   ],
+  providers: [CurrencyPipe],
   templateUrl: './navigation.component.html',
   styleUrl: './navigation.component.scss',
   encapsulation: ViewEncapsulation.None,

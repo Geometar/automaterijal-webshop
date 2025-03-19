@@ -79,13 +79,12 @@
   display: flex;
   align-items: center;
 }
-
 .custom-profile-menu .menu-header {
-  padding: 12px 16px 10px;
+  padding: 14px 16px 12px;
   font-size: 14px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
   background-color: #f9fafb;
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;
@@ -94,7 +93,7 @@
 .custom-profile-menu .menu-header strong {
   font-weight: 600;
   color: #1e293b;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .custom-profile-menu .menu-header .email {
@@ -102,6 +101,25 @@
   font-size: 13px;
 }
 
-.custom-profile-menu mat-divider {
-  margin: 4px 0;
+.custom-profile-menu .menu-header .menu-balance {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #374151;
+  background-color: #f3f4f6;
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+.custom-profile-menu .menu-header .label {
+  font-weight: 500;
+}
+
+.custom-profile-menu .menu-header .value {
+  font-weight: 600;
+}
+
+.custom-profile-menu .menu-header .value.negative {
+  color: #dc2626; // Tailwind red-600, jasno ali elegantno
+  transition: color 0.3s ease;
 }
