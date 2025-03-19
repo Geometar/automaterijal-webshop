@@ -216,6 +216,11 @@ export class CartComponent implements OnInit, OnDestroy {
     this.bezPdv = total / 1.2;
   }
 
+  removeFromBasketHandler(robaId: number): void {
+    this.cartStateService.removeFromCart(robaId);
+
+  }
+
   /** Basket send: start */
 
   submitInvoice(): void {

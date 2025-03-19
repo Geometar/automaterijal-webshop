@@ -208,4 +208,13 @@
       </div>
     </div>
   </div>
+
+  <!-- CloseBtn Section -->
+  <div *ngIf="showCloseBtn">
+    <autom-icon
+      [tooltip]="{ tooltipText: 'Izbrisi iz korpe' }"
+      [source]="iconEnum.X"
+      (click)="removeEvent.emit(data.robaid)"
+    ></autom-icon>
+  </div>
 </div>

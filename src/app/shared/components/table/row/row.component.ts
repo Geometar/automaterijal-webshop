@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
@@ -48,7 +48,9 @@ import { SnackbarService } from '../../../service/utils/snackbar.service';
 export class RowComponent implements OnInit {
   @Input() data!: Roba;
   @Input() showAddToBasket = false;
+  @Input() showCloseBtn = false;
   @Input() showPriceOnly = false;
+  @Output() removeEvent = new EventEmitter<number>();
 
   quantity: number = 1;
 

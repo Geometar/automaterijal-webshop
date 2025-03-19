@@ -1,7 +1,12 @@
 <section *ngIf="roba.length" class="header-margin--top cart">
   <div class="cart_items">
     <div class="product-row" *ngFor="let row of roba">
-      <row [data]="row" [showPriceOnly]="true"></row>
+      <row
+        [data]="row"
+        [showPriceOnly]="true"
+        [showCloseBtn]="true"
+        (removeEvent)="removeFromBasketHandler($event)"
+      ></row>
     </div>
   </div>
 
