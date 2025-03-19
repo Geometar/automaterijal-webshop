@@ -15,6 +15,7 @@ import {
   RouterLinkActive,
 } from '@angular/router';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { Subject, takeUntil } from 'rxjs';
 
@@ -42,6 +43,7 @@ import { LoginService } from '../shared/service/login.service';
     RouterLinkActive,
     MatMenuModule,
     MatIconModule,
+    MatDividerModule
   ],
   templateUrl: './navigation.component.html',
   styleUrl: './navigation.component.scss',
@@ -81,7 +83,11 @@ export class NavigationComponent implements OnInit, OnDestroy {
   /** Angular lifecycle hooks start */
 
   ngOnInit(): void {
-    this.accountService.identity().subscribe((account: Account | null) => {
+    // Always trigger identity resolution on init
+    this.accountService.identity().subscribe(); // this kicks off the loading if needed
+
+    // Subscribe to the state
+    this.accountService.authenticationState.subscribe((account: Account | null) => {
       this.account = account;
       this.loggedIn = !!account;
     });
@@ -122,6 +128,5 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
   logout() {
     this.loginService.logout();
-    this.router.navigate(['/login']);
   }
 }

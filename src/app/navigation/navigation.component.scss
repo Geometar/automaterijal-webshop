@@ -1,7 +1,4 @@
 /* ========== LOGO ========== */
-.logo {
-  position: absolute;
-}
 
 /* ========== LOGIN STIL ========== */
 .login:hover {
@@ -20,6 +17,29 @@
   mat-icon svg path {
     stroke: var(--figma-highlight-orange) !important;
   }
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.navbar-list {
+  display: flex;
+  gap: 45px;
+  list-style: none;
+  justify-content: center;
+  flex: 1; // najbitnije
+  margin: 0;
+  padding: 0;
+}
+
+.nav-action-list {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 /* ========== MATERIAL DROPDOWN MENI (Profil) ========== */.mat-mdc-menu-content {
@@ -58,4 +78,30 @@
 .menu-item-align {
   display: flex;
   align-items: center;
+}
+
+.custom-profile-menu .menu-header {
+  padding: 12px 16px 10px;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background-color: #f9fafb;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+.custom-profile-menu .menu-header strong {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 14px;
+}
+
+.custom-profile-menu .menu-header .email {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.custom-profile-menu mat-divider {
+  margin: 4px 0;
 }

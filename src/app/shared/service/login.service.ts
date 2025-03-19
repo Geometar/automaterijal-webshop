@@ -1,9 +1,10 @@
-import { Injectable, NgZone } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { AuthServerProvider } from '../auth/service/auth-jwt.service';
 import { Account, Credentials } from '../data-models/model';
 import { catchError, mergeMap, Observable, throwError } from 'rxjs';
 import { AccountService } from '../auth/service/account.service';
 import { Router } from '@angular/router';
+import { CartStateService } from './utils/cart-state.service';
 
 @Injectable({
   providedIn: 'root',
@@ -13,7 +14,7 @@ export class LoginService {
   constructor(
     private accountService: AccountService,
     private authServerProvider: AuthServerProvider,
-    private ngZone: NgZone,
+    private cartStateService: CartStateService,
     private router: Router
   ) { }
 
@@ -30,11 +31,13 @@ export class LoginService {
 
   logout(): void {
     sessionStorage.clear();
+    this.accountService.authenticate(null);
+    this.cartStateService.resetCart();
+    this.router.navigate(['/']);
     this.authServerProvider.logout().subscribe({
       next: () => { },
       complete: () => {
-        this.accountService.authenticate(null);
-        this.ngZone.run(() => this.router.navigate(['/home']));
+
       },
     });
   }

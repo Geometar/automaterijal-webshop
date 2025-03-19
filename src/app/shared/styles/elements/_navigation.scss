@@ -565,7 +565,7 @@ body {
   color: var(--bittersweet);
 }
 
-.navbar .logo {
+.navbar {
   background: var(--maximum-blue-green_10);
   padding-block: 50px 40px;
 }
@@ -613,10 +613,10 @@ body {
   transition: var(--transition-1);
 }
 
-.nav-action-btn:is(:hover, :focus) {
+.nav-action-btn:is(:hover) {
   color: var(--bittersweet);
 }
-.nav-action-btn svg path:is(:hover, :focus) {
+.nav-action-btn svg path:is(:hover) {
   color: var(--bittersweet);
 }
 
@@ -1197,7 +1197,7 @@ body {
   }
   .nav-open-btn,
   .nav-close-btn,
-  .navbar .logo,
+  .navbar,
   .nav-action-text,
   .overlay {
     display: none;
@@ -1219,7 +1219,7 @@ body {
   }
 
   .nav-action-list {
-    gap: 20px;
+    gap: 25px;
   }
 
   .navbar {
@@ -1230,7 +1230,7 @@ body {
 
   .navbar-list {
     margin-inline: auto;
-    gap: 35px;
+    gap: 45px;
   }
 
   .navbar-link {

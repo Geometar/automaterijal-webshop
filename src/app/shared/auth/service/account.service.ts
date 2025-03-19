@@ -14,8 +14,8 @@ const PARTNER_URL = environment.apiUrl + '/api/partner';
   providedIn: 'root',
 })
 export class AccountService {
+  authenticationState = new Subject<Account | null>();
   private accountCache$?: Observable<Account> | null;
-  private authenticationState = new Subject<Account | null>();
   private userIdentity: Account | null = null;
 
   constructor(
