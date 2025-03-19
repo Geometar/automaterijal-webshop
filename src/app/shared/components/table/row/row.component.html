@@ -1,6 +1,6 @@
 <div class="row-container">
   <!-- Image Section -->
-  <div class="image-container">
+  <div class="image-container" [class.image-smaller]="showPriceOnly">
     <img [src]="data!.slika!.slikeUrl" alt="Product Image" />
   </div>
 
@@ -34,7 +34,7 @@
         data!.stanje
       }}</span>
     </p>
-    <table class="specifications">
+    <table *ngIf="!showPriceOnly" class="specifications">
       <tbody>
         <!-- Mandatory tdLinkageCriteria (show all) -->
         <tr *ngFor="let spec of displayedLinkageCriteria">

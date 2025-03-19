@@ -1,7 +1,18 @@
 import { Injectable } from '@angular/core';
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 
+export enum SnackbarPosition {
+  TOP = 'top',
+  BOTTOM = 'bottom'
+}
 
+export enum SnackbarHorizontalPosition {
+  START = 'start',
+  CENTER = 'center',
+  END = 'end',
+  LEFT = 'left',
+  RIGHT = 'right'
+}
 @Injectable({
   providedIn: 'root'
 })
@@ -15,13 +26,21 @@ export class SnackbarService {
    * @param action The action button text (optional)
    * @param duration The duration before it auto-closes (in milliseconds)
    */
-  showAutoClose(message: string, action: string = 'OK', duration: number = 3000): void {
+
+  showAutoClose(
+    message: string,
+    verticalPosition: SnackbarPosition = SnackbarPosition.BOTTOM,
+    action: string = 'OK',
+    duration: number = 3000,
+    horizontalPosition: SnackbarHorizontalPosition = SnackbarHorizontalPosition.CENTER
+  ): void {
     const config: MatSnackBarConfig = {
-      duration: duration,
-      horizontalPosition: 'center',
-      verticalPosition: 'bottom',
+      duration,
+      horizontalPosition,
+      verticalPosition,
       panelClass: ['snackbar-auto']
     };
+
     this.snackBar.open(message, action, config);
   }
 

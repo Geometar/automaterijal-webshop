@@ -1,4 +1,4 @@
-<section class="header-margin--top cart">
+<section *ngIf="roba.length" class="header-margin--top cart">
   <div class="cart_items">
     <div class="product-row" *ngFor="let row of roba">
       <row [data]="row" [showPriceOnly]="true"></row>
@@ -6,34 +6,133 @@
   </div>
 
   <div class="display--flex justify-content--space-between">
-    <div class="information">
+    <form *ngIf="loggedIn" class="information" [formGroup]="cartForm">
       <div class="display--flex gap-7">
         <autom-select
+          class="flex--1"
           [label]="'Nacin placanja'"
           [placeholder]="'Izaberite nacin placanja'"
-          [selectionList]="payingChoices"
           [required]="true"
+          [selectionList]="payingChoices"
+          (emitSelected)="setCartSelectionValue('payment', $event.key!)"
           ngDefaultControl
         ></autom-select>
         <autom-select
+          class="flex--1"
           [label]="'Nacin transporta'"
           [placeholder]="'Izaberite nacin transporta'"
-          [selectionList]="transportChoices"
           [required]="true"
+          [selectionList]="transportChoices"
+          (emitSelected)="setCartSelectionValue('transport', $event.key!)"
           ngDefaultControl
         ></autom-select>
       </div>
       <autom-input-fields
+        [clearBtn]="true"
+        [formControlName]="'address'"
         [label]="'Adresa isporuke'"
         [value]="account?.adresa"
+        (emitSelected)="setCartSelectionValue('address', $event)"
         ngDefaultControl
       ></autom-input-fields>
       <autom-text-area
         [label]="'Komentar'"
         [placeholder]="'Unesite vas komentar ovde'"
+        (emitSelected)="setCartSelectionValue('comment', $event)"
         ngDefaultControl
       ></autom-text-area>
-    </div>
+    </form>
+    <form *ngIf="!loggedIn" class="information" [formGroup]="userForm">
+      <div class="display--flex gap-7">
+        <autom-input-fields
+          class="flex--1"
+          [clearBtn]="true"
+          [formControlName]="'name'"
+          [label]="'Ime'"
+          [required]="true"
+          (emitSelected)="setUserSelectionValue('name', $event)"
+          ngDefaultControl
+        ></autom-input-fields>
+        <autom-input-fields
+          class="flex--1"
+          [clearBtn]="true"
+          [formControlName]="'surname'"
+          [label]="'Prezime'"
+          [required]="true"
+          (emitSelected)="setUserSelectionValue('surname', $event)"
+          ngDefaultControl
+        ></autom-input-fields>
+      </div>
+      <div class="display--flex gap-7">
+        <autom-input-fields
+          class="flex--1"
+          [clearBtn]="true"
+          [formControlName]="'postalcode'"
+          [label]="'Postal code'"
+          [required]="true"
+          (emitSelected)="setUserSelectionValue('postalcode', $event)"
+          ngDefaultControl
+        ></autom-input-fields>
+        <autom-input-fields
+          class="flex--1"
+          [clearBtn]="true"
+          [formControlName]="'city'"
+          [label]="'Grad'"
+          [required]="true"
+          (emitSelected)="setUserSelectionValue('city', $event)"
+          ngDefaultControl
+        ></autom-input-fields>
+      </div>
+      <div class="display--flex gap-7">
+        <autom-input-fields
+          class="flex--1"
+          [clearBtn]="true"
+          [formControlName]="'street'"
+          [label]="'Ulica i broj'"
+          [required]="true"
+          (emitSelected)="setUserSelectionValue('street', $event)"
+          ngDefaultControl
+        ></autom-input-fields>
+        <autom-input-fields
+          class="flex--1"
+          [clearBtn]="true"
+          [formControlName]="'phone'"
+          [label]="'Telefon'"
+          [required]="true"
+          (emitSelected)="setUserSelectionValue('phone', $event)"
+          ngDefaultControl
+        ></autom-input-fields>
+      </div>
+      <autom-input-fields
+        [clearBtn]="true"
+        [formControlName]="'email'"
+        [id]="'email'"
+        [label]="'Email'"
+        [required]="true"
+        [type]="inputTypeEnum.EMAIL"
+        [validators]="[
+          {
+            name: 'pattern',
+            value: emailAddressPattern
+          }
+        ]"
+        (emitSelected)="setUserSelectionValue('email', $event)"
+        ngDefaultControl
+      ></autom-input-fields>
+      <autom-input-fields
+        [clearBtn]="true"
+        [formControlName]="'pib'"
+        [label]="'PIB'"
+        (emitSelected)="setUserSelectionValue('pib', $event)"
+        ngDefaultControl
+      ></autom-input-fields>
+      <autom-text-area
+        [label]="'Komentar'"
+        [placeholder]="'Unesite vas komentar ovde'"
+        (emitSelected)="setUserSelectionValue('comment', $event)"
+        ngDefaultControl
+      ></autom-text-area>
+    </form>
     <div *ngIf="total" class="total">
       <table>
         <tr>
@@ -54,7 +153,26 @@
         [type]="buttonTypes.PRIMARY"
         [theme]="buttonThemes.LIGHT_ORANGE"
         [label]="'Potvrdi porudzbinu'"
+        [disabled]="
+          invoiceSubmitted || (loggedIn ? !cartForm.valid : !userForm.valid)
+        "
+        (clickEvent)="submitInvoice()"
       ></autom-button>
     </div>
+  </div>
+</section>
+<section *ngIf="!roba.length" class="util__flex--center">
+  <div class="util__flex--center util__height no-result">
+    <h5>
+      <autom-icon [source]="iconsEnum.SHOPPING_CART"></autom-icon> Vasa korpa je
+      prazna
+    </h5>
+    <autom-button
+      [routerLink]="['/webshop']"
+      [type]="buttonTypes.PRIMARY"
+      [theme]="buttonThemes.LIGHT_ORANGE"
+      [label]="'Posetite nas katalog'"
+    >
+    </autom-button>
   </div>
 </section>

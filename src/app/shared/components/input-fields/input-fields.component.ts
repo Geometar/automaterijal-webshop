@@ -1,7 +1,6 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, UntypedFormControl, UntypedFormGroup, ValidatorFn, Validators } from '@angular/forms';
 
 // Angular Material Modules
 import {
@@ -268,6 +267,14 @@ export class InputFieldsComponent implements AfterViewInit, OnChanges, OnInit {
           end: new UntypedFormControl()
         });
         break;
+      case this.inputTypes.EMAIL:
+        this.form = new UntypedFormGroup({
+          formCtrl: new UntypedFormControl({
+            value: this.value,
+            disabled: this.disableInput
+          }, Validators.email)
+        });
+        break;
       default:
         this.form = new UntypedFormGroup({
           formCtrl: new UntypedFormControl({
@@ -304,36 +311,46 @@ export class InputFieldsComponent implements AfterViewInit, OnChanges, OnInit {
   setCtrlValidators(): void {
     if (!this.form || [this.inputTypes.DATE_RANGE].includes(this.type)) return;
 
-    this.validators.forEach((validator: any) => {
-      if (validator.name === 'required') {
-        this.form!.controls['formCtrl'].addValidators(Validators.required);
-      }
+    if (!this.validators.length) {
+      return;
+    }
 
-      if (validator.name === 'max') {
-        this.form!.controls['formCtrl'].addValidators(Validators.max(validator.value));
-        this.validatorMaxValue = validator.value;
-      }
+    const validatorFns: ValidatorFn[] = this.validators
+      .map((validator: any): ValidatorFn | null => {
+        if (validator.required) {
+          return Validators.required;
+        }
 
-      if (validator.name === 'min') {
-        this.form!.controls['formCtrl'].addValidators(Validators.min(validator.value));
-        this.validatorMinValue = validator.value;
-      }
+        switch (validator.name) {
+          case 'required':
+            return Validators.required;
 
-      if (validator.name === 'maxLength') {
-        this.form!.controls['formCtrl'].addValidators(Validators.maxLength(validator.value));
-        this.validatorMaxLength = validator.value;
-      }
+          case 'max':
+            this.validatorMaxValue = validator.value;
+            return Validators.max(validator.value);
 
-      if (validator.name === 'minLength') {
-        this.form!.controls['formCtrl'].addValidators(Validators.minLength(validator.value));
-        this.validatorMinLength = validator.value;
-      }
+          case 'min':
+            this.validatorMinValue = validator.value;
+            return Validators.min(validator.value);
 
-      if (validator.name === 'pattern') {
-        this.form!.controls['formCtrl'].addValidators(Validators.pattern(validator.value));
-      }
-    });
+          case 'maxLength':
+            this.validatorMaxLength = validator.value;
+            return Validators.maxLength(validator.value);
 
+          case 'minLength':
+            this.validatorMinLength = validator.value;
+            return Validators.minLength(validator.value);
+
+          case 'pattern':
+            return Validators.pattern(validator.value);
+
+          default:
+            return null;
+        }
+      })
+      .filter((v): v is ValidatorFn => v !== null); // Strictly filter out nulls
+
+    this.form!.controls['formCtrl'].setValidators(validatorFns);
     this.form!.controls['formCtrl'].updateValueAndValidity();
   }
 

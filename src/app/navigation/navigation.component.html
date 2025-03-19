@@ -99,15 +99,20 @@
         </li>
 
         <li>
-          <a routerLink="/cart" class="nav-action-btn">
+          <a
+            routerLink="/cart"
+            class="nav-action-btn nav-btn"
+            [ngClass]="currentUrl.includes('/cart') ? 'icon-active' : null"
+          >
             <autom-icon
               routerLink="/cart"
-              [ngClass]="currentUrl.includes('/cart') ? 'icon-active' : null"
               [badge]="cartSize"
               [color]="colorEnum.RICH_BLACK"
               [enableBadge]="true"
+              [ngClass]="currentUrl.includes('/cart') ? 'icon-active' : null"
               [source]="iconEnum.SHOPPING_CART"
             ></autom-icon>
+            Vasa korpa
 
             <span class="nav-action-text">Korpa</span>
           </a>

@@ -94,6 +94,12 @@ html {
 	}
 }
 
+.flex {
+	&--1 {
+		flex: 1;
+	}
+}
+
 .justify-content {
 	&--space-around {
 		justify-content: space-around;

@@ -620,6 +620,12 @@ body {
 .nav-action-btn svg path:is(:hover, :focus) {
   color: var(--bittersweet);
 }
+
+.nav-btn:hover {
+  mat-icon svg path {
+    stroke: var(--figma-highlight-orange) !important;
+  } 
+}
 .nav-action-text strong {
   font-weight: initial;
   color: var(--bittersweet);
@@ -1570,5 +1576,20 @@ body {
 
   .footer-top .container {
     padding-inline-start: 20%;
+  }
+}
+
+.no-result {
+  flex-direction: column;
+  gap: 10px;
+  width: 1050px;
+  h5 {
+    width: 500px;
+    text-align: center;
+  }
+
+  button {
+    width: 250px;
+    height: 40px;
   }
 }
