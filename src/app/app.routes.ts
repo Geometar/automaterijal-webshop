@@ -41,4 +41,9 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./modules/cart/cart.component').then((m) => m.CartComponent)
   },
+  {
+    path: 'invoices',
+    loadComponent: () =>
+      import('./modules/personal/invoices/invoices.component').then((m) => m.InvoicesComponent)
+  },
 ];
