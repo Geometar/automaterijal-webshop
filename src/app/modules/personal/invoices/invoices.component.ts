@@ -5,9 +5,9 @@ import {
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
-import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatPaginator } from '@angular/material/paginator';
+import { CommonModule, CurrencyPipe } from '@angular/common';
 import { finalize, Subject, takeUntil } from 'rxjs';
 
 // Data models
@@ -15,18 +15,18 @@ import { Invoice, PaginatedResponse } from '../../../shared/data-models/model';
 import { HeaderData } from '../../../shared/data-models/interface/header.interface';
 
 // Enums
+import { AutomTableColumn, CellType } from '../../../shared/data-models/enums/table.enum';
 import { HeadingLevelEnum } from '../../../shared/data-models/enums/heading.enum';
 
 // Import components
 import { AutomHeaderComponent } from '../../../shared/components/autom-header/autom-header.component';
-import { SpinnerComponent } from '../../../shared/components/spinner/spinner.component';
 
-// Pipe
-import { RsdCurrencyPipe } from '../../../shared/pipe/rsd-currency.pipe';
+import { TableFlatComponent } from '../../../shared/components/table-flat/table-flat.component';
 
 // Services
 import { InvoiceService } from '../../../shared/service/invoice.service';
 import { AccountStateService } from '../../../shared/service/utils/account-state.service';
+
 
 export const InvoicesHeader: HeaderData = {
   titleInfo: {
@@ -40,11 +40,7 @@ export const InvoicesHeader: HeaderData = {
   imports: [
     AutomHeaderComponent,
     CommonModule,
-    DatePipe,
-    MatPaginatorModule,
-    MatTableModule,
-    RsdCurrencyPipe,
-    SpinnerComponent,
+    TableFlatComponent
   ],
   providers: [CurrencyPipe],
   templateUrl: './invoices.component.html',
@@ -55,15 +51,28 @@ export class InvoicesComponent implements OnInit, OnDestroy {
   headerData = InvoicesHeader;
 
   // Table config
-  displayedColumns: string[] = [
-    'id',
-    'partner',
-    'brojStavki',
-    'iznosNarucen',
-    'iznosPotvrdjen',
-    'vremePorucivanja',
-    'status',
+
+  columns: AutomTableColumn[] = [
+    {
+      key: 'id',
+      header: 'Broj fakture',
+      type: CellType.LINK,
+      callback: (row) => this.onInvoiceClick(row.id)
+    },
+    { key: 'partner', header: 'Partner', type: CellType.TEXT },
+    { key: 'brojStavki', header: 'Broj stavki', type: CellType.NUMBER },
+    { key: 'iznosNarucen', header: 'Iznos naručen', type: CellType.CURRENCY },
+    { key: 'iznosPotvrdjen', header: 'Iznos potvrđen', type: CellType.CURRENCY },
+    {
+      key: 'vremePorucivanja',
+      header: 'Datum',
+      type: CellType.DATE,
+      dateFormat: 'dd-MMM-yyyy HH:mm'
+    },
+    { key: 'status.naziv', header: 'Status', type: CellType.TEXT }
   ];
+
+  displayedColumns: string[] = this.columns.map(col => col.key);
   dataSource = new MatTableDataSource<Invoice>();
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
