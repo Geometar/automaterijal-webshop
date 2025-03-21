@@ -68,7 +68,7 @@ export class InvoicesComponent implements OnInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   // Misc
-  loading = true;
+  loading = false;
 
   // Paging and Sorting elements
   dateFrom: Date | null = null;

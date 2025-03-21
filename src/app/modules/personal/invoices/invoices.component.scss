@@ -20,16 +20,21 @@
 
 // Override MDC table default width and font
 .mdc-data-table__table {
-  width: 100%;
-  font-size: 14px;
   border-collapse: collapse;    
   border-left: var(--space-default) solid var(--figma-grey-200);
   border-right: var(--space-default) solid var(--figma-grey-200);
+  font-size: 14px;
+  width: 100%;
 }
 
 // Header cell styling
+.mat-mdc-header-row {
+  border-left: var(--space-default) solid var(--figma-grey-200);
+  border-right: var(--space-default) solid var(--figma-grey-200);
+}
 th.mat-mdc-header-cell {
-  background-color: var(--figma-base-white);
+  background-color: var(--figma-base-white) !important;
+  border-bottom: var(--space-default) solid var(--figma-grey-200);
   color: #333;
   font-weight: 600;
   padding: 12px 16px;
@@ -42,10 +47,13 @@ td.mat-mdc-cell {
   color: #333;
   padding: 12px 16px;
   white-space: nowrap;
+  border-bottom: var(--space-default) solid var(--figma-grey-200)
 }
 
 .mat-mdc-row {
   border-color: var(--figma-grey-100);
+  border-right: var(--space-default) solid var(--figma-grey-200);
+  border-left: var(--space-default) solid var(--figma-grey-200);
 }
 
 // Alternating row colors for better readability
