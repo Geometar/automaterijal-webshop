@@ -1,0 +1,119 @@
+<div
+  class="cesx-header"
+  [class.cesx-header__page]="isPage"
+  [class.cesx-header__sticky]="stickyHeader"
+>
+  <div class="cesx-header__main" [class.cesx-header__main-page]="isPage">
+    <div
+      [attr.data-e2e-selector]="headerData.titleInfo.title"
+      class="cesx-header__title-container"
+    >
+      <div class="cesx-header__title">
+        <ng-container *ngIf="headerData.titleInfo.title">
+          <h1 *ngIf="headingLevel === headingLevelEnum.H1">
+            <ng-container *ngTemplateOutlet="headerTitle"></ng-container>
+          </h1>
+          <h2 *ngIf="headingLevel === headingLevelEnum.H2">
+            <ng-container *ngTemplateOutlet="headerTitle"></ng-container>
+          </h2>
+          <h3 *ngIf="headingLevel === headingLevelEnum.H3">
+            <ng-container *ngTemplateOutlet="headerTitle"></ng-container>
+          </h3>
+          <h4 *ngIf="headingLevel === headingLevelEnum.H4">
+            <ng-container *ngTemplateOutlet="headerTitle"></ng-container>
+          </h4>
+          <h5 *ngIf="headingLevel === headingLevelEnum.H5">
+            <ng-container *ngTemplateOutlet="headerTitle"></ng-container>
+          </h5>
+          <h6 *ngIf="headingLevel === headingLevelEnum.H6">
+            <ng-container *ngTemplateOutlet="headerTitle"></ng-container>
+          </h6>
+          <ng-template #headerTitle>
+            {{ headerData.titleInfo.title }}
+          </ng-template>
+          <h5
+            *ngIf="headerData.subtitle"
+            [attr.data-e2e-selector]="headerData.subtitle"
+          >
+            {{ headerData.subtitle }}
+          </h5>
+        </ng-container>
+      </div>
+      <div class="cesx-header__title-icon">
+        <autom-icon
+          *ngIf="
+            headerData.titleInfo.tooltip?.content &&
+            headerData.titleInfo.titleIcon
+          "
+          class="title-icon"
+          [source]="headerData.titleInfo.titleIcon!"
+          [tooltip]="{ tooltipText: headerData.titleInfo.tooltip?.content }"
+        ></autom-icon>
+      </div>
+    </div>
+    <div class="cesx-header__action">
+      <ng-container *ngIf="headerData.actions?.notifications">
+        <div #notificationButton class="cesx-header__action__icon-container">
+          <autom-button
+            *ngIf="headerData.actions!.notifications!.icon"
+            class="cesx-header__action__icon"
+            [iconOnlyMode]="true"
+            [iconSource]="headerData.actions!.notifications!.icon"
+            [theme]="iconButtonThemes.DARK_GREY"
+            [type]="buttonTypes.TERNARY"
+            (click)="isDropdownOpen = !isDropdownOpen"
+          ></autom-button>
+
+          <!-- Notification Badge -->
+          <span
+            *ngIf="headerData.actions!.notifications!.count"
+            class="cesx-header__action__notification-badge"
+          >
+            {{
+              headerData.actions!.notifications!.count > 9
+                ? "9+"
+                : headerData.actions!.notifications!.count
+            }}
+          </span>
+
+          <!-- Dropdown Menu -->
+          <article
+            #dropdownMenu
+            *ngIf="isDropdownOpen"
+            class="cesx-header__action__notification-menu"
+          >
+            <header class="cesx-header__action__notification-title">
+              {{ "NOTIFICATION_CENTER" }}
+            </header>
+            <hr class="cesx-header__action__notification-divider" />
+            <div
+              *ngFor="
+                let notification of headerData.actions!.notifications!.items
+              "
+              class="cesx-header__action__notification-item"
+            >
+              {{ headerData.actions!.notifications!.count }}
+              {{ notification }}
+            </div>
+          </article>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="headerData.actions?.buttons?.length">
+        <autom-button
+          *ngFor="let button of headerData.actions!.buttons"
+          [iconPrefix]="!!button.iconSource"
+          [iconSource]="button.iconSource"
+          [label]="button.label"
+          [theme]="button.theme!"
+          [type]="button.type!"
+          (clickEvent)="
+            headerAction.emit({
+              action: button.action
+            })
+          "
+        ></autom-button>
+      </ng-container>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,138 @@
+.cesx-header {
+	background-color: var(--figma-base-white);
+	display: flex;
+	margin: var(--space-s) 0;
+
+	&__action {
+		align-items: center;
+		column-gap: var(--space-xs);
+		display: flex;
+		gap: var(--space-s);
+		justify-content: flex-end;
+		position: relative;
+
+		&__icon-container {
+			display: inline-block;
+			position: relative;
+		}
+
+		&__icon svg path {
+			stroke: var(--figma-grey-700) !important;
+		}
+
+		&__notification {
+			&-badge {
+				align-items: center;
+				background-color: var(--figma-primary-600);
+				border-radius: var(--space-l);
+				color: var(--figma-base-white);
+				display: flex;
+				font-size: var(--text-xs);
+				height: var(--space-s);
+				min-width: var(--space-s);
+				padding: 0 var(--space-xs);
+				pointer-events: none;
+				position: absolute;
+				right: 0;
+				text-align: center;
+				top: 0;
+				transform: translate(50%, -50%);
+			}
+
+			&-divider {
+				border: none;
+				border-top: var(--space-default) solid var(--figma-grey-200);
+				margin: var(--space-xs) 0;
+			}
+
+			&-item {
+				align-items: center;
+				display: flex;
+				font-size: var(--text-xs);
+				gap: var(--space-xs);
+				justify-content: space-between;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+
+				&:hover {
+					background-color: rgba(0, 0, 0, 0.05);
+				}
+			}
+
+			&-menu {
+				background: var(--figma-base-white);
+				border: var(--space-default) solid rgba(0, 0, 0, 0.1);
+				border-radius: var(--space-xs) 0 0 0;
+				box-shadow: 0 var(--space-xxs) var(--space-xs) rgba(0, 0, 0, 0.1);
+				height: auto;
+				margin-top: var(--space-xs);
+				opacity: 1;
+				padding: var(--space-xs);
+				position: absolute;
+				right: 0;
+				width: calc(var(--space-xl) * 3.5);
+				z-index: 1000;
+			}
+
+			&-title {
+				font-size: var(--text-sm);
+				font-weight: var(--font-weight-semibold);
+				margin-bottom: var(--space-xs);
+			}
+		}
+	}
+
+	&__page {
+		border-bottom: var(--space-default) solid var(--figma-grey-200);
+		outline: var(--space-xxs) solid var(--figma-base-white);
+		margin: 0 24px;
+	}
+
+	&__sticky {
+		position: -webkit-sticky;
+		position: sticky;
+		top: 0;
+		z-index: var(--z-index-3);
+	}
+
+	&__main {
+		align-items: center;
+		align-self: center;
+		column-gap: var(--space-s);
+		display: flex;
+		flex-direction: row;
+		flex-grow: 0;
+		justify-content: space-between;
+		overflow: visible;
+		padding: var(--space-xs) 0;
+		width: 100%;
+
+		&-page {
+			padding: calc(var(--space-xs) * 2.5) 0;
+		}
+	}
+
+	&__title {
+		&-container {
+			align-items: center;
+			column-gap: var(--space-xs);
+			display: flex;
+			justify-content: flex-start;
+		}
+
+		&-icon {
+			.title-icon {
+				line-height: var(--space-s);
+				margin: var(--space-default);
+				position: relative;
+				top: var(--space-default);
+
+				.mat-icon {
+					width: var(--space-s);
+					height: var(--space-s);
+				}
+			}
+		}
+	}
+}

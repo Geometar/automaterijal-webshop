@@ -1,0 +1,101 @@
+// Wrapper that holds the table and top border
+.invoices-wrapper {
+  padding: 24px;
+}
+
+// Orange top border like the image
+.top-border {
+  height: 6px;
+  background-color: #f57c00;
+  border-radius: 6px 6px 0 0;
+}
+
+// Table container with subtle elevation and rounded corners
+.invoices-table-container {
+  background-color: #ffffff;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+// Override MDC table default width and font
+.mdc-data-table__table {
+  width: 100%;
+  font-size: 14px;
+  border-collapse: collapse;    
+  border-left: var(--space-default) solid var(--figma-grey-200);
+  border-right: var(--space-default) solid var(--figma-grey-200);
+}
+
+// Header cell styling
+th.mat-mdc-header-cell {
+  background-color: var(--figma-base-white);
+  color: #333;
+  font-weight: 600;
+  padding: 12px 16px;
+  white-space: nowrap;
+  
+}
+
+// Body cell styling
+td.mat-mdc-cell {
+  color: #333;
+  padding: 12px 16px;
+  white-space: nowrap;
+}
+
+.mat-mdc-row {
+  border-color: var(--figma-grey-100);
+}
+
+// Alternating row colors for better readability
+.mat-mdc-row:nth-child(even) {
+  background-color: var(--figma-base-white);
+}
+
+// Hover effect on rows (optional)
+.mdc-data-table__row:hover {
+  background-color: var(--figma-info-50);
+  transition: background-color 0.2s;
+}
+
+// Clickable invoice number styling
+.invoice-link {
+  color: #f57c00;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+    color: #f57c00;
+  }
+}
+
+// Paginator border and spacing
+mat-paginator {
+  border-top: 1px solid #e0e0e0;
+  padding: 8px 16px;
+  background-color: #fff;
+  border-left: var(--space-default) solid var(--figma-grey-200);
+  border-right: var(--space-default) solid var(--figma-grey-200);
+  border-bottom: var(--space-default) solid var(--figma-grey-200);
+  border-bottom-right-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+
+// Responsive tweaks (optional)
+@media (max-width: 768px) {
+  .mdc-data-table__table {
+    font-size: 13px;
+  }
+
+  td.mat-mdc-cell,
+  th.mat-mdc-header-cell {
+    padding: 10px;
+  }
+
+  .invoices-wrapper {
+    padding: 12px;
+  }
+}

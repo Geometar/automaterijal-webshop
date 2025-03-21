@@ -1,3 +1,88 @@
 <section class="header-margin--top">
-  <p>invoices works!</p>
+  <autom-header
+    [headerData]="headerData"
+    [headingLevel]="headingLevelEnum.H2"
+  ></autom-header>
+  <div *ngIf="!loading" class="invoices-wrapper">
+    <div class="top-border"></div>
+
+    <div class="invoices-table-container mat-elevation-z1">
+      <table mat-table [dataSource]="dataSource" class="mat-table">
+        <!-- Broj fakture -->
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef>Broj fakture</th>
+          <td mat-cell *matCellDef="let invoice">
+            <a (click)="onInvoiceClick(invoice.id!)" class="invoice-link">
+              {{ invoice.id }}
+            </a>
+          </td>
+        </ng-container>
+
+        <!-- Partner -->
+        <ng-container matColumnDef="partner">
+          <th mat-header-cell *matHeaderCellDef>Partner</th>
+          <td mat-cell *matCellDef="let invoice">{{ invoice.partner }}</td>
+        </ng-container>
+
+        <!-- Broj stavki -->
+        <ng-container matColumnDef="brojStavki">
+          <th mat-header-cell *matHeaderCellDef>Broj stavki</th>
+          <td mat-cell *matCellDef="let invoice">{{ invoice.brojStavki }}</td>
+        </ng-container>
+
+        <!-- Iznos naručen -->
+        <ng-container matColumnDef="iznosNarucen">
+          <th mat-header-cell *matHeaderCellDef>Iznos naručen</th>
+          <td mat-cell *matCellDef="let invoice">
+            {{ invoice.iznosNarucen | rsdCurrency }} RSD
+          </td>
+        </ng-container>
+
+        <!-- Iznos potvrđen -->
+        <ng-container matColumnDef="iznosPotvrdjen">
+          <th mat-header-cell *matHeaderCellDef>Iznos potvrđen</th>
+          <td mat-cell *matCellDef="let invoice">
+            {{ invoice.iznosPotvrdjen | rsdCurrency }} RSD
+          </td>
+        </ng-container>
+
+        <!-- Datum -->
+        <ng-container matColumnDef="vremePorucivanja">
+          <th mat-header-cell *matHeaderCellDef>Datum</th>
+          <td mat-cell *matCellDef="let invoice">
+            {{ invoice.vremePorucivanja | date : "dd-MMM-yyyy HH:mm" }}
+          </td>
+        </ng-container>
+
+        <!-- Status -->
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let invoice">
+            {{ invoice.status?.naziv }}
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr
+          mat-row
+          *matRowDef="let row; columns: displayedColumns"
+          class="invoice-row"
+        ></tr>
+      </table>
+
+      <mat-paginator
+        [length]="totalItems"
+        [pageSize]="rowsPerPage"
+        [pageIndex]="pageIndex"
+        [pageSizeOptions]="[5, 10, 25, 50]"
+        (page)="onPageChange($event)"
+        showFirstLastButtons
+      >
+      </mat-paginator>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="spinner">
+    <spinner></spinner>
+  </div>
 </section>

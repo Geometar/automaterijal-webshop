@@ -12,7 +12,7 @@
 
     <nav class="navbar" data-navbar>
       <!-- Logo (levo) -->
-      <a href="#" class="logo">
+      <a href="#" class="logo flex--02">
         <img
           src="/images/logo/logo.svg"
           width="190"
@@ -22,7 +22,7 @@
       </a>
 
       <!-- Glavna navigacija (centar) -->
-      <ul class="navbar-list">
+      <ul class="navbar-list flex--1">
         <li class="navbar-item">
           <a
             routerLink="/home"
@@ -65,7 +65,7 @@
         </li>
       </ul>
       <!-- Profil + Korpa (desno) -->
-      <ul class="nav-action-list">
+      <ul class="nav-action-list flex--02">
         <ul class="nav-action-list">
           <li *ngIf="loggedIn" class="navbar-item profile-menu-wrapper">
             <button
