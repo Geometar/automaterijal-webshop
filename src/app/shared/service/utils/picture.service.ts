@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Roba } from '../../data-models/model/roba';
+import { InvoiceItem } from '../../data-models/model';
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +21,12 @@ export class PictureService {
     }
     if (r.proizvodjacLogo && !r.proizvodjacLogo.toString().includes('data:image/jpeg;base64')) {
       r.proizvodjacLogo = 'data:image/jpeg;base64,' + r.proizvodjacLogo;
+    }
+  }
+
+  convertByteToImageInvoice(r: InvoiceItem): void {
+    if (!r.slika?.isUrl && r.slika?.slikeByte) {
+      r.slika.slikeUrl = 'data:image/jpeg;base64,' + r.slika.slikeByte;
     }
   }
 

@@ -1,0 +1,63 @@
+<section class="header-margin--top invoice-details">
+  <div *ngIf="!loading">
+    <h2>Detalji porudzbenice</h2>
+    <div class="invoice-info autom-margin--top__m">
+      <div class="info-item border-info">
+        <autom-icon
+          [color]="colorEnum.YELLOW_700"
+          [source]="iconEnum.ANCHOR"
+        ></autom-icon>
+        <table class="invoice-table">
+          <tr>
+            <td>Status:</td>
+            <td>{{ data?.status?.naziv }}</td>
+          </tr>
+          <tr>
+            <td>Datum:</td>
+            <td>{{ data?.vremePorucivanja | date : "dd MMM yyyy" }}</td>
+          </tr>
+          <tr>
+            <td>Partner:</td>
+            <td>{{ data?.partner }}</td>
+          </tr>
+        </table>
+      </div>
+      <div class="info-item border-info">
+        <autom-icon
+          [color]="colorEnum.YELLOW_700"
+          [source]="iconEnum.TRUCK"
+        ></autom-icon>
+        <table class="invoice-table">
+          <tr>
+            <td>Prevoz:</td>
+            <td>{{ data?.nacinPrevoza?.naziv }}</td>
+          </tr>
+          <tr>
+            <td>Adresa:</td>
+            <td>{{ data?.adresa?.naziv }}</td>
+          </tr>
+        </table>
+      </div>
+      <div class="info-item">
+        <autom-icon
+          [color]="colorEnum.YELLOW_700"
+          [source]="iconEnum.CREDIT_CARD"
+        ></autom-icon>
+        <table class="invoice-table">
+          <tr>
+            <td>Plaćanje:</td>
+            <td>{{ data?.nacinPlacanja?.naziv }}</td>
+          </tr>
+          <tr>
+            <td>Napomena:</td>
+            <td [innerHTML]="data?.napomena?.replaceAll(';', '<br>')"></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="spinner">
+    <spinner></spinner>
+  </div>
+</section>

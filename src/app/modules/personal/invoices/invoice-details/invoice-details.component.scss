@@ -1,0 +1,68 @@
+.invoice-details {
+  text-align: center;
+  padding: 20px;
+
+  h2 {
+    margin-top: 35px !important;
+  }
+
+  .border-info {
+    border-right: 1px solid var(--figma-grey-100);
+  }
+
+  .invoice-info {
+    display: flex;
+    align-items: stretch; // 👈 Sve kolone iste visine
+    justify-content: center;
+    margin: 0 auto;
+    max-width: 1000px;
+    padding: 20px 0;
+  }
+
+  .info-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; // 👈 Poravnaj sadržaj na vrh
+    align-items: center;
+    flex: 1;
+    padding: 20px;
+    height: auto;
+
+    autom-icon {
+      margin-bottom: 12px; // 👈 razmak ispod ikone
+    }
+
+    a:hover {
+      color: var(--figma-primary-800);
+    }
+
+    p {
+      margin: 0;
+    }
+  }
+
+  .invoice-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+    color: var(--figma-grey-900);
+
+    td {
+      padding: 6px 10px;
+      vertical-align: top;
+    }
+
+    td:first-child {
+      font-weight: 600;
+      color: var(--figma-primary-700);
+      white-space: nowrap;
+      width: 90px;
+    }
+
+    td:last-child {
+      text-align: left;
+      color: var(--figma-grey-800);
+      word-break: break-word;
+    }
+  }
+}

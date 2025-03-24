@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, EventEmitter, Input, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { AutomLabelComponent } from '../autom-label/autom-label.component';
 
 // Angular material
@@ -22,7 +22,7 @@ import { IconModel } from '../../data-models/interface';
   templateUrl: './text-area.component.html',
   styleUrl: './text-area.component.scss'
 })
-export class TextAreaComponent {
+export class TextAreaComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() autofocus = false;
   @Input() cols = 30;
   @Input() counter = false;
@@ -48,12 +48,7 @@ export class TextAreaComponent {
 
   init = true;
 
-  textForm = new UntypedFormGroup({
-    textArea: new UntypedFormControl({
-      value: '',
-      disabled: this.disableInput
-    })
-  });
+  textForm!: UntypedFormGroup;
 
   get inputError(): boolean {
     return (
@@ -85,8 +80,22 @@ export class TextAreaComponent {
 
   constructor(private cdRef: ChangeDetectorRef) { }
 
+  ngOnInit(): void {
+    this.textForm = new UntypedFormGroup({
+      textArea: new UntypedFormControl({
+        value: this.value || '',
+        disabled: this.disableInput
+      })
+    });
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
-    this.textArea = changes['value']?.currentValue ?? this.textArea;
+    if (changes['value'] && !this.init) return;
+
+    if (changes['value']) {
+      this.textArea = changes['value'].currentValue;
+    }
+
     if (changes['disableInput']) {
       if (changes['disableInput'].currentValue) {
         this.textForm.get('textArea')?.disable();
@@ -110,6 +119,13 @@ export class TextAreaComponent {
 
   onTextAreaChange(): void {
     this.emitSelected.next(this.textArea);
+    this.init = false;
+  }
+
+  onTextAreaInput(event: Event): void {
+    const input = event.target as HTMLTextAreaElement;
+    this.textArea = input.value;
+    this.emitSelected.emit(this.textArea);
     this.init = false;
   }
 }

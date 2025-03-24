@@ -9,6 +9,7 @@
 <textarea
   #textAreaField
   class="autom-text-area"
+  formControlName="textArea"
   [attr.data-e2e-selector]="selector || label || placeholder"
   [autofocus]="autofocus"
   [class.input-error]="inputError"
@@ -20,9 +21,10 @@
   [readonly]="readonly"
   [required]="required"
   [rows]="rows"
-  (blur)="init = false; emitSelected.emit(textArea)"
+  (input)="onTextAreaInput($event)"
+  (blur)="init = false; onTextAreaChange()"
   (change)="onTextAreaChange()"
-  (keyup)="emitSelected.emit(textArea)"
+  (keyup)="onTextAreaChange()"
 ></textarea>
 <div
   *ngIf="counter"

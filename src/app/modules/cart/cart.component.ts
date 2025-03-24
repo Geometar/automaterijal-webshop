@@ -305,21 +305,31 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   private buildLoggedUserNote(): string {
-    const method = this.transportChoices.find(
-      (t) => t.key === this.cartForm.get('transport')?.value
-    )?.value;
+    const formAddress = this.cartForm.get('address')?.value?.trim();
+    const userAddress = this.account?.adresa?.trim(); // prilagodi ako je adresa složenija
+    const comment = this.cartForm.get('comment')?.value?.trim();
 
-    const noteParts = [
-      method ? `Nacin transporta: ${method}` : null,
-      this.cartForm.get('address')?.value
-        ? `Adresa: ${this.cartForm.get('address')?.value}`
-        : null,
-      this.cartForm.get('comment')?.value
-        ? `Komentar: ${this.cartForm.get('comment')?.value}`
-        : null,
-    ];
+    const addressChanged =
+      formAddress && userAddress && formAddress !== userAddress;
 
-    return noteParts.filter(Boolean).join('; ') + ';';
+    const noteParts = [];
+
+    if (addressChanged) {
+      noteParts.push(`Adresa je promenjena. Nova adresa: ${formAddress}`);
+      if (comment) {
+        noteParts.push(`Komentar: ${comment}`);
+      }
+    } else if (comment) {
+      noteParts.push(`Komentar: ${comment}`);
+    }
+
+    if (noteParts.length === 0) {
+      return '';
+    }
+
+    return noteParts.length === 1 ? noteParts[0] : noteParts.join('; ') + ';';
   }
+
+
   /** Basket send: end */
 }

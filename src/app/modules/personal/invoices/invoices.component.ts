@@ -9,6 +9,7 @@ import { CommonModule, CurrencyPipe } from '@angular/common';
 import { finalize, Subject, takeUntil } from 'rxjs';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
+import { Router } from '@angular/router';
 
 // Data models
 import { HeaderData } from '../../../shared/data-models/interface/header.interface';
@@ -96,7 +97,8 @@ export class InvoicesComponent implements OnInit, OnDestroy {
   constructor(
     private accountStateService: AccountStateService,
     private invoiceService: InvoiceService,
-    private urlHelperService: UrlHelperService
+    private urlHelperService: UrlHelperService,
+    private router: Router
   ) { }
 
   /** Angular lifecycle hooks start */
@@ -169,6 +171,6 @@ export class InvoicesComponent implements OnInit, OnDestroy {
   }
 
   onInvoiceClick(invoiceId: number): void {
-    console.log('Clicked invoice', invoiceId);
+    this.router.navigateByUrl('/invoices/' + invoiceId);
   }
 }
