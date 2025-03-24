@@ -17,10 +17,11 @@ import { HeaderData } from '../../../shared/data-models/interface/header.interfa
 // Enums
 import { AutomTableColumn, CellType } from '../../../shared/data-models/enums/table.enum';
 import { HeadingLevelEnum } from '../../../shared/data-models/enums/heading.enum';
+import { InputTypeEnum } from '../../../shared/data-models/enums';
 
 // Import components
 import { AutomHeaderComponent } from '../../../shared/components/autom-header/autom-header.component';
-
+import { InputFieldsComponent } from "../../../shared/components/input-fields/input-fields.component";
 import { TableFlatComponent } from '../../../shared/components/table-flat/table-flat.component';
 
 // Services
@@ -40,7 +41,8 @@ export const InvoicesHeader: HeaderData = {
   imports: [
     AutomHeaderComponent,
     CommonModule,
-    TableFlatComponent
+    InputFieldsComponent,
+    TableFlatComponent,
   ],
   providers: [CurrencyPipe],
   templateUrl: './invoices.component.html',
@@ -88,6 +90,7 @@ export class InvoicesComponent implements OnInit, OnDestroy {
 
   // Enums
   headingLevelEnum = HeadingLevelEnum;
+  inputTypeEnum = InputTypeEnum;
 
   private destroy$ = new Subject<void>();
 

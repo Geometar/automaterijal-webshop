@@ -98,6 +98,48 @@
     />
   </ng-container>
 
+  <!-- Date Input Container -->
+  <ng-container
+    *ngIf="type === inputTypes.DATE || type === inputTypes.DATE_TIME"
+  >
+    <mat-datepicker-toggle
+      [attr.data-e2e-selector]="selector || label || placeholder"
+      matIconSuffix
+      class="autom-input__date--toggle"
+      [class.cesarx-input__date--toggle--disabled]="disableInput"
+      [for]="dp"
+    >
+      <autom-icon [source]="iconEnum.CALENDAR" matDatepickerToggleIcon>
+      </autom-icon>
+    </mat-datepicker-toggle>
+
+    <input
+      #cesarxInput
+      matInput
+      class="autom-input__date"
+      [attr.data-e2e-selector]="selector || label || placeholder"
+      [autofocus]="autofocus"
+      [class.autom-error-input--animation]="
+        inputHasErrorGetter && errorAnimationTrigger
+      "
+      [class.autom-error-input]="inputHasErrorGetter"
+      [class.autom-input__date--disabled]="readonly || disableInput"
+      [formControlName]="'formCtrl'"
+      [id]="id"
+      [matDatepicker]="dp"
+      [max]="maxDate || maxAllowedDate"
+      [min]="minDate || minAllowedDate"
+      [readonly]="readonly"
+      [required]="required"
+      [value]="value"
+      (blur)="getInputErrorState()"
+      (dateChange)="datePickerHandler($event)"
+      (keypress)="datePickerValidator($event)"
+    />
+
+    <mat-datepicker #dp></mat-datepicker>
+  </ng-container>
+
   <!-- Number Input Container -->
   <ng-container *ngIf="type === inputTypes.NUMBER">
     <input

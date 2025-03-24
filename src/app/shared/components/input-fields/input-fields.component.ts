@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule, UntypedFormControl, UntypedFormGroup,
 
 // Angular Material Modules
 import {
+  MatDatepickerInputEvent,
   MatDatepickerModule
 } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
@@ -178,6 +179,14 @@ export class InputFieldsComponent implements AfterViewInit, OnChanges, OnInit {
 
       case ctrl.hasError('minlength'):
         message = 'Minimalan broj je ' + this.validatorMaxLength;
+        break;
+
+      case ctrl.hasError('invalidDate'):
+        message = 'Datum nije ispravan';
+        break;
+
+      case ctrl.hasError('invalidDateRange'):
+        message = 'Datum nije ispravan';
         break;
 
       case ctrl.hasError('max'):
@@ -439,6 +448,62 @@ export class InputFieldsComponent implements AfterViewInit, OnChanges, OnInit {
 
     this.form?.controls[controlName].updateValueAndValidity();
     this.form?.controls[controlName].setValue('');
+  }
+
+  datePickerHandler(event: MatDatepickerInputEvent<Date>): void {
+    /**
+     *
+     * TODO: Replace this with date format validation
+     * to prevent emitter and trigger error on the input field
+     * till then leave date field readonly. The idea is to get
+     * the actual value from the cesarxInput element and check
+     * if it matches with the regex for the dates that we allow
+     *
+     *  */
+    // const input = (this.cesarxInput as ElementRef).nativeElement.value;
+    // if (!this.dateFormatValidation(input)) return;
+
+    const emittedValue = event.value;
+
+    // DATE: Do not clear date if 0 entered first time
+    if (!emittedValue && this.customAction === 'clearDate') {
+      this.customActionEvent.emit();
+      return;
+    } else if (!emittedValue) {
+      this.datePickerErrorHandler('invalidDate');
+      return;
+    }
+
+    // DATE: Do not emit invalid date or date out of range
+    const date = new Date(emittedValue);
+    const minDate = new Date(this.minDate || this.minAllowedDate);
+    const maxDate = new Date(this.maxDate || this.maxAllowedDate);
+
+    if (date < minDate || date > maxDate) {
+      this.datePickerErrorHandler('invalidDateRange');
+      return;
+    }
+    // Don't emit Invalid date values
+    if (isNaN(date.getDate()) || isNaN(date.getTime())) {
+      this.datePickerErrorHandler('invalidDate');
+      return;
+    }
+
+    this.form!.controls['formCtrl'].setValue(emittedValue);
+    this.form!.controls['formCtrl'].updateValueAndValidity();
+    this.emitSelected.emit(emittedValue);
+  }
+
+  datePickerValidator(event: KeyboardEvent): boolean {
+    const digits = event.charCode >= 48 && event.charCode <= 57;
+    const separator = event.charCode >= 45 && event.charCode <= 47;
+
+    if (digits || separator) {
+      return true;
+    }
+
+    event.preventDefault();
+    return false;
   }
 
   /**

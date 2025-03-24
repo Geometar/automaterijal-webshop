@@ -1,8 +1,15 @@
-<section class="header-margin--top">
+<section class="header-margin--top invoices">
   <autom-header
     [headerData]="headerData"
     [headingLevel]="headingLevelEnum.H2"
   ></autom-header>
+
+  <div class="invoices__filter">
+    <autom-input-fields [label]="'Datum od'" [type]="inputTypeEnum.DATE">
+    </autom-input-fields>
+    <autom-input-fields [label]="'Datum do'" [type]="inputTypeEnum.DATE">
+    </autom-input-fields>
+  </div>
 
   <autom-table-flat
     [columns]="columns"

@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, LOCALE_ID, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { authInterceptor } from './shared/auth/interceptor/auth.interceptor';
@@ -23,6 +23,6 @@ export const appConfig: ApplicationConfig = {
       }),
       withLocalStorage(), // Enable local storage
       withSessionStorage() // Enable session storage
-    )
+    ), { provide: LOCALE_ID, useValue: 'sr-Latn' }
   ],
 };

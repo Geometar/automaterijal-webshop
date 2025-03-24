@@ -148,7 +148,7 @@
 
 			&--toggle {
 				margin-left: var(--space-xxs);
-				margin-top: var(--space-xs);
+				margin-top: calc(var(--space-xs) / 3);
 				position: absolute;
 				z-index: var(--z-index-1);
 
