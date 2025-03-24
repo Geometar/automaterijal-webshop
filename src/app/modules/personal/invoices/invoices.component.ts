@@ -5,14 +5,14 @@ import {
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
-import { MatPaginator } from '@angular/material/paginator';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { finalize, Subject, takeUntil } from 'rxjs';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatTableDataSource } from '@angular/material/table';
 
 // Data models
-import { Invoice, PaginatedResponse } from '../../../shared/data-models/model';
 import { HeaderData } from '../../../shared/data-models/interface/header.interface';
+import { Invoice, PaginatedResponse } from '../../../shared/data-models/model';
 
 // Enums
 import { AutomTableColumn, CellType } from '../../../shared/data-models/enums/table.enum';
@@ -25,8 +25,9 @@ import { InputFieldsComponent } from "../../../shared/components/input-fields/in
 import { TableFlatComponent } from '../../../shared/components/table-flat/table-flat.component';
 
 // Services
-import { InvoiceService } from '../../../shared/service/invoice.service';
 import { AccountStateService } from '../../../shared/service/utils/account-state.service';
+import { InvoiceService } from '../../../shared/service/invoice.service';
+import { UrlHelperService } from '../../../shared/service/utils/url-helper.service';
 
 
 export const InvoicesHeader: HeaderData = {
@@ -53,7 +54,6 @@ export class InvoicesComponent implements OnInit, OnDestroy {
   headerData = InvoicesHeader;
 
   // Table config
-
   columns: AutomTableColumn[] = [
     {
       key: 'id',
@@ -91,17 +91,24 @@ export class InvoicesComponent implements OnInit, OnDestroy {
   // Enums
   headingLevelEnum = HeadingLevelEnum;
   inputTypeEnum = InputTypeEnum;
-
   private destroy$ = new Subject<void>();
 
   constructor(
+    private accountStateService: AccountStateService,
     private invoiceService: InvoiceService,
-    private accountStateService: AccountStateService
+    private urlHelperService: UrlHelperService
   ) { }
 
   /** Angular lifecycle hooks start */
 
   ngOnInit(): void {
+    const params = this.urlHelperService.readQueryParams();
+
+    this.dateFrom = params['dateFrom'] ? new Date(params['dateFrom']) : null;
+    this.dateTo = params['dateTo'] ? new Date(params['dateTo']) : null;
+    this.pageIndex = params['pageIndex'] ? +params['pageIndex'] : 0;
+    this.rowsPerPage = params['rowsPerPage'] ? +params['rowsPerPage'] : 10;
+
     this.getInvoices();
   }
 
@@ -113,6 +120,13 @@ export class InvoicesComponent implements OnInit, OnDestroy {
   /** Angular lifecycle hooks end */
 
   getInvoices(): void {
+    this.urlHelperService.addOrUpdateQueryParams({
+      dateFrom: this.dateFrom ? this.dateFrom?.toISOString() : '',
+      dateTo: this.dateTo ? this.dateTo?.toISOString() : '',
+      pageIndex: this.pageIndex,
+      rowsPerPage: this.rowsPerPage
+    });
+
     this.loading = true;
     this.invoiceService
       .getInvoices(
@@ -136,6 +150,16 @@ export class InvoicesComponent implements OnInit, OnDestroy {
           this.rowsPerPage = response.size;
         },
       });
+  }
+
+  onFilterDateFrom(date: Date): void {
+    this.dateFrom = date;
+    this.getInvoices();
+  }
+
+  onFilterDateTo(date: Date): void {
+    this.dateTo = date;
+    this.getInvoices();
   }
 
   onPageChange(event: any): void {

@@ -5,9 +5,21 @@
   ></autom-header>
 
   <div class="invoices__filter">
-    <autom-input-fields [label]="'Datum od'" [type]="inputTypeEnum.DATE">
+    <autom-input-fields
+      [label]="'Datum od'"
+      [maxDate]="dateTo"
+      [type]="inputTypeEnum.DATE"
+      [value]="dateFrom"
+      (emitSelected)="onFilterDateFrom($event)"
+    >
     </autom-input-fields>
-    <autom-input-fields [label]="'Datum do'" [type]="inputTypeEnum.DATE">
+    <autom-input-fields
+      [label]="'Datum do'"
+      [minDate]="dateFrom"
+      [type]="inputTypeEnum.DATE"
+      [value]="dateTo"
+      (emitSelected)="onFilterDateTo($event)"
+    >
     </autom-input-fields>
   </div>
 

@@ -61,7 +61,7 @@ export class InputFieldsComponent implements AfterViewInit, OnChanges, OnInit {
   @Input() labelIcons: Array<IconModel> = [];
   @Input() labelSize = SizeEnum.FULL;
   @Input() max = MAX_VALUE;
-  @Input() maxDate = '';
+  @Input() maxDate: Date | null = null;
   @Input() maxLength = 256;
   /**
    * minutesGap notes:
@@ -76,7 +76,7 @@ export class InputFieldsComponent implements AfterViewInit, OnChanges, OnInit {
    * it by increments of 1, in both manual and popup modes.
    */
   @Input() min = 0;
-  @Input() minDate = '';
+  @Input() minDate: Date | null = null;
   @Input() minutesGap: number | null = null;
   @Input() pattern = '';
   @Input() placeholder = '';
@@ -476,8 +476,8 @@ export class InputFieldsComponent implements AfterViewInit, OnChanges, OnInit {
 
     // DATE: Do not emit invalid date or date out of range
     const date = new Date(emittedValue);
-    const minDate = new Date(this.minDate || this.minAllowedDate);
-    const maxDate = new Date(this.maxDate || this.maxAllowedDate);
+    const minDate = this.minDate || new Date(this.minAllowedDate);
+    const maxDate = this.maxDate || new Date(this.maxDate || this.maxAllowedDate);
 
     if (date < minDate || date > maxDate) {
       this.datePickerErrorHandler('invalidDateRange');
