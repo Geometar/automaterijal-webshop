@@ -57,6 +57,19 @@
     </div>
   </div>
 
+  <autom-table-flat
+    [columns]="columns"
+    [displayedColumns]="displayedColumns"
+    [dataSource]="dataSource"
+    [loading]="loading"
+    [pagination]="{
+      length: totalItems,
+      pageIndex: pageIndex,
+      pageSize: rowsPerPage,
+      pageSizeOptions: [5, 10, 25, 50]
+    }"
+  ></autom-table-flat>
+
   <div *ngIf="loading" class="spinner">
     <spinner></spinner>
   </div>

@@ -27,6 +27,18 @@
               }}
             </ng-container>
 
+            <ng-container *ngSwitchCase="CellType.PERCENTAGE">
+              {{ row[column.key] }}%
+            </ng-container>
+
+            <ng-container *ngSwitchCase="CellType.IMG">
+              <img
+                [src]="getNestedValue(row, column.key)"
+                alt="image"
+                style="max-width: 100px; max-height: 100px"
+              />
+            </ng-container>
+
             <ng-container *ngSwitchDefault
               >{{ getNestedValue(row, column.key) }}
             </ng-container>

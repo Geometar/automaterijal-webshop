@@ -1,9 +1,11 @@
 export enum CellType {
-  TEXT = 'text',
-  LINK = 'link',
-  NUMBER = 'number',
   CURRENCY = 'currency',
   DATE = 'date',
+  IMG = 'image',
+  LINK = 'link',
+  NUMBER = 'number',
+  PERCENTAGE = 'percentage',
+  TEXT = 'text',
 }
 
 export interface AutomTableColumn {
