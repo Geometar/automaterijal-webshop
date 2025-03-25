@@ -1,1 +1,20 @@
-<p>sales-reports works!</p>
+<section class="header-margin--top invoices">
+  <autom-header
+    [headerData]="headerData"
+    [headingLevel]="headingLevelEnum.H2"
+  ></autom-header>
+
+  <autom-table-flat
+    [columns]="columns"
+    [displayedColumns]="displayedColumns"
+    [dataSource]="dataSource"
+    [loading]="loading"
+    [pagination]="{
+      length: totalItems,
+      pageIndex: pageIndex,
+      pageSize: rowsPerPage,
+      pageSizeOptions: [5, 10, 25, 50]
+    }"
+    (pageChange)="onPageChange($event)"
+  ></autom-table-flat>
+</section>

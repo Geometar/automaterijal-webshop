@@ -4,5 +4,6 @@ export * from './invoice';
 export * from './kontakt';
 export * from './page';
 export * from './proizvodjac';
+export * from './sales-report';
 export * from './tecdoc';
 export * from './webshop';
