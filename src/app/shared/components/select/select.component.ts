@@ -57,6 +57,6 @@ export class SelectComponent {
 
   onSelectionChange(event: MatSelectChange) {
     this.selectedValue = event.value;
-    this.emitSelected.emit(event);
+    this.emitSelected.emit(event.value);
   }
 }

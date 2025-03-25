@@ -63,6 +63,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
   // Misc
   account: Account | null = null;
   fixedHeaderClass = false;
+  isAdmin = false;
   loggedIn = false;
   mobileSidebarOpen = false;
 
@@ -91,8 +92,16 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
     // Subscribe to the state
     this.accountService.authenticationState.subscribe((account: Account | null) => {
-      this.account = account;
-      this.loggedIn = !!account;
+      if (account) {
+        this.account = Object.assign(new Account(), account);
+
+        this.loggedIn = true;
+        this.isAdmin = this.account.isAdmin; // now it works ✅
+      } else {
+        this.account = null;
+        this.loggedIn = false;
+        this.isAdmin = false;
+      }
     });
 
     this.syncOnCartItemSize();

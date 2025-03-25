@@ -22,7 +22,7 @@
       </a>
 
       <!-- Glavna navigacija (centar) -->
-      <ul class="navbar-list flex--1">
+      <ul class="navbar-list flex--06">
         <li class="navbar-item">
           <a
             routerLink="/home"
@@ -66,8 +66,44 @@
       </ul>
       <!-- Profil + Korpa (desno) -->
       <ul class="nav-action-list flex--02">
-        <ul class="nav-action-list">
-          <li *ngIf="loggedIn" class="navbar-item profile-menu-wrapper">
+        <ul *ngIf="loggedIn && isAdmin" class="nav-action-list">
+          <li class="navbar-item profile-menu-wrapper">
+            <button
+              mat-button
+              [matMenuTriggerFor]="adminMenu"
+              #menuTrigger="matMenuTrigger"
+              class="nav-action-btn nav-btn"
+            >
+              <autom-icon
+                [color]="colorEnum.RICH_BLACK"
+                [source]="iconEnum.STAR"
+              ></autom-icon>
+              <span>Admin</span>
+            </button>
+
+            <mat-menu
+              #adminMenu="matMenu"
+              class="custom-profile-menu"
+              overlapTrigger="false"
+            >
+              <button mat-menu-item routerLink="/invoices">
+                <div class="menu-item-align">
+                  <autom-icon [source]="iconEnum.PEN_TOOL"></autom-icon>
+                  <span>Izvestaji</span>
+                </div>
+              </button>
+
+              <button mat-menu-item (click)="logout()">
+                <div class="menu-item-align">
+                  <autom-icon [source]="iconEnum.LIFE_BUOY"></autom-icon>
+                  <span>Logovi</span>
+                </div>
+              </button>
+            </mat-menu>
+          </li>
+        </ul>
+        <ul *ngIf="loggedIn" class="nav-action-list">
+          <li class="navbar-item profile-menu-wrapper">
             <button
               mat-button
               [matMenuTriggerFor]="profileMenu"

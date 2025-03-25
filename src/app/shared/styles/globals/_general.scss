@@ -96,10 +96,13 @@ html {
 
 .flex {
 	&--1 {
-		flex: 1;
+		flex: 1 !important;
+	}
+	&--06 {
+		flex: 0.6 !important;
 	}
 	&--02 {
-		flex: 0.2;
+		flex: 0.2 !important;
 	}
 }
 
