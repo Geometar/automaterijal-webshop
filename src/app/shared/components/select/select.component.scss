@@ -1,134 +1,136 @@
-.mat-mdc-select-arrow {
-  width: 24px !important;
-  height: 24px !important;
-}
+.autom-select {
+  .mat-mdc-select-arrow {
+    width: 24px !important;
+    height: 24px !important;
+  }
 
-.mat-mdc-form-field {
-  width: 100%;
-}
+  .mat-mdc-form-field {
+    width: 100%;
+  }
 
-.mat-select--styled-with-arrow {
-  width: 100%;
+  .mat-select--styled-with-arrow {
+    width: 100%;
 
-  .mat-mdc-select-underline {
+    .mat-mdc-select-underline {
+      display: none;
+    }
+
+    .mat-select-placeholder.mat-floating-placeholder {
+      visibility: hidden !important;
+    }
+
+    .mat-select-value {
+      padding: 0;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    .mat-select-trigger {
+      color: var(--figma-grey-500);
+
+      .mat-select-value {
+        .mat-placeholder .mat-select-min-line {
+          color: var(--figma-grey-300) !important;
+        }
+      }
+
+      &__icon {
+        margin-right: var(--space-xs);
+
+        & .mat-icon {
+          position: relative;
+          top: calc(var(--space-xxxs) * 1.5);
+        }
+
+        & .mat-icon svg path {
+          stroke: var(--figma-primary-600);
+        }
+
+        & .mat-icon.no-stroke svg path {
+          stroke: none !important;
+          fill: var(--figma-primary-600);
+        }
+      }
+    }
+  }
+
+  .mat-mdc-form-field-infix {
+    min-height: inherit !important;
+    width: 230px !important;
+    padding: 0px !important;
+  }
+
+  .mdc-text-field--filled {
+    background-color: white !important;
+    padding: 0px !important;
+  }
+
+  .mat-mdc-form-field-subscript-wrapper {
     display: none;
   }
 
-  .mat-select-placeholder.mat-floating-placeholder {
-    visibility: hidden !important;
+  .mat-mdc-select-placeholder {
+    display: none;
   }
 
-  .mat-select-value {
-    padding: 0;
-    text-align: left;
-    vertical-align: middle;
+  .mat-mdc-select:focus-within {
+    border: var(--space-default) solid var(--figma-primary-600) !important;
+    border-radius: var(--space-xs) !important;
+    box-shadow: 0 0 calc(var(--space-xs) / 1.6) var(--figma-primary-600) !important;
+    outline: none !important;
   }
 
-  .mat-select-trigger {
-    color: var(--figma-grey-500);
+  .mat-mdc-select {
+    align-items: center;
+    align-self: stretch;
+    background-color: var(--figma-base-white);
+    border-radius: var(--space-xs) !important;
+    border: var(--space-default) solid var(--figma-grey-300) !important;
+    box-shadow: none !important;
+    box-sizing: border-box;
+    cursor: pointer;
+    display: flex !important;
+    flex-direction: row;
+    flex-grow: 0;
+    flex: none;
+    font-size: var(--text-md);
+    font-weight: var(--font-weight-regular);
+    height: calc(var(--space-xs) * 5.5) !important;
+    line-height: var(--font-3-line-height);
+    margin: 0;
+    padding: calc(var(--space-xxs) * 2.5) calc(var(--space-xxs) * 3.5);
+    position: relative;
+    width: 100%;
 
-    .mat-select-value {
-      .mat-placeholder .mat-select-min-line {
-        color: var(--figma-grey-300) !important;
+    .mat-mdc-select-trigger {
+      appearance: none !important;
+      background-color: var(--conti-primary-white);
+      color: var(--figma-grey-500);
+      line-height: normal !important;
+      min-width: 100%;
+      -webkit-appearance: none !important;
+
+      &__icon {
+        margin-right: var(--space-xs);
       }
     }
 
-    &__icon {
-      margin-right: var(--space-xs);
-
-      & .mat-icon {
-        position: relative;
-        top: calc(var(--space-xxxs) * 1.5);
-      }
-
-      & .mat-icon svg path {
-        stroke: var(--figma-primary-600);
-      }
-
-      & .mat-icon.no-stroke svg path {
-        stroke: none !important;
-        fill: var(--figma-primary-600);
-      }
-    }
-  }
-}
-
-.mat-mdc-form-field-infix {
-  min-height: inherit !important;
-  width: 230px !important;
-  padding: 0px !important;
-}
-
-.mdc-text-field--filled {
-  background-color: white !important;
-  padding: 0px !important;
-}
-
-.mat-mdc-form-field-subscript-wrapper {
-  display: none;
-}
-
-.mat-mdc-select-placeholder {
-  display: none;
-}
-
-.mat-mdc-select:focus-within {
-  border: var(--space-default) solid var(--figma-primary-600) !important;
-  border-radius: var(--space-xs) !important;
-  box-shadow: 0 0 calc(var(--space-xs) / 1.6) var(--figma-primary-600) !important;
-  outline: none !important;
-}
-
-.mat-mdc-select {
-  align-items: center;
-  align-self: stretch;
-  background-color: var(--figma-base-white);
-  border-radius: var(--space-xs) !important;
-  border: var(--space-default) solid var(--figma-grey-300) !important;
-  box-shadow: none !important;
-  box-sizing: border-box;
-  cursor: pointer;
-  display: flex !important;
-  flex-direction: row;
-  flex-grow: 0;
-  flex: none;
-  font-size: var(--text-md);
-  font-weight: var(--font-weight-regular);
-  height: calc(var(--space-xs) * 5.5) !important;
-  line-height: var(--font-3-line-height);
-  margin: 0;
-  padding: calc(var(--space-xxs) * 2.5) calc(var(--space-xxs) * 3.5);
-  position: relative;
-  width: 100%;
-
-  .mat-mdc-select-trigger {
-    appearance: none !important;
-    background-color: var(--conti-primary-white);
-    color: var(--figma-grey-500);
-    line-height: normal !important;
-    min-width: 100%;
-    -webkit-appearance: none !important;
-
-    &__icon {
-      margin-right: var(--space-xs);
+    .mat-mdc-select-arrow svg {
+      top: 85%;
     }
   }
 
-  .mat-mdc-select-arrow svg {
-    top: 85%;
+  .mdc-line-ripple::before,
+  .mdc-line-ripple::after {
+    display: none !important;
   }
-}
 
-.mdc-line-ripple::before,
-.mdc-line-ripple::after {
-  display: none !important;
-}
+  .mat-mdc-form-field-flex {
+    padding: 2px;
+  }
 
-.mat-mdc-form-field-flex {
-	padding: 2px;
-}
-
-.mat-mdc-text-field-wrapper:hover {
-	opacity: 1 !important;
-  border-radius: var(--space-xs) !important;
+  .mat-mdc-text-field-wrapper:hover {
+    opacity: 1 !important;
+    border-radius: var(--space-xs) !important;
+  }
 }

@@ -3,6 +3,7 @@ export * from './cart';
 export * from './invoice';
 export * from './kontakt';
 export * from './page';
+export * from './partner';
 export * from './proizvodjac';
 export * from './sales-report';
 export * from './tecdoc';

@@ -1,8 +1,35 @@
-<section class="header-margin--top invoices">
+<section class="header-margin--top sales-reports">
   <autom-header
     [headerData]="headerData"
     [headingLevel]="headingLevelEnum.H2"
   ></autom-header>
+
+  <div class="sales-reports__filter">
+    <autom-select
+      *ngIf="salesPersonsSelectModel.length"
+      [placeholder]="'Izaberite komercijalistu'"
+      [label]="'Komercijalisti'"
+      [selectionList]="salesPersonsSelectModel"
+      (emitSelected)="onFilterSalesPerson($event)"
+    >
+    </autom-select>
+    <autom-input-fields
+      [label]="'Datum od'"
+      [maxDate]="dateTo"
+      [type]="inputTypeEnum.DATE"
+      [value]="dateFrom"
+      (emitSelected)="onFilterDateFrom($event)"
+    >
+    </autom-input-fields>
+    <autom-input-fields
+      [label]="'Datum do'"
+      [minDate]="dateFrom"
+      [type]="inputTypeEnum.DATE"
+      [value]="dateTo"
+      (emitSelected)="onFilterDateTo($event)"
+    >
+    </autom-input-fields>
+  </div>
 
   <autom-table-flat
     [columns]="columns"
