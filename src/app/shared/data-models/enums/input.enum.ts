@@ -1,4 +1,5 @@
 export enum InputTypeEnum {
+	AUTOCOMPLETE = 'autocomplete',
 	CUSTOM = 'custom',
 	DATE = 'date',
 	DATE_RANGE = 'dateRange',
@@ -9,7 +10,7 @@ export enum InputTypeEnum {
 	QUANTITY = 'quantity',
 	SEARCH = 'search',
 	TEXT = 'text',
-	TIMEPICKER = 'time'
+	TIMEPICKER = 'time',
 }
 
 export enum InputFieldTypeEnum {

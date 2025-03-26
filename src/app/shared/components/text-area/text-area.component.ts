@@ -22,7 +22,7 @@ import { IconModel } from '../../data-models/interface';
   templateUrl: './text-area.component.html',
   styleUrl: './text-area.component.scss'
 })
-export class TextAreaComponent implements OnInit, AfterViewInit, OnChanges {
+export class TextAreaComponent implements AfterViewInit, OnChanges {
   @Input() autofocus = false;
   @Input() cols = 30;
   @Input() counter = false;
@@ -34,7 +34,7 @@ export class TextAreaComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() labelSize = SizeEnum.LARGE;
   @Input() maxLength = 256;
   @Input() name = 'name';
-  @Input() placeholder = 'WRITE_HERE';
+  @Input() placeholder = 'Pisi ovde';
   @Input() readonly = false;
   @Input() required = false;
   @Input() rows = 10;
@@ -78,9 +78,7 @@ export class TextAreaComponent implements OnInit, AfterViewInit, OnChanges {
     return 'autom-text-area__' + this.height;
   }
 
-  constructor(private cdRef: ChangeDetectorRef) { }
-
-  ngOnInit(): void {
+  constructor(private cdRef: ChangeDetectorRef) {
     this.textForm = new UntypedFormGroup({
       textArea: new UntypedFormControl({
         value: this.value || '',

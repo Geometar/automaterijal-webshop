@@ -1,12 +1,12 @@
 import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { finalize, Subject, takeUntil } from 'rxjs';
-import { Router } from '@angular/router';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 
 // Component imports
 import { AutomHeaderComponent } from '../../../shared/components/autom-header/autom-header.component';
+import { SalesReportsDetailsPopupComponent } from './sales-reports-details-popup/sales-reports-details-popup.component';
 import { SelectComponent } from '../../../shared/components/select/select.component';
 import { TableFlatComponent } from '../../../shared/components/table-flat/table-flat.component';
 
@@ -25,7 +25,7 @@ import {
   CellType,
 } from '../../../shared/data-models/enums/table.enum';
 import { HeadingLevelEnum } from '../../../shared/data-models/enums/heading.enum';
-import { InputTypeEnum } from '../../../shared/data-models/enums';
+import { ButtonThemes, ButtonTypes, InputTypeEnum } from '../../../shared/data-models/enums';
 
 // Services
 import { InputFieldsComponent } from '../../../shared/components/input-fields/input-fields.component';
@@ -37,6 +37,16 @@ export const SalesReportsHeader: HeaderData = {
   titleInfo: {
     title: 'Izvestaji',
   },
+  actions: {
+    buttons: [
+      {
+        action: 'createReport',
+        label: 'Kreiraj Izvestaj',
+        theme: ButtonThemes.LIGHT_ORANGE,
+        type: ButtonTypes.PRIMARY
+      }
+    ]
+  }
 };
 
 @Component({
@@ -46,8 +56,9 @@ export const SalesReportsHeader: HeaderData = {
     AutomHeaderComponent,
     CommonModule,
     InputFieldsComponent,
+    SalesReportsDetailsPopupComponent,
+    SelectComponent,
     TableFlatComponent,
-    SelectComponent
   ],
   providers: [CurrencyPipe],
   templateUrl: './sales-reports.component.html',
@@ -63,6 +74,7 @@ export class SalesReportsComponent implements OnInit, OnDestroy {
 
   // Misc
   loading = false;
+  showDetailsPopup = true;
 
   // Paging and Sorting elements
   dateFrom: Date | null = null;
@@ -108,7 +120,6 @@ export class SalesReportsComponent implements OnInit, OnDestroy {
 
   constructor(
     private partnerService: PartnerService,
-    private router: Router,
     private salesReportService: SalesReportsService,
     private urlHelperService: UrlHelperService,
   ) { }
@@ -200,7 +211,11 @@ export class SalesReportsComponent implements OnInit, OnDestroy {
     this.getSalesReports();
   }
 
+  createSalesReport(): void {
+    this.showDetailsPopup = true;
+  }
+
   onSalesReportClick(invoiceId: number): void {
-    this.router.navigateByUrl('/invoices/' + invoiceId);
+    this.showDetailsPopup = true;
   }
 }

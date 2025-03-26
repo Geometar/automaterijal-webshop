@@ -24,3 +24,17 @@ export class Comment {
   podsetnik!: Date;
   ppid!: number;
 }
+
+export class SalesReportCreate {
+  adresa?: string;
+  datumKreiranja?: number;
+  firmaId?: number;
+  ime?: string;
+  komentar?: string;
+  konkurent?: string;
+  kontakt?: string;
+  mesto?: string;
+  osnovniAsortiman?: string;
+  podsetnik?: number;
+  sektor?: string;
+}

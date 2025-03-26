@@ -248,6 +248,36 @@
     />
   </ng-container>
 
+  <!-- Autocomplete -->
+  <ng-container *ngIf="type === inputTypes.AUTOCOMPLETE">
+    <input
+      #automInput
+      class="autom-input__text"
+      matInput
+      [class.disabled-input]="readonly || disableInput"
+      [formControlName]="'formCtrl'"
+      [matAutocomplete]="auto"
+      [placeholder]="placeholder"
+      [readonly]="readonly"
+      [required]="required"
+      (blur)="onAutocompleteBlur()"
+      (focus)="onAutocompleteFocus()"
+    />
+
+    <mat-autocomplete
+      #auto="matAutocomplete"
+      (optionSelected)="onAutocompleteSelected($event)"
+    >
+      <mat-option
+        *ngFor="let option of filteredAutocompleteOptions | async"
+        [value]="option.value"
+      >
+        <img *ngIf="option.img" [src]="option.img" height="25" />
+        {{ option.value }}
+      </mat-option>
+    </mat-autocomplete>
+  </ng-container>
+
   <autom-icon
     *ngIf="inputHasErrorGetter && (internalError || inputInsideTable)"
     class="suffix-icon"

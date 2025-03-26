@@ -11,10 +11,6 @@ import { finalize, Subject, takeUntil } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 
 // Component Imports
-import {
-  TypeaheadComponent,
-  TypeaheadItem,
-} from '../../typeahead/typeahead.component';
 import { AutomIconComponent } from '../../autom-icon/autom-icon.component';
 import { PopupComponent } from '../../popup/popup.component';
 import { ButtonComponent } from '../../button/button.component';
@@ -33,6 +29,7 @@ import {
   ButtonTypes,
   ColorEnum,
   IconsEnum,
+  InputTypeEnum,
   PositionEnum,
   SizeEnum,
 } from '../../../data-models/enums';
@@ -43,14 +40,15 @@ import { TecdocSearchHistoryService } from '../../../service/utils/tecdoc-search
 import { SelectComponent } from '../../select/select.component';
 import { SelectModel } from '../../../data-models/interface';
 import { CommonModule } from '@angular/common';
+import { InputFieldsComponent, TypeaheadItem } from '../../input-fields/input-fields.component';
 
 @Component({
   selector: 'vehicle-selection-popup',
   standalone: true,
   imports: [
+    InputFieldsComponent,
     CommonModule,
     PopupComponent,
-    TypeaheadComponent,
     AutomIconComponent,
     ButtonComponent,
     SelectComponent,
@@ -75,6 +73,7 @@ export class VehicleSelectionPopupComponent implements OnInit, OnDestroy {
   buttonType = ButtonTypes;
   colorEnum = ColorEnum;
   iconsEnum = IconsEnum;
+  inputTypeEnum = InputTypeEnum
   positionEnum = PositionEnum;
   sizeEnum = SizeEnum;
 

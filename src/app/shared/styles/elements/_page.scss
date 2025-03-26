@@ -9,6 +9,7 @@
 		justify-content: space-between;
 		padding: calc(var(--space-s) * 1.5);
 		width: 100%;
+		border-bottom: var(--space-default) solid var(--figma-grey-200);
 	}
 
 	// todo: rename to &--height to align with BEM notation

@@ -1,4 +1,5 @@
 <autom-popup
+  ngSkipHydration
   class="vehicle-selection"
   [height]="sizeEnum.AUTO"
   [position]="positionEnum.CENTER"
@@ -32,32 +33,35 @@
       (emitSelected)="selectVehicleFromHistory($event)"
     >
     </autom-select>
-    <typeahead
+    <autom-input-fields
       class="element-width"
-      [data]="typeaheadManufactures"
-      [disabled]="loadingManufactures || !!searchHistorySelected?.key"
+      [autocompleteOptions]="typeaheadManufactures"
+      [autocompleteSelected]="taSelectedManufacture"
+      [disableInput]="loadingManufactures || !!searchHistorySelected?.key"
       [label]="'Izaberite proizvodjaca'"
-      [selectedItem]="taSelectedManufacture"
-      (emit)="selectedManufacturer($event)"
-    ></typeahead>
-    <typeahead
+      [type]="inputTypeEnum.AUTOCOMPLETE"
+      (emitSelected)="selectedManufacturer($event)"
+    ></autom-input-fields>
+    <autom-input-fields
       class="element-width"
-      [data]="typeaheadModels"
-      [disabled]="loadingModels || !!searchHistorySelected?.key"
-      [selectedItem]="taSelectedModel"
+      [autocompleteOptions]="typeaheadModels"
+      [autocompleteSelected]="taSelectedModel"
+      [disableInput]="loadingModels || !!searchHistorySelected?.key"
       [label]="'Izaberite model'"
-      (emit)="selectedModels($event)"
-    ></typeahead>
-    <typeahead
+      [type]="inputTypeEnum.AUTOCOMPLETE"
+      (emitSelected)="selectedModels($event)"
+    ></autom-input-fields>
+    <autom-input-fields
       class="element-width"
-      [data]="typeaheadType"
-      [disabled]="loadingType || !!searchHistorySelected?.key"
+      [autocompleteOptions]="typeaheadType"
+      [autocompleteSelected]="taSelectedType"
+      [disableInput]="loadingType || !!searchHistorySelected?.key"
       [label]="'Izaberite tip'"
-      [selectedItem]="taSelectedType"
-      (emit)="selectedType($event)"
-    ></typeahead>
+      [type]="inputTypeEnum.AUTOCOMPLETE"
+      (emitSelected)="selectedType($event)"
+    ></autom-input-fields>
     <autom-button
-      class="element-width"
+      class="element-width confirm-btn"
       [disabled]="
         !searchHistorySelected?.key &&
         (!selectedManufacture || !selectedModel || !selectedVehicleId)

@@ -2,6 +2,7 @@
   <autom-header
     [headerData]="headerData"
     [headingLevel]="headingLevelEnum.H2"
+    (headerAction)="showDetailsPopup = true"
   ></autom-header>
 
   <div class="sales-reports__filter">
@@ -45,3 +46,8 @@
     (pageChange)="onPageChange($event)"
   ></autom-table-flat>
 </section>
+
+<sales-reports-details-popup
+  *ngIf="showDetailsPopup"
+  (closePopupModal)="showDetailsPopup = false"
+></sales-reports-details-popup>

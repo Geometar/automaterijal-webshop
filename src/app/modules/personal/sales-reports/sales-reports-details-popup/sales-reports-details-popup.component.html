@@ -1,0 +1,131 @@
+<autom-popup
+  ngSkipHydration
+  class="sales-report-details"
+  [height]="sizeEnum.FULL_VH"
+  [position]="positionEnum.BOTTOM"
+  [rounded]="true"
+  [subPosition]="positionEnum.RIGHT"
+  [width]="sizeEnum.LARGE"
+>
+  <div custom-header class="page-details__header">
+    <div class="page-details__title--row">
+      <h3 class="h3">
+        {{ title }}
+      </h3>
+    </div>
+
+    <autom-icon
+      mat-dialog-close
+      [color]="colorEnum.GREY_400"
+      [source]="iconsEnum.X"
+      (click)="closePopupModal.emit()"
+    ></autom-icon>
+  </div>
+  <div
+    custom-body
+    class="page-details__body page-details__height--auto body display--flex autom-flex-direction--column"
+    [formGroup]="form"
+  >
+    <autom-input-fields
+      [label]="'Firma'"
+      [allowFreeTextInput]="true"
+      [autocompleteOptions]="companiesTypeAheadItems"
+      [clearBtn]="false"
+      [disableInput]="!companiesTypeAheadItems.length"
+      [formControlName]="'name'"
+      [required]="true"
+      [type]="inputTypeEnum.AUTOCOMPLETE"
+      (emitSelected)="companyAutocompleteHandle($event)"
+      ngDefaultControl
+    >
+    </autom-input-fields>
+    <div class="util__flex--center gap-7">
+      <autom-input-fields
+        [clearBtn]="false"
+        [formControlName]="'city'"
+        [label]="'Mesto'"
+        [required]="true"
+        [type]="inputTypeEnum.TEXT"
+        [value]="form.controls['city'].value"
+        (emitSelected)="setSelectionValue('city', $event)"
+        ngDefaultControl
+      />
+      <autom-input-fields
+        [clearBtn]="false"
+        [formControlName]="'address'"
+        [label]="'Adresa'"
+        [required]="true"
+        [type]="inputTypeEnum.TEXT"
+        [value]="form.controls['address'].value"
+        (emitSelected)="setSelectionValue('address', $event)"
+        ngDefaultControl
+      />
+      <autom-select
+        [label]="'Sektor'"
+        [required]="true"
+        [selectionList]="sectionSelectOptions"
+        (emitSelected)="setSelectionValue('sector', $event.key)"
+        ngDefaultControl
+      ></autom-select>
+    </div>
+    <autom-text-area
+      [formControlName]="'contact'"
+      [label]="'Kontakt'"
+      [required]="true"
+      [value]="form.controls['contact'].value"
+      (emitSelected)="setSelectionValue('contact', $event)"
+      ngDefaultControl
+    ></autom-text-area>
+    <autom-text-area
+      [formControlName]="'assortment'"
+      [label]="'Osnovni asortiman'"
+      [required]="true"
+      [value]="form.controls['assortment'].value"
+      (emitSelected)="setSelectionValue('assortment', $event)"
+      ngDefaultControl
+    ></autom-text-area>
+    <autom-text-area
+      [formControlName]="'competitors'"
+      [label]="'Konkurenti'"
+      [required]="true"
+      [value]="form.controls['competitors'].value"
+      (emitSelected)="setSelectionValue('competitors', $event)"
+      ngDefaultControl
+    ></autom-text-area>
+    <autom-text-area
+      [formControlName]="'comment'"
+      [label]="'Izvestaj'"
+      [required]="true"
+      (emitSelected)="setSelectionValue('comment', $event)"
+      ngDefaultControl
+    ></autom-text-area>
+
+    <div class="util__flex--center gap-7">
+      <autom-input-fields
+        [formControlName]="'creationDate'"
+        [label]="'Vreme kreiranja'"
+        [required]="true"
+        [type]="inputTypeEnum.DATE"
+        [value]="form.controls['creationDate'].value"
+        (emitSelected)="setSelectionValue('creationDate', $event)"
+        ngDefaultControl
+      />
+      <autom-input-fields
+        [formControlName]="'reminder'"
+        [label]="'Podsetnik'"
+        [type]="inputTypeEnum.DATE"
+        (emitSelected)="setSelectionValue('reminder', $event)"
+        ngDefaultControl
+      />
+    </div>
+
+    <div custom-footer class="page-details__footer page-details__footer-row">
+      <autom-button
+        [disabled]="!form.valid"
+        [label]="'Kreiraj izvestaj'"
+        (clickEvent)="onSubmit()"
+      >
+      </autom-button>
+    </div>
+  </div>
+</autom-popup>

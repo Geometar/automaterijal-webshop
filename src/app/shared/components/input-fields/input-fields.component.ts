@@ -15,8 +15,16 @@ import { AutomLabelComponent } from '../autom-label/autom-label.component';
 import { AutomTooltipDirective } from '../autom-tooltip/autom-tooltip.directive';
 import { IconModel } from '../../data-models/interface';
 import { ButtonThemes, ButtonTypes, ColorEnum, IconsEnum, InputTypeEnum, SizeEnum, TooltipPositionEnum, TooltipThemeEnum, TooltipTypesEnum } from '../../data-models/enums';
+import { map, Observable, of, startWith } from 'rxjs';
+import { MatAutocompleteModule, MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+
 
 export const MAX_VALUE = 999999999;
+export interface TypeaheadItem {
+  key?: string | number;
+  value?: string;
+  img?: string;
+}
 
 @Component({
   selector: 'autom-input-fields',
@@ -27,6 +35,7 @@ export const MAX_VALUE = 999999999;
     ReactiveFormsModule,
 
     // Angular Material
+    MatAutocompleteModule,
     MatDatepickerModule,
     MatInputModule,
     MatNativeDateModule,
@@ -37,10 +46,13 @@ export const MAX_VALUE = 999999999;
     AutomLabelComponent,
     AutomTooltipDirective],
   templateUrl: './input-fields.component.html',
-  styleUrl: './input-fields.component.scss'
+  styleUrl: './input-fields.component.scss',
 })
 export class InputFieldsComponent implements AfterViewInit, OnChanges, OnInit {
+  @Input() allowFreeTextInput: boolean = false;
   @Input() anchor = false;
+  @Input() autocompleteOptions: TypeaheadItem[] = []
+  @Input() autocompleteSelected: TypeaheadItem | null = null;
   @Input() autofocus = false;
   @Input() clearBtn = true;
   @Input() currency = '';
@@ -101,6 +113,11 @@ export class InputFieldsComponent implements AfterViewInit, OnChanges, OnInit {
   @Output() customActionEvent = new EventEmitter<any>();
   @Output() emitSelected = new EventEmitter<any | null>();
   @ViewChild('automInput') automInput: ElementRef | null = null;
+
+  // Autocomplete config
+  filteredAutocompleteOptions: Observable<TypeaheadItem[]> = of([]);
+  @ViewChild(MatAutocompleteTrigger) autocompleteTrigger?: MatAutocompleteTrigger;
+
 
   // Enums
   buttonTheme = ButtonThemes;
@@ -251,6 +268,17 @@ export class InputFieldsComponent implements AfterViewInit, OnChanges, OnInit {
     if (changes['validators']) {
       this.setCtrlValidators();
     }
+
+    if (this.type === this.inputTypes.AUTOCOMPLETE && changes['autocompleteSelected']) {
+      const selected = changes['autocompleteSelected'].currentValue;
+      const ctrl = this.form.get('formCtrl');
+
+      if (selected?.value) {
+        ctrl?.setValue(selected.value, { emitEvent: false });
+      } else {
+        ctrl?.setValue('', { emitEvent: false });
+      }
+    }
   }
 
   ngOnInit(): void {
@@ -262,6 +290,18 @@ export class InputFieldsComponent implements AfterViewInit, OnChanges, OnInit {
 
     if (this.currency) {
       this.initCurrency(this.currency);
+    }
+
+
+    if (this.type === this.inputTypes.AUTOCOMPLETE) {
+      this.filteredAutocompleteOptions = this.form!.get('formCtrl')!.valueChanges.pipe(
+        startWith(''),
+        map(value => this._filterAutocomplete(value || '').slice(0, 50))
+      );
+
+      if (this.autocompleteSelected?.value) {
+        this.form?.get('formCtrl')?.setValue(this.autocompleteSelected.value);
+      }
     }
   }
 
@@ -601,4 +641,62 @@ export class InputFieldsComponent implements AfterViewInit, OnChanges, OnInit {
       value: this.form!.controls['formCtrl'].value
     });
   }
+
+  // Autocomplete logic: start of
+  onAutocompleteBlur(): void {
+    setTimeout(() => {
+      const ctrl = this.form?.get('formCtrl');
+      const inputValue = ctrl?.value?.trim();
+
+      if (!inputValue) {
+        // If the input is empty, do nothing
+        return;
+      }
+
+      const isValid = this.autocompleteOptions.some(opt => opt.value === inputValue);
+
+      if (isValid) {
+        // If the typed value is a valid selection, leave it as is
+        return;
+      }
+
+      if (this.allowFreeTextInput) {
+        // Let user input stay — emit it as-is
+        this.emitSelected.emit({ key: null, value: inputValue });
+        return;
+      }
+
+      if (this.autocompleteSelected?.value) {
+        // If a value was previously selected, revert back to it
+        ctrl?.setValue(this.autocompleteSelected.value, { emitEvent: false });
+      } else {
+        // If nothing was selected, clear the input and emit null
+        ctrl?.setValue('', { emitEvent: false });
+        this.emitSelected.emit(null);
+      }
+    }, 150); // Delay to allow autocomplete selection to complete
+  }
+
+  onAutocompleteFocus(): void {
+    const ctrl = this.form?.get('formCtrl');
+    if (ctrl && !ctrl.value) {
+      ctrl.setValue('');
+    }
+  }
+
+  onAutocompleteSelected(event: MatAutocompleteSelectedEvent) {
+    const selectedItem = this.autocompleteOptions.find(o => o.value === event.option.value);
+    if (selectedItem) {
+      this.form?.get('formCtrl')?.setValue(selectedItem.value);
+      this.emitSelected.emit(selectedItem);
+    }
+  }
+
+  private _filterAutocomplete(value: string): TypeaheadItem[] {
+    const filterValue = value.toLowerCase();
+    return this.autocompleteOptions.filter(option =>
+      option.value?.toLowerCase().includes(filterValue)
+    );
+  }
+  // Autocomplete logic: end
 }
