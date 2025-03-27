@@ -2,6 +2,7 @@
   ngSkipHydration
   class="sales-report-details"
   [height]="sizeEnum.FULL_VH"
+  [loading]="internalLoading"
   [position]="positionEnum.BOTTOM"
   [rounded]="true"
   [subPosition]="positionEnum.RIGHT"
@@ -23,18 +24,19 @@
   </div>
   <div
     custom-body
-    class="page-details__body page-details__height--auto body display--flex autom-flex-direction--column"
+    class="page-details__body page-details__height--auto body display--flex autom-flex-direction--column report-details"
     [formGroup]="form"
   >
     <autom-input-fields
-      [label]="'Firma'"
       [allowFreeTextInput]="true"
       [autocompleteOptions]="companiesTypeAheadItems"
       [clearBtn]="false"
-      [disableInput]="!companiesTypeAheadItems.length"
+      [disableInput]="!companiesTypeAheadItems.length || inputDisabled"
       [formControlName]="'name'"
+      [label]="'Firma'"
       [required]="true"
       [type]="inputTypeEnum.AUTOCOMPLETE"
+      [value]="form.controls['name'].value"
       (emitSelected)="companyAutocompleteHandle($event)"
       ngDefaultControl
     >
@@ -42,6 +44,7 @@
     <div class="util__flex--center gap-7">
       <autom-input-fields
         [clearBtn]="false"
+        [disableInput]="inputDisabled"
         [formControlName]="'city'"
         [label]="'Mesto'"
         [required]="true"
@@ -52,6 +55,7 @@
       />
       <autom-input-fields
         [clearBtn]="false"
+        [disableInput]="inputDisabled"
         [formControlName]="'address'"
         [label]="'Adresa'"
         [required]="true"
@@ -61,32 +65,40 @@
         ngDefaultControl
       />
       <autom-select
+        [disabled]="inputDisabled"
         [label]="'Sektor'"
         [required]="true"
+        [selectedValue]="selectedOption"
         [selectionList]="sectionSelectOptions"
         (emitSelected)="setSelectionValue('sector', $event.key)"
         ngDefaultControl
       ></autom-select>
     </div>
     <autom-text-area
+      [disableInput]="inputDisabled"
       [formControlName]="'contact'"
       [label]="'Kontakt'"
+      [maxLength]="2000"
       [required]="true"
       [value]="form.controls['contact'].value"
       (emitSelected)="setSelectionValue('contact', $event)"
       ngDefaultControl
     ></autom-text-area>
     <autom-text-area
+      [disableInput]="inputDisabled"
       [formControlName]="'assortment'"
       [label]="'Osnovni asortiman'"
+      [maxLength]="2000"
       [required]="true"
       [value]="form.controls['assortment'].value"
       (emitSelected)="setSelectionValue('assortment', $event)"
       ngDefaultControl
     ></autom-text-area>
     <autom-text-area
+      [disableInput]="inputDisabled"
       [formControlName]="'competitors'"
       [label]="'Konkurenti'"
+      [maxLength]="2000"
       [required]="true"
       [value]="form.controls['competitors'].value"
       (emitSelected)="setSelectionValue('competitors', $event)"
@@ -95,13 +107,18 @@
     <autom-text-area
       [formControlName]="'comment'"
       [label]="'Izvestaj'"
+      [maxLength]="2000"
+      [readonly]="inputDisabled"
       [required]="true"
+      [value]="form.controls['comment'].value"
       (emitSelected)="setSelectionValue('comment', $event)"
       ngDefaultControl
     ></autom-text-area>
 
     <div class="util__flex--center gap-7">
       <autom-input-fields
+        [clearBtn]="false"
+        [disableInput]="inputDisabled"
         [formControlName]="'creationDate'"
         [label]="'Vreme kreiranja'"
         [required]="true"
@@ -111,9 +128,12 @@
         ngDefaultControl
       />
       <autom-input-fields
+        [clearBtn]="false"
+        [disableInput]="inputDisabled"
         [formControlName]="'reminder'"
         [label]="'Podsetnik'"
         [type]="inputTypeEnum.DATE"
+        [value]="form.controls['reminder'].value"
         (emitSelected)="setSelectionValue('reminder', $event)"
         ngDefaultControl
       />
@@ -121,8 +141,10 @@
 
     <div custom-footer class="page-details__footer page-details__footer-row">
       <autom-button
-        [disabled]="!form.valid"
-        [label]="'Kreiraj izvestaj'"
+        class="sales-report-btn"
+        [disabled]="!form.valid || inputDisabled"
+        [theme]="buttonThemes.LIGHT_ORANGE"
+        [label]="isNewSalesReport ? 'Kreiraj izvestaj' : 'Modifikuj izvestaj'"
         (clickEvent)="onSubmit()"
       >
       </autom-button>

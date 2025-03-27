@@ -255,6 +255,7 @@
       class="autom-input__text"
       matInput
       [class.disabled-input]="readonly || disableInput"
+      [disabled]="readonly || disableInput"
       [formControlName]="'formCtrl'"
       [matAutocomplete]="auto"
       [placeholder]="placeholder"

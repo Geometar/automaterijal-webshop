@@ -139,10 +139,10 @@
 			padding-left: calc(var(--space-xs) * 6);
 
 			&--disabled {
-				background: var(--figma-grey-50);
+				background: var(--figma-grey-25);
 
 				input {
-					background: var(--figma-grey-50);
+					background: var(--figma-grey-25);
 				}
 			}
 
@@ -239,7 +239,7 @@
 				width: 100%;
 
 				&--disabled {
-					background: var(--figma-grey-50) !important;
+					background: var(--figma-grey-25) !important;
 					border-radius: var(--space-xs);
 				}
 
@@ -368,7 +368,7 @@
 }
 
 .disabled-input {
-	background-color: var(--figma-grey-50) !important;
+	background-color: var(--figma-grey-25) !important;
 	color: var(--figma-grey-300) !important;
 	pointer-events: none;
 }

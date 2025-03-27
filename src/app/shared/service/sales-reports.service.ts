@@ -9,9 +9,9 @@ import { Company, PaginatedResponse, SalesReport, SalesReportCreate } from '../d
 // Services
 import { ServiceHelpersService } from './utils/service-helpers.service';
 
-const COMPANY_URL = '/firme';
+const COMPANY_URL = '/companies';
 const DOMAIN_URL = environment.apiUrl + '/api';
-const SALES_URL = '/izvestaj';
+const SALES_URL = '/sales-reports';
 
 @Injectable({
   providedIn: 'root'
@@ -42,6 +42,24 @@ export class SalesReportsService {
     const fullUrl = DOMAIN_URL + SALES_URL + parametersString;
     return this.http
       .get<PaginatedResponse<SalesReport>>(fullUrl)
+      .pipe(
+        catchError((error: any) => throwError(error))
+      );
+  }
+
+  public getSalesReportDetails(salesReportId: number): Observable<SalesReport> {
+    const fullUrl = DOMAIN_URL + SALES_URL + '/details/' + salesReportId;
+    return this.http
+      .get<SalesReport>(fullUrl)
+      .pipe(
+        catchError((error: any) => throwError(error))
+      );
+  }
+
+  public updateSalesReportDetails(salesReportId: number, salesReportDetails: SalesReport): Observable<SalesReport> {
+    const fullUrl = DOMAIN_URL + SALES_URL + '/details/' + salesReportId;
+    return this.http
+      .put<SalesReport>(fullUrl, salesReportDetails)
       .pipe(
         catchError((error: any) => throwError(error))
       );

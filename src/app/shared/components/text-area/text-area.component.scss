@@ -54,7 +54,7 @@
 	}
 
 	&[disabled] {
-		background: var(--figma-grey-50);
+		background: var(--figma-grey-25);
 		border: var(--space-default) solid var(--figma-grey-300);
 		box-shadow: 0 0 calc(var(--space-xs) / 1.6) var(--figma-grey-300);
 		resize: none;

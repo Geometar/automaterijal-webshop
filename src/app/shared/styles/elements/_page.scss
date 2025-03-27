@@ -10,6 +10,8 @@
 		padding: calc(var(--space-s) * 1.5);
 		width: 100%;
 		border-bottom: var(--space-default) solid var(--figma-grey-200);
+		border-top: 5px solid var(--bittersweet);
+    border-radius: calc(var(--space-xxs)* 2.5);
 	}
 
 	// todo: rename to &--height to align with BEM notation

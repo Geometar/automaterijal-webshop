@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewEncapsulation } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 
@@ -28,32 +28,27 @@ import { SelectModel } from '../../data-models/interface/selected-item.interface
   styleUrl: './select.component.scss',
   encapsulation: ViewEncapsulation.None
 })
-export class SelectComponent {
+export class SelectComponent implements OnChanges {
+  @Input() disabled = false;
   @Input() label = '';
   @Input() labelIcons: Array<IconModel> = [];
   @Input() placeholder = '';
   @Input() required = false;
   @Input() selectedValue: SelectModel | null = null;
-
-  private _selectionList: Array<SelectModel> = [];
-  @Input()
-  set selectionList(value: Array<SelectModel>) {
-    this._selectionList = value;
-
-    if (
-      this.required &&
-      (!this.selectedValue || !this._selectionList.find(item => item.key === this.selectedValue?.key)) &&
-      this._selectionList.length > 0
-    ) {
-      this.selectedValue = this._selectionList[0];
-      this.emitSelected.emit(this.selectedValue);
-    }
-  }
-  get selectionList(): Array<SelectModel> {
-    return this._selectionList;
-  }
+  @Input() selectionList: Array<SelectModel> = [];
 
   @Output() emitSelected = new EventEmitter<SelectModel>();
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['selectionList'] || changes['selectedValue']) {
+      const exists = this.selectionList.find(item => item.key === this.selectedValue?.key);
+
+      if (this.required && (!this.selectedValue || !exists) && this.selectionList.length > 0) {
+        this.selectedValue = this.selectionList[0];
+        this.emitSelected.emit(this.selectedValue);
+      }
+    }
+  }
 
   onSelectionChange(event: MatSelectChange) {
     this.selectedValue = event.value;

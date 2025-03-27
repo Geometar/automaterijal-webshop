@@ -74,7 +74,7 @@ export class SalesReportsComponent implements OnInit, OnDestroy {
 
   // Misc
   loading = false;
-  showDetailsPopup = true;
+  showDetailsPopup = false;
 
   // Paging and Sorting elements
   dateFrom: Date | null = null;
@@ -90,7 +90,7 @@ export class SalesReportsComponent implements OnInit, OnDestroy {
       key: 'komentarDto.id',
       header: 'Id',
       type: CellType.LINK,
-      callback: (row) => this.onSalesReportClick(row.id),
+      callback: (row) => this.onSalesReportClick(row.komentarDto.id),
     },
     {
       key: 'komentarDto.datumKreiranja',
@@ -115,6 +115,7 @@ export class SalesReportsComponent implements OnInit, OnDestroy {
 
   // Data
   salesPersonsSelectModel: SelectModel[] = [];
+  salesReportId: number | null = null;
 
   private destroy$ = new Subject<void>();
 
@@ -215,7 +216,13 @@ export class SalesReportsComponent implements OnInit, OnDestroy {
     this.showDetailsPopup = true;
   }
 
-  onSalesReportClick(invoiceId: number): void {
+  onSalesReportClick(salesReportId: number): void {
+    this.salesReportId = salesReportId;
     this.showDetailsPopup = true;
+  }
+
+  closeServiceReportDetailsPopup(): void {
+    this.salesReportId = null;
+    this.showDetailsPopup = false;
   }
 }

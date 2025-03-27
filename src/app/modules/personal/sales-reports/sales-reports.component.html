@@ -49,5 +49,6 @@
 
 <sales-reports-details-popup
   *ngIf="showDetailsPopup"
-  (closePopupModal)="showDetailsPopup = false"
+  [salesReportId]="salesReportId"
+  (closePopupModal)="closeServiceReportDetailsPopup()"
 ></sales-reports-details-popup>

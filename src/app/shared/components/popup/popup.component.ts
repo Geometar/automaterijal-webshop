@@ -7,9 +7,10 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 
-// Automaterijal imports
+// Component imports
 import { AutomIconComponent } from '../autom-icon/autom-icon.component';
 import { ButtonComponent } from '../button/button.component';
+import { SpinnerComponent } from '../spinner/spinner.component';
 
 // Enums
 import { PositionEnum, SizeEnum } from '../../data-models/enums';
@@ -24,6 +25,7 @@ import { PositionEnum, SizeEnum } from '../../data-models/enums';
     ButtonComponent,
     MatFormFieldModule,
     ReactiveFormsModule,
+    SpinnerComponent,
     // CDK
     DragDropModule],
   templateUrl: './popup.component.html',
