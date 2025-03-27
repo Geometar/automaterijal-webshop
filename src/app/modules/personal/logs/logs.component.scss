@@ -1,0 +1,18 @@
+.log-details {
+  .invoices-table-container{
+    overflow-x: auto !important;
+  }
+
+  .popup-container__body {
+    justify-content: center;
+    overflow-y: auto;
+  }
+
+  .page-details__footer {
+    justify-content: center;
+  }
+
+  .sales-report-btn button {
+    width: 200px;
+  }
+}

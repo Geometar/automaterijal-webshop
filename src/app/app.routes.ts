@@ -56,4 +56,9 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./modules/personal/sales-reports/sales-reports.component').then((m) => m.SalesReportsComponent)
   },
+  {
+    path: 'logs',
+    loadComponent: () =>
+      import('./modules/personal/logs/logs.component').then((m) => m.LogsComponent)
+  },
 ];

@@ -1,1 +1,64 @@
-<p>logs works!</p>
+<section class="header-margin--top sales-reports">
+  <autom-header
+    [headerData]="headerData"
+    [headingLevel]="headingLevelEnum.H2"
+  ></autom-header>
+
+  <autom-table-flat
+    [columns]="columns"
+    [dataSource]="dataSource"
+    [displayedColumns]="displayedColumns"
+    [loading]="loading"
+    [pagination]="{
+      length: totalItems,
+      pageIndex: pageIndex,
+      pageSize: rowsPerPage,
+      pageSizeOptions: [5, 10, 25, 50]
+    }"
+    (pageChange)="onPageChange($event)"
+  ></autom-table-flat>
+</section>
+
+<autom-popup
+  *ngIf="showLogsPopup"
+  class="log-details"
+  [height]="sizeEnum.EXTRA_LARGE"
+  [loading]="loadingDetails"
+  [position]="positionEnum.BOTTOM"
+  [rounded]="true"
+  [subPosition]="positionEnum.CENTER"
+  [width]="sizeEnum.EXTRA_LARGE"
+  [width]="sizeEnum.LARGE"
+>
+  <div custom-header class="page-details__header">
+    <div class="page-details__title--row">
+      <h3 class="h3">
+        {{ "Logovi" }}
+      </h3>
+    </div>
+
+    <autom-icon
+      mat-dialog-close
+      [color]="colorEnum.GREY_400"
+      [source]="iconsEnum.X"
+      (click)="closeLogDetails()"
+    ></autom-icon>
+  </div>
+  <div
+    custom-body
+    class="page-details__body page-details__height--auto body display--flex autom-flex-direction--column log-table-details"
+  >
+    <autom-table-flat
+      [columns]="columnsDetails"
+      [dataSource]="dataSourceDetails"
+      [displayedColumns]="displayedDetailsColumns"
+      [pagination]="{
+        length: totalItemsDetails,
+        pageIndex: pageIndexDetails,
+        pageSize: rowsPerPageDetails,
+        pageSizeOptions: [5, 10, 25, 50]
+      }"
+      (pageChange)="onPageChangeDetails($event)"
+    ></autom-table-flat>
+  </div>
+</autom-popup>

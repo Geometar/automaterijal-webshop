@@ -2,6 +2,7 @@ export * from './account';
 export * from './cart';
 export * from './invoice';
 export * from './kontakt';
+export * from './log';
 export * from './page';
 export * from './partner';
 export * from './proizvodjac';
