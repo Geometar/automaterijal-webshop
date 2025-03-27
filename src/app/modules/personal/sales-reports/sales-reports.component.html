@@ -50,5 +50,5 @@
 <sales-reports-details-popup
   *ngIf="showDetailsPopup"
   [salesReportId]="salesReportId"
-  (closePopupModal)="closeServiceReportDetailsPopup()"
+  (closePopupModal)="closeServiceReportDetailsPopup($event)"
 ></sales-reports-details-popup>

@@ -221,8 +221,11 @@ export class SalesReportsComponent implements OnInit, OnDestroy {
     this.showDetailsPopup = true;
   }
 
-  closeServiceReportDetailsPopup(): void {
+  closeServiceReportDetailsPopup(reload: boolean = false): void {
     this.salesReportId = null;
     this.showDetailsPopup = false;
+    if (reload) {
+      this.getSalesReports();
+    }
   }
 }

@@ -80,7 +80,7 @@ export const SECTIONS: SelectModel[] = [
 })
 export class SalesReportsDetailsPopupComponent implements OnInit, OnDestroy {
   @Input() salesReportId: number | null = null;
-  @Output() closePopupModal = new EventEmitter<void>();
+  @Output() closePopupModal = new EventEmitter<boolean>();
 
   // Data
   companies: Company[] = [];
@@ -103,7 +103,7 @@ export class SalesReportsDetailsPopupComponent implements OnInit, OnDestroy {
   // Misc
   inputDisabled = false;
   internalLoading = false;
-  isNewSalesReport = false;
+  isNewSalesReport = true;
 
   // Typeahead config
   companiesTypeAheadItems: TypeaheadItem[] = [];
@@ -117,7 +117,7 @@ export class SalesReportsDetailsPopupComponent implements OnInit, OnDestroy {
   @HostListener('window:keydown', ['$event'])
   handleKeyDown(event: KeyboardEvent) {
     if (event.key === 'Escape') {
-      this.closePopupModal.emit();
+      this.closePopupModal.emit(false);
     }
   }
 
@@ -192,8 +192,8 @@ export class SalesReportsDetailsPopupComponent implements OnInit, OnDestroy {
           const { komentarDto, firmaDto } = salesReportDetails;
           this.inputDisabled =
             komentarDto.ppid !== this.accountStateService.get().ppid;
-          this.populateFormFromCompany(firmaDto);
           this.populateFormFromComment(komentarDto);
+          this.populateFormFromCompany(firmaDto);
         },
       });
   }
@@ -220,12 +220,19 @@ export class SalesReportsDetailsPopupComponent implements OnInit, OnDestroy {
   }
 
   createSalesReport(salesReportCreate: SalesReportCreate): void {
+    this.internalLoading = true;
     this.salesReportsService
       .createSalesReport(salesReportCreate)
-      .pipe(takeUntil(this.destroy$))
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.internalLoading = false;
+        })
+      )
       .subscribe({
         next: () => {
           this.snackbarService.showAutoClose('Izvestaj je uspesno kreiran');
+          this.closePopupModal.emit(true);
         },
       });
   }
