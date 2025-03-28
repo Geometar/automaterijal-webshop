@@ -1,0 +1,223 @@
+{
+  "brands": [
+    {
+      "src": "/images/brands/shell.png",
+      "alt": "Shell",
+      "label": "Shell",
+      "id": "SHELL",
+      "visible": true,
+      "section": "MOTOR_OIL"
+    },
+    {
+      "src": "/images/brands/lukoil.png",
+      "alt": "Lukoil",
+      "label": "Lukoil",
+      "id": "LKOIL",
+      "visible": true,
+      "section": "MOTOR_OIL"
+    },
+    {
+      "src": "/images/brands/fuchs.png",
+      "alt": "Fuchs",
+      "label": "Fuchs",
+      "id": "FUCHS",
+      "visible": true,
+      "section": "MOTOR_OIL"
+    },
+    {
+      "src": "/images/brands/febi.png",
+      "alt": "Febi",
+      "label": "Febi",
+      "id": "FEBI",
+      "visible": true,
+      "section": "PARTS"
+    },
+    {
+      "src": "/images/brands/bilstain.png",
+      "alt": "Bilstain",
+      "label": "Bilstain",
+      "id": "BIL",
+      "visible": true,
+      "section": "PARTS"
+    },
+    {
+      "src": "/images/brands/blue_print.png",
+      "alt": "Blue Print",
+      "label": "Blue Print",
+      "id": "BLUE",
+      "visible": true,
+      "section": "PARTS"
+    },
+    {
+      "src": "/images/brands/hiq.png",
+      "alt": "HiQ",
+      "label": "HiQ",
+      "id": "HIQ",
+      "visible": true,
+      "section": "PARTS"
+    },
+    {
+      "src": "/images/brands/mahle.png",
+      "alt": "Mahle",
+      "label": "Mahle",
+      "id": "MAHL",
+      "visible": true,
+      "section": "FILTERS"
+    },
+    {
+      "src": "/images/brands/fleetguard.png",
+      "alt": "Fleetguard",
+      "label": "Fleetguard",
+      "id": "FTG",
+      "visible": true,
+      "section": "FILTERS"
+    },
+    {
+      "src": "/images/brands/victor_reinz.png",
+      "alt": "Victor Reinz",
+      "label": "Victor Reinz",
+      "id": "VR",
+      "visible": true,
+      "section": "PARTS"
+    },
+    {
+      "src": "/images/brands/pierburg.png",
+      "alt": "Pierburg",
+      "label": "Pierburg",
+      "id": "PIERB",
+      "visible": true,
+      "section": "PARTS"
+    },
+    {
+      "src": "/images/brands/kolbenschmidt.png",
+      "alt": "Kolbenschmidt",
+      "label": "Kolbenschmidt",
+      "id": "KS",
+      "visible": true,
+      "section": "PARTS"
+    },
+    {
+      "src": "/images/brands/magneti_marelli.png",
+      "alt": "Magneti Marelli",
+      "label": "Magneti Marelli",
+      "id": "MAGNM",
+      "visible": true,
+      "section": "PARTS"
+    },
+    {
+      "src": "/images/brands/bottari.png",
+      "alt": "Bottari",
+      "label": "Bottari",
+      "id": "BOTT",
+      "visible": true,
+      "section": "ACCESSORIES"
+    },
+    {
+      "src": "/images/brands/energizer.png",
+      "alt": "Energizer",
+      "label": "Energizer",
+      "id": "ENERG",
+      "visible": true,
+      "section": "BATTERIES"
+    }
+  ],
+  "categories": [
+    {
+      "src": "/images/groups/maziva-putnicki.png",
+      "alt": "Maziva",
+      "label": "Maziva - putnicki program",
+      "id": "MPU",
+      "visible": true
+    },
+    {
+      "src": "/images/groups/maziva-teretni.png",
+      "alt": "Maziva",
+      "label": "Maziva - teretni program",
+      "id": "MTR",
+      "visible": true
+    },
+    {
+      "src": "/images/groups/maziva-obradametala.png",
+      "alt": "Maziva",
+      "label": "Maziva - Obrada metala",
+      "id": "MOM",
+      "visible": true
+    },
+    {
+      "src": "/images/groups/maziva-industrija.png",
+      "alt": "Maziva",
+      "label": "Maziva - Industrijski program",
+      "id": "MIZ",
+      "visible": true
+    },
+    {
+      "src": "/images/groups/maziva-ostalo.png",
+      "alt": "Maziva",
+      "label": "Maziva - ostalo",
+      "id": "MOS",
+      "visible": true
+    },
+    {
+      "src": "/images/groups/alati.png",
+      "alt": "Alati",
+      "label": "Alati",
+      "id": "ALATI",
+      "visible": true
+    },
+    {
+      "src": "/images/groups/kozmetika.png",
+      "alt": "Maziva",
+      "label": "Kozmetika",
+      "id": "NAZI",
+      "visible": true
+    },
+    {
+      "src": "/images/groups/odrzavanje-vozila.png",
+      "alt": "Maziva",
+      "label": "Odrzavanje vozila",
+      "id": "OD",
+      "visible": true
+    },
+    {
+      "src": "/images/groups/oprema-auta.png",
+      "alt": "Maziva",
+      "label": "Praktična auto oprema.",
+      "id": "UD",
+      "visible": true
+    },
+    {
+      "src": "/images/groups/auto_enterijer.png",
+      "alt": "Maziva",
+      "label": "Auto Enterijer",
+      "id": "UNIDO",
+      "visible": true
+    },
+    {
+      "src": "/images/groups/auto_enterijer.png",
+      "alt": "Filteri Teretni Program",
+      "label": "Filteri Teretni Program",
+      "id": "FILTTE",
+      "visible": false
+    }
+  ],
+  "youtubeLinks": [
+    {
+      "videoId": "8ZMLhKbxsqU",
+      "title": "Značaj redovne zamene motornog ulja i posledice nepridržavanja optimalnih intervala zamene",
+      "publishedAt": "25. maj 2024.",
+      "visible": true
+    },
+    {
+      "videoId": "RwFQ05brbV0",
+      "title": "Najvažnije tečnosti u automobiliu i značaj njihove zamene",
+      "publishedAt": "2. septembar 2024.",
+      "visible": true
+    },
+    {
+      "videoId": "vtYvyGAUhxc",
+      "title": "Novo u ponudi! Hi-Q kočioni sistem",
+      "publishedAt": "31. oktobar 2024.",
+      "visible": true
+    }
+  ]
+}

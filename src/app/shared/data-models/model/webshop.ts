@@ -3,4 +3,5 @@ export class Categories {
   id?: string;
   label?: string;
   src?: string;
+  visible: boolean = true;
 }

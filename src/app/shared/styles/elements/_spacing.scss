@@ -356,7 +356,7 @@
 		}
 
 		&__s {
-			margin-bottom: calc(1.5 * var(--space-s));
+			margin-bottom: calc(1.5 * var(--space-s))  !important;
 		}
 
 		&__m {

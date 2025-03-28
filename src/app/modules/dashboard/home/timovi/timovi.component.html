@@ -26,7 +26,7 @@
 
             <h4 class="card-title">Odaberite kvalitet za svoje vozilo</h4>
 
-            <a href="#" class="card-btn">
+            <a routerLink="/webshop" class="card-btn">
               <autom-icon
                 source="arrow-right"
                 [color]="iconColor.INFO_25"
@@ -57,7 +57,11 @@
 
             <h4 class="card-title">Kvalitetna maziva za sve primene</h4>
 
-            <a href="#" class="card-btn">
+            <a
+              [routerLink]="['/webshop']"
+              [queryParams]="{ grupe: 'MIZ,MOM,MOS,MPU,MTR' }"
+              class="card-btn"
+            >
               <autom-icon
                 source="arrow-right"
                 [color]="iconColor.INFO_25"
@@ -90,7 +94,11 @@
               Pouzdani filteri za teretna i građevinska vozila
             </h4>
 
-            <a href="#" class="card-btn">
+            <a
+              [routerLink]="['/webshop']"
+              [queryParams]="{ grupe: 'FILTTE' }"
+              class="card-btn"
+            >
               <autom-icon
                 source="arrow-right"
                 [color]="iconColor.INFO_25"

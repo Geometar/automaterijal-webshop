@@ -5,107 +5,16 @@
     <!-- <h2 class="h2 section-title">Razliciti sektori</h2> -->
 
     <div class="display--flex autom-flex-wrap--wrap product">
-      <div class="product--card">
-        <img src="/images/brands/shell.png" alt="Teapot with black tea" />
-      </div>
-      <div class="product--card">
-        <img
-          src="/images/brands/lukoil.png"
-          loading="lazy"
-          alt="Teapot with black tea"
-        />
-      </div>
-      <div class="product--card">
-        <img
-          src="/images/brands/fuchs.png"
-          loading="lazy"
-          alt="Teapot with black tea"
-        />
-      </div>
-      <div class="product--card">
-        <img
-          src="/images/brands/febi.png"
-          loading="lazy"
-          alt="Teapot with black tea"
-        />
-      </div>
-      <div class="product--card">
-        <img
-          src="/images/brands/bilstain.png"
-          loading="lazy"
-          alt="Teapot with black tea"
-        />
-      </div>
-      <div class="product--card">
-        <img
-          src="/images/brands/blue_print.png"
-          loading="lazy"
-          alt="Teapot with black tea"
-        />
-      </div>
-      <div class="product--card">
-        <img
-          src="/images/brands/hiq.png"
-          loading="lazy"
-          alt="Teapot with black tea"
-        />
-      </div>
-      <div class="product--card">
-        <img
-          src="/images/brands/mahle.png"
-          loading="lazy"
-          alt="Teapot with black tea"
-        />
-      </div>
-      <div class="product--card">
-        <img
-          src="/images/brands/fleetguard.png"
-          loading="lazy"
-          alt="Teapot with black tea"
-        />
-      </div>
-      <div class="product--card">
-        <img
-          src="/images/brands/victor_reinz.png"
-          loading="lazy"
-          alt="Teapot with black tea"
-        />
-      </div>
-      <div class="product--card">
-        <img
-          src="/images/brands/pierburg.png"
-          loading="lazy"
-          alt="Teapot with black tea"
-        />
-      </div>
-      <div class="product--card">
-        <img
-          src="/images/brands/kolbenschmidt.png"
-          loading="lazy"
-          alt="Teapot with black tea"
-        />
-      </div>
-      <div class="product--card">
-        <img
-          src="/images/brands/magneti_marelli.png"
-          loading="lazy"
-          alt="Teapot with black tea"
-        />
-      </div>
-      <div class="product--card">
-        <img
-          src="/images/brands/bottari.png"
-          loading="lazy"
-          alt="Teapot with black tea"
-        />
-      </div>
-      <div class="product--card">
-        <img
-          src="/images/brands/energizer.png"
-          loading="lazy"
-          alt="Teapot with black tea"
-        />
-      </div>
+      <ng-container *ngIf="brands?.length">
+        <div
+          class="product--card"
+          *ngFor="let brand of brands"
+          [routerLink]="['/webshop']"
+          [queryParams]="{ mandatoryproid: brand.id }"
+        >
+          <img [src]="brand.src" [alt]="brand.alt" loading="lazy" />
+        </div>
+      </ng-container>
     </div>
   </div>
 </section>

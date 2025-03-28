@@ -3,6 +3,7 @@ import {
   EventEmitter,
   Input,
   OnChanges,
+  OnInit,
   Output,
   SimpleChanges,
   ViewEncapsulation,
@@ -13,12 +14,6 @@ import { CommonModule } from '@angular/common';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { InputFieldsComponent } from '../../../shared/components/input-fields/input-fields.component';
 import { VehicleSelectionPopupComponent } from '../../../shared/components/ui/vehicle-selection-popup/vehicle-selection-popup.component';
-
-// Constants
-import {
-  CATEGORIES_EMPTY_CONTAINER,
-  MANUFACTURES_EMPTY_CONTAINER,
-} from '../../../shared/data-models/constants/webshop.constants';
 
 // Data models
 import { Categories } from '../../../shared/data-models/model/webshop';
@@ -35,6 +30,7 @@ import {
 } from '../../../shared/data-models/enums';
 
 // Service
+import { ConfigService } from '../../../shared/service/config.service';
 import { UrlHelperService } from '../../../shared/service/utils/url-helper.service';
 
 export class NavTitles {
@@ -75,7 +71,19 @@ export class WebshopNavComponent implements OnChanges {
   // Misc
   chooseVehicleVisible = false;
 
-  constructor(private urlHelperService: UrlHelperService) { }
+  // Consts
+  categories: Categories[] = [];
+  manufacturers: Categories[] = [];
+
+  constructor(
+    private configService: ConfigService,
+    private urlHelperService: UrlHelperService,
+  ) {
+    this.configService.getConfig().subscribe(config => {
+      this.categories = config.categories;
+      this.manufacturers = config.brands;
+    });
+  }
 
   /** Angular lifecycle hooks start */
 
@@ -106,11 +114,14 @@ export class WebshopNavComponent implements OnChanges {
     this.searchTerm = searchTerm?.value ? searchTerm?.value.trim() : '';
 
     if (this.searchTerm) {
-      if (!this.urlHelperService.hasQueryParam('mandatoryproid') && !this.urlHelperService.hasQueryParam('grupe')) {
+      if (
+        !this.urlHelperService.hasQueryParam('mandatoryproid') &&
+        !this.urlHelperService.hasQueryParam('grupe')
+      ) {
         this.urlHelperService.setQueryParams({ searchTerm: this.searchTerm });
       } else {
         this.urlHelperService.addOrUpdateQueryParams({
-          searchTerm: this.searchTerm
+          searchTerm: this.searchTerm,
         });
       }
     } else {
@@ -144,29 +155,69 @@ export class WebshopNavComponent implements OnChanges {
   /**
    * Start of: private methods
    */
-
   private updateNavigationFromFilter(filter: Filter): boolean {
     if (filter.grupe && filter.grupe.length) {
-      const category = CATEGORIES_EMPTY_CONTAINER.find((value: Categories) =>
-        filter.grupe!.includes(value.id!)
-      );
-      if (category) {
-        this.secondNavigation = category.label!;
-        return true;
-      }
+      return this.updateNavigationFromGroups(filter.grupe);
     }
 
     if (filter.mandatoryProid && filter.mandatoryProid.length) {
-      const manufacturer = MANUFACTURES_EMPTY_CONTAINER.find(
-        (value: Categories) => filter.mandatoryProid!.includes(value.id!)
+      return this.updateNavigationFromManufacturers(filter.mandatoryProid);
+    }
+
+    return false;
+  }
+
+  private updateNavigationFromGroups(groups: string[]): boolean {
+    const matchedCategories = this.categories.filter(
+      (category: Categories) => groups.includes(category.id!)
+    );
+
+    if (!matchedCategories.length) return false;
+
+    const mostCommonAlt = this.getMostCommonAlt(matchedCategories);
+
+    if (mostCommonAlt) {
+      const category = matchedCategories.find(
+        (cat) => cat.alt === mostCommonAlt
       );
-      if (manufacturer) {
-        this.secondNavigation = manufacturer.label!;
+      if (category) {
+        this.secondNavigation = category.alt!;
         return true;
       }
     }
 
+    this.secondNavigation = matchedCategories[0].label!;
+    return true;
+  }
+
+  private updateNavigationFromManufacturers(
+    manufacturerIds: string[]
+  ): boolean {
+    const manufacturer = this.manufacturers.find(
+      (category: Categories) => manufacturerIds.includes(category.id!)
+    );
+
+    if (manufacturer) {
+      this.secondNavigation = manufacturer.label!;
+      return true;
+    }
+
     return false;
+  }
+
+  private getMostCommonAlt(categories: Categories[]): string | null {
+    const altCounts = categories.reduce((acc, cat) => {
+      const alt = cat.alt;
+      if (alt) {
+        acc[alt] = (acc[alt] || 0) + 1;
+      }
+      return acc;
+    }, {} as Record<string, number>);
+
+    const repeatedAltEntry = Object.entries(altCounts).find(
+      ([_, count]) => count > 1
+    );
+    return repeatedAltEntry ? repeatedAltEntry[0] : null;
   }
 
   private updateNavigationFromVehicle(vehicle: TDVehicleDetails): boolean {

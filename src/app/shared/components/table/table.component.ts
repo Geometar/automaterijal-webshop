@@ -7,15 +7,14 @@ import { MatTableModule } from '@angular/material/table';
 import { Chip, ChipsComponent } from '../chips/chips.component';
 import { RowComponent } from './row/row.component';
 
-// Constants 
-import { CATEGORIES_EMPTY_CONTAINER } from '../../data-models/constants/webshop.constants';
-
 // Data models
+import { Category } from '../../data-models/interface';
 import { Filter, Roba } from '../../data-models/model/roba';
 import { Categories } from '../../data-models/model/webshop';
 import { isPaginatedResponse, PaginatedResponse, TablePage } from '../../data-models/model/page';
 
 // Services
+import { ConfigService } from '../../service/config.service';
 import { UrlHelperService } from '../../service/utils/url-helper.service';
 
 
@@ -39,7 +38,7 @@ export class TableComponent implements OnChanges {
   dataSource = [];
 
   // Misc
-  categories = CATEGORIES_EMPTY_CONTAINER;
+  categories: Category[] = [];
 
   // Pagination variables
   totalElements = 0; // Default total items
@@ -47,7 +46,11 @@ export class TableComponent implements OnChanges {
 
   filterChips: Chip[] = [];
 
-  constructor(private urlHelperService: UrlHelperService) { }
+  constructor(private urlHelperService: UrlHelperService, private configService: ConfigService) {
+    this.configService.getConfig().subscribe(config => {
+      this.categories = config.categories;
+    });
+  }
 
   ngOnInit() {
     this.updatePaginatedData();

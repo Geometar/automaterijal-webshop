@@ -1,75 +1,33 @@
 <section class="section onama-brendovi">
   <div class="container">
     <h1 class="autom-margin--bottom__m">
-      Sektori Kompanije i Partneri Od Povjerenja
+      Sektori Kompanije i Partneri Od Poverenja
     </h1>
-    <h2 class="sector-title autom-margin--bottom__s">Auto delovi</h2>
-    <p class="sector-description autom-margin--bottom__s">
-      Provereni delovi za sve vrste vozila, direktno od renomiranih proizvođača.
-    </p>
 
-    <div class="brand-grid util__flex--wrap">
-      <a href="#" class="brand">
-        <img src="/images/brands/febi.png" alt="FEBI" />
-      </a>
-      <a href="#" class="brand">
-        <img src="/images/brands/bilstain.png" alt="FEBI" />
-      </a>
-      <a href="#" class="brand">
-        <img src="/images/brands/blue_print.png" alt="FEBI" />
-      </a>
-      <a href="#" class="brand">
-        <img src="/images/brands/hiq.png" alt="FEBI" />
-      </a>
-      <a href="#" class="brand">
-        <img src="/images/brands/kolbenschmidt.png" alt="FEBI" />
-      </a>
-      <a href="#" class="brand">
-        <img src="/images/brands/pierburg.png" alt="FEBI" />
-      </a>
-      <a href="#" class="brand">
-        <img src="/images/brands/mahle.png" alt="FEBI" />
-      </a>
-      <a href="#" class="brand">
-        <img src="/images/brands/victor_reinz.png" alt="FEBI" />
-      </a>
-      <a href="#" class="brand">
-        <img src="/images/brands/energizer.png" alt="FEBI" />
-      </a>
-    </div>
-  </div>
-  <div class="container">
-    <h2 class="sector-title autom-margin--bottom__s">Maziva</h2>
-    <p class="sector-description autom-margin--bottom__s">
-      Maziva koja pokreću vaše poslovanje – preko milion litara prodatih širom
-      regiona.
-    </p>
+    <ng-container *ngFor="let section of sectionKeys">
+      <div
+        class="container autom-margin--top__s"
+        *ngIf="getBrandsForSection(section).length"
+      >
+        <h2 class="sector-title autom-margin--bottom__xs">
+          {{ getSectionLabel(section) }}
+        </h2>
 
-    <div class="brand-grid util__flex--wrap">
-      <a href="#" class="brand">
-        <img src="/images/brands/shell.png" alt="FEBI" />
-      </a>
-      <a href="#" class="brand">
-        <img src="/images/brands/lukoil.png" alt="FEBI" />
-      </a>
-      <a href="#" class="brand">
-        <img src="/images/brands/fuchs.png" alt="FEBI" />
-      </a>
-    </div>
-  </div>
-  <div class="container">
-    <h2 class="sector-title autom-margin--bottom__s">Filteri</h2>
-    <p class="sector-description autom-margin--bottom__s">
-      Od traktora do bagera – filteri za dug vek trajanja.
-    </p>
+        <p class="sector-description autom-margin--bottom__xxs">
+          {{ getSectionDescription(section) }}
+        </p>
 
-    <div class="brand-grid util__flex--wrap">
-      <a href="#" class="brand">
-        <img src="/images/brands/mahle.png" alt="FEBI" />
-      </a>
-      <a href="#" class="brand">
-        <img src="/images/brands/fleetguard.png" alt="FEBI" />
-      </a>
-    </div>
+        <div class="brand-grid util__flex--wrap">
+          <a
+            class="brand"
+            *ngFor="let brand of getBrandsForSection(section)"
+            [routerLink]="['/webshop']"
+            [queryParams]="{ mandatoryproid: brand.id }"
+          >
+            <img [src]="brand.src" [alt]="brand.alt" loading="lazy" />
+          </a>
+        </div>
+      </div>
+    </ng-container>
   </div>
 </section>
