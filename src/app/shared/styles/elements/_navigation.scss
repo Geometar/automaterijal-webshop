@@ -890,6 +890,7 @@ body {
 }
 
 .footer-link:is(:hover, :focus-visible) {
+  cursor: pointer;
   color: var(--international-orange-engineering);
 }
 

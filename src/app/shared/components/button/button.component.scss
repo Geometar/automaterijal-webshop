@@ -179,13 +179,13 @@
       }
 
       &:hover {
-        background: var(--figma-accent-green-700);
-        border-color: var(--figma-accent-green-700);
+        background: var(--figma-accent-yellow-500);
+        border-color: var(--figma-accent-yellow-500);
       }
 
       &:disabled {
-        background: var(--figma-accent-yellow-100);
-        border-color: var(--figma-accent-yellow-300);
+        background: var(--figma-grey-600);
+        border-color: var(--figma-grey-600);
         color: var(--figma-base-white);
 
         autom-icon svg path {

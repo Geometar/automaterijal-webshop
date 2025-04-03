@@ -43,40 +43,40 @@
     <h3>POŠALJITE NAM PORUKU</h3>
     <div class="form-group">
       <autom-input-fields
+        [label]="'Ime'"
         [formControlName]="'ime'"
-        [placeholder]="'Ime *'"
         [required]="true"
         [type]="inputType.TEXT"
         (emitSelected)="setSelectionValue('ime', $event)"
         ngDefaultControl
       />
       <autom-input-fields
+        [label]="'Prezime'"
         [formControlName]="'prezime'"
         [required]="true"
-        [placeholder]="'Prezime *'"
         [type]="inputType.TEXT"
         (emitSelected)="setSelectionValue('prezime', $event)"
         ngDefaultControl
       />
     </div>
     <autom-input-fields
+      [label]="'Firma'"
       [formControlName]="'firma'"
-      [placeholder]="'Firma'"
       [type]="inputType.TEXT"
       (emitSelected)="setSelectionValue('firma', $event)"
       ngDefaultControl
     />
     <autom-input-fields
+      [label]="'Telefon'"
       [formControlName]="'tel'"
-      [placeholder]="'Telefon'"
       [type]="inputType.TEXT"
       (emitSelected)="setSelectionValue('tel', $event)"
       ngDefaultControl
     />
     <autom-input-fields
+      [label]="'Email'"
       [formControlName]="'email'"
       [required]="true"
-      [placeholder]="'Email *'"
       [type]="inputType.EMAIL"
       [validators]="[
         {
@@ -88,13 +88,14 @@
       ngDefaultControl
     />
     <autom-text-area
+      [label]="'Poruka'"
       [formControlName]="'poruka'"
       [required]="true"
-      [placeholder]="'Tekst poruke *'"
       (emitSelected)="setSelectionValue('poruka', $event)"
       ngDefaultControl
     />
     <autom-button
+      class="confirm-btn"
       [disabled]="kontaktForma.pristine || !kontaktForma.valid || ucitavanje"
       [label]="'Pošalji sada!'"
       [theme]="buttonThemes.ORANGE"
