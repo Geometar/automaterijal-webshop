@@ -15,7 +15,7 @@ import { ButtonThemes, ColorEnum, IconsEnum, InputTypeEnum } from '../../../shar
 import { EMAIL_ADDRESS } from '../../../shared/data-models/constants/input.constants';
 
 // Model
-import { Kontakt } from '../../../shared/data-models/model/kontakt';
+import { Kontakt } from '../../../shared/data-models/model';
 
 // Service
 import { EmailService } from '../../../shared/service/email.service';

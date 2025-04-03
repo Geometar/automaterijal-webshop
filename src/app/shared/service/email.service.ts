@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { catchError, Observable, throwError, timeoutWith } from 'rxjs';
-import { Kontakt } from '../data-models/model/kontakt';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environment/environment';
 
+// Data models
+import { CreateAccount, Kontakt } from '../data-models/model/email';
+
 const DOMAIN_URL = environment.apiUrl + '/api/email';
 const PORUKA_URL = '/poruka';
-
-const TIMEOUT = 15000;
-const TIMEOUT_ERROR = 'Timeout error!';
+const REQUEST_ACCOUNT_CREATION_URL = '/registracija';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +23,14 @@ export class EmailService {
     const fullUrl = DOMAIN_URL + PORUKA_URL;
     return this.http.post(fullUrl, poruka)
       .pipe(
-        timeoutWith(TIMEOUT, throwError(TIMEOUT_ERROR)),
+        catchError((error: any) => throwError(error))
+      );
+  }
+
+  public createAccountRequest(account: CreateAccount): Observable<void> {
+    const fullUrl = DOMAIN_URL + REQUEST_ACCOUNT_CREATION_URL;
+    return this.http.post<void>(fullUrl, account)
+      .pipe(
         catchError((error: any) => throwError(error))
       );
   }

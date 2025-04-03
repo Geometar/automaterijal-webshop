@@ -1,6 +1,12 @@
 import { Component, OnDestroy, ViewEncapsulation } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { takeWhile } from 'rxjs';
+import {
+  FormsModule,
+  ReactiveFormsModule,
+  UntypedFormBuilder,
+  UntypedFormGroup,
+  Validators,
+} from '@angular/forms';
+import { finalize, takeWhile } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -9,16 +15,33 @@ import { Router } from '@angular/router';
 import { InputFieldsComponent } from '../../shared/components/input-fields/input-fields.component';
 import { ButtonComponent } from '../../shared/components/button/button.component';
 
+// Data models
+import {
+  Account,
+  CreateAccount,
+  Credentials,
+} from '../../shared/data-models/model';
+
 // Enums
-import { ButtonThemes, ButtonTypes, InputTypeEnum, SaveButtonIcons, SizeEnum } from '../../shared/data-models/enums';
+import {
+  ButtonThemes,
+  ButtonTypes,
+  InputTypeEnum,
+  SaveButtonIcons,
+  SizeEnum,
+} from '../../shared/data-models/enums';
 
 // Constants
 import { EMAIL_ADDRESS } from '../../shared/data-models/constants/input.constants';
 
 // Services
-import { Account, Credentials } from '../../shared/data-models/model';
 import { AccountService } from '../../shared/auth/service/account.service';
+import { EmailService } from '../../shared/service/email.service';
 import { LoginService } from '../../shared/service/login.service';
+import { SnackbarService } from '../../shared/service/utils/snackbar.service';
+
+// Animation
+import { trigger, transition, style, animate } from '@angular/animations';
 
 @Component({
   selector: 'app-login',
@@ -30,9 +53,26 @@ import { LoginService } from '../../shared/service/login.service';
     InputFieldsComponent,
     ReactiveFormsModule,
   ],
+  animations: [
+    trigger('fadeAnimation', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(10px)' }),
+        animate(
+          '800ms ease-out',
+          style({ opacity: 1, transform: 'translateY(0)' })
+        ),
+      ]),
+      transition(':leave', [
+        animate(
+          '0ms ease-in',
+          style({ opacity: 0, transform: 'translateY(-10px)' })
+        ),
+      ]),
+    ]),
+  ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
 })
 export class LoginComponent implements OnDestroy {
   authenticationToken = '';
@@ -51,6 +91,7 @@ export class LoginComponent implements OnDestroy {
   sizeEnum = SizeEnum;
 
   // Misc
+  createAccountInProgress = false;
   disableLoginBtn = false;
   loginInProgress = false;
   showAccountCreation = false;
@@ -62,8 +103,14 @@ export class LoginComponent implements OnDestroy {
   // Validator patterns
   emailAddressPattern = EMAIL_ADDRESS;
 
-  constructor(private accountService: AccountService, private fb: UntypedFormBuilder, private loginService: LoginService,
-    private router: Router) {
+  constructor(
+    private accountService: AccountService,
+    private emailService: EmailService,
+    private fb: UntypedFormBuilder,
+    private loginService: LoginService,
+    private router: Router,
+    private snackbarService: SnackbarService
+  ) {
     this.loginForm = this.fb.group({
       username: ['', Validators.required],
       password: ['', Validators.required],
@@ -74,11 +121,11 @@ export class LoginComponent implements OnDestroy {
       grad: ['', [Validators.required]],
       adresa: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
-      kontaktTelefon: ['', [Validators.required]]
+      kontaktTelefon: ['', [Validators.required]],
     });
     this.forgotPasswordForm = this.fb.group({
-      id: ['', [Validators.required]]
-    })
+      id: ['', [Validators.required]],
+    });
   }
 
   logout(): void {
@@ -87,20 +134,23 @@ export class LoginComponent implements OnDestroy {
   }
 
   login(): void {
-    const credentials = { username: this.loginForm.controls['username'].value, password: this.loginForm.controls['password'].value } as Credentials;
-    this.loginService.login(credentials).pipe(takeWhile(() => this.alive)).subscribe({
-      next: (account: Account | null) => {
-        this.accountService.authenticate(account);
-        this.user = account!;
+    const credentials = {
+      username: this.loginForm.controls['username'].value,
+      password: this.loginForm.controls['password'].value,
+    } as Credentials;
+    this.loginService
+      .login(credentials)
+      .pipe(takeWhile(() => this.alive))
+      .subscribe({
+        next: (account: Account | null) => {
+          this.accountService.authenticate(account);
+          this.user = account!;
 
-        this.getToken();
-        this.routeToPage();
-
-      },
-      error: (err: HttpErrorResponse) => {
-
-      }
-    })
+          this.getToken();
+          this.routeToPage();
+        },
+        error: (err: HttpErrorResponse) => { },
+      });
   }
 
   ngOnDestroy(): void {
@@ -128,7 +178,23 @@ export class LoginComponent implements OnDestroy {
   }
 
   kreirajNalog(): void {
-    console.log('Korisnik je pokusao da se kreira nalog')!
+    this.createAccountInProgress = true;
+    const createAccount = this.mapAccountCreationFormToModel();
+    this.emailService
+      .createAccountRequest(createAccount)
+      .pipe(
+        takeWhile(() => this.alive),
+        finalize(() => (this.createAccountInProgress = false))
+      )
+      .subscribe({
+        next: () => {
+          this.snackbarService.showAutoClose(
+            'Vaš zahtev za kreiranje naloga je uspešno poslat i uskoro će biti obrađen.'
+          );
+          this.toggleLogin();
+        },
+        error: (err: HttpErrorResponse) => { },
+      });
   }
 
   toggleAccountCreation(): void {
@@ -143,10 +209,25 @@ export class LoginComponent implements OnDestroy {
     this.showLogin = true;
   }
 
-
   toggleZaboravljenaSifra(): void {
     this.showAccountCreation = false;
     this.showForgotPassword = true;
     this.showLogin = false;
+  }
+
+  private mapAccountCreationFormToModel(): CreateAccount {
+    const formValue = this.accountCreationForm.value;
+
+    const account: CreateAccount = {
+      adresa: formValue.adresa,
+      daLiJePravnoLice: true,
+      email: formValue.email,
+      grad: formValue.grad,
+      kontaktTelefon: formValue.kontaktTelefon,
+      nazivFirme: formValue.nazivFirme,
+      pib: formValue.pib,
+    };
+
+    return account;
   }
 }

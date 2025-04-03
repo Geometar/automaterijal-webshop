@@ -1,6 +1,6 @@
 <section class="header-margin--top login login-container">
   <div class="header-margin--bottom login-left">
-    <ng-container *ngIf="showForgotPassword">
+    <div *ngIf="showForgotPassword" @fadeAnimation>
       <h3>Restartujte vasu sifru</h3>
       <form class="login-form__container" [formGroup]="forgotPasswordForm">
         <autom-input-fields
@@ -30,8 +30,8 @@
           ngDefaultControl
         ></autom-button>
       </form>
-    </ng-container>
-    <ng-container *ngIf="showLogin">
+    </div>
+    <div *ngIf="showLogin" @fadeAnimation>
       <h3>Dobrodosli u prodavnicu Automaterijala</h3>
       <form class="login-form__container" [formGroup]="loginForm">
         <autom-input-fields
@@ -60,9 +60,7 @@
           (keydown.enter)="login()"
           ngDefaultControl
         ></autom-input-fields>
-        <a class="forgot-password" (click)="toggleZaboravljenaSifra()"
-          >Zaboravio sifru?</a
-        >
+        <!-- <a class="forgot-password"w -->
         <autom-button
           class="login-form-button"
           [disabled]="!loginForm.valid || disableLoginBtn"
@@ -75,9 +73,9 @@
           ngDefaultControl
         ></autom-button>
       </form>
-    </ng-container>
+    </div>
 
-    <ng-container *ngIf="showAccountCreation">
+    <div *ngIf="showAccountCreation" @fadeAnimation>
       <h3>Napravite svoj nalog</h3>
       <form class="login-form__container" [formGroup]="accountCreationForm">
         <autom-input-fields
@@ -92,7 +90,6 @@
           (emitSelected)="
             setSelectionValueAccountCreation('nazivFirme', $event)
           "
-          (keydown.enter)="login()"
           ngDefaultControl
         ></autom-input-fields>
         <autom-input-fields
@@ -105,7 +102,6 @@
           [type]="inputTypeEnums.NUMBER"
           [validators]="[{ required: true }]"
           (emitSelected)="setSelectionValueAccountCreation('pib', $event)"
-          (keydown.enter)="login()"
           ngDefaultControl
         ></autom-input-fields>
         <autom-input-fields
@@ -131,7 +127,6 @@
           [type]="inputTypeEnums.TEXT"
           [validators]="[{ required: true }]"
           (emitSelected)="setSelectionValueAccountCreation('adresa', $event)"
-          (keydown.enter)="login()"
           ngDefaultControl
         ></autom-input-fields>
         <autom-input-fields
@@ -150,7 +145,6 @@
             }
           ]"
           (emitSelected)="setSelectionValueAccountCreation('email', $event)"
-          (keydown.enter)="login()"
           ngDefaultControl
         ></autom-input-fields>
         <autom-input-fields
@@ -170,7 +164,7 @@
         ></autom-input-fields>
         <autom-button
           class="login-form-button"
-          [disabled]="!accountCreationForm.valid"
+          [disabled]="!accountCreationForm.valid || createAccountInProgress"
           [iconPrefix]="loginInProgress"
           [iconSource]="buttonIcon"
           [label]="'Kreiraj'"
@@ -180,23 +174,27 @@
           ngDefaultControl
         ></autom-button>
       </form>
-    </ng-container>
+    </div>
   </div>
   <div class="header-margin--bottom login-right">
-    <ng-container *ngIf="showLogin || showForgotPassword">
+    <div
+      class="right-side"
+      *ngIf="showLogin || showForgotPassword"
+      @fadeAnimation
+    >
       <h3>Nemas nalog?</h3>
       <p>Napravi svoj nalog i uzivaj u dodatnim pogodnostima.</p>
       <button class="sign-up-btn" (click)="toggleAccountCreation()">
         Kreiraj
       </button>
-    </ng-container>
-    <ng-container *ngIf="showAccountCreation">
+    </div>
+    <div class="right-side" *ngIf="showAccountCreation" @fadeAnimation>
       <h3>Imas nalog?</h3>
       <p>
         Uloguj se sada da pristupiš svom nalogu i nastaviš s kupovinom ili
         pregledom svojih podataka.
       </p>
       <button class="sign-up-btn" (click)="toggleLogin()">Login</button>
-    </ng-container>
+    </div>
   </div>
 </section>
