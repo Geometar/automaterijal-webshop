@@ -1,0 +1,113 @@
+<autom-popup
+  class="first-login"
+  [height]="sizeEnum.AUTO"
+  [position]="positionEnum.CENTER"
+  [rounded]="true"
+  [subPosition]="positionEnum.CENTER"
+  [width]="sizeEnum.LARGE"
+>
+  <div custom-header class="page-details__header">
+    <div class="page-details__title--row">
+      <h3 class="h3">Dobrodosli na vase prvo logovanje</h3>
+    </div>
+  </div>
+
+  <div
+    custom-body
+    class="page-details__body page-details__height--auto body util__flex--center autom-flex-direction--column"
+  >
+    <mat-stepper linear class="stepper" [orientation]="'horizontal'">
+      <!-- Step 1: Welcome step -->
+      <mat-step label="Obaveštenje">
+        <div>
+          <h2>Poštovani</h2>
+          <p>Dobrodošli u internet prodavnicu Automaterijala.</p>
+          <p class="margin-top--10">
+            Da bi vaš nalog bio potpuno funkcionalan, potrebno je da postavite
+            novu lozinku. Klikom na Dalje, prelazite na korak za unos nove
+            lozinke.
+          </p>
+        </div>
+        <div class="autom-margin--top__m">
+          <button mat-button matStepperNext>Next</button>
+        </div>
+      </mat-step>
+
+      <!-- Step 2: Create password -->
+      <mat-step label="Kreirajte lozinku">
+        <div>
+          <autom-input-fields
+            [label]="'Sifra'"
+            [required]="true"
+            [type]="inputTypeEnum.PASSWORD"
+            (emitSelected)="evaluatePassword($event, false)"
+          ></autom-input-fields>
+          <autom-input-fields
+            [label]="'Ponovite Sifru'"
+            [required]="true"
+            [type]="inputTypeEnum.PASSWORD"
+            (emitSelected)="evaluatePassword($event, true)"
+          ></autom-input-fields>
+          <section class="password-popup__container">
+            <article class="password-popup__rule">
+              <autom-icon
+                [ngClass]="{
+                  'password-popup__rule--valid': passwordRules.passwordLength
+                }"
+                [source]="iconsEnum.CHECK_1"
+              ></autom-icon>
+              <h3
+                class="h5"
+                [ngClass]="{
+                  'password-popup__rule--valid': passwordRules.passwordLength
+                }"
+              >
+                Sifra mora imati bar 5 karaktera
+              </h3>
+            </article>
+            <article class="password-popup__rule">
+              <autom-icon
+                [ngClass]="{
+                  'password-popup__rule--valid': passwordRules.passwordsMatching
+                }"
+                [source]="iconsEnum.CHECK_1"
+              ></autom-icon>
+              <h3
+                class="h5"
+                [ngClass]="{
+                  'password-popup__rule--valid': passwordRules.passwordsMatching
+                }"
+              >
+                Sifra se podudaraju
+              </h3>
+            </article>
+          </section>
+          <div class="autom-margin--top__m">
+            <button mat-button matStepperPrevious>Back</button>
+            <button
+              mat-button
+              matStepperNext
+              (click)="createNewPassowrd()"
+              [disabled]="!enablePasswordBtn"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      </mat-step>
+
+      <!-- Step 3: Finished -->
+      <mat-step>
+        <ng-template matStepLabel>Gotovo</ng-template>
+        <h2>Čestitamo</h2>
+        <p>
+          Lozinka je uspešno postavljena. Vaš nalog je sada spreman za
+          korišćenje.
+        </p>
+        <div>
+          <button mat-button (click)="closePopupModal.emit()">U redu</button>
+        </div>
+      </mat-step>
+    </mat-stepper>
+  </div>
+</autom-popup>

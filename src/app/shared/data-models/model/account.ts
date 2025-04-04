@@ -33,3 +33,10 @@ export class Credentials {
 export interface JwtToken {
   token: string;
 }
+
+export class PasswordChange {
+  ponovljenjaSifra?: string;
+  ppid?: number;
+  sifra?: string;
+  staraSifra?: string;
+}

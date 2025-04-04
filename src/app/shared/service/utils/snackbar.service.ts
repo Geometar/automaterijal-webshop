@@ -29,7 +29,7 @@ export class SnackbarService {
 
   showAutoClose(
     message: string,
-    verticalPosition: SnackbarPosition = SnackbarPosition.BOTTOM,
+    verticalPosition: SnackbarPosition = SnackbarPosition.TOP,
     action: string = 'OK',
     duration: number = 3000,
     horizontalPosition: SnackbarHorizontalPosition = SnackbarHorizontalPosition.CENTER

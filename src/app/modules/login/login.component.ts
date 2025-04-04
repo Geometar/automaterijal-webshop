@@ -42,13 +42,15 @@ import { SnackbarService } from '../../shared/service/utils/snackbar.service';
 
 // Animation
 import { trigger, transition, style, animate } from '@angular/animations';
+import { FirstLoginPopupComponent } from './first-login-popup/first-login-popup.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [
-    CommonModule,
     ButtonComponent,
+    CommonModule,
+    FirstLoginPopupComponent,
     FormsModule,
     InputFieldsComponent,
     ReactiveFormsModule,
@@ -95,6 +97,7 @@ export class LoginComponent implements OnDestroy {
   disableLoginBtn = false;
   loginInProgress = false;
   showAccountCreation = false;
+  showFirstLoginPopup = false;
   showForgotPassword = false;
   showLogin = true;
 
@@ -128,6 +131,16 @@ export class LoginComponent implements OnDestroy {
     });
   }
 
+  /** Angular lifecycle hooks start */
+
+  ngOnDestroy(): void {
+    this.alive = false;
+  }
+
+  /** Angular lifecycle hooks end */
+
+  /** Main event: start */
+
   logout(): void {
     this.authenticationToken = '';
     this.loginService.logout();
@@ -143,19 +156,20 @@ export class LoginComponent implements OnDestroy {
       .pipe(takeWhile(() => this.alive))
       .subscribe({
         next: (account: Account | null) => {
-          this.accountService.authenticate(account);
           this.user = account!;
-
+          this.accountService.authenticate(account);
           this.getToken();
+          if (account && account.loginCount === 0) {
+            this.showFirstLoginPopup = true;
+            return;
+          }
           this.routeToPage();
         },
         error: (err: HttpErrorResponse) => { },
       });
   }
 
-  ngOnDestroy(): void {
-    this.alive = false;
-  }
+  /** Main event: end */
 
   setSelectionValue(control: string, value: string): void {
     this.loginForm.controls[control].setValue(value);
@@ -229,5 +243,10 @@ export class LoginComponent implements OnDestroy {
     };
 
     return account;
+  }
+
+  changedPasswordPopupHandler(): void {
+    this.showFirstLoginPopup = false;
+    this.routeToPage();
   }
 }

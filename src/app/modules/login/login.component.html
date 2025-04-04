@@ -198,3 +198,9 @@
     </div>
   </div>
 </section>
+
+<first-login-popup
+  *ngIf="showFirstLoginPopup"
+  [account]="user!"
+  (closePopupModal)="changedPasswordPopupHandler()"
+></first-login-popup>

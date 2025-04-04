@@ -1,0 +1,73 @@
+.first-login {
+  .stepper {
+    background: white;
+    padding: 10px;
+
+    p {
+      font-size: 16px;
+      padding: 5px;
+    }
+
+    h2 {
+      margin-bottom: 10px !important;
+    }
+
+    .mat-step-header {
+      pointer-events: none;
+    }
+
+    .mat-horizontal-content-container {
+      overflow: hidden;
+      padding: 15px 24px 24px 24px;
+  }
+  }
+}
+.password-popup {
+  &__container {
+    margin-top: calc(var(--space-m) - var(--space-s));
+  }
+
+  &__rule {
+    display: flex;
+    gap: var(--space-s);
+    height: 20px;
+
+    .h5 {
+      font-size: 16px !important;
+    }
+
+    &--valid {
+      color: var(--figma-success-600);
+
+      .mat-icon {
+        svg {
+          path {
+            stroke: var(--figma-success-600) !important;
+          }
+        }
+      }
+    }
+  }
+
+  cesarx-button {
+    flex: 1;
+
+    button {
+      width: 100%;
+    }
+  }
+
+  .confirmation-container__main {
+    max-width: unset;
+  }
+
+  .h5 {
+    font-size: var(--text-md) !important;
+  }
+}
+
+.revoke-popup {
+  .confirmation-container__icon--circle {
+    background-color: var(--figma-error-50);
+  }
+}
