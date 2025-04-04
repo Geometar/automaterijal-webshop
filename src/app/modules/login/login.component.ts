@@ -12,8 +12,9 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
 // Automaterijal imports
-import { InputFieldsComponent } from '../../shared/components/input-fields/input-fields.component';
 import { ButtonComponent } from '../../shared/components/button/button.component';
+import { FirstLoginPopupComponent } from './first-login-popup/first-login-popup.component';
+import { InputFieldsComponent } from '../../shared/components/input-fields/input-fields.component';
 
 // Data models
 import {
@@ -42,7 +43,6 @@ import { SnackbarService } from '../../shared/service/utils/snackbar.service';
 
 // Animation
 import { trigger, transition, style, animate } from '@angular/animations';
-import { FirstLoginPopupComponent } from './first-login-popup/first-login-popup.component';
 
 @Component({
   selector: 'app-login',
