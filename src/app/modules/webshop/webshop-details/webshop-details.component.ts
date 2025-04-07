@@ -145,6 +145,10 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       });
   }
 
+  openLink(doc: TecDocDokumentacija) {
+    window.open(doc.docUrl, '_blank');
+  }
+
   // End of: Events
   fillDocumentation() {
     if (!this.data.dokumentacija) {

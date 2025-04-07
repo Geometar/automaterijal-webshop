@@ -105,9 +105,26 @@
         <ng-container *ngFor="let document of getDocumentByKey(key)">
           <div
             class="documentation--section-padding"
-            *ngIf="document.docFileTypeName!.toUpperCase().indexOf('URL') > -1"
+            *ngIf="
+              document.docFileTypeName!.toUpperCase().indexOf('URL') > -1 &&
+              document.docTypeId === 9
+            "
           >
             <youtube-player [videoId]="document.saniraniUrl"></youtube-player>
+          </div>
+          <div
+            class="documentation--section-padding"
+            *ngIf="
+              document.docFileTypeName!.toUpperCase().indexOf('URL') > -1 &&
+              (document.docTypeId === 6 || document.docTypeId === 17)
+            "
+          >
+            <span (click)="openLink(document)">
+              <autom-icon
+                [tooltip]="{ tooltipText: 'Link: ' + document.docUrl }"
+                [source]="iconEnum.LINK"
+              ></autom-icon>
+            </span>
           </div>
         </ng-container>
       </div>
