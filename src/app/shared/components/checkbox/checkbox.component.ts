@@ -38,7 +38,7 @@ export class CheckboxComponent implements OnInit, OnChanges {
   @Input() size = SizeEnum.FULL;
   @Input() theme = OrientationEnum.HORIZONTAL;
   @Input() tooltipData: TooltipModel | null = null;
-  @Output() emitCheckbox = new EventEmitter<CheckboxModel>();
+  @Output() emitCheckbox = new EventEmitter<CheckboxModel[]>();
   @Output() emitSelected = new EventEmitter<any>();
 
   // Enums
@@ -107,7 +107,6 @@ export class CheckboxComponent implements OnInit, OnChanges {
       this.items[0].checked = !found;
     }
 
-    this.emitCheckbox.emit(this.items[index]);
-    this.emitSelected.emit(this.items[index].checked);
+    this.emitCheckbox.emit(this.items);
   }
 }
