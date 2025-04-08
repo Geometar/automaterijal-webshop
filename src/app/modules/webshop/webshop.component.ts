@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { finalize, Subject, takeUntil } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -56,6 +56,7 @@ interface QueryParams {
   ],
   templateUrl: './webshop.component.html',
   styleUrl: './webshop.component.scss',
+  encapsulation: ViewEncapsulation.None
 })
 export class WebshopComponent implements OnDestroy, OnInit {
   private destroy$ = new Subject<void>();
