@@ -6,21 +6,18 @@
 >
   <div class="filter-section">
     <div class="filter-container">
-      <autom-radio-button
-        [label]="'Raspolozivost'"
-        [options]="radioOptions"
-        [theme]="orientation.VERTICAL"
-        (emitSelected)="adjustAvailability()"
-      ></autom-radio-button>
+      <availability-filter
+        [onStock]="filter.naStanju!"
+        (availabilityChanged)="onAvailabilityChanged($event)"
+      ></availability-filter>
     </div>
     <div class="filter-container" *ngIf="categories && categories !== null">
-      <checkbox-group
+      <category-filter
         *ngIf="openCategoriesFilters"
-        class="filter-selection"
-        [items]="categoriesCheckBoxModels"
-        [label]="'Kategorije'"
-        (clickEvent)="adjustCategoriesFilters()"
-      ></checkbox-group>
+        [categories]="categories"
+        [selectedSubgroupIds]="filter.podgrupe || []"
+        (subgroupsChanged)="onSubgroupsChanged($event)"
+      ></category-filter>
     </div>
     <div class="filter-container" *ngIf="manufactures && manufactures.length">
       <div class="filter-prefilter" *ngIf="manufactures.length > 7">
@@ -31,20 +28,13 @@
           (emitSelected)="preFilterManufactures($event)"
         ></autom-input-fields>
       </div>
-      <autom-checkbox
+      <manufacture-filter
         *ngIf="openManufacturesFilters"
-        class="filter-selection"
-        [horizontal]="false"
-        [items]="
-          manufacturerPreFilter
-            ? filteredManufactures
-            : manufacturesCheckBoxModels
-        "
-        [label]="'Proizvodjaci'"
-        [size]="sizeEnum.AUTO"
-        [theme]="orientation.VERTICAL"
-        (emitCheckbox)="adjustManufactureFilters()"
-      ></autom-checkbox>
+        [manufactures]="manufacturesModels"
+        [selected]="filter.proizvodjaci || []"
+        [filterTerm]="manufacturerPreFilter"
+        (selectionChanged)="onManufactureChanged($event)"
+      ></manufacture-filter>
     </div>
   </div>
 </div>

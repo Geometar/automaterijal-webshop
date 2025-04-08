@@ -32,33 +32,3 @@
   margin: 10px 0;
   padding: 5px;
 }
-
-.filter-list {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-}
-
-.filter-list li {
-  background: #fff;
-  border-radius: 5px;
-  cursor: pointer;
-  padding: 0 10px;
-  font-size: 14px;
-
-  &:hover {
-    background-color: var(--figma-grey-25);
-    color: var(--figma-highlight-orange);
-  }
-}
-
-.filter-selection {
-  .autom-checkbox__vertical {
-    max-height: 340px;
-    overflow-y: auto;
-  }
-  .grouped-checkbox {
-    max-height: 340px;
-    overflow-y: auto;
-  }
-}

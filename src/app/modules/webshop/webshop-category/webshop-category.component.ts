@@ -2,17 +2,14 @@ import { CommonModule } from '@angular/common';
 import {
   Component,
   Input,
-  OnChanges,
-  OnInit,
-  SimpleChanges,
   ViewEncapsulation,
 } from '@angular/core';
 
 // Component imported
-import { CheckboxComponent } from '../../../shared/components/checkbox/checkbox.component';
-import { CheckboxGroupComponent, Task } from '../../../shared/components/checkbox-group/checkbox-group.component';
+import { AvailabilityFilterComponent } from './availability-filter/availability-filter.component';
+import { CategoryFilterComponent } from './category-filter/category-filter.component';
 import { InputFieldsComponent } from '../../../shared/components/input-fields/input-fields.component';
-import { RadioButtonComponent } from '../../../shared/components/radio-button/radio-button.component';
+import { ManufactureFilterComponent } from './manufacture-filter/manufacture-filter.component';
 
 // Data models
 import {
@@ -42,17 +39,17 @@ export enum FilterEnum {
   selector: 'webshop-category',
   standalone: true,
   imports: [
-    CheckboxComponent,
-    CheckboxGroupComponent,
+    AvailabilityFilterComponent,
+    CategoryFilterComponent,
     CommonModule,
     InputFieldsComponent,
-    RadioButtonComponent,
+    ManufactureFilterComponent,
   ],
   templateUrl: './webshop-category.component.html',
   styleUrl: './webshop-category.component.scss',
   encapsulation: ViewEncapsulation.None,
 })
-export class WebshopCategoryComponent implements OnChanges, OnInit {
+export class WebshopCategoryComponent {
   @Input() categories: any = null;
   @Input() filter: Filter = new Filter();
   @Input() manufactures: Manufacture[] | undefined = [];
@@ -60,10 +57,6 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
   // Misc
   openCategoriesFilters = true;
   openManufacturesFilters = true;
-
-  // CheckBox Models
-  categoriesCheckBoxModels: Task[] = [];
-  manufacturesCheckBoxModels: CheckboxModel[] = [];
 
   // Radio Models
   radioOptions: RadioOption[] = [];
@@ -79,160 +72,39 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
   orientation = OrientationEnum;
   sizeEnum = SizeEnum;
 
-  get filteredManufactures(): CheckboxModel[] {
-    this.manufacturesCheckBoxModels.filter((data: CheckboxModel) => {
-      return data.value
-        .toLowerCase()
-        .includes(this.manufacturerPreFilter.toLowerCase());
-    });
-    return this.manufacturesCheckBoxModels.filter((data: CheckboxModel) =>
-      data.value
-        .toLowerCase()
-        .includes(this.manufacturerPreFilter.toLowerCase())
-    );
+  get manufacturesModels(): CheckboxModel[] {
+    const selected = this.filter.proizvodjaci ?? [];
+    return (this.manufactures ?? []).map((manufacture) => ({
+      value: manufacture.naziv!,
+      key: manufacture.proid,
+      checked: selected.includes(manufacture.proid!),
+    }));
   }
 
   constructor(private urlHelperService: UrlHelperService) { }
 
-  // Start of: Angular life cycles
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['categories']) {
-      this.fillCategories();
-    }
-    if (changes['manufactures']) {
-      this.fillManufactures();
-    }
-    if (changes['filter']) {
-      if (changes['filter'].firstChange) {
-        this.adjustCompleteFilters();
-      }
-      this.checkAvailability();
-    }
-  }
-
-  ngOnInit(): void {
-    this.fillAvailability();
-  }
-
-  // End of: Angular life cycles
-
-  fillAvailability(): void {
-    const selected = this.filter.naStanju ? 'Ima na stanju' : 'Svi artikli';
-    this.radioOptionKeys.forEach((value: string) => {
-      this.radioOptions.push({
-        key: value,
-        value: value,
-        checked: value === selected,
-      } as RadioOption);
-    });
-  }
-
-  checkAvailability(): void {
-    if (this.radioOptions && this.radioOptions.length) {
-      const selected = this.filter.naStanju ? 'Ima na stanju' : 'Svi artikli';
-      this.radioOptions.forEach((value: RadioOption) => {
-        value.checked = value.value === selected
-      })
-    }
-  }
-
-  fillCategories(): void {
-    this.categoriesCheckBoxModels = [];
-    if (this.categories != null) {
-      const filteredSubGroups = this.filter.podgrupe ?? [];
-      this.categoriesCheckBoxModels = Object.keys(this.categories).map((key) => {
-        const subtasks = this.categories[key].map((item: any) => ({
-          name: item.naziv,
-          completed: filteredSubGroups.length ? filteredSubGroups.includes(item.id.toString()) : false,
-          id: item.id,
-          grupa: item.grupa
-        }));
-
-        // Check if all subtasks are completed
-        const allCompleted = subtasks.length > 0 && subtasks.every((subtask: any) => subtask.completed);
-
-        return {
-          name: key,
-          completed: allCompleted,
-          id: key,
-          subtasks
-        };
-      });
-    }
-  }
-
-  fillManufactures(): void {
-    this.manufacturesCheckBoxModels = [];
-    if (this.manufactures?.length) {
-      const filterManufactures = this.filter.proizvodjaci ?? [];
-      this.manufactures.forEach((manufacture: Manufacture) => {
-        this.manufacturesCheckBoxModels.push({
-          value: manufacture.naziv,
-          key: manufacture.proid,
-          checked: filterManufactures.includes(manufacture.proid!),
-        } as CheckboxModel);
-      });
-    }
-  }
-
   // Start of: Emit handle
 
-  adjustCategoriesFilters(): void {
-    const categories: Task[] = this.categoriesCheckBoxModels && this.categoriesCheckBoxModels.length ? this.categoriesCheckBoxModels.flatMap((data: Task) => data.subtasks!) : [];
+  onSubgroupsChanged(updatedIds: string[]): void {
     this.urlHelperService.addOrUpdateQueryParams({
-      podgrupe: categories.filter((category: Task) => category.completed).map((task: Task) => task.id)
+      podgrupe: updatedIds
     });
   }
 
-  adjustManufactureFilters(): void {
+  onManufactureChanged(ids: (string | number)[]): void {
     this.urlHelperService.addOrUpdateQueryParams({
-      proizvodjaci: this.manufacturesCheckBoxModels
-        .filter((value: CheckboxModel) => value.checked)
-        .map((value: CheckboxModel) => value.key),
+      proizvodjaci: ids,
     });
   }
 
-  adjustCompleteFilters(): void {
-    if (this.manufactures?.length) {
-      if (this.filter.proizvodjaci?.length) {
-        this.manufacturesCheckBoxModels.forEach(
-          (value: CheckboxModel) =>
-            (value.checked = this.filter.proizvodjaci!.includes(value.key!))
-        );
-      }
-    }
-    if (this.categories !== null) {
-      if (this.filter.podgrupe?.length) {
-        this.categoriesCheckBoxModels.forEach(
-          (value: Task) => {
-            value.completed = this.filter.podgrupe!.includes(value.id.toString());
-            value.subtasks?.forEach((subtaskValue: Task) => {
-              subtaskValue.completed = this.filter.podgrupe!.includes(subtaskValue.id.toString());
-            })
-
-          }
-        );
-      }
-    }
-  }
-
-  adjustAvailability(): void {
-    const selectedCheckbox = this.radioOptions.find(
-      (value: RadioOption) => value.checked
-    );
-    const allAvailability = selectedCheckbox?.key === this.radioOptionKeys[0];
+  onAvailabilityChanged(isAvailable: boolean): void {
     this.urlHelperService.addOrUpdateQueryParams({
-      naStanju: !allAvailability,
+      naStanju: isAvailable,
     });
   }
   // End of: Emit handle
 
-  // Start of: Filter categories
-
   preFilterManufactures(filterTerm: string): void {
     this.manufacturerPreFilter = filterTerm;
   }
-
-  // End of: Filter categories
 }

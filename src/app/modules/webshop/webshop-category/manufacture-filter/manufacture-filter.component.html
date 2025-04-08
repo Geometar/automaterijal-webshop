@@ -1,0 +1,9 @@
+<autom-checkbox
+  class="filter-selection"
+  [horizontal]="false"
+  [items]="filterTerm ? filteredManufactures() : state()"
+  [label]="'Proizvođači'"
+  [size]="sizeEnum.AUTO"
+  [theme]="orientationEnum.VERTICAL"
+  (emitCheckbox)="emitChanges($event)"
+></autom-checkbox>
