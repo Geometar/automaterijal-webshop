@@ -31,15 +31,21 @@ export class ManufactureFilterComponent implements OnChanges {
   readonly orientationEnum = OrientationEnum;
 
   readonly filteredManufactures = computed(() => {
-    const term = this.filterTerm.toLowerCase();
+    const term = this._filterTerm().toLowerCase();
     return this.state().filter((item) =>
       item.value.toLowerCase().includes(term)
     );
   });
 
+  readonly _filterTerm = signal('');
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['manufactures'] || changes['selected']) {
       this.syncState();
+    }
+
+    if (changes['filterTerm']) {
+      this._filterTerm.set(this.filterTerm);
     }
   }
 

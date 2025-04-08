@@ -146,10 +146,7 @@ export class WebshopNavComponent implements OnChanges {
   }
 
   goToSecondPage(): void {
-    this.urlHelperService.removeQueryParams([
-      'assemblyGroupName',
-      'assembleGroupId',
-    ]);
+    this.urlHelperService.retainOnlyQueryParams(['tecdocType', 'tecdocId']);
   }
 
   /**

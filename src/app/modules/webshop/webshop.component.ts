@@ -56,7 +56,7 @@ interface QueryParams {
   ],
   templateUrl: './webshop.component.html',
   styleUrl: './webshop.component.scss',
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
 })
 export class WebshopComponent implements OnDestroy, OnInit {
   private destroy$ = new Subject<void>();
@@ -92,7 +92,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
     private pictureService: PictureService,
     private robaService: RobaService,
     private stateService: WebshopStateService,
-    private tecdocService: TecdocService,
+    private tecdocService: TecdocService
   ) { }
 
   /** Angular lifecycle hooks start */
@@ -143,7 +143,9 @@ export class WebshopComponent implements OnDestroy, OnInit {
           this.pictureService.convertByteToImageArray(
             response.robaDto!.content
           );
-          this.cartStateService.updateStockFromCart(response?.robaDto?.content!);
+          this.cartStateService.updateStockFromCart(
+            response?.robaDto?.content!
+          );
           this.magacinData = response;
           this.currentState = this.state.SHOW_ARTICLES;
         },
@@ -219,8 +221,13 @@ export class WebshopComponent implements OnDestroy, OnInit {
   setRobaPageData(tableEvent: TablePage): void {
     this.pageIndex = tableEvent.pageIndex;
     this.rowsPerPage = tableEvent.pageSize;
-    this.currentState === this.state.SHOW_ARTICLES_WITH_VEHICLE_DETAILS ? this.getArticlesByAssembleGroup(this.tecdocId!, this.tecdocType!, this.assembleGroupId) :
-      this.getRoba();
+    this.currentState === this.state.SHOW_ARTICLES_WITH_VEHICLE_DETAILS
+      ? this.getArticlesByAssembleGroup(
+        this.tecdocId!,
+        this.tecdocType!,
+        this.assembleGroupId
+      )
+      : this.getRoba();
   }
 
   selectVehicleDetailsEventHandle(selectedVehicle: TDVehicleDetails): void {
@@ -233,8 +240,8 @@ export class WebshopComponent implements OnDestroy, OnInit {
   // Start of: Private methods
 
   /**
- * Handles finalize logic, only setting loading = false when all requests complete.
- */
+   * Handles finalize logic, only setting loading = false when all requests complete.
+   */
   private finalizeLoading(): void {
     this.activeRequests--; // Decrease active requests count
     if (this.activeRequests === 0) {
@@ -244,172 +251,51 @@ export class WebshopComponent implements OnDestroy, OnInit {
   }
 
   /**
-   * Handles query parameters and updates the component's state accordingly.
-   * @param params The query parameters.
-   * @param isInitialLoad Flag to determine if this is the initial load.
+   * Main logic
+   * @param params The query parameters from the URL
+   * @param isInitialLoad Flag indicating if this is the initial component load
    */
-  private handleQueryParams(params: QueryParams, isInitialLoad: boolean = false): void {
-    // Extract and safely parse all parameters
-    const searchTerm = params.searchTerm || '';
-    const tecdocType = this.tecdocType = params.tecdocType || '';
-    const tecdocId = this.tecdocId = params.tecdocId ? +params.tecdocId : null;
-    const assembleGroupId = params.assembleGroupId || '';
+  private handleQueryParams(
+    params: QueryParams,
+    isInitialLoad: boolean = false
+  ): void {
+    // 1. Extract and store basic parameters into the component's state
+    this.extractBaseParams(params);
 
-    const mandatoryProid = params.mandatoryproid || '';
-    const mandatoryGrupe = params.grupe || '';
+    // 2. Build a new filter object based on query parameters
+    const newFilter = this.logicService.createFilterFromParams(params);
 
-    this.assemblyGroupName = params.assemblyGroupName || '';
-
-    // Create a filter object from parameters
-    const filter = this.logicService.createFilterFromParams(params);
-    const filtersChanged = this.logicService.haveFiltersChanged(this.filter, filter);
-
-    if (filtersChanged) {
-      this.pageIndex = 0;
-    }
-
-    // Determine if parameters are empty and an empty container should be shown
-    const isEmptyParams = this.stateService.shouldShowEmptyContainer(
-      searchTerm,
-      mandatoryProid,
-      mandatoryGrupe,
-      tecdocId,
-      tecdocType,
+    // 3. Compare with the previous filter to check for changes
+    const filtersChanged = this.logicService.haveFiltersChanged(
+      this.filter,
+      newFilter
     );
 
-    if (!tecdocId) {
-      this.selectedVehicleDetails = null;
-    }
+    // 4. If filters have changed, reset to the first page
+    if (filtersChanged) this.pageIndex = 0;
 
-    if (isEmptyParams) {
-      this.filter = filter;
-      this.updateState(WebShopState.SHOW_EMPTY_CONTAINER, searchTerm);
+    // 5. If all params are effectively empty, show the empty container
+    if (this.checkEmptyState(params)) {
+      this.filter = newFilter;
+      this.updateState(WebShopState.SHOW_EMPTY_CONTAINER, this.searchTerm);
       return;
     }
 
-    // Determine if we need to fetch new vehicle details
-    const shouldFetchNewVehicleDetails = this.shouldFetchVehicleDetails(tecdocType, tecdocId);
+    // 6. Update vehicle details if tecdocId/type changed
+    this.updateVehicleIfNeeded(params);
 
-    if (shouldFetchNewVehicleDetails && tecdocId !== null) {
-      this.getTDVehicleDetails(tecdocId, tecdocType);
-    }
-
-    // Determine if an assemble group is selected
-    const assembleGroupSelected = !!assembleGroupId;
-
-    // Determine the state of the webshop
-    this.currentState = this.determineWebShopState({
-      showVehicleDetails: !!tecdocId && !!tecdocType,
-      assembleGroupSelected
-    });
-
-    // Update state based on new parameters
-    this.updateStateBasedOnQueryParams({
-      searchTerm,
-      filter,
-      isInitialLoad,
-      assembleGroupId,
-    });
-
-    // Fetch data based on the current state
-    this.fetchDataBasedOnCurrentState({
-      tecdocType,
-      tecdocId,
-      assembleGroupId,
-      filtersChanged,
-      isInitialLoad,
-    });
-  }
-
-  /**
-   * Updates the component's state based on query parameters.
-   */
-  private updateStateBasedOnQueryParams({
-    searchTerm,
-    filter,
-    isInitialLoad,
-    assembleGroupId,
-  }: {
-    searchTerm: string;
-    filter: Filter;
-    isInitialLoad: boolean;
-    assembleGroupId: string;
-  }): void {
-    const isSearchTermChanged = searchTerm !== this.searchTerm;
-    const isMandatoryFilterActive = !!filter.mandatoryProid!.length || !!filter.grupe!.length;
-    const isResetNeeded = this.currentState === this.state.SHOW_ARTICLES ? isSearchTermChanged : false;
-    if (!isInitialLoad && !isMandatoryFilterActive && isResetNeeded) {
-      this.filter = new Filter();
-    } else {
-      this.filter = filter;
-    }
-
-    this.searchTerm = searchTerm;
-    this.assembleGroupId = assembleGroupId;
-  }
-
-  /**
-   * Fetches data based on the current component state.
-   */
-  private fetchDataBasedOnCurrentState({
-    tecdocType,
-    tecdocId,
-    assembleGroupId,
-    filtersChanged,
-    isInitialLoad,
-  }: {
-    tecdocType: string;
-    tecdocId: number | null;
-    assembleGroupId: string;
-    filtersChanged: boolean;
-    isInitialLoad: boolean;
-  }): void {
-    switch (this.currentState) {
-      case WebShopState.SHOW_VEHICLE_DETAILS:
-        if (tecdocId !== null && (!this.selectedVehicleDetails || this.selectedVehicleDetails.linkageTargetId !== tecdocId)) {
-          this.getTDVehicleDetails(tecdocId, tecdocType);
-        }
-        break;
-      case WebShopState.SHOW_ARTICLES_WITH_VEHICLE_DETAILS:
-        if (tecdocId !== null) {
-          this.getArticlesByAssembleGroup(tecdocId, tecdocType, assembleGroupId, isInitialLoad || filtersChanged);
-        }
-        break;
-      case WebShopState.SHOW_ARTICLES:
-        this.getRoba(isInitialLoad || filtersChanged);
-        break;
-    }
-  }
-
-  /**
-   * Determines if a new vehicle detail fetch is required.
-   */
-  private shouldFetchVehicleDetails(tecdocType: string, tecdocId: number | null): boolean {
-    return (
-      tecdocId !== null &&
-      (!this.selectedVehicleDetails ||
-        this.selectedVehicleDetails.linkageTargetType !== tecdocType ||
-        this.selectedVehicleDetails.linkageTargetId !== tecdocId)
+    // 7. Determine which WebShop view state should be shown (articles, vehicle, empty)
+    this.currentState = this.stateService.determineWebShopState(
+      this.tecdocId,
+      this.tecdocType!,
+      this.assembleGroupId
     );
-  }
 
-  /**
-   * Determines the correct state for the WebShop based on conditions.
-   */
-  private determineWebShopState({
-    showVehicleDetails,
-    assembleGroupSelected
-  }: {
-    showVehicleDetails: boolean;
-    assembleGroupSelected: boolean
-  }): WebShopState {
-    if (assembleGroupSelected) {
-      return WebShopState.SHOW_ARTICLES_WITH_VEHICLE_DETAILS;
-    }
-    if (showVehicleDetails) {
-      return WebShopState.SHOW_VEHICLE_DETAILS;
-    }
-    return WebShopState.SHOW_ARTICLES;
+    // 8. Set filter with the new one
+    this.filter = newFilter;
+
+    // 9. Fetch data depending on current state (articles, vehicle, etc.)
+    this.fetchBasedOnState(filtersChanged, isInitialLoad);
   }
 
   /**
@@ -420,5 +306,70 @@ export class WebshopComponent implements OnDestroy, OnInit {
     this.searchTerm = searchTerm;
   }
 
-  // End of: Private methods
+  private extractBaseParams(params: QueryParams): void {
+    this.searchTerm = params.searchTerm || '';
+    this.tecdocType = params.tecdocType || '';
+    this.tecdocId = params.tecdocId ? +params.tecdocId : null;
+    this.assembleGroupId = params.assembleGroupId || '';
+    this.assemblyGroupName = params.assemblyGroupName || '';
+  }
+
+  private checkEmptyState(params: QueryParams): boolean {
+    return this.stateService.shouldShowEmptyContainer(
+      this.searchTerm,
+      params.mandatoryproid || '',
+      params.grupe || '',
+      this.tecdocId,
+      this.tecdocType!
+    );
+  }
+
+  private updateVehicleIfNeeded(params: QueryParams): void {
+    if (!this.tecdocId) {
+      this.selectedVehicleDetails = null;
+      return;
+    }
+
+    const shouldFetch = this.stateService.shouldFetchVehicleDetails(
+      this.selectedVehicleDetails,
+      this.tecdocId,
+      this.tecdocType!
+    );
+
+    if (shouldFetch) {
+      this.getTDVehicleDetails(this.tecdocId, this.tecdocType!);
+    }
+  }
+
+  private fetchBasedOnState(
+    filtersChanged: boolean,
+    isInitialLoad: boolean
+  ): void {
+    const shouldRefresh = filtersChanged || isInitialLoad;
+
+    switch (this.currentState) {
+      case WebShopState.SHOW_VEHICLE_DETAILS:
+        if (
+          this.tecdocId &&
+          (!this.selectedVehicleDetails ||
+            this.selectedVehicleDetails.linkageTargetId !== this.tecdocId)
+        ) {
+          this.getTDVehicleDetails(this.tecdocId, this.tecdocType!);
+        }
+        break;
+      case WebShopState.SHOW_ARTICLES_WITH_VEHICLE_DETAILS:
+        if (this.tecdocId) {
+          this.getArticlesByAssembleGroup(
+            this.tecdocId,
+            this.tecdocType!,
+            this.assembleGroupId,
+            shouldRefresh
+          );
+        }
+        break;
+      case WebShopState.SHOW_ARTICLES:
+        this.getRoba(shouldRefresh);
+        break;
+    }
+  }
 }

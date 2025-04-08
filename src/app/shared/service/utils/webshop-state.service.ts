@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Filter } from '../../data-models/model/roba';
+import { TDVehicleDetails } from '../../data-models/model';
+import { WebShopState } from '../../../modules/webshop/webshop.component';
 
 @Injectable({
   providedIn: 'root'
@@ -22,34 +23,31 @@ export class WebshopStateService {
     );
   }
 
-  updateState(
-    searchTerm: string,
-    newFilter: Filter,
-    isInitialLoad: boolean,
-    isSameSearchTerm: boolean,
-    isMandatoryFilterOn: boolean,
-    assembleGroupId: string,
-    filterChanged: boolean
-  ): Filter {
-    // If it's the initial load, keep the new filter as is
-    if (isInitialLoad) {
-      return newFilter;
+  shouldFetchVehicleDetails(
+    currentDetails: TDVehicleDetails | null,
+    tecdocId: number | null,
+    tecdocType: string
+  ): boolean {
+    return (
+      tecdocId !== null &&
+      (!currentDetails ||
+        currentDetails.linkageTargetId !== tecdocId ||
+        currentDetails.linkageTargetType !== tecdocType)
+    );
+  }
+
+
+  determineWebShopState(
+    tecdocId: number | null,
+    tecdocType: string,
+    assembleGroupId: string
+  ): WebShopState {
+    if (assembleGroupId) {
+      return WebShopState.SHOW_ARTICLES_WITH_VEHICLE_DETAILS;
     }
-
-    // If no mandatory filters are active and conditions suggest a reset, return a new empty Filter
-    const shouldResetFilter =
-      !isMandatoryFilterOn &&
-      (!searchTerm || !isSameSearchTerm || (!assembleGroupId && filterChanged));
-
-    if (shouldResetFilter) {
-      return new Filter();
+    if (tecdocId && tecdocType) {
+      return WebShopState.SHOW_VEHICLE_DETAILS;
     }
-
-    // If the search term changed but mandatory filters are active, reset `podgrupe`
-    if (!isSameSearchTerm && isMandatoryFilterOn) {
-      newFilter.podgrupe = [];
-    }
-
-    return newFilter;
+    return WebShopState.SHOW_ARTICLES;
   }
 }

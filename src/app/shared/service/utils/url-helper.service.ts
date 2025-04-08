@@ -98,6 +98,27 @@ export class UrlHelperService {
   }
 
   /**
+ * Keeps only the specified query parameters and removes all others.
+ * @param paramNames Names of the parameters to retain.
+ */
+  retainOnlyQueryParams(paramNames: string[]): void {
+    const currentParams = this.activatedRoute.snapshot.queryParams;
+    const retainedParams: { [key: string]: string } = {};
+
+    paramNames.forEach((key) => {
+      const value = currentParams[key];
+      if (value !== undefined) {
+        retainedParams[key] = value;
+      }
+    });
+
+    this.router.navigate([], {
+      queryParams: retainedParams,
+      queryParamsHandling: '', // Replace all query parameters
+    });
+  }
+
+  /**
    * Reads query parameters from the current route
    * @returns An object containing all query parameters
    */

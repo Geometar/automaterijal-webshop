@@ -2,6 +2,8 @@ import { CommonModule } from '@angular/common';
 import {
   Component,
   Input,
+  OnChanges,
+  SimpleChanges,
   ViewEncapsulation,
 } from '@angular/core';
 
@@ -49,7 +51,7 @@ export enum FilterEnum {
   styleUrl: './webshop-category.component.scss',
   encapsulation: ViewEncapsulation.None,
 })
-export class WebshopCategoryComponent {
+export class WebshopCategoryComponent implements OnChanges {
   @Input() categories: any = null;
   @Input() filter: Filter = new Filter();
   @Input() manufactures: Manufacture[] | undefined = [];
@@ -62,6 +64,9 @@ export class WebshopCategoryComponent {
   radioOptions: RadioOption[] = [];
   radioOptionKeys = ['Svi artikli', 'Ima na stanju'];
 
+  // Checkbox Model
+  manufacturesModels: CheckboxModel[] = [];
+
   // Pre Filters
   manufacturerPreFilter = '';
 
@@ -72,16 +77,13 @@ export class WebshopCategoryComponent {
   orientation = OrientationEnum;
   sizeEnum = SizeEnum;
 
-  get manufacturesModels(): CheckboxModel[] {
-    const selected = this.filter.proizvodjaci ?? [];
-    return (this.manufactures ?? []).map((manufacture) => ({
-      value: manufacture.naziv!,
-      key: manufacture.proid,
-      checked: selected.includes(manufacture.proid!),
-    }));
-  }
-
   constructor(private urlHelperService: UrlHelperService) { }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['manufactures'] || changes['filter']) {
+      this.buildManufactureModels();
+    }
+  }
 
   // Start of: Emit handle
 
@@ -106,5 +108,14 @@ export class WebshopCategoryComponent {
 
   preFilterManufactures(filterTerm: string): void {
     this.manufacturerPreFilter = filterTerm;
+  }
+
+  buildManufactureModels(): void {
+    const selected = this.filter.proizvodjaci ?? [];
+    this.manufacturesModels = (this.manufactures ?? []).map((m) => ({
+      value: m.naziv!,
+      key: m.proid!,
+      checked: selected.includes(m.proid!),
+    }));
   }
 }

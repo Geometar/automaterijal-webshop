@@ -49,6 +49,7 @@ export class TableComponent implements OnChanges {
   constructor(private urlHelperService: UrlHelperService, private configService: ConfigService) {
     this.configService.getConfig().subscribe(config => {
       this.categories = config.categories;
+      this.processFilter();
     });
   }
 
@@ -61,7 +62,7 @@ export class TableComponent implements OnChanges {
       this.updatePaginationVariables();
       this.updatePaginatedData();
     }
-    if (changes['filter']) {
+    if (changes['filter'] && this.categories.length) {
       this.processFilter();
     }
   }
