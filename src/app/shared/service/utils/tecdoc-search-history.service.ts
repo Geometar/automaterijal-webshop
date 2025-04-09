@@ -14,21 +14,24 @@ export class TecdocSearchHistoryService {
   saveVehicle(vehicle: TecdocSearchHistory): void {
     let vehicles = this.getVehiclesArray();
 
-    // Prevent duplicate entries
-    if (!vehicles.some(v => v.id === vehicle.id && v.type === vehicle.type)) {
-      vehicles.push(vehicle);
-      this.localStorage.store(this.storageKey, vehicles);
+    // Prevent duplicates
+    const alreadyExists = vehicles.some(v => v.id === vehicle.id && v.type === vehicle.type);
+    if (alreadyExists) return;
+
+    // Add new vehicle
+    vehicles.push(vehicle);
+
+    // Keep only the last 10
+    if (vehicles.length > 10) {
+      vehicles = vehicles.slice(vehicles.length - 10); // Keep last 10 items
     }
+
+    this.localStorage.store(this.storageKey, vehicles);
   }
 
   // Get history as an array of TecdocVehicle objects
   getVehiclesArray(): TecdocSearchHistory[] {
     const data = this.localStorage.retrieve(this.storageKey) || [];
     return data.map((v: any) => new TecdocSearchHistory(v.id, v.type, v.description));
-  }
-
-  // Clear search history
-  clearHistory(): void {
-    this.localStorage.clear(this.storageKey);
   }
 }

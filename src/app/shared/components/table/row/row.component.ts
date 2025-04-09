@@ -25,6 +25,7 @@ import {
 import { RsdCurrencyPipe } from '../../../pipe/rsd-currency.pipe';
 
 // Services
+import { AccountStateService } from '../../../service/utils/account-state.service';
 import { CartStateService } from '../../../service/utils/cart-state.service';
 import { SnackbarService } from '../../../service/utils/snackbar.service';
 
@@ -68,14 +69,17 @@ export class RowComponent implements OnInit {
 
   // Misc
   hasMoreThanFiveSpecs = false;
+  isEmployee = false;
   showAllSpecs = false;
 
   constructor(
     private cartStateService: CartStateService,
-    private snackbarService: SnackbarService
+    private snackbarService: SnackbarService,
+    private accountStateService: AccountStateService
   ) { }
 
   ngOnInit() {
+    this.isEmployee = this.accountStateService.isEmployee();
     this.updateDisplayedSpecs();
   }
 

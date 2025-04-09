@@ -5,6 +5,18 @@
     width: 100%;
   }
 
+  .login-error-banner {
+    background-color: #fdecea;
+    border-radius: 8px;
+    border: 1px solid #f44336;
+    color: #b71c1c;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 0px;
+    padding: 12px;
+    text-align: center;
+  }
+
   &-left {
     flex: 1.5;
     background: #fff;

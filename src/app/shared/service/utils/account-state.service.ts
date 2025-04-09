@@ -26,4 +26,11 @@ export class AccountStateService {
   isUserLoggedIn(): boolean {
     return !!this.get()?.ppid;
   }
+
+  isEmployee(): boolean {
+    const account = this.get();
+    const hasPpid = !!account?.ppid;
+    const hasPrivileges = (account?.privilegije ?? 0) >= 2043;
+    return hasPpid && hasPrivileges;
+  }
 }

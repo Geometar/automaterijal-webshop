@@ -33,6 +33,10 @@
     </div>
     <div *ngIf="showLogin" @fadeAnimation>
       <h3>Dobrodosli u prodavnicu Automaterijala</h3>
+
+      <div *ngIf="loginError" class="login-error-banner" @fadeAnimation>
+        <span>Pogrešno korisničko ime ili lozinka.</span>
+      </div>
       <form class="login-form__container" [formGroup]="loginForm">
         <autom-input-fields
           [clearBtn]="true"

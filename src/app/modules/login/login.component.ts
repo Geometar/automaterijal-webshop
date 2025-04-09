@@ -95,6 +95,7 @@ export class LoginComponent implements OnDestroy {
   // Misc
   createAccountInProgress = false;
   disableLoginBtn = false;
+  loginError = false;
   loginInProgress = false;
   showAccountCreation = false;
   showFirstLoginPopup = false;
@@ -165,13 +166,18 @@ export class LoginComponent implements OnDestroy {
           }
           this.routeToPage();
         },
-        error: (err: HttpErrorResponse) => { },
+        error: (err: HttpErrorResponse) => {
+          if (err.status === 400) {
+            this.loginError = true;
+          }
+        },
       });
   }
 
   /** Main event: end */
 
   setSelectionValue(control: string, value: string): void {
+    this.loginError = false;
     this.loginForm.controls[control].setValue(value);
   }
 

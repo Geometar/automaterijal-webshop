@@ -28,7 +28,7 @@
         data!.podGrupaNaziv
       }}</span>
     </p>
-    <p>
+    <p *ngIf="isEmployee">
       Stanje:
       <span class="color--figma-primary-800 display--inline font-medium">{{
         data!.stanje
