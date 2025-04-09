@@ -1,17 +1,23 @@
 <autom-label *ngIf="label" [label]="label"></autom-label>
 
 <section class="grouped-checkbox">
-  <ng-container *ngFor="let task of tasks(); let taskIndex = index">
-    <span class="parent">
+  <ng-container *ngFor="let task of tasks(); let taskIndex = index"
+    ><span class="parent" (click)="toggleExpand(taskIndex)">
       <mat-checkbox
         [checked]="task.completed"
         [indeterminate]="partiallyComplete()[taskIndex]"
+        (click)="$event.stopPropagation()"
         (change)="update($event.checked, taskIndex)"
       >
         <b class="parent-label">{{ task.name }}</b>
       </mat-checkbox>
+
+      <autom-icon
+        class="expand-icon"
+        [source]="task.expanded ? iconsEnum.CHEVRON_UP : iconsEnum.CHEVRON_DOWN"
+      />
     </span>
-    <span class="child">
+    <span *ngIf="task.expanded" class="child">
       <ul>
         <li *ngFor="let subtask of task.subtasks; let subtaskIndex = index">
           <mat-checkbox

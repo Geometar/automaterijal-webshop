@@ -9,11 +9,18 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+
+// Automaterijal imports
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { AutomLabelComponent } from '../autom-label/autom-label.component';
+import { AutomIconComponent } from '../autom-icon/autom-icon.component';
+
+// Enums
+import { IconsEnum } from '../../data-models/enums';
 
 export interface Task {
   completed: boolean;
+  expanded: boolean;
   id: number | string;
   name: string;
   subtasks?: Task[];
@@ -22,7 +29,13 @@ export interface Task {
 @Component({
   selector: 'checkbox-group',
   standalone: true,
-  imports: [MatCheckboxModule, FormsModule, CommonModule, AutomLabelComponent],
+  imports: [
+    AutomIconComponent,
+    AutomLabelComponent,
+    CommonModule,
+    FormsModule,
+    MatCheckboxModule,
+  ],
   templateUrl: './checkbox-group.component.html',
   styleUrl: './checkbox-group.component.scss',
   encapsulation: ViewEncapsulation.None,
@@ -32,10 +45,20 @@ export class CheckboxGroupComponent {
   @Input() label = '';
   @Output() clickEvent = new EventEmitter<Task[]>();
 
+  // Enums
+  iconsEnum = IconsEnum;
+
   readonly tasks = signal<Task[]>([]); // Signal for internal task management
 
   ngOnChanges() {
-    this.tasks.set(this.items); // Set tasks from parent input when it changes
+    const currentExpandedMap = new Map(this.tasks().map((task) => [task.id, task.expanded]));
+
+    this.tasks.set(
+      this.items.map((item) => ({
+        ...item,
+        expanded: currentExpandedMap.get(item.id) ?? true, // preserve if exists
+      }))
+    );
   }
 
   readonly partiallyComplete = computed(() => {
@@ -59,6 +82,13 @@ export class CheckboxGroupComponent {
 
       // Emit the updated list of subtasks
       this.clickEvent.emit(tasks);
+      return [...tasks];
+    });
+  }
+
+  toggleExpand(taskIndex: number): void {
+    this.tasks.update((tasks) => {
+      tasks[taskIndex].expanded = !tasks[taskIndex].expanded;
       return [...tasks];
     });
   }

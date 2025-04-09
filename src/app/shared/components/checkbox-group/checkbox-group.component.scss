@@ -3,7 +3,28 @@
   flex-direction: column;
   
   .parent {
-    margin-left: 0;
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    padding-right: 8px;
+  }
+  
+  .parent mat-checkbox {
+    font-size: 16px;
+    color: var(--figma-grey-500);
+  }
+
+  .expand-icon {
+    & mat-icon {
+      width: 22px;
+      height: 22px;
+
+      & svg path {
+        stroke: var(--figma-grey-500);
+      }
+    }
   }
 
   .parent-label {

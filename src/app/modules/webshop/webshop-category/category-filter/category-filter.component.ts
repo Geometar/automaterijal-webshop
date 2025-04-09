@@ -45,6 +45,7 @@ export class CategoryFilterComponent implements OnChanges {
         completed: allCompleted,
         id: key,
         subtasks,
+        expanded: true
       };
     });
   }
