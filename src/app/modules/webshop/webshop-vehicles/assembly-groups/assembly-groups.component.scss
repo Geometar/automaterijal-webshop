@@ -18,8 +18,11 @@
   border: 1px solid #ccc;
   box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
   display: flex;
+  display: flex;
+  flex-direction: column;
   flex-direction: column;
   justify-content: space-between;
+  justify-content: space-between; // Ovo je ključno!
   max-height: 300px;
   min-height: 300px;
   overflow: hidden;
@@ -31,6 +34,7 @@
 
 .assembly-group-card.expanded {
   max-height: 1000px;
+  overflow-y: auto;
   padding-bottom: 20px;
 }
 
@@ -55,16 +59,15 @@
   display: inline;
   margin-right: 8px;
 }
-
 .card-body {
-  flex-grow: 1;
-  padding-left: 8px;
+  flex: 1 1 auto;
   font-size: 0.9em;
+  overflow-y: auto;
+  padding-left: 8px;
 }
 
 .child-list {
   list-style: none;
-  padding-bottom: 40px;
   padding-left: 0;
 }
 
@@ -101,13 +104,10 @@
 }
 
 .card-footer {
-  bottom: 16px;
+  border-top: 1px solid #eee; // opciono, radi vizuelne separacije
   display: flex;
   justify-content: center;
-  left: 50%;
-  position: absolute;
-  transform: translateX(-50%);
-  width: 100%;
+  padding-top: 12px;
 }
 
 .show-all-btn {

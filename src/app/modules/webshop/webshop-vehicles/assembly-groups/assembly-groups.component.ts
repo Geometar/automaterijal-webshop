@@ -74,15 +74,51 @@ export class AssemblyGroupsComponent implements OnInit {
 
   buildHierarchy(groups: AssemblyGroup[]): AssemblyGroup[] {
     const parentMap = new Map<number, AssemblyGroup>();
-    groups.forEach(group => parentMap.set(group.assemblyGroupNodeId!, { ...group, childrenNodes: [] }));
-    const rootGroups: AssemblyGroup[] = [];
+
+    // Step 1: Initialize the map with empty children
     groups.forEach(group => {
+      parentMap.set(group.assemblyGroupNodeId!, { ...group, childrenNodes: [] });
+    });
+
+    const rootGroups: AssemblyGroup[] = [];
+
+    // Step 2: Build parent-child hierarchy
+    groups.forEach(group => {
+      const current = parentMap.get(group.assemblyGroupNodeId!)!;
       if (group.parentNodeId && parentMap.has(group.parentNodeId)) {
-        parentMap.get(group.parentNodeId)!.childrenNodes!.push(parentMap.get(group.assemblyGroupNodeId!)!);
+        const parent = parentMap.get(group.parentNodeId)!;
+        parent.childrenNodes!.push(current);
       } else {
-        rootGroups.push(parentMap.get(group.assemblyGroupNodeId!)!);
+        rootGroups.push(current);
       }
     });
+
+    // Step 3: Reorganize – flatten grandchildren under the same parent
+    parentMap.forEach(parent => {
+      const allChildren = parent.childrenNodes ?? [];
+
+      // Collect all grandchildren who have parentNodeId pointing to one of these children
+      const grandChildren: AssemblyGroup[] = [];
+
+      allChildren.forEach(child => {
+        const childId = child.assemblyGroupNodeId;
+        // Find all grandchildren who point to this child as parent
+        const subChildren = groups.filter(g => g.parentNodeId === childId);
+        subChildren.forEach(grandchild => {
+          const grandChildInstance = parentMap.get(grandchild.assemblyGroupNodeId!);
+          if (grandChildInstance && !allChildren.includes(grandChildInstance)) {
+            grandChildren.push(grandChildInstance);
+          }
+        });
+
+        // Clear nested children if they exist
+        child.childrenNodes = [];
+      });
+
+      // Append grandchildren next to their parent
+      parent.childrenNodes = [...allChildren, ...grandChildren];
+    });
+
     return rootGroups;
   }
 
