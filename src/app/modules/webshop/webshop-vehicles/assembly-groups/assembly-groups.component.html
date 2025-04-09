@@ -55,8 +55,17 @@
                 ? group.childrenNodes
                 : group.childrenNodes?.slice(0, 5)
             "
+            class="layer-child-item"
+            [ngClass]="{
+              'is-grandchild': child.parentNodeId !== group.assemblyGroupNodeId
+            }"
             (click)="searchForArticlesWithAssembleGroup(child)"
           >
+            <span
+              class="tree-icon"
+              *ngIf="child.parentNodeId !== group.assemblyGroupNodeId"
+              >🛠️</span
+            >
             {{ child.assemblyGroupName }}
           </li>
         </ul>
@@ -99,8 +108,16 @@
         <li
           *ngFor="let child of group.childrenNodes"
           class="nested-item"
+          [ngClass]="{
+            'is-grandchild': child.parentNodeId !== group.assemblyGroupNodeId
+          }"
           (click)="searchForArticlesWithAssembleGroup(child)"
         >
+          <span
+            class="tree-icon"
+            *ngIf="child.parentNodeId !== group.assemblyGroupNodeId"
+            >🛠️</span
+          >
           {{ child.assemblyGroupName }}
         </li>
       </ul>

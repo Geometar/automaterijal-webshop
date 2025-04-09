@@ -107,6 +107,7 @@ export class AssemblyGroupsComponent implements OnInit {
         subChildren.forEach(grandchild => {
           const grandChildInstance = parentMap.get(grandchild.assemblyGroupNodeId!);
           if (grandChildInstance && !allChildren.includes(grandChildInstance)) {
+            (grandChildInstance as any).originParentId = childId;
             grandChildren.push(grandChildInstance);
           }
         });
@@ -116,7 +117,28 @@ export class AssemblyGroupsComponent implements OnInit {
       });
 
       // Append grandchildren next to their parent
-      parent.childrenNodes = [...allChildren, ...grandChildren];
+      // Combine allChildren and grandChildren
+      const combined = [...allChildren, ...grandChildren];
+
+      // Sort so that grandchild comes immediately after their originParent
+      const sorted: AssemblyGroup[] = [];
+
+      combined.forEach(item => {
+        sorted.push(item);
+
+        const itemId = item.assemblyGroupNodeId;
+
+        const grandchildrenForThis = combined.filter(
+          g => (g as any).originParentId === itemId
+        );
+
+        sorted.push(...grandchildrenForThis);
+      });
+
+      // Remove duplicates
+      const uniqueSorted = Array.from(new Map(sorted.map(g => [g.assemblyGroupNodeId, g])).values());
+
+      parent.childrenNodes = uniqueSorted;
     });
 
     return rootGroups;

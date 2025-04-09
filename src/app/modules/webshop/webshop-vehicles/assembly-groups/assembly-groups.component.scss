@@ -1,125 +1,3 @@
-.assembly-groups-container {
-  align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  justify-content: center;
-  margin-top: 50px;
-}
-
-.filter-groups {
-  margin-top: 25px;
-  width: 450px;
-}
-
-.assembly-group-card {
-  background: #fff;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
-  display: flex;
-  display: flex;
-  flex-direction: column;
-  flex-direction: column;
-  justify-content: space-between;
-  justify-content: space-between; // Ovo je ključno!
-  max-height: 300px;
-  min-height: 300px;
-  overflow: hidden;
-  padding: 16px;
-  position: relative;
-  transition: max-height 0.5s ease-in-out, padding-bottom 0.5s ease-in-out;
-  width: 450px;
-}
-
-.assembly-group-card.expanded {
-  max-height: 1000px;
-  overflow-y: auto;
-  padding-bottom: 20px;
-}
-
-.assembly-group-card.collapsing {
-  max-height: 300px;
-}
-
-.card-header {
-  align-items: center;
-  display: flex;
-  font-size: 0.95em;
-  font-weight: bold;
-  margin-bottom: 8px;
-}
-
-.card-header h3:hover {
-  color: var(--figma-accent-yellow-700);
-  cursor: pointer;
-}
-
-.card-header .icon {
-  display: inline;
-  margin-right: 8px;
-}
-.card-body {
-  flex: 1 1 auto;
-  font-size: 0.9em;
-  overflow-y: auto;
-  padding-left: 8px;
-}
-
-.child-list {
-  list-style: none;
-  padding-left: 0;
-}
-
-.child-list li {
-  align-items: center;
-  animation: fadeInUp 0.3s ease-in-out forwards;
-  cursor: pointer;
-  display: flex;
-  margin-bottom: 4px;
-  opacity: 0;
-  transform: translateY(10px);
-}
-
-.child-list.collapsing li {
-  opacity: 0;
-  transform: translateY(-10px);
-  transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
-}
-
-.child-list li:hover {
-  color: var(--figma-accent-yellow-700);
-  text-decoration: underline;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.card-footer {
-  border-top: 1px solid #eee; // opciono, radi vizuelne separacije
-  display: flex;
-  justify-content: center;
-  padding-top: 12px;
-}
-
-.show-all-btn {
-  border-radius: 4px;
-  border: none;
-  color: white;
-  cursor: pointer;
-  font-size: 0.85em;
-  padding: 2px 12px;
-  transition: all 0.3s ease-in-out;
-}
-
 /* 🔹 Ensure the filter container is centered */
 .filter-container {
   display: flex;
@@ -128,110 +6,294 @@
   gap: 16px; /* Spacing between elements */
   width: 100%;
   margin-top: 20px;
-}
 
-/* 🔹 Icons container (keeps icons aligned left) */
-.filter-icons {
-  display: flex;
-  gap: 10px;
-  padding-right: 20px;
-  padding-top: 70px;
+  /* 🔹 Icons container (keeps icons aligned left) */
+  .filter-icons {
+    display: flex;
+    gap: 10px;
+    padding-right: 20px;
+    padding-top: 70px;
 
-  .mat-icon {
-    width: 26px;
-    height: 26px;
+    .mat-icon {
+      width: 26px;
+      height: 26px;
+    }
+  }
+
+  /* 🔹 Search Input (Ensures it's centered) */
+  .filter-groups {
+    flex-grow: 1;
+    max-width: 450px;
+    margin-top: 25px;
   }
 }
 
-/* 🔹 Search Input (Ensures it's centered) */
-.filter-groups {
-  flex-grow: 1;
-  max-width: 450px;
-}
-
-
-
-/* 🔹 List View */
-.list-view-container {
-  width: 100%;
-  list-style-type: none;
-  padding: 0;
-}
-
-/* 🔹 List Header (Top-Level Category with Arrow) */
-.list-header {
-  display: flex;
+.assembly-groups-container {
   align-items: center;
-  justify-content: flex-start;
-  font-weight: bold;
-  padding: 10px;
-  gap: 5px;
-  border-bottom: 1px solid #ddd;
-}
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 50px;
 
-.list-header-value:hover {
-  background: var(--figma-bg-light);
-  color: var(--figma-accent-yellow-700);
-  text-decoration: underline;
-  cursor: pointer;
-}
+  .is-grandchild {
+    padding-left: 24px;
+    position: relative;
+    font-style: normal;
+    color: var(--figma-grey-700);
 
-.list-header:hover{
-  background: var(--figma-bg-light)
-}
+    &:hover {
+      background: var(--figma-bg-light);
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  }
 
-/* 🔹 Expand/Collapse Arrow */
-.arrow {
-  cursor: pointer;
-  margin-right: 10px;
-  transition: transform 0.3s ease-in-out;
-}
+  .tree-icon {
+    margin-right: 6px;
+    font-size: 0.9em;
+    opacity: 0.7;
+  }
 
-.arrow.expanded {
-  transform: rotate(90deg);
-}
+  .layer-child-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+    cursor: pointer;
 
-/* 🔹 Nested List (Initially Hidden) */
-/* 🔹 Default (Hidden State) */
-.nested-list {
-  list-style-type: none;
-  padding-left: 20px;
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
-}
+    &:hover {
+      color: var(--figma-accent-yellow-700);
+      text-decoration: underline;
+    }
 
-/* 🔹 Expanded State */
-.nested-list.expanded {
-  max-height: 500px; /* Adjust this if needed */
-  opacity: 1;
-}
+    &.is-grandchild {
+      padding-left: 16px;
+      font-style: normal;
+      opacity: 0.85;
+      font-size: 0.92em;
 
-.nested-item {
-  padding: 6px 22px;
-  cursor: pointer;
-  font-size: 0.9em;
-}
+      .tree-icon {
+        opacity: 0.6;
+      }
+    }
+  }
 
-.nested-item:hover {
-  background: var(--figma-bg-light);
-  color: var(--figma-accent-yellow-700);
-  text-decoration: underline;
-}
+  .tree-icon {
+    margin-right: 4px;
+    font-size: 0.9em;
+  }
 
-/* 🔹 Animations */
-@keyframes fadeIn {
-  from {
+  .is-grandchild {
+    padding-left: 24px;
+    position: relative;
+    font-style: normal;
+    color: var(--figma-grey-700);
+
+    &:hover {
+      background: var(--figma-bg-light);
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  }
+
+  .tree-icon {
+    margin-right: 6px;
+    font-size: 0.9em;
+    opacity: 0.7;
+  }
+
+  .assembly-group-card {
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    display: flex;
+    flex-direction: column;
+    flex-direction: column;
+    justify-content: space-between;
+    justify-content: space-between; // Ovo je ključno!
+    max-height: 300px;
+    min-height: 300px;
+    overflow: hidden;
+    padding: 16px;
+    position: relative;
+    transition: max-height 0.5s ease-in-out, padding-bottom 0.5s ease-in-out;
+    width: 450px;
+  }
+
+  .assembly-group-card.expanded {
+    max-height: 1000px;
+    overflow-y: auto;
+    padding-bottom: 20px;
+  }
+
+  .assembly-group-card.collapsing {
+    max-height: 300px;
+  }
+
+  .card-header {
+    align-items: center;
+    display: flex;
+    font-size: 0.95em;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+
+  .card-header h3:hover {
+    color: var(--figma-accent-yellow-700);
+    cursor: pointer;
+  }
+
+  .card-header .icon {
+    display: inline;
+    margin-right: 8px;
+  }
+  .card-body {
+    flex: 1 1 auto;
+    font-size: 0.9em;
+    overflow-y: auto;
+    padding-left: 8px;
+  }
+
+  .child-list {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  .child-list li {
+    align-items: center;
+    animation: fadeInUp 0.3s ease-in-out forwards;
+    cursor: pointer;
+    display: flex;
+    margin-bottom: 4px;
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  .child-list.collapsing li {
     opacity: 0;
     transform: translateY(-10px);
+    transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
-.list-item {
-  animation: fadeIn 0.3s ease-in-out;
+  .child-list li:hover {
+    color: var(--figma-accent-yellow-700);
+    text-decoration: underline;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .card-footer {
+    border-top: 1px solid #eee; // opciono, radi vizuelne separacije
+    display: flex;
+    justify-content: center;
+    padding-top: 12px;
+  }
+
+  .show-all-btn {
+    border-radius: 4px;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 0.85em;
+    padding: 2px 12px;
+    transition: all 0.3s ease-in-out;
+  }
+
+  /* 🔹 List View */
+  .list-view-container {
+    width: 100%;
+    list-style-type: none;
+    padding: 0;
+  }
+
+  /* 🔹 List Header (Top-Level Category with Arrow) */
+  .list-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    font-weight: bold;
+    padding: 10px;
+    gap: 5px;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .list-header-value:hover {
+    background: var(--figma-bg-light);
+    color: var(--figma-accent-yellow-700);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .list-header:hover {
+    background: var(--figma-bg-light);
+  }
+
+  /* 🔹 Expand/Collapse Arrow */
+  .arrow {
+    cursor: pointer;
+    margin-right: 10px;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .arrow.expanded {
+    transform: rotate(90deg);
+  }
+
+  /* 🔹 Nested List (Initially Hidden) */
+  /* 🔹 Default (Hidden State) */
+  .nested-list {
+    list-style-type: none;
+    padding-left: 20px;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  }
+
+  /* 🔹 Expanded State */
+  .nested-list.expanded {
+    max-height: 500px; /* Adjust this if needed */
+    overflow: auto;
+    opacity: 1;
+  }
+
+  .nested-item {
+    padding: 6px 22px;
+    cursor: pointer;
+    font-size: 0.9em;
+  }
+
+  .nested-item:hover {
+    background: var(--figma-bg-light);
+    color: var(--figma-accent-yellow-700);
+    text-decoration: underline;
+  }
+
+  /* 🔹 Animations */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .list-item {
+    animation: fadeIn 0.3s ease-in-out;
+  }
 }
