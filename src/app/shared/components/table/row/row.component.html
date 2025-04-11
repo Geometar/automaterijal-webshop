@@ -10,11 +10,10 @@
       [class.disabled]="data.podGrupa === 1000000"
       [routerLink]="['/webshop', data.robaid]"
     >
-      {{
-        data.naziv?.includes(data.proizvodjac!.naziv!)
-          ? data.naziv
-          : data.proizvodjac?.naziv + " " + data.naziv
-      }}
+      <span class="color--figma-primary-800">{{
+        data.proizvodjac?.naziv
+      }}</span>
+      {{ data.naziv }}
     </h3>
     <p class="autom-margin__none">
       Kataloski broj:

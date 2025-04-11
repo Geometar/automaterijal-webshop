@@ -19,7 +19,7 @@ export class PictureService {
     if (!r.slika?.isUrl && r.slika?.slikeByte) {
       r.slika.slikeUrl = 'data:image/jpeg;base64,' + r.slika.slikeByte;
     }
-    if (r.proizvodjacLogo && !r.proizvodjacLogo.toString().includes('data:image/jpeg;base64')) {
+    if (r.proizvodjacLogo && !r.proizvodjacLogo.toString().startsWith('data:')) {
       r.proizvodjacLogo = 'data:image/jpeg;base64,' + r.proizvodjacLogo;
     }
   }
