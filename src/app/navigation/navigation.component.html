@@ -1,4 +1,9 @@
-<div *ngIf="mobileSidebarOpen" class="overlay-mobile" data-overlay></div>
+<div
+  *ngIf="mobileSidebarOpen"
+  class="overlay-mobile"
+  data-overlay
+  (click)="closeMobileSidebar()"
+></div>
 <nav class="header desktop-navigation-menu" data-header>
   <div class="container">
     <div class="overlay" data-overlay></div>
@@ -17,7 +22,7 @@
           src="/images/logo/logo.svg"
           width="190"
           height="50"
-          alt="Footcap logo"
+          alt="Automaterijal logo"
         />
       </a>
 
@@ -238,16 +243,11 @@
 <nav
   *ngIf="mobileSidebarOpen"
   class="mobile-navigation-menu has-scrollbar-mobile"
-  data-mobile-menu
+  [ngClass]="{ 'slide-out': mobileSidebarClosing }"
 >
   <div class="menu-top">
-    <h2 class="menu-title">Menu</h2>
-
-    <button
-      class="menu-close-btn"
-      (click)="mobileSidebarOpen = false"
-      data-mobile-menu-close-btn
-    >
+    <h2 class="menu-title">Meni</h2>
+    <button class="menu-close-btn" (click)="closeMobileSidebar()">
       <autom-icon
         [color]="colorEnum.RICH_BLACK"
         [source]="iconEnum.X"
@@ -255,28 +255,122 @@
     </button>
   </div>
 
+  <!-- Profil sekcija -->
+  <div *ngIf="loggedIn" class="menu-section-profile">
+    <span class="menu-section-label">Profil</span>
+
+    <div class="menu-header">
+      <strong>{{ account?.naziv }}</strong>
+      <div class="email">{{ account?.email }}</div>
+      <div class="menu-balance">
+        <span class="label">Stanje:</span>
+        <span class="value" [ngClass]="{ negative: account?.stanje! < 0 }">
+          {{ account?.stanje! | rsdCurrency }}
+        </span>
+      </div>
+      <div class="menu-balance">
+        <span class="label">Van valute:</span>
+        <span
+          class="value"
+          [ngClass]="{ negative: account?.stanjeporoku! < 0 }"
+        >
+          {{ account?.stanjeporoku! | rsdCurrency }}
+        </span>
+      </div>
+    </div>
+  </div>
+
   <ul class="mobile-menu-category-list">
+    <!-- Standard links -->
     <li class="menu-category">
-      <a href="/home" class="menu-title">Home</a>
+      <a routerLink="/home" class="menu-title" (click)="closeMobileSidebar()">
+        Home
+      </a>
     </li>
-
     <li class="menu-category">
-      <a href="/onama" class="menu-title">Onama</a>
+      <a routerLink="/onama" class="menu-title" (click)="closeMobileSidebar()">
+        O nama
+      </a>
     </li>
-
     <li class="menu-category">
-      <a href="/kontakt" class="menu-title">Kontakt</a>
+      <a
+        routerLink="/kontakt"
+        class="menu-title"
+        (click)="closeMobileSidebar()"
+      >
+        Kontakt
+      </a>
     </li>
-
     <li class="menu-category">
-      <a href="/webshop" class="menu-title">Webshop</a>
+      <a
+        routerLink="/webshop"
+        class="menu-title"
+        (click)="closeMobileSidebar()"
+      >
+        Webshop
+      </a>
     </li>
-
-    <li class="menu-category">
-      <a href="/login" class="menu-title">Login</a>
+    <li class="menu-category" *ngIf="!loggedIn">
+      <a
+        routerLink="/login"
+        class="menu-title color--figma-error-600"
+        (click)="closeMobileSidebar()"
+        >Login</a
+      >
+    </li>
+    <li class="menu-category" *ngIf="!loggedIn">
+      <a
+        routerLink="/login"
+        class="menu-title color--figma-error-600"
+        (click)="closeMobileSidebar()"
+        >Login</a
+      >
+    </li>
+    <li class="menu-category" *ngIf="loggedIn">
+      <a
+        routerLink="/invoices"
+        class="menu-title"
+        (click)="closeMobileSidebar()"
+      >
+        Porudžbenice
+      </a>
+    </li>
+    <li class="menu-category" *ngIf="loggedIn">
+      <a class="menu-title" routerLink="/cart"> Korpa </a>
     </li>
   </ul>
 
+  <!-- Admin sekcija -->
+  <div *ngIf="loggedIn && isAdmin" class="menu-section">
+    <span class="menu-section-label">Admin</span>
+    <a
+      routerLink="/sales-reports"
+      class="menu-title"
+      (click)="closeMobileSidebar()"
+    >
+      <autom-icon [source]="iconEnum.PEN_TOOL"></autom-icon>
+      Izveštaji
+    </a>
+    <a routerLink="/logs" class="menu-title" (click)="closeMobileSidebar()">
+      <autom-icon [source]="iconEnum.LIFE_BUOY"></autom-icon>
+      Logovi
+    </a>
+  </div>
+
+  <!-- Korpa -->
+  <div class="menu-section flex--1">
+    <span class="menu-section-label">Logout</span>
+
+    <a
+      class="menu-title menu-title--danger"
+      (click)="logout(); closeMobileSidebar()"
+    >
+      <autom-icon [source]="iconEnum.LOG_OUT"></autom-icon>
+      Izloguj se
+    </a>
+  </div>
+
+  <!-- Social icons -->
   <div class="menu-bottom">
     <ul class="menu-social-container">
       <li>
@@ -287,7 +381,6 @@
           ></autom-icon>
         </a>
       </li>
-
       <li>
         <a href="#" class="social-link">
           <autom-icon

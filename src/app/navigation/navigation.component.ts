@@ -65,6 +65,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
   fixedHeaderClass = false;
   isAdmin = false;
   loggedIn = false;
+  mobileSidebarClosing = false;
   mobileSidebarOpen = false;
 
   private destroy$ = new Subject<void>();
@@ -81,6 +82,13 @@ export class NavigationComponent implements OnInit, OnDestroy {
   onScroll(): void {
     if (isPlatformBrowser(this.platformId)) {
       this.fixedHeaderClass = window.scrollY > 90;
+    }
+  }
+
+  @HostListener('document:keydown.escape', ['$event'])
+  onEscape(event: KeyboardEvent) {
+    if (this.mobileSidebarOpen) {
+      this.closeMobileSidebar();
     }
   }
 
@@ -136,6 +144,16 @@ export class NavigationComponent implements OnInit, OnDestroy {
         this.cartSize = 0;
       },
     });
+  }
+
+  closeMobileSidebar(): void {
+    this.mobileSidebarClosing = true;
+
+    // Wait for the animation to finish, then remove the sidebar
+    setTimeout(() => {
+      this.mobileSidebarOpen = false;
+      this.mobileSidebarClosing = false;
+    }, 300); // match the CSS animation duration
   }
 
   logout() {

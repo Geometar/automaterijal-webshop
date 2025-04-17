@@ -31,7 +31,7 @@
   gap: 45px;
   list-style: none;
   justify-content: center;
-  flex: 1; // najbitnije
+  flex: 1;
   margin: 0;
   padding: 0;
 }
@@ -42,7 +42,8 @@
   gap: 32px;
 }
 
-/* ========== MATERIAL DROPDOWN MENI (Profil) ========== */.mat-mdc-menu-content {
+/* ========== MATERIAL DROPDOWN MENI (Profil) ========== */
+.mat-mdc-menu-content {
   background-color: #ffffff;
   border-radius: 12px;
   padding: 8px 0;
@@ -63,6 +64,7 @@
 
 .mat-mdc-menu-item:hover {
   background-color: #f1f5f9;
+
   mat-icon svg path {
     stroke: var(--figma-highlight-orange) !important;
   }
@@ -79,6 +81,7 @@
   display: flex;
   align-items: center;
 }
+
 .custom-profile-menu .menu-header {
   padding: 14px 16px 12px;
   font-size: 14px;
@@ -120,6 +123,189 @@
 }
 
 .custom-profile-menu .menu-header .value.negative {
-  color: #dc2626; // Tailwind red-600, jasno ali elegantno
+  color: #dc2626;
   transition: color 0.3s ease;
+}
+
+// Mobile / small laptop design
+$breakpoint-sm: 768px;
+
+@media (max-width: $breakpoint-sm) {
+  .mobile-bottom-navigation {
+    background: var(--white);
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 500px;
+    margin: auto;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 5px 0;
+    box-shadow: 0 0 10px hsla(0, 0%, 0%, 0.25);
+    z-index: 1001;
+  }
+
+  .overlay-mobile {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1002;
+  }
+
+  .mobile-navigation-menu {
+    animation: slideInLeft 0.3s ease forwards;
+    background-color: #fff;
+    bottom: 0;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    flex-direction: column;
+    display: flex;
+    height: 100dvh;
+    left: 0;
+    padding: 20px;
+    position: fixed;
+    top: 0;
+    transform: translateX(0);
+    transition: transform 0.3s ease;
+    width: 280px;
+    z-index: 1002;
+  }
+
+  .mobile-navigation-menu.slide-out {
+    animation: slideOutLeft 0.3s ease forwards;
+  }
+
+  .desktop-navigation-menu {
+    display: none !important;
+  }
+}
+
+@media (min-width: #{($breakpoint-sm + 1)}px) {
+  .mobile-bottom-navigation,
+  .mobile-navigation-menu,
+  .overlay-mobile {
+    display: none !important;
+  }
+
+  .desktop-navigation-menu {
+    display: block;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutLeft {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+.menu-subtitle {
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.menu-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  font-size: 15px;
+  color: #111827;
+  text-decoration: none;
+}
+
+.menu-title:hover {
+  color: var(--figma-highlight-orange);
+}
+
+.menu-title autom-icon {
+  font-size: 18px;
+}
+
+.menu-header {
+  background-color: #f9fafb;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.menu-balance {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #374151;
+}
+
+.menu-balance .label {
+  font-weight: 500;
+}
+
+.menu-balance .value {
+  font-weight: 600;
+}
+
+.menu-balance .value.negative {
+  color: #dc2626;
+}
+
+.menu-social-container {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.menu-social-container .social-link {
+  background-color: #f3f4f6;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.menu-section {
+  margin-top: 20px;
+  padding-top: 12px;
+  border-top: 1px solid #f3f4f6;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.menu-section-profile {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.menu-section-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
