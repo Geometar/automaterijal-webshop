@@ -1,5 +1,9 @@
 import { Routes } from '@angular/router';
 
+// Guards
+import { authGuard } from './shared/guards/auth.guard';
+import { salesGuard } from './shared/guards/sales.guard';
+
 export const routes: Routes = [
   {
     path: '',
@@ -44,21 +48,25 @@ export const routes: Routes = [
   {
     path: 'invoices',
     loadComponent: () =>
-      import('./modules/personal/invoices/invoices.component').then((m) => m.InvoicesComponent)
+      import('./modules/personal/invoices/invoices.component').then((m) => m.InvoicesComponent),
+    canActivate: [authGuard]
   },
   {
     path: 'invoices/:id',
     loadComponent: () =>
-      import('./modules/personal/invoices/invoice-details/invoice-details.component').then((m) => m.InvoiceDetailsComponent)
+      import('./modules/personal/invoices/invoice-details/invoice-details.component').then((m) => m.InvoiceDetailsComponent),
+    canActivate: [authGuard]
   },
   {
     path: 'sales-reports',
     loadComponent: () =>
-      import('./modules/personal/sales-reports/sales-reports.component').then((m) => m.SalesReportsComponent)
+      import('./modules/personal/sales-reports/sales-reports.component').then((m) => m.SalesReportsComponent),
+    canActivate: [salesGuard]
   },
   {
     path: 'logs',
     loadComponent: () =>
-      import('./modules/personal/logs/logs.component').then((m) => m.LogsComponent)
+      import('./modules/personal/logs/logs.component').then((m) => m.LogsComponent),
+    canActivate: [salesGuard]
   },
 ];

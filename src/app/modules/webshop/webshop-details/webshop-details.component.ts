@@ -37,9 +37,8 @@ import { YouTubePlayer } from '@angular/youtube-player';
 // Services
 import { PictureService } from '../../../shared/service/utils/picture.service';
 import { RobaService } from '../../../shared/service/roba.service';
-import { TecdocService } from '../../../shared/service/tecdoc.service';
-import { Meta, Title } from '@angular/platform-browser';
 import { SeoService } from '../../../shared/service/seo.service';
+import { TecdocService } from '../../../shared/service/tecdoc.service';
 
 @Component({
   selector: 'app-webshop-details',
