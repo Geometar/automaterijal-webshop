@@ -1,5 +1,11 @@
-import { Component, OnDestroy, ViewEncapsulation, } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import {
+  FormsModule,
+  ReactiveFormsModule,
+  UntypedFormBuilder,
+  UntypedFormGroup,
+  Validators,
+} from '@angular/forms';
 import { catchError, finalize, Subject, takeUntil, throwError } from 'rxjs';
 
 // Automaterijal import
@@ -9,7 +15,12 @@ import { InputFieldsComponent } from '../../../shared/components/input-fields/in
 import { TextAreaComponent } from '../../../shared/components/text-area/text-area.component';
 
 // Enums
-import { ButtonThemes, ColorEnum, IconsEnum, InputTypeEnum } from '../../../shared/data-models/enums';
+import {
+  ButtonThemes,
+  ColorEnum,
+  IconsEnum,
+  InputTypeEnum,
+} from '../../../shared/data-models/enums';
 
 // Constants
 import { EMAIL_ADDRESS } from '../../../shared/data-models/constants/input.constants';
@@ -19,6 +30,7 @@ import { Kontakt } from '../../../shared/data-models/model';
 
 // Service
 import { EmailService } from '../../../shared/service/email.service';
+import { SeoService } from '../../../shared/service/seo.service';
 
 @Component({
   selector: 'app-kontakt',
@@ -29,12 +41,13 @@ import { EmailService } from '../../../shared/service/email.service';
     FormsModule,
     InputFieldsComponent,
     ReactiveFormsModule,
-    TextAreaComponent],
+    TextAreaComponent,
+  ],
   templateUrl: './kontakt.component.html',
   styleUrl: './kontakt.component.scss',
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
 })
-export class KontaktComponent implements OnDestroy {
+export class KontaktComponent implements OnDestroy, OnInit {
   colorEnum = ColorEnum;
   iconEnum = IconsEnum;
   inputType = InputTypeEnum;
@@ -54,7 +67,10 @@ export class KontaktComponent implements OnDestroy {
   private destroy$ = new Subject<void>();
 
   constructor(
-    private fb: UntypedFormBuilder, private emailService: EmailService) {
+    private emailService: EmailService,
+    private fb: UntypedFormBuilder,
+    private seoService: SeoService
+  ) {
     this.kontaktForma = this.fb.group({
       ime: ['', Validators.required],
       prezime: ['', Validators.required],
@@ -66,6 +82,9 @@ export class KontaktComponent implements OnDestroy {
   }
 
   /** Angular lifecycle hooks start */
+  ngOnInit(): void {
+    this.updateSeoTags();
+  }
 
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -81,13 +100,14 @@ export class KontaktComponent implements OnDestroy {
   posaljiPoruku(): void {
     this.ucitavanje = true;
 
-    this.emailService.posaljiPoruku(this.napraviPoruku())
+    this.emailService
+      .posaljiPoruku(this.napraviPoruku())
       .pipe(
         takeUntil(this.destroy$),
         catchError((error: Response) => throwError(error)),
-        finalize(() => this.ucitavanje = false)
-      ).subscribe(res => {
-      });
+        finalize(() => (this.ucitavanje = false))
+      )
+      .subscribe((res) => { });
   }
 
   private napraviPoruku(): Kontakt {
@@ -99,5 +119,14 @@ export class KontaktComponent implements OnDestroy {
       email: this.kontaktForma.controls['email'].value,
       poruka: this.kontaktForma.controls['poruka'].value,
     } as Kontakt;
+  }
+
+  private updateSeoTags(): void {
+    this.seoService.updateSeoTags({
+      title: 'Kontakt | Automaterijal - Auto delovi Šabac',
+      description:
+        'Kontaktirajte Automaterijal u Šapcu – adresa, telefon, email i forma za upit. Tu smo za sva pitanja u vezi sa delovima, filterima i mazivima.',
+      url: 'https://www.automaterijal.com/kontakt'
+    });
   }
 }

@@ -1,21 +1,44 @@
-import { Component } from '@angular/core';
-import { AutomIconComponent } from '../../../shared/components/autom-icon/autom-icon.component';
-import { YouTubePlayer } from '@angular/youtube-player';
+import { Component, OnInit } from '@angular/core';
+
+// Enums
 import { ColorEnum } from '../../../shared/data-models/enums';
 
-// Komponente
-import { HistoryTimelineComponent } from './history-timeline/history-timeline.component';
-import { HeaderComponent } from './header/header.component';
+// Automaterijal Imports
 import { BrendoviComponent } from './brendovi/brendovi.component';
+import { HeaderComponent } from './header/header.component';
+import { HistoryTimelineComponent } from './history-timeline/history-timeline.component';
+
+// Services
+import { SeoService } from '../../../shared/service/seo.service';
 
 @Component({
   selector: 'app-o-nama',
   standalone: true,
-  imports: [AutomIconComponent, HistoryTimelineComponent, YouTubePlayer, HeaderComponent, BrendoviComponent],
+  imports: [
+    HistoryTimelineComponent,
+    HeaderComponent,
+    BrendoviComponent,
+  ],
   templateUrl: './o-nama.component.html',
-  styleUrl: './o-nama.component.scss'
+  styleUrl: './o-nama.component.scss',
 })
-export class ONamaComponent {
+export class ONamaComponent implements OnInit {
   iconColor = ColorEnum;
 
+  constructor(private seoService: SeoService) { }
+
+  ngOnInit(): void {
+    this.updateSeoTags();
+  }
+
+  private updateSeoTags(): void {
+    this.seoService.updateSeoTags({
+      title: 'O nama | Automaterijal - Istorija, partneri i razvoj',
+      description:
+        'Saznajte više o kompaniji Automaterijal. Naša istorija, partneri i razvojni put od 1990. do danas.',
+      url: 'https://www.automaterijal.com/onama',
+      keywords:
+        'O nama, Automaterijal, istorija, auto delovi, partneri, Šabac, Pierburg, Reinz, Mahle, Shell, Lukoil, Fuchs'
+    });
+  }
 }

@@ -38,6 +38,8 @@ import { YouTubePlayer } from '@angular/youtube-player';
 import { PictureService } from '../../../shared/service/utils/picture.service';
 import { RobaService } from '../../../shared/service/roba.service';
 import { TecdocService } from '../../../shared/service/tecdoc.service';
+import { Meta, Title } from '@angular/platform-browser';
+import { SeoService } from '../../../shared/service/seo.service';
 
 @Component({
   selector: 'app-webshop-details',
@@ -87,6 +89,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   constructor(
+    private seoService: SeoService,
     private pictureService: PictureService,
     private robaService: RobaService,
     private route: ActivatedRoute,
@@ -125,6 +128,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
           this.data = response;
           this.fillDocumentation();
           this.fillOeNumbers();
+          this.updateSeoTags(response);
         },
         error: (err: HttpErrorResponse) => {
           const error = err.error.details || err.error;
@@ -227,5 +231,21 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
 
   addToShopingCart(): void {
     console.log(this.quantity);
+  }
+
+  private updateSeoTags(roba: Roba): void {
+    const proizvodjac = roba.proizvodjac?.naziv || '';
+    const naziv = roba.naziv || '';
+    const katbr = roba.katbr || '';
+
+    this.seoService.updateSeoTags({
+      title: `${proizvodjac} ${naziv} (${katbr}) | Automaterijal`,
+      description: `Kupite ${proizvodjac} ${naziv} (${katbr}) online. Proverena dostupnost, brza dostava, originalna dokumentacija i OE brojevi.`,
+      url: `https://www.automaterijal.com/webshop/${roba.robaid}`,
+      type: 'product',
+      image: typeof roba.proizvodjacLogo === 'string'
+        ? roba.proizvodjacLogo
+        : 'https://www.automaterijal.com/images/logo/logo.svg',
+    });
   }
 }

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import {
   FormsModule,
   ReactiveFormsModule,
@@ -39,6 +39,7 @@ import { EMAIL_ADDRESS } from '../../shared/data-models/constants/input.constant
 import { AccountService } from '../../shared/auth/service/account.service';
 import { EmailService } from '../../shared/service/email.service';
 import { LoginService } from '../../shared/service/login.service';
+import { SeoService } from '../../shared/service/seo.service';
 import { SnackbarService } from '../../shared/service/utils/snackbar.service';
 
 // Animation
@@ -76,7 +77,7 @@ import { trigger, transition, style, animate } from '@angular/animations';
   styleUrl: './login.component.scss',
   encapsulation: ViewEncapsulation.None,
 })
-export class LoginComponent implements OnDestroy {
+export class LoginComponent implements OnDestroy, OnInit {
   authenticationToken = '';
   user?: Account;
 
@@ -113,6 +114,7 @@ export class LoginComponent implements OnDestroy {
     private fb: UntypedFormBuilder,
     private loginService: LoginService,
     private router: Router,
+    private seoService: SeoService,
     private snackbarService: SnackbarService
   ) {
     this.loginForm = this.fb.group({
@@ -133,6 +135,10 @@ export class LoginComponent implements OnDestroy {
   }
 
   /** Angular lifecycle hooks start */
+
+  ngOnInit(): void {
+    this.updateSeoTags();
+  }
 
   ngOnDestroy(): void {
     this.alive = false;
@@ -254,5 +260,15 @@ export class LoginComponent implements OnDestroy {
   changedPasswordPopupHandler(): void {
     this.showFirstLoginPopup = false;
     this.routeToPage();
+  }
+
+  private updateSeoTags(): void {
+    this.seoService.updateSeoTags({
+      title: 'Prijava | Automaterijal',
+      description: 'Ulogujte se na svoj nalog na Automaterijal webshopu.',
+      url: 'https://www.automaterijal.com/login',
+      image: 'https://www.automaterijal.com/images/logo/logo.svg', // 👈 promenjeno
+      robots: 'noindex, nofollow',
+    });
   }
 }

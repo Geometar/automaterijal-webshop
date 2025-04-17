@@ -23,6 +23,7 @@ import { SpinnerComponent } from '../../shared/components/spinner/spinner.compon
 import { TecdocService } from '../../shared/service/tecdoc.service';
 import { WebshopLogicService } from '../../shared/service/utils/webshop-logic.service';
 import { WebshopStateService } from '../../shared/service/utils/webshop-state.service';
+import { SeoService } from '../../shared/service/seo.service';
 
 export enum WebShopState {
   SHOW_ARTICLES_WITH_VEHICLE_DETAILS,
@@ -89,15 +90,19 @@ export class WebshopComponent implements OnDestroy, OnInit {
     private activatedRoute: ActivatedRoute,
     private cartStateService: CartStateService,
     private logicService: WebshopLogicService,
+
     private pictureService: PictureService,
     private robaService: RobaService,
     private stateService: WebshopStateService,
-    private tecdocService: TecdocService
+    private tecdocService: TecdocService,
+    private seoService: SeoService
   ) { }
 
   /** Angular lifecycle hooks start */
 
   ngOnInit(): void {
+    this.updateSeoTagsForState();
+
     let init = true;
     this.filter = new Filter();
     // Subscribe to queryParams observable
@@ -148,6 +153,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
           );
           this.magacinData = response;
           this.currentState = this.state.SHOW_ARTICLES;
+          this.updateSeoTagsForState();
         },
         error: (err: HttpErrorResponse) => {
           const error = err.error.details || err.error;
@@ -371,5 +377,48 @@ export class WebshopComponent implements OnDestroy, OnInit {
         this.getRoba(shouldRefresh);
         break;
     }
+  }
+  private updateSeoTagsForState(): void {
+    let title = 'Webshop | Automaterijal - Auto delovi, filteri i maziva';
+    let description = 'Kupite auto delove, filtere i maziva online putem našeg Webshopa. Pretraga po vozilu, brendu ili kategoriji. Brza isporuka širom Srbije.';
+    const pageUrl = 'https://www.automaterijal.com/webshop';
+
+    const brandName =
+      this.magacinData?.proizvodjaci?.[0]?.naziv ||
+      this.filter?.proizvodjaci?.[0] ||
+      null;
+
+    const groupLabels = this.magacinData?.categories
+      ? Object.keys(this.magacinData.categories)
+      : [];
+
+    const searchTerm = this.searchTerm?.trim();
+    const resultCount = this.magacinData?.robaDto?.totalElements ?? 0;
+
+    if (this.filter.mandatoryProid && brandName) {
+      title = `Webshop | ${brandName} delovi - Automaterijal`;
+      description = `Kupite ${brandName} auto delove putem našeg webshopa. Brza dostava i proveren kvalitet.`;
+    }
+
+    if (this.filter.grupe?.length && groupLabels.length) {
+      const allGroups = groupLabels.join(', ');
+      title = `Webshop | ${allGroups} - Automaterijal`;
+      description = `Istražite ponudu za kategorije: ${allGroups}. Delovi, filteri i maziva za sve potrebe.`;
+    }
+
+    if (searchTerm && resultCount > 0) {
+      title = `Webshop pretraga: "${searchTerm}" - Automaterijal`;
+      description = `Pronađeno ${resultCount} rezultata za "${searchTerm}". Pogledajte delove, filtere i maziva dostupne za online porudžbinu.`;
+    } else if (searchTerm) {
+      title = `Webshop pretraga: "${searchTerm}" - Automaterijal`;
+      description = `Nažalost, nema rezultata za "${searchTerm}". Pokušajte sa drugim nazivom ili kataloškim brojem.`;
+    }
+
+    // ✅ Use SeoService to update tags
+    this.seoService.updateSeoTags({
+      title,
+      description,
+      url: pageUrl
+    });
   }
 }
