@@ -1,7 +1,10 @@
 <div class="row-container">
   <!-- Image Section -->
   <div class="image-container" [class.image-smaller]="showPriceOnly">
-    <img [src]="data!.slika!.slikeUrl" alt="Product Image" />
+    <img
+      [src]="data!.slika!.slikeUrl"
+      [alt]="data.proizvodjac?.naziv + ' ' + data.naziv"
+    />
   </div>
 
   <!-- Details Section -->
@@ -33,7 +36,11 @@
         data!.stanje
       }}</span>
     </p>
-    <table *ngIf="!showPriceOnly" class="specifications">
+    <table
+      *ngIf="!showPriceOnly"
+      class="specifications"
+      aria-label="Specifikacije artikla"
+    >
       <tbody>
         <!-- Mandatory tdLinkageCriteria (show all) -->
         <tr *ngFor="let spec of displayedLinkageCriteria">
@@ -159,6 +166,7 @@
     </div>
     <div *ngIf="isInCart(data.robaid ?? 0)" class="util__flex--center">
       <autom-icon
+        aria-label="Artikal je već dodat u korpu"
         class="in-cart"
         [color]="colorEnum.GREEN_700"
         [source]="iconEnum.SHOPPING_BAG"

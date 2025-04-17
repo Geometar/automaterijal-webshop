@@ -33,7 +33,12 @@
               "@angular/material/prebuilt-themes/azure-blue.css",
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "server": "src/main.server.ts",
+            "prerender": true,
+            "ssr": {
+              "entry": "server.ts"
+            }
           },
           "configurations": {
             "production": {
@@ -46,8 +51,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "1MB",
+                  "maximumError": "2MB"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -55,35 +60,20 @@
                   "maximumError": "12kB"
                 }
               ],
-              "sourceMap": true,
-              "statsJson": true,
-              "extractLicenses": false,
-              "optimization": true,
+              "optimization": {
+                "scripts": true,
+                "styles": {
+                  "minify": true,
+                  "inlineCritical": false
+                },
+                "fonts": true
+              },
               "outputHashing": "all"
             },
             "development": {
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
-            },
-            "stats": {
-              "sourceMap": true,
-              "extractLicenses": false,
-              "optimization": true,
-              "namedChunks": true
-            },
-            "analyze": {
-              "fileReplacements": [
-                {
-                  "replace": "src/environment/environment.ts",
-                  "with": "src/environment/environment.prod.ts"
-                }
-              ],
-              "sourceMap": true,
-              "extractLicenses": false,
-              "optimization": true,
-              "outputHashing": "none",
-              "namedChunks": true
             }
           },
           "defaultConfiguration": "production"

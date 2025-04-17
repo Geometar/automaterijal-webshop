@@ -1,11 +1,18 @@
 <section class="container">
+  <!-- Proizvođači -->
   <div>
-    <h1 class="heading">FILTRIRAJ PO PROIZVODJACIMA</h1>
-    <div class="product-grid">
-      <div
+    <h1 class="heading">Filtriraj po proizvođačima</h1>
+
+    <ul class="product-grid" role="list">
+      <li
         class="product--card"
         *ngFor="let brand of brands"
         (click)="filterByBrand(brand.id!)"
+        tabindex="0"
+        role="button"
+        [attr.aria-label]="'Filtriraj po brendu: ' + brand.label"
+        (keydown.enter)="filterByBrand(brand.id!)"
+        (keydown.space)="filterByBrand(brand.id!)"
       >
         <div class="image-wrapper">
           <img [src]="brand.src" [alt]="brand.alt" loading="lazy" />
@@ -14,16 +21,24 @@
           <span class="dot"></span>
         </div>
         <p class="product-label">{{ brand.label }}</p>
-      </div>
-    </div>
+      </li>
+    </ul>
   </div>
+
+  <!-- Kategorije -->
   <div>
-    <h1 class="heading">FILTRIRAJ PO GRUPAMA</h1>
-    <div class="product-grid">
-      <div
+    <h1 class="heading">Filtriraj po grupama</h1>
+
+    <ul class="product-grid" role="list">
+      <li
         class="category--card"
         *ngFor="let categorie of categories"
         (click)="filterByCategory(categorie.id!)"
+        tabindex="0"
+        role="button"
+        [attr.aria-label]="'Filtriraj po kategoriji: ' + categorie.label"
+        (keydown.enter)="filterByCategory(categorie.id!)"
+        (keydown.space)="filterByCategory(categorie.id!)"
       >
         <div class="category-image-wrapper">
           <img [src]="categorie.src" [alt]="categorie.alt" loading="lazy" />
@@ -32,7 +47,7 @@
           <span class="dot"></span>
         </div>
         <p class="product-label">{{ categorie.label }}</p>
-      </div>
-    </div>
+      </li>
+    </ul>
   </div>
 </section>

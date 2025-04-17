@@ -18,7 +18,12 @@
 
           <div class="card-content">
             <h3 class="h3">
-              <a href="#" class="card-title">{{ video.title }}</a>
+              <a
+                href="#"
+                class="card-title"
+                [attr.aria-label]="'Pogledaj blog: ' + video.title"
+                >{{ video.title }}</a
+              >
             </h3>
 
             <ul class="card-meta-list">

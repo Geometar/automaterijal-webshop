@@ -1,4 +1,7 @@
-<section class="section onama-brendovi">
+<section
+  class="section onama-brendovi"
+  aria-label="Sektori kompanije i partneri"
+>
   <div class="container">
     <h1 class="autom-margin--bottom__m">
       Sektori Kompanije i Partneri Od Poverenja
@@ -23,6 +26,7 @@
             *ngFor="let brand of getBrandsForSection(section)"
             [routerLink]="['/webshop']"
             [queryParams]="{ mandatoryproid: brand.id }"
+            [attr.aria-label]="'Pogledaj proizvode brenda ' + brand.alt"
           >
             <img [src]="brand.src" [alt]="brand.alt" loading="lazy" />
           </a>

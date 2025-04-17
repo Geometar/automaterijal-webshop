@@ -2,7 +2,7 @@
     - #FOOTER
   -->
 
-<footer class="footer">
+<footer class="footer" aria-label="Podnožje sajta – informacije i kontakt">
   <div class="footer-top section">
     <div class="container">
       <div class="footer-brand">
@@ -27,6 +27,7 @@
               class="social-link"
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="Posetite nas na Facebook-u"
             >
               <img src="/images/navigation/facebook.svg" alt="facebook" />
             </a>
@@ -75,7 +76,7 @@
         </li>
 
         <li>
-          <a href="tel:+01234567890" class="footer-link">
+          <a href="tel:+38115319000" class="footer-link">
             <autom-icon
               [color]="colorEnum.ERROR_700"
               [source]="iconEnum.PHONE_CALL"
@@ -86,7 +87,7 @@
         </li>
 
         <li>
-          <a href="mailto:info@autofix.com" class="footer-link">
+          <a href="mailto:office@automaterijal.com" class="footer-link">
             <autom-icon
               [color]="colorEnum.ERROR_700"
               [source]="iconEnum.MAIL"
@@ -97,7 +98,11 @@
         </li>
 
         <li>
-          <address class="footer-link address">
+          <address
+            class="footer-link address"
+            aria-label="Naša adresa"
+            role="contentinfo"
+          >
             <autom-icon
               [color]="colorEnum.ERROR_700"
               [source]="iconEnum.NAVIGATION"
@@ -137,7 +142,7 @@
         width="805"
         height="652"
         loading="lazy"
-        alt="Red Car"
+        alt="Crveno vozilo"
         class="shape shape-1 move-anim"
       />
     </div>

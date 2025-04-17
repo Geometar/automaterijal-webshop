@@ -1,7 +1,7 @@
 <section *ngIf="!loading" class="section">
   <div class="product-container">
     <div class="product-header">
-      <h1 class="product-title">
+      <h1 class="product-title" aria-label="Naziv proizvoda">
         {{ data.proizvodjac?.naziv }} {{ data.naziv }}
       </h1>
       <p class="product-article">Kat br: {{ data.katbr }}</p>
@@ -17,12 +17,12 @@
         <img
           class="product-img"
           [src]="data.slika!.slikeUrl"
-          alt="MAHLE ORIGINAL OX 388D"
+          [alt]="data.proizvodjac?.naziv + ' ' + data.naziv"
         />
       </div>
       <div *ngIf="data.tehnickiOpis?.length" class="product-description">
         <h3>Description</h3>
-        <ul class="description-list">
+        <ul class="description-list" aria-label="Tehnički opis proizvoda">
           <li *ngFor="let data of data.tehnickiOpis">
             <span class="label"
               >{{ data.oznaka
@@ -49,6 +49,7 @@
         <div class="product-actions">
           <div class="quantity-control">
             <autom-input-fields
+              aria-label="Količina za porudžbinu"
               [clearBtn]="false"
               [customClass]="'quantity-size'"
               [max]="data!.stanje!"
@@ -83,6 +84,7 @@
   <div
     *ngIf="documentKeys && documentKeys.length !== 0"
     class="product-container documentation documentation--section"
+    aria-label="Dokumentacija proizvoda"
   >
     <div *ngFor="let key of documentKeys">
       <h3 class="product-title">{{ key }}</h3>
@@ -146,13 +148,13 @@
     </div>
   </div>
   <div *ngIf="oeNumbers.size > 0" class="product-container documentation">
-    <div class="oe-title">OE brojevi</div>
-    <div class="oe-subtitle">
+    <h3 class="oe-title">OE brojevi</h3>
+    <p class="oe-subtitle">
       OE referentni brojevi koji su uporedivi sa originalnim brojem rezervnog
       dela:
-    </div>
-    <div class="oe-grid">
-      <ng-container *ngFor="let oe of oeNumbers | keyvalue">
+    </p>
+    <ul class="oe-grid" role="list">
+      <li *ngFor="let oe of oeNumbers | keyvalue">
         <a
           href="#"
           class="oe-item"
@@ -161,8 +163,8 @@
         >
           {{ oe.key }} - {{ oe.value }}
         </a>
-      </ng-container>
-    </div>
+      </li>
+    </ul>
   </div>
 </section>
 <div *ngIf="loading" class="spinner">
