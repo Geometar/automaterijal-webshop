@@ -140,6 +140,13 @@ textarea:focus {
 .header-margin {
 	&--top {
 		margin-top: 71px;
+		@media (max-width: 1024px) {
+			margin-top: 60px;
+		}
+	
+		@media (max-width: 991px) {
+			margin-top: 0px;
+		}
 	}
 	&--bottom {
 		padding-bottom: 71px !important;

@@ -68,11 +68,55 @@
 }
 
 @media (max-width: 768px) {
+
+  .contact-section {
+    padding: 0px;
+  }
+
+  .contact-form {
+    padding: 10px;
+    text-align: center;
+  }
+
+  .contact-form h3 {
+    font-size: 1.25rem;
+  }
+
+  .form-group {
+    flex-direction: column;
+    gap: 10px;
+  }
+
   .contact-info {
     flex-direction: column;
     gap: 20px;
+    padding: 10px;
+    height: 100%;
   }
-  .form-group {
-    flex-direction: column;
+
+  .info-item {
+    height: auto;
+    width: 100%;
+    padding: 10px 0;
+  }
+
+  .border-info {
+    border-right: none !important;
+    border-bottom: 1px solid var(--figma-grey-100);
+    padding-bottom: 10px;
+  }
+
+  .map-container {
+    margin: 20px 0px;
+  }
+
+  .map-container iframe {
+    aspect-ratio: 16 / 9;
+    height: auto;
+  }
+
+  .contact-section h2 {
+    font-size: 1.5rem;
+    margin-top: 25px !important;
   }
 }
