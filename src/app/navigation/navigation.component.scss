@@ -7,7 +7,7 @@
 
 /* ========== AKTIVNE NAVIGACIJE ========== */
 .nav-active {
-  color: var(--figma-highlight-orange);
+  color: var(--figma-highlight-orange) !important;
 }
 
 /* ========== AKTIVNE IKONE ========== */
@@ -233,6 +233,7 @@ $breakpoint-sm: 768px;
   font-size: 15px;
   color: #111827;
   text-decoration: none;
+  border-bottom: 1px solid var(--figma-grey-100);
 }
 
 .menu-title:hover {
@@ -288,9 +289,6 @@ $breakpoint-sm: 768px;
   justify-content: center;
 }
 .menu-section {
-  margin-top: 20px;
-  padding-top: 12px;
-  border-top: 1px solid #f3f4f6;
   display: flex;
   flex-direction: column;
   gap: 8px;

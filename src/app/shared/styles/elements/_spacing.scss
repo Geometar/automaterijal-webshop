@@ -191,11 +191,11 @@
 		}
 
 		&__xxs {
-			padding: calc(1.5 * var(--space-xxs)) 0;
+			padding: calc(1.5 * var(--space-xxs)) 0 !important;
 		}
 
 		&__xs {
-			padding: calc(1.5 * var(--space-xs)) 0;
+			padding: calc(1.5 * var(--space-xs)) 0 !important;
 		}
 
 		&__s {
