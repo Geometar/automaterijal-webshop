@@ -283,6 +283,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
     // 5. If all params are effectively empty, show the empty container
     if (this.checkEmptyState(params)) {
       this.filter = newFilter;
+      this.selectedVehicleDetails = null;
       this.updateState(WebShopState.SHOW_EMPTY_CONTAINER, this.searchTerm);
       return;
     }
