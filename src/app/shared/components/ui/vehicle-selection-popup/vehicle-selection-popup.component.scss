@@ -23,3 +23,50 @@
     margin-top: 26px;
   }
 }
+
+@media (max-width: 768px) {
+  .vehicle-selection {
+    .body {
+      padding: 20px;
+    }
+
+    .popup-container {
+      border-radius: 16px 16px 0 0;
+      width: 100vw !important;
+      left: 0 !important;
+      right: 0 !important;
+      max-height: 90vh;
+      overflow-y: auto;
+      max-height: calc(90vh - 57px); // keep popup above the footer
+      padding-bottom: 57px; // prevent content from hiding behind footer
+    }
+
+    .popup-container__body {
+      flex-direction: column;
+      align-items: stretch;
+      overflow-y: auto;
+      padding-bottom: 51px;
+    }
+
+    .element-width {
+      width: 100% !important;
+    }
+
+    .button__content-wrapper {
+      width: 100% !important;
+    }
+
+    .confirm-btn {
+      margin-top: 20px;
+    }
+
+    .page-details__header {
+      padding: 16px;
+      text-align: center;
+
+      h3 {
+        font-size: 1.2rem;
+      }
+    }
+  }
+}

@@ -75,10 +75,19 @@ export class PopupComponent implements AfterViewInit {
   }
 
   getPopupSize(): void {
-    const bodyWidth = document.body.clientWidth;
-    const popup = document.getElementById('popupContainer');
+    const bodyWidth = window.innerWidth;
+    const isMobile = bodyWidth <= 768;
 
-    this.fullVW = bodyWidth <= popup!.getBoundingClientRect()!.width;
+    if (isMobile) {
+      this.position = PositionEnum.BOTTOM;
+      this.subPosition = PositionEnum.CENTER;
+      this.width = SizeEnum.FULL;
+      this.height = SizeEnum.AUTO;
+      this.customPosition = false;
+      this.fullVW = true;
+    } else {
+      this.fullVW = bodyWidth <= this.popupContainer?.nativeElement.offsetWidth;
+    }
   }
 
   onOverlayClick(): void {
