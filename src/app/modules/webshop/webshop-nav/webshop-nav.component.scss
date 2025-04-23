@@ -62,3 +62,48 @@
     cursor: auto;
   }
 }
+
+@media (max-width: 991px) {
+  .webshop__navigation-search {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 10px 10px;
+    margin-bottom: 10px;
+  }
+
+  autom-button {
+    width: 100%;
+    margin-top: 5px;
+    text-align: center;
+  }
+
+  .search-input {
+    width: 100% !important;
+  }
+
+  .breadcrumb {
+    width: 100%;
+    padding: 0 10px;
+    flex-wrap: wrap;
+    font-size: 13px;
+  }
+
+  .breadcrumb li:not(:last-child)::after {
+    content: ">";
+    margin: 0 5px;
+  }
+}
+
+@media (max-width: 600px) {
+  .breadcrumb {
+    flex-direction: row;
+    align-items: flex-start !important;
+    width: 100% !important;
+    gap: 5px;
+  }
+
+  .breadcrumb li {
+    margin-bottom: 2px;
+  }
+}

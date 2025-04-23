@@ -141,3 +141,8 @@ a.disabled {
 }
 
 
+@media (max-width: 768px) {
+  .autom-input-wrapper .clear-btn {
+    display: none !important;
+  }
+}

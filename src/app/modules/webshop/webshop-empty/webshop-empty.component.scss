@@ -113,3 +113,58 @@
   font-weight: bold;
   margin-top: 10px;
 }
+
+@media (max-width: 991px) {
+  .container {
+    flex-direction: column;
+    padding: 15px;
+  }
+
+  .product-grid {
+    gap: 15px;
+  }
+
+  .product--card,
+  .category--card {
+    width: 45%; // 2 kartice u redu
+    height: auto;
+    padding: 10px;
+  }
+
+  .image-wrapper,
+  .category-image-wrapper {
+    height: 80px; // manje slike
+    margin-bottom: 15px;
+  }
+
+  .product-label {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .product--card,
+  .category--card {
+    width: 100%; // samo 1 u redu
+  }
+
+  .heading {
+    font-size: 1.2rem;
+  }
+
+  .image-wrapper,
+  .category-image-wrapper {
+    height: 60px;
+    margin-bottom: 10px;
+  }
+
+  .line .dot {
+    width: 6px;
+    height: 6px;
+    top: -3px;
+  }
+
+  .product-label {
+    font-size: 0.85rem;
+  }
+}
