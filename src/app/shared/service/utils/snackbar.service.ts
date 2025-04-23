@@ -29,7 +29,7 @@ export class SnackbarService {
 
   showAutoClose(
     message: string,
-    verticalPosition: SnackbarPosition = SnackbarPosition.TOP,
+    verticalPosition?: SnackbarPosition,
     action: string = 'OK',
     duration: number = 3000,
     horizontalPosition: SnackbarHorizontalPosition = SnackbarHorizontalPosition.CENTER
@@ -37,7 +37,7 @@ export class SnackbarService {
     const config: MatSnackBarConfig = {
       duration,
       horizontalPosition,
-      verticalPosition,
+      verticalPosition: this.getVerticalPosition(verticalPosition),
       panelClass: ['snackbar-auto']
     };
 
@@ -81,9 +81,13 @@ export class SnackbarService {
     const config: MatSnackBarConfig = {
       duration: 4000,
       horizontalPosition: 'center',
-      verticalPosition: 'bottom',
+      verticalPosition: this.getVerticalPosition(),
       panelClass: ['snackbar-success']
     };
     this.snackBar.open(message, 'OK', config);
+  }
+
+  private getVerticalPosition(userDefined?: SnackbarPosition): SnackbarPosition {
+    return window.innerWidth < 991 ? SnackbarPosition.TOP : (userDefined ?? SnackbarPosition.BOTTOM);
   }
 }

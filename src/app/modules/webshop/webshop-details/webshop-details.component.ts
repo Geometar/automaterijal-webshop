@@ -35,9 +35,11 @@ import { SpinnerComponent } from '../../../shared/components/spinner/spinner.com
 import { YouTubePlayer } from '@angular/youtube-player';
 
 // Services
+import { CartStateService } from '../../../shared/service/utils/cart-state.service';
 import { PictureService } from '../../../shared/service/utils/picture.service';
 import { RobaService } from '../../../shared/service/roba.service';
 import { SeoService } from '../../../shared/service/seo.service';
+import { SnackbarService } from '../../../shared/service/utils/snackbar.service';
 import { TecdocService } from '../../../shared/service/tecdoc.service';
 
 @Component({
@@ -88,10 +90,12 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   constructor(
-    private seoService: SeoService,
+    private cartStateService: CartStateService,
     private pictureService: PictureService,
     private robaService: RobaService,
     private route: ActivatedRoute,
+    private seoService: SeoService,
+    private snackbarService: SnackbarService,
     private tecDocService: TecdocService
   ) { }
 
@@ -229,7 +233,8 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   }
 
   addToShopingCart(): void {
-    console.log(this.quantity);
+    this.cartStateService.addToCart(this.data, this.quantity);
+    this.snackbarService.showSuccess('Artikal je dodat u korpu');
   }
 
   private updateSeoTags(roba: Roba): void {
@@ -242,9 +247,10 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       description: `Kupite ${proizvodjac} ${naziv} (${katbr}) online. Proverena dostupnost, brza dostava, originalna dokumentacija i OE brojevi.`,
       url: `https://www.automaterijal.com/webshop/${roba.robaid}`,
       type: 'product',
-      image: typeof roba.proizvodjacLogo === 'string'
-        ? roba.proizvodjacLogo
-        : 'https://www.automaterijal.com/images/logo/logo.svg',
+      image:
+        typeof roba.proizvodjacLogo === 'string'
+          ? roba.proizvodjacLogo
+          : 'https://www.automaterijal.com/images/logo/logo.svg',
     });
   }
 }
