@@ -8,3 +8,13 @@
     padding: 16px;
   }
 }
+
+@media (max-width: 991px) {
+  .product-table {
+    padding: 0 10px;
+  }
+
+  .product-row {
+    padding: 12px 0;
+  }
+}

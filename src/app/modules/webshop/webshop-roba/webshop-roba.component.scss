@@ -16,3 +16,35 @@
   width: 1050px;
 }
 
+@media (max-width: 991px) {
+  .webshop-container-roba {
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    gap: 20px;
+  }
+
+  webshop-category {
+    width: 100% !important;
+    order: 1;
+  }
+
+  autom-table {
+    width: 100% !important;
+    order: 2;
+  }
+
+  .spinner {
+    width: 100% !important;
+    max-width: 90vw;
+  }
+
+  .no-result {
+    padding: 0 20px;
+    text-align: center;
+  }
+
+  .autom-margin--top__s {
+    margin-top: 20px !important;
+  }
+}
