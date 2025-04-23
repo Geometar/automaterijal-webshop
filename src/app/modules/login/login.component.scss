@@ -139,3 +139,54 @@
     }
   }
 }
+
+@media (max-width: 991px) {
+  .login-container {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .login-left,
+  .login-right {
+    width: 100%;
+    padding: 2rem 1rem;
+    border-radius: 0;
+  }
+
+  .login-left {
+    box-shadow: none;
+  }
+
+  .login-left h3 {
+    text-align: center;
+  }
+
+  .login-form__container {
+    width: 100%;
+    max-width: 380px;
+    padding: 0;
+  }
+
+  .login-form-button button {
+    width: 100%;
+  }
+
+  .login-right {
+    background-size: cover;
+    background-position: center;
+    min-height: 300px;
+  }
+
+  .login-right .right-side {
+    padding-top: 1rem;
+  }
+
+  .header-margin--top {
+    margin-top: 0 !important;
+  }
+
+  .header-margin--bottom {
+    padding-bottom: 60px !important; /* enough for mobile footer overlap */
+  }
+}
