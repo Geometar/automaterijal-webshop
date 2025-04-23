@@ -72,6 +72,16 @@ export class RowComponent implements OnInit {
   isEmployee = false;
   showAllSpecs = false;
 
+  get nameWithoutManufacturer(): string {
+    const manufacturer = this.data.proizvodjac?.naziv?.trim();
+    const name = this.data.naziv?.trim();
+
+    if (!manufacturer || !name) return name ?? '';
+
+    const regex = new RegExp(`^${manufacturer}\\s+`, 'i'); // starts with manufacturer + space
+    return name.replace(regex, '');
+  }
+
   constructor(
     private cartStateService: CartStateService,
     private snackbarService: SnackbarService,
