@@ -1586,17 +1586,45 @@ body {
 }
 
 .no-result {
+  display: flex;
   flex-direction: column;
   gap: 10px;
-  width: 1050px;
+  width: 100%;
+  max-width: 1050px;
+  padding: 20px 15px;
+  margin: 0 auto;
+  align-items: center;
+  text-align: center;
+
   h5 {
-    width: 500px;
+    width: 100%;
+    max-width: 500px;
     text-align: center;
+    word-break: break-word;
   }
 
   button {
     width: 250px;
     height: 40px;
+  }
+}
+
+@media (max-width: 991px) {
+  .no-result {
+    padding: 20px 10px;
+    gap: 16px;
+
+    h5 {
+      font-size: 16px; // ako želiš malo manji font na mobilnom
+      max-width: 100%; // popuni fino ekran
+    }
+
+    button {
+      width: 100%;
+      max-width: 300px;
+      font-size: 16px;
+      height: 45px;
+    }
   }
 }
 

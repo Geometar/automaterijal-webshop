@@ -51,6 +51,14 @@
 }
 
 @media (max-width: 991px) {
+  .mobile-empty-page {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: calc(100vh - 57px);
+    padding-bottom: 70px; 
+  }
   .cart {
     padding: 0 15px;
 

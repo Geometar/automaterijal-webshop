@@ -206,7 +206,7 @@
     ></autom-icon>
   </button>
 
-  <a class="action-btn" href="/home">
+  <a class="action-btn" routerLink="/home">
     <autom-icon
       [ngClass]="currentUrl.includes('/home') ? 'icon-active' : null"
       [color]="colorEnum.RICH_BLACK"
@@ -232,6 +232,14 @@
       [color]="colorEnum.RICH_BLACK"
       [enableBadge]="true"
       [source]="iconEnum.SHOPPING_CART"
+    ></autom-icon>
+  </button>
+
+  <button *ngIf="loggedIn" class="action-btn" routerLink="/invoices">
+    <autom-icon
+      [ngClass]="currentUrl.includes('/invoices') ? 'icon-active' : null"
+      [color]="colorEnum.RICH_BLACK"
+      [source]="iconEnum.BOOK"
     ></autom-icon>
   </button>
 

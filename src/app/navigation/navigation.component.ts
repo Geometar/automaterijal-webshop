@@ -95,9 +95,6 @@ export class NavigationComponent implements OnInit, OnDestroy {
   /** Angular lifecycle hooks start */
 
   ngOnInit(): void {
-    // Always trigger identity resolution on init
-    this.accountService.identity().subscribe(); // this kicks off the loading if needed
-
     // Subscribe to the state
     this.accountService.authenticationState.subscribe((account: Account | null) => {
       if (account) {
