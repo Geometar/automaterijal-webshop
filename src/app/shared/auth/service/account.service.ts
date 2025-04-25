@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { catchError, Observable, of, shareReplay, Subject, tap } from 'rxjs';
+import { BehaviorSubject, catchError, Observable, of, shareReplay, Subject, tap } from 'rxjs';
 import { Account } from '../../data-models/model';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environment/environment';
@@ -14,7 +14,7 @@ const PARTNER_URL = environment.apiUrl + '/api/partner';
   providedIn: 'root',
 })
 export class AccountService {
-  authenticationState = new Subject<Account | null>();
+  authenticationState = new BehaviorSubject<Account | null>(null);
   private accountCache$?: Observable<Account> | null;
   private userIdentity: Account | null = null;
 
