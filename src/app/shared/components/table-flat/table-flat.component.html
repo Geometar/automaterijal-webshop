@@ -2,61 +2,122 @@
   <div class="top-border"></div>
 
   <div class="invoices-table-container mat-elevation-z1">
-    <table mat-table [dataSource]="dataSource" class="mat-table">
-      <ng-container *ngFor="let column of columns" [matColumnDef]="column.key">
-        <th mat-header-cell *matHeaderCellDef>{{ column.header }}</th>
-        <td mat-cell *matCellDef="let row">
-          <ng-container [ngSwitch]="column.type">
-            <ng-container *ngSwitchCase="CellType.LINK">
-              <a
-                class="invoice-link"
-                (click)="onLinkClick(row, column.callback)"
-                >{{ getNestedValue(row, column.key) }}
-              </a>
+    <!-- DESKTOP TABLE -->
+    <div class="desktop-table" *ngIf="!isMobileView()">
+      <table mat-table [dataSource]="dataSource" class="mat-table">
+        <ng-container
+          *ngFor="let column of columns"
+          [matColumnDef]="column.key"
+        >
+          <th mat-header-cell *matHeaderCellDef>{{ column.header }}</th>
+          <td mat-cell *matCellDef="let row">
+            <ng-container [ngSwitch]="column.type">
+              <ng-container *ngSwitchCase="CellType.IMG">
+                <img
+                  class="invoice-image"
+                  [src]="getNestedValue(row, column.key)"
+                  alt="image"
+                  style="max-width: 100px; max-height: 100px"
+                />
+              </ng-container>
+              <ng-container *ngSwitchCase="CellType.LINK">
+                <a
+                  class="invoice-link"
+                  (click)="onLinkClick(row, column.callback)"
+                >
+                  {{ getNestedValue(row, column.key) }}
+                </a>
+              </ng-container>
+              <ng-container *ngSwitchCase="CellType.CURRENCY">
+                {{ row[column.key] | rsdCurrency }}
+              </ng-container>
+              <ng-container *ngSwitchCase="CellType.DATE">
+                {{
+                  getNestedValue(row, column.key)
+                    | date : column.dateFormat || "dd-MMM-yyyy HH:mm"
+                }}
+              </ng-container>
+              <ng-container *ngSwitchCase="CellType.PERCENTAGE">
+                {{ row[column.key] }}%
+              </ng-container>
+              <ng-container *ngSwitchDefault>
+                {{ getNestedValue(row, column.key) }}
+              </ng-container>
             </ng-container>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
 
-            <ng-container *ngSwitchCase="CellType.CURRENCY">
-              {{ row[column.key] | rsdCurrency }}
+      <mat-paginator
+        [length]="pagination.length"
+        [pageSize]="pagination.pageSize"
+        [pageIndex]="pagination.pageIndex"
+        [pageSizeOptions]="pagination.pageSizeOptions"
+        (page)="onPageChange($event)"
+        showFirstLastButtons
+      ></mat-paginator>
+    </div>
+
+    <!-- MOBILE VIEW -->
+    <div class="mobile-card-wrapper" *ngIf="isMobileView()">
+      <div class="row-card" *ngFor="let row of dataSource.data">
+        <div class="row-field" *ngFor="let column of columns">
+          <span *ngIf="column.type !== CellType.IMG" class="label"
+            >{{ column.header }}:</span
+          >
+          <span class="value">
+            <ng-container [ngSwitch]="column.type">
+              <ng-container *ngSwitchCase="CellType.IMG">
+                <img
+                  [src]="getNestedValue(row, column.key)"
+                  alt="image"
+                  style="
+                    max-width: 100%;
+                    max-height: 150px;
+                    object-fit: contain;
+                    margin-top: 8px;
+                  "
+                />
+              </ng-container>
+              <ng-container *ngSwitchCase="CellType.LINK">
+                <a
+                  class="invoice-link"
+                  (click)="onLinkClick(row, column.callback)"
+                >
+                  {{ getNestedValue(row, column.key) }}
+                </a>
+              </ng-container>
+              <ng-container *ngSwitchCase="CellType.CURRENCY">
+                {{ row[column.key] | rsdCurrency }}
+              </ng-container>
+              <ng-container *ngSwitchCase="CellType.DATE">
+                {{
+                  getNestedValue(row, column.key)
+                    | date : column.dateFormat || "dd-MMM-yyyy HH:mm"
+                }}
+              </ng-container>
+              <ng-container *ngSwitchCase="CellType.PERCENTAGE">
+                {{ row[column.key] }}%
+              </ng-container>
+              <ng-container *ngSwitchDefault>
+                {{ getNestedValue(row, column.key) }}
+              </ng-container>
             </ng-container>
+          </span>
+        </div>
+      </div>
 
-            <ng-container *ngSwitchCase="CellType.DATE">
-              {{
-                getNestedValue(row, column.key)
-                  | date : column.dateFormat || "dd-MMM-yyyy HH:mm"
-              }}
-            </ng-container>
-
-            <ng-container *ngSwitchCase="CellType.PERCENTAGE">
-              {{ row[column.key] }}%
-            </ng-container>
-
-            <ng-container *ngSwitchCase="CellType.IMG">
-              <img
-                [src]="getNestedValue(row, column.key)"
-                alt="image"
-                style="max-width: 100px; max-height: 100px"
-              />
-            </ng-container>
-
-            <ng-container *ngSwitchDefault
-              >{{ getNestedValue(row, column.key) }}
-            </ng-container>
-          </ng-container>
-        </td>
-      </ng-container>
-
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-    </table>
-
-    <mat-paginator
-      [length]="pagination.length"
-      [pageSize]="pagination.pageSize"
-      [pageIndex]="pagination.pageIndex"
-      [pageSizeOptions]="pagination.pageSizeOptions"
-      (page)="onPageChange($event)"
-      showFirstLastButtons
-    ></mat-paginator>
+      <mat-paginator
+        [length]="pagination.length"
+        [pageSize]="pagination.pageSize"
+        [pageIndex]="pagination.pageIndex"
+        [pageSizeOptions]="pagination.pageSizeOptions"
+        (page)="onPageChange($event)"
+        showFirstLastButtons
+      ></mat-paginator>
+    </div>
   </div>
 </div>
 

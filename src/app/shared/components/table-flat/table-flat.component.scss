@@ -9,6 +9,14 @@
 }
 
 .invoices-table-container {
+  img.invoice-image {
+    display: block;
+    margin: 8px auto;
+    max-width: 100px;
+    max-height: 100px;
+    object-fit: contain;
+    border-radius: 6px;
+  }
   background-color: #ffffff;
   border-radius: 6px;
   overflow: hidden;
@@ -91,5 +99,62 @@ mat-paginator {
 
   .invoices-wrapper {
     padding: 12px;
+  }
+}
+
+.mobile-card-wrapper {
+  display: none;
+
+  @media (max-width: 768px) {
+    display: block;
+  }
+
+  .row-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    padding: 12px;
+    background-color: #fff;
+    box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.04);
+  }
+
+  .row-field {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+
+    .label {
+      font-weight: 600;
+      color: #666;
+    }
+
+    .value {
+      color: #333;
+      text-align: right;
+      word-break: break-word;
+    }
+  }
+
+  .invoice-link {
+    color: #f57c00;
+    font-weight: 500;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.desktop-table {
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+
+@media (max-width: 991px) {
+  .mobile-flat-image {
+    justify-content: center;
   }
 }

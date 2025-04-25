@@ -1601,11 +1601,17 @@ body {
 }
 
 .spinner {
-  align-items: center;
   display: flex;
-  height: calc(100vh - 220px);
   justify-content: center;
-  margin-left: auto;
-  margin-right: auto;
-  width: 1050px;
+  align-items: center;
+  width: 100%;
+  max-width: 1050px;
+  margin: 0 auto;
+  padding: 32px 16px;
+  min-height: 200px;
+
+  @media (max-width: 991px) {
+    padding: 24px 12px;
+    min-height: 150px;
+  }
 }

@@ -1,17 +1,57 @@
 .sales-report-details {
   .report-details {
-    padding: 0px 20px 100px 20px;
+    padding: 0 20px 60px; // standardni padding dole
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
   }
+
   .popup-container__body {
     justify-content: center;
     overflow-y: auto;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
   }
 
   .page-details__footer {
+    position: static; // nije više sticky
+    padding: 24px 0;
+    background-color: transparent;
+    box-shadow: none;
     justify-content: center;
+    display: flex;
   }
 
   .sales-report-btn button {
     width: 200px;
+  }
+
+  @media (max-width: 768px) {
+    autom-input-fields {
+      width: 100%;
+    }
+
+    autom-select {
+      width: 100%;
+    }
+    .report-details {
+      padding: 0 12px 80px;
+      gap: 16px;
+    }
+
+    .util__flex--center.gap-7 {
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .page-details__footer {
+      padding: 16px 0;
+    }
+
+    .sales-report-btn button {
+      width: 100%;
+      max-width: 300px;
+    }
   }
 }

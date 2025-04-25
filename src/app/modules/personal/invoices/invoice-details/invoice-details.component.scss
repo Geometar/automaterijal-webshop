@@ -48,7 +48,7 @@
     color: var(--figma-grey-900);
 
     td {
-      padding: 6px 10px;
+      padding: 6px 10px !important;
       vertical-align: top;
     }
 
@@ -63,6 +63,66 @@
       text-align: left;
       color: var(--figma-grey-800);
       word-break: break-word;
+    }
+  }
+}
+
+@media (max-width: 991px) {
+  .invoice-details {
+    padding: 12px;
+
+    h2 {
+      font-size: 20px;
+      margin-top: 24px !important;
+    }
+
+    .invoice-info {
+      flex-direction: column;
+      gap: 16px;
+      align-items: stretch;
+      padding: 12px 0;
+    }
+
+    .info-item {
+      align-items: center;
+      padding: 16px;
+      text-align: left;
+
+      autom-icon {
+        margin-bottom: 10px;
+      }
+
+      .invoice-table {
+        font-size: 14px;
+
+        td {
+          display: block;
+          padding: 4px 0;
+        }
+
+        td:first-child {
+          display: inline-block;
+          font-weight: 600;
+          width: auto;
+          margin-right: 6px;
+        }
+
+        td:last-child {
+          display: inline;
+        }
+      }
+    }
+
+    .invoice-table {
+      td {
+        vertical-align: baseline;
+      }
+    }
+
+    .border-info {
+      border-right: none;
+      border-bottom: 1px solid var(--figma-grey-100);
+      padding-bottom: 16px;
     }
   }
 }

@@ -1,6 +1,6 @@
 .log-details {
-  .invoices-table-container{
-    overflow-x: auto !important;
+  .log-table-details {
+    padding: 16px;
   }
 
   .popup-container__body {
@@ -14,5 +14,57 @@
 
   .sales-report-btn button {
     width: 200px;
+  }
+
+  // MOBILE CARD VIEW
+  @media (max-width: 768px) {
+    @media (max-width: 991px) {
+      .log-table-details {
+        padding-bottom: 100px;
+      }
+    }
+    .desktop-table {
+      display: none;
+    }
+
+    .mobile-card-wrapper {
+      display: block;
+    }
+
+    .row-card {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      padding: 12px;
+      background-color: #fff;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    }
+
+    .row-field {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+
+      .label {
+        font-weight: 600;
+        color: #666;
+      }
+
+      .value {
+        color: #333;
+        text-align: right;
+        word-break: break-word;
+      }
+    }
+
+    .invoice-link {
+      color: #f57c00;
+      font-weight: 500;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
   }
 }
