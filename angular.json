@@ -24,6 +24,7 @@
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
+              "src/.well-known/pki-validation/godaddy.html",
               {
                 "glob": "**/*",
                 "input": "public"
