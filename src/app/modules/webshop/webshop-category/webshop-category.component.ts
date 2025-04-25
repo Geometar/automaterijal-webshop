@@ -1,8 +1,10 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import {
   Component,
+  Inject,
   Input,
   OnChanges,
+  PLATFORM_ID,
   SimpleChanges,
   ViewEncapsulation,
 } from '@angular/core';
@@ -23,14 +25,21 @@ import { Manufacture } from '../../../shared/data-models/model/proizvodjac';
 
 // Enums
 import {
+  ButtonThemes,
+  ButtonTypes,
+  ColorEnum,
   IconsEnum,
   InputTypeEnum,
   OrientationEnum,
+  PositionEnum,
   SizeEnum,
 } from '../../../shared/data-models/enums';
 
 // Service
 import { UrlHelperService } from '../../../shared/service/utils/url-helper.service';
+import { ButtonComponent } from '../../../shared/components/button/button.component';
+import { PopupComponent } from '../../../shared/components/popup/popup.component';
+import { AutomIconComponent } from '../../../shared/components/autom-icon/autom-icon.component';
 
 export enum FilterEnum {
   CATEGORY,
@@ -46,6 +55,9 @@ export enum FilterEnum {
     CommonModule,
     InputFieldsComponent,
     ManufactureFilterComponent,
+    ButtonComponent,
+    PopupComponent,
+    AutomIconComponent
   ],
   templateUrl: './webshop-category.component.html',
   styleUrl: './webshop-category.component.scss',
@@ -58,6 +70,7 @@ export class WebshopCategoryComponent implements OnChanges {
 
   // Misc
   openCategoriesFilters = true;
+  openFilterPopup = false;
   openManufacturesFilters = true;
 
   // Radio Models
@@ -71,13 +84,29 @@ export class WebshopCategoryComponent implements OnChanges {
   manufacturerPreFilter = '';
 
   // Enums
+  buttonThemes = ButtonThemes;
+  buttonTypes = ButtonTypes;
+  colorEnum = ColorEnum;
   filterEnum = FilterEnum;
   iconEnums = IconsEnum;
   inputTypeEnum = InputTypeEnum;
   orientation = OrientationEnum;
+  positionEnum = PositionEnum;
   sizeEnum = SizeEnum;
 
-  constructor(private urlHelperService: UrlHelperService) { }
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private urlHelperService: UrlHelperService
+  ) { }
+
+  isMobileView(): boolean {
+    if (isPlatformBrowser(this.platformId)) {
+      return window.innerWidth < 991;
+    }
+    return false; // fallback za server-side render
+  }
+
+  /** Start of: Angular lifecycle hooks */
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['manufactures'] || changes['filter']) {
@@ -85,11 +114,13 @@ export class WebshopCategoryComponent implements OnChanges {
     }
   }
 
+  /** End of: Angular lifecycle hooks */
+
   // Start of: Emit handle
 
   onSubgroupsChanged(updatedIds: string[]): void {
     this.urlHelperService.addOrUpdateQueryParams({
-      podgrupe: updatedIds
+      podgrupe: updatedIds,
     });
   }
 

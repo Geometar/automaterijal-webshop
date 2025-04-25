@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 
 export enum SnackbarPosition {
@@ -18,7 +19,7 @@ export enum SnackbarHorizontalPosition {
 })
 export class SnackbarService {
 
-  constructor(private snackBar: MatSnackBar) { }
+  constructor(@Inject(PLATFORM_ID) private platformId: Object, private snackBar: MatSnackBar) { }
 
   /**
    * Displays a snackbar that auto-closes after a given duration.
@@ -88,6 +89,6 @@ export class SnackbarService {
   }
 
   private getVerticalPosition(userDefined?: SnackbarPosition): SnackbarPosition {
-    return window.innerWidth < 991 ? SnackbarPosition.TOP : (userDefined ?? SnackbarPosition.BOTTOM);
+    return isPlatformBrowser(this.platformId) && window.innerWidth < 991 ? SnackbarPosition.TOP : (userDefined ?? SnackbarPosition.BOTTOM);
   }
 }

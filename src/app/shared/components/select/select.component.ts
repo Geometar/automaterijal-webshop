@@ -45,7 +45,10 @@ export class SelectComponent implements OnChanges {
 
       if (this.required && (!this.selectedValue || !exists) && this.selectionList.length > 0) {
         this.selectedValue = this.selectionList[0];
-        this.emitSelected.emit(this.selectedValue);
+      }
+
+      if (!this.required || this.selectedValue) {
+        this.emitSelected.emit(this.selectedValue ?? {} as SelectModel);
       }
     }
   }
@@ -54,4 +57,8 @@ export class SelectComponent implements OnChanges {
     this.selectedValue = event.value;
     this.emitSelected.emit(event.value);
   }
+
+  compareFn = (a: SelectModel, b: SelectModel): boolean => {
+    return a?.key === b?.key;
+  };
 }

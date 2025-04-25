@@ -1,6 +1,6 @@
 <autom-radio-button
   [label]="'Raspoloživost'"
   [options]="radioOptions"
-  [theme]="orientation.VERTICAL"
+  [theme]="isMobileView ? orientation.HORIZONTAL : orientation.VERTICAL"
   (emitSelected)="emitSelected()"
 ></autom-radio-button>

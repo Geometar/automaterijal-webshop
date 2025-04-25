@@ -1,16 +1,34 @@
+<!-- Button to open mobile filters (visible only on mobile) -->
+<autom-button
+  *ngIf="isMobileView() && !openFilterPopup"
+  class="mobile-filter-btn"
+  [label]="'Filter'"
+  [type]="buttonTypes.PRIMARY"
+  [theme]="buttonThemes.DEFAULT"
+  [iconSource]="iconEnums.FILTER"
+  [iconPrefix]="true"
+  (clickEvent)="openFilterPopup = true"
+></autom-button>
+
+<!-- Sidebar filter (visible only on desktop) -->
 <div
   *ngIf="
-    (categories && categories !== null) || (manufactures && manufactures.length)
+    !isMobileView() &&
+    ((categories && categories !== null) ||
+      (manufactures && manufactures.length))
   "
   class="sidebar"
 >
   <div class="filter-section">
+    <!-- Availability filter -->
     <div class="filter-container">
       <availability-filter
         [onStock]="filter.naStanju!"
         (availabilityChanged)="onAvailabilityChanged($event)"
       ></availability-filter>
     </div>
+
+    <!-- Category filter -->
     <div class="filter-container" *ngIf="categories && categories !== null">
       <category-filter
         *ngIf="openCategoriesFilters"
@@ -19,15 +37,18 @@
         (subgroupsChanged)="onSubgroupsChanged($event)"
       ></category-filter>
     </div>
+
+    <!-- Manufacturer filter -->
     <div class="filter-container" *ngIf="manufactures && manufactures.length">
       <div class="filter-prefilter" *ngIf="manufactures.length > 7">
         <autom-input-fields
-          [placeholder]="'Filter proizvodjaca'"
+          [placeholder]="'Filter manufacturers'"
           [suffixIcon]="iconEnums.FILTER"
           [type]="inputTypeEnum.SEARCH"
           (emitSelected)="preFilterManufactures($event)"
         ></autom-input-fields>
       </div>
+
       <manufacture-filter
         *ngIf="openManufacturesFilters"
         [manufactures]="manufacturesModels"
@@ -38,3 +59,54 @@
     </div>
   </div>
 </div>
+
+<!-- Filter popup (visible only on mobile) -->
+<autom-popup
+  class="mobile-filters"
+  *ngIf="isMobileView() && openFilterPopup"
+  [height]="sizeEnum.AUTO"
+  [position]="positionEnum.BOTTOM"
+  [subPosition]="positionEnum.BOTTOM"
+  [width]="sizeEnum.FULL"
+  [rounded]="true"
+>
+  <div custom-header class="page-details__header">
+    <div class="page-details__title--row">
+      <h3 class="h3">Filter</h3>
+    </div>
+    <autom-icon
+      mat-dialog-close
+      [color]="colorEnum.GREY_400"
+      [source]="iconEnums.X"
+      (click)="openFilterPopup = false"
+    ></autom-icon>
+  </div>
+
+  <div
+    custom-body
+    class="page-details__body page-details__height--auto body util__flex--center autom-flex-direction--column"
+  >
+    <!-- Availability -->
+    <availability-filter
+      [onStock]="filter.naStanju!"
+      (availabilityChanged)="onAvailabilityChanged($event)"
+    ></availability-filter>
+
+    <!-- Categories -->
+    <category-filter
+      *ngIf="openCategoriesFilters"
+      [categories]="categories"
+      [selectedSubgroupIds]="filter.podgrupe || []"
+      (subgroupsChanged)="onSubgroupsChanged($event)"
+    ></category-filter>
+
+    <!-- Manufacturers -->
+    <manufacture-filter
+      *ngIf="openManufacturesFilters"
+      [manufactures]="manufacturesModels"
+      [selected]="filter.proizvodjaci || []"
+      [filterTerm]="''"
+      (selectionChanged)="onManufactureChanged($event)"
+    ></manufacture-filter>
+  </div>
+</autom-popup>

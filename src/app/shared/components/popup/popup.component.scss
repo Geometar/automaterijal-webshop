@@ -1,5 +1,6 @@
 .popup {
 	&-container {
+		z-index: 101 !important;
 		background: var(--figma-base-white);
 		box-shadow: var(--figma-shadow-xl);
 		display: flex;
@@ -27,6 +28,7 @@
 		}
 
 		&__body {
+			z-index: 101;
 			display: flex;
 			width: 100%;
 		}

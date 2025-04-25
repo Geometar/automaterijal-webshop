@@ -1,11 +1,12 @@
-import { CommonModule } from '@angular/common';
-import { Component, computed, EventEmitter, Input, OnChanges, Output, signal, SimpleChanges } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { ChangeDetectorRef, Component, computed, EventEmitter, HostListener, Inject, Input, OnChanges, Output, PLATFORM_ID, signal, SimpleChanges } from '@angular/core';
 
 // Automaterijal imports
 import { CheckboxComponent } from '../../../../shared/components/checkbox/checkbox.component';
+import { SelectComponent } from '../../../../shared/components/select/select.component';
 
 // Data models
-import { CheckboxModel } from '../../../../shared/data-models/interface';
+import { CheckboxModel, SelectModel } from '../../../../shared/data-models/interface';
 
 // Enums
 import { OrientationEnum, SizeEnum } from '../../../../shared/data-models/enums';
@@ -13,7 +14,7 @@ import { OrientationEnum, SizeEnum } from '../../../../shared/data-models/enums'
 @Component({
   selector: 'manufacture-filter',
   standalone: true,
-  imports: [CommonModule, CheckboxComponent],
+  imports: [CommonModule, CheckboxComponent, SelectComponent],
   templateUrl: './manufacture-filter.component.html',
   styleUrl: './manufacture-filter.component.scss'
 })
@@ -26,9 +27,17 @@ export class ManufactureFilterComponent implements OnChanges {
 
   readonly state = signal<CheckboxModel[]>([]);
 
-  // Expose enums
+  // Enums
   readonly sizeEnum = SizeEnum;
   readonly orientationEnum = OrientationEnum;
+
+  // Misc
+  isMobile = false;
+  selectReady = false;
+
+  // Select config
+  selectOptions: SelectModel[] = [];
+  selectedOption: SelectModel | null = null;
 
   readonly filteredManufactures = computed(() => {
     const term = this._filterTerm().toLowerCase();
@@ -38,6 +47,19 @@ export class ManufactureFilterComponent implements OnChanges {
   });
 
   readonly _filterTerm = signal('');
+
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object, private cdr: ChangeDetectorRef
+  ) { }
+
+  @HostListener('window:resize', [])
+  onResize(): void {
+    this.isMobile = isPlatformBrowser(this.platformId) && window.innerWidth < 991;
+  }
+
+  ngOnInit(): void {
+    this.onResize();
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['manufactures'] || changes['selected']) {
@@ -55,6 +77,24 @@ export class ManufactureFilterComponent implements OnChanges {
       checked: this.selected.includes(m.key!),
     }));
     this.state.set(updated);
+
+    // Build select options
+    this.selectOptions = this.manufactures.map(m => ({
+      key: m.key,
+      value: m.value
+    }));
+
+    // Preselect if applicable
+    if (this.selected.length === 1) {
+      const match = this.selectOptions.find(opt => opt.key === this.selected[0]);
+      if (match) this.selectedOption = match;
+    }
+
+    // ✅ Trigger outside change detection cycle
+    setTimeout(() => {
+      this.selectReady = true;
+      this.cdr.detectChanges(); //
+    });
   }
 
   emitChanges(models: CheckboxModel[]): void {
@@ -63,5 +103,10 @@ export class ManufactureFilterComponent implements OnChanges {
       .filter((m) => m.checked && m.key !== undefined)
       .map((m) => m.key as string | number);
     this.selectionChanged.emit(selected);
+  }
+
+  onSelectChange(selected: SelectModel): void {
+    this.selectedOption = selected;
+    this.selectionChanged.emit(selected.key ? [selected.key] : []);
   }
 }

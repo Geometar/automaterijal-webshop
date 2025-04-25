@@ -1,6 +1,20 @@
-<checkbox-group
-  class="filter-selection"
-  [items]="tasks"
-  [label]="'Kategorije'"
-  (clickEvent)="emitSelectedSubgroups($event)"
-></checkbox-group>
+<ng-container *ngIf="!isMobileView(); else mobileSelect">
+  <checkbox-group
+    class="filter-selection"
+    [items]="tasks"
+    [label]="'Kategorije'"
+    (clickEvent)="emitSelectedSubgroups($event)"
+  ></checkbox-group>
+</ng-container>
+
+<ng-template #mobileSelect>
+  <autom-select
+    *ngIf="selectReady"
+    class="filter-selection"
+    [label]="'Kategorije'"
+    [placeholder]="'Izaberi kategoriju'"
+    [selectedValue]="selectedOption"
+    [selectionList]="selectOptions"
+    (emitSelected)="onSelectChange($event)"
+  ></autom-select>
+</ng-template>

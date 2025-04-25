@@ -1,11 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
 
 import { DragDropModule } from '@angular/cdk/drag-drop';
 
 // Angular Material Modules
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
+
+// Animations
+import { animate, style, transition, trigger } from '@angular/animations';
 
 // Component imports
 import { AutomIconComponent } from '../autom-icon/autom-icon.component';
@@ -29,9 +32,20 @@ import { PositionEnum, SizeEnum } from '../../data-models/enums';
     // CDK
     DragDropModule],
   templateUrl: './popup.component.html',
-  styleUrl: './popup.component.scss'
+  styleUrl: './popup.component.scss',
+  animations: [
+    trigger('fadeInOut', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('200ms ease-out', style({ opacity: 1 }))
+      ]),
+      transition(':leave', [
+        animate('150ms ease-in', style({ opacity: 0 }))
+      ])
+    ])
+  ]
 })
-export class PopupComponent implements AfterViewInit {
+export class PopupComponent implements OnInit {
   @Input() allowDrag = false;
   @Input() customLeft = 0;
   @Input() customPosition = false;
@@ -53,6 +67,7 @@ export class PopupComponent implements AfterViewInit {
   positionEnum = PositionEnum;
   sizeEnum = SizeEnum;
 
+  // Misc
   fullVW = false;
 
   get popupClasses(): Array<string> {
@@ -70,8 +85,9 @@ export class PopupComponent implements AfterViewInit {
     this.getPopupSize();
   }
 
-  ngAfterViewInit(): void {
+  ngOnInit(): void {
     this.getPopupSize();
+
   }
 
   getPopupSize(): void {

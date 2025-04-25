@@ -1,11 +1,13 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import {
   Component,
   EventEmitter,
+  Inject,
   Input,
   OnChanges,
   OnInit,
   Output,
+  PLATFORM_ID,
   SimpleChanges,
   ViewEncapsulation,
 } from '@angular/core';
@@ -36,6 +38,15 @@ export class AvailabilityFilterComponent implements OnChanges, OnInit {
 
   radioOptions: RadioOption[] = [];
   readonly radioOptionKeys = ['Svi artikli', 'Ima na stanju'];
+
+  get isMobileView(): boolean {
+    if (isPlatformBrowser(this.platformId)) {
+      return window.innerWidth < 991;
+    }
+    return false; // fallback za server-side render
+  }
+
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) { }
 
   ngOnInit(): void {
     this.buildOptions();

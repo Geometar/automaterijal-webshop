@@ -2,18 +2,22 @@ import {
   Component,
   EventEmitter,
   HostListener,
+  Inject,
   OnDestroy,
   OnInit,
   Output,
+  PLATFORM_ID,
   ViewEncapsulation,
 } from '@angular/core';
 import { finalize, Subject, takeUntil } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 
-// Component Imports
+// Automaterijal Imports
 import { AutomIconComponent } from '../../autom-icon/autom-icon.component';
-import { PopupComponent } from '../../popup/popup.component';
 import { ButtonComponent } from '../../button/button.component';
+import { InputFieldsComponent, TypeaheadItem } from '../../input-fields/input-fields.component';
+import { PopupComponent } from '../../popup/popup.component';
 
 // Data models
 import {
@@ -39,8 +43,6 @@ import { TecdocService } from '../../../service/tecdoc.service';
 import { TecdocSearchHistoryService } from '../../../service/utils/tecdoc-search-history.service';
 import { SelectComponent } from '../../select/select.component';
 import { SelectModel } from '../../../data-models/interface';
-import { CommonModule } from '@angular/common';
-import { InputFieldsComponent, TypeaheadItem } from '../../input-fields/input-fields.component';
 
 @Component({
   selector: 'vehicle-selection-popup',
@@ -60,11 +62,6 @@ import { InputFieldsComponent, TypeaheadItem } from '../../input-fields/input-fi
 export class VehicleSelectionPopupComponent implements OnInit, OnDestroy {
   @Output() closePopupModal = new EventEmitter<void>();
   @Output() emitVehicle = new EventEmitter<TDVehicleDetails>();
-
-  constructor(
-    private tecdocService: TecdocService,
-    private searchHistoryService: TecdocSearchHistoryService
-  ) { }
 
   title = 'Izaberite vozilo';
 
@@ -112,6 +109,12 @@ export class VehicleSelectionPopupComponent implements OnInit, OnDestroy {
     }
   }
 
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private searchHistoryService: TecdocSearchHistoryService,
+    private tecdocService: TecdocService,
+  ) { }
+
   /** Start of: Angular lifecycle hooks */
 
   ngOnInit(): void {
@@ -124,6 +127,13 @@ export class VehicleSelectionPopupComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
   /** End of: Angular lifecycle hooks */
+
+  isMobileView(): boolean {
+    if (isPlatformBrowser(this.platformId)) {
+      return window.innerWidth < 991;
+    }
+    return false; // fallback za server-side render
+  }
 
   setSearchHistory(): void {
     this.vehicleSearchHistory = this.searchHistoryService.getVehiclesArray();

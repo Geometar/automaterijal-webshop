@@ -1,4 +1,13 @@
+<autom-select
+  *ngIf="isMobile && selectReady"
+  [label]="'Proizvođači'"
+  [selectedValue]="selectedOption"
+  [selectionList]="state()"
+  (emitSelected)="onSelectChange($event)"
+></autom-select>
+
 <autom-checkbox
+  *ngIf="!isMobile"
   class="filter-selection"
   [horizontal]="false"
   [items]="filterTerm ? filteredManufactures() : state()"

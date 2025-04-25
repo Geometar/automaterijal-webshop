@@ -9,10 +9,11 @@
     <mat-label></mat-label
     ><mat-select
       class="mat-select--styled-with-arrow"
+      [(value)]="selectedValue"
+      [compareWith]="compareFn"
       [disabled]="disabled"
       [placeholder]="placeholder"
       [required]="required"
-      [(value)]="selectedValue"
       (selectionChange)="onSelectionChange($event)"
     >
       <mat-option *ngIf="!required">--</mat-option>

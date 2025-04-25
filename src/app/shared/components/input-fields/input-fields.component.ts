@@ -273,6 +273,7 @@ export class InputFieldsComponent implements AfterViewInit, OnChanges, OnInit {
       const selected = changes['autocompleteSelected'].currentValue;
       const ctrl = this.form.get('formCtrl');
 
+
       if (selected?.value) {
         ctrl?.setValue(selected.value, { emitEvent: false });
       } else {
