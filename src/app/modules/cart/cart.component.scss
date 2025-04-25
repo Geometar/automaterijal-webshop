@@ -49,3 +49,48 @@
     }
   }
 }
+
+@media (max-width: 991px) {
+  .cart {
+    padding: 0 15px;
+
+    .display--flex {
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .information {
+      margin: 0;
+      padding: 15px;
+      width: 100%;
+    }
+
+    .total {
+      padding: 15px 0;
+      width: 100%;
+
+      table {
+        width: 100%;
+      }
+
+      .price {
+        font-size: 18px;
+      }
+
+      .order-btn button {
+        width: 100%;
+        font-size: 16px;
+        height: 48px;
+      }
+    }
+
+    .product-row {
+      padding: 10px 0;
+    }
+
+    .gap-7 {
+      flex-direction: column;
+      gap: 10px;
+    }
+  }
+}

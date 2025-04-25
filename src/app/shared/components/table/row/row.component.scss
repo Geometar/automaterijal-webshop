@@ -35,6 +35,17 @@
   align-items: flex-start;
   gap: 16px;
 
+  .remove-icon {
+    order: -1;
+    align-self: flex-end;
+    margin-bottom: 8px;
+
+    autom-icon {
+      font-size: 20px;
+      cursor: pointer;
+    }
+  }
+
   .image-container {
     align-items: center;
     display: flex;
