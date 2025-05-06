@@ -113,7 +113,7 @@
             class="youtube-wrapper documentation--section-padding"
             *ngIf="
               document.docFileTypeName!.toUpperCase().indexOf('URL') > -1 &&
-              document.docTypeId === 9
+              document.docUrl?.includes('youtube')
             "
           >
             <youtube-player [videoId]="document.saniraniUrl"></youtube-player>

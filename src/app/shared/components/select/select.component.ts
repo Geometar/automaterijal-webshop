@@ -40,14 +40,28 @@ export class SelectComponent implements OnChanges {
   @Output() emitSelected = new EventEmitter<SelectModel>();
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['selectionList'] || changes['selectedValue']) {
+    const selectionListChanged = changes['selectionList'];
+    const selectedValueChanged = changes['selectedValue'];
+
+    if (selectionListChanged || selectedValueChanged) {
       const exists = this.selectionList.find(item => item.key === this.selectedValue?.key);
 
       if (this.required && (!this.selectedValue || !exists) && this.selectionList.length > 0) {
         this.selectedValue = this.selectionList[0];
+        this.emitSelected.emit(this.selectedValue);
+        return;
       }
 
-      if (!this.required || this.selectedValue) {
+      // Ako nije required i vrednost je null na init, ignorisi
+      if (!this.required && selectedValueChanged?.firstChange && this.selectedValue === null) {
+        return;
+      }
+
+      // Emituj samo ako se key zaista promenio
+      const prevKey = selectedValueChanged?.previousValue?.key;
+      const currKey = selectedValueChanged?.currentValue?.key;
+
+      if (prevKey !== currKey) {
         this.emitSelected.emit(this.selectedValue ?? {} as SelectModel);
       }
     }

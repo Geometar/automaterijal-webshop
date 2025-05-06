@@ -35,16 +35,7 @@
   align-items: flex-start;
   gap: 16px;
 
-  .remove-icon {
-    order: -1;
-    align-self: flex-end;
-    margin-bottom: 8px;
-
-    autom-icon {
-      font-size: 20px;
-      cursor: pointer;
-    }
-  }
+ 
 
   .image-container {
     align-items: center;
@@ -90,6 +81,7 @@
       width: 500px;
       font-size: 14px;
       color: #666;
+      margin-top: 15px;
 
       td {
         padding: 2px 8px;
@@ -171,6 +163,17 @@
     gap: 20px;
     padding: 16px 0;
     border-bottom: 1px solid #eee;
+
+    .remove-icon {
+      order: -1;
+      align-self: flex-end;
+      margin-bottom: 8px;
+  
+      autom-icon {
+        font-size: 20px;
+        cursor: pointer;
+      }
+    }
   }
 
   .image-container {
