@@ -9,10 +9,12 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 // Services
 import { AccountStateService } from '../../service/utils/account-state.service';
+import { AccountService } from '../service/account.service';
 
 export const authInterceptor: HttpInterceptorFn = (request, next) => {
   const sessionStorageService = inject(SessionStorageService);
   const accountStateService = inject(AccountStateService);
+  const accountService = inject(AccountService);
   const router = inject(Router);
 
   if (
@@ -48,6 +50,7 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
 
         sessionStorageService.clear('authenticationToken');  // Remove authentication token
         accountStateService.remove(); // Remove logged in user
+        accountService.authenticate(null); // Clear authentication state
         router.navigate(['/login']);   // Redirect to login
       }
 

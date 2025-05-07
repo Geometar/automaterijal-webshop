@@ -169,28 +169,28 @@
       "alt": "Maziva",
       "label": "Kozmetika",
       "id": "NAZI",
-      "visible": true
+      "visible": false
     },
     {
       "src": "/images/groups/odrzavanje-vozila.png",
       "alt": "Maziva",
       "label": "Odrzavanje vozila",
-      "id": "OD",
-      "visible": true
+      "id": "OSTALO",
+      "visible": false
     },
     {
       "src": "/images/groups/oprema-auta.png",
       "alt": "Maziva",
       "label": "Praktična auto oprema.",
       "id": "UD",
-      "visible": true
+      "visible": false
     },
     {
       "src": "/images/groups/auto_enterijer.png",
       "alt": "Maziva",
       "label": "Auto Enterijer",
       "id": "UNIDO",
-      "visible": true
+      "visible": false
     },
     {
       "src": "/images/groups/auto_enterijer.png",
