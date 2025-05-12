@@ -69,4 +69,9 @@ export const routes: Routes = [
       import('./modules/personal/logs/logs.component').then((m) => m.LogsComponent),
     canActivate: [salesGuard]
   },
+  {
+    path: '**',
+    loadComponent: () =>
+      import('./modules/dashboard/not-found/not-found.component').then((m) => m.PageNotFoundComponent)
+  },
 ];
