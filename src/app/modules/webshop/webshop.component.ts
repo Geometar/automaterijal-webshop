@@ -266,6 +266,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
     isInitialLoad: boolean = false
   ): void {
     // 1. Extract and store basic parameters into the component's state
+    const searchChanged = this.searchTerm !== params.searchTerm;
     this.extractBaseParams(params);
 
     // 2. Build a new filter object based on query parameters
@@ -278,7 +279,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
     );
 
     // 4. If filters have changed, reset to the first page
-    if (filtersChanged) this.pageIndex = 0;
+    if (filtersChanged || searchChanged) this.pageIndex = 0;
 
     // 5. If all params are effectively empty, show the empty container
     if (this.checkEmptyState(params)) {
