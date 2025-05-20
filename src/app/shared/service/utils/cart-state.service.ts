@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { SessionStorageService } from 'ngx-webstorage';
+import { LocalStorageService } from 'ngx-webstorage';
 import { BehaviorSubject } from 'rxjs';
 
 // Data models
@@ -14,12 +14,12 @@ export class CartStateService {
   cartSize$: BehaviorSubject<number> = new BehaviorSubject(0);
   roba$: BehaviorSubject<Roba[]> = new BehaviorSubject([] as Roba[]);
 
-  constructor(private sessionStorage: SessionStorageService) {
+  constructor(private localStorage: LocalStorageService) {
     this.updateCartSize();
   }
 
   getAll(): CartItem[] {
-    return this.sessionStorage.retrieve(this.storageKey) || [];
+    return this.localStorage.retrieve(this.storageKey) || [];
   }
 
   addToCart(roba: any, quantity: number = 1): void {
@@ -39,18 +39,18 @@ export class CartStateService {
     // ✅ Smanjuje stanje robe
     roba.stanje = this.calculateNewStock(roba.stanje, quantity);
 
-    this.sessionStorage.store(this.storageKey, cart);
+    this.localStorage.store(this.storageKey, cart);
     this.updateCartSize();
   }
 
   removeFromCart(itemId: number): void {
     const updatedCart = this.getAll().filter((item) => item.robaId !== itemId);
-    this.sessionStorage.store(this.storageKey, updatedCart);
+    this.localStorage.store(this.storageKey, updatedCart);
     this.updateCartSize();
   }
 
   resetCart(): void {
-    this.sessionStorage.clear(this.storageKey);
+    this.localStorage.clear(this.storageKey);
     this.updateCartSize();
   }
 
@@ -63,7 +63,7 @@ export class CartStateService {
       item.totalPrice = (item.unitPrice ?? 1) * quantity;
     }
 
-    this.sessionStorage.store(this.storageKey, cart);
+    this.localStorage.store(this.storageKey, cart);
     this.updateCartSize();
   }
 

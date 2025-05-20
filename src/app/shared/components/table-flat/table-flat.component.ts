@@ -1,9 +1,15 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { AutomTableColumn, CellType } from '../../data-models/enums/table.enum';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { CommonModule, CurrencyPipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
+
+// Automaterijal imports
 import { SpinnerComponent } from '../spinner/spinner.component';
+
+// Enums
+import { AutomTableColumn, CellType } from '../../data-models/enums/table.enum';
+
+// Pipes
 import { RsdCurrencyPipe } from '../../pipe/rsd-currency.pipe';
 
 @Component({

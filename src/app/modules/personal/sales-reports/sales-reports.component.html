@@ -6,6 +6,14 @@
   ></autom-header>
 
   <div class="sales-reports__filter">
+    <autom-input-fields
+      class="filter-groups"
+      [label]="'Pretraga'"
+      [preIcon]="iconsEnum.FILTER"
+      [round]="true"
+      [type]="inputTypeEnum.SEARCH"
+      (emitSelected)="onSearchTerm($event)"
+    ></autom-input-fields>
     <autom-select
       *ngIf="salesPersonsSelectModel.length"
       [placeholder]="'Izaberite komercijalistu'"

@@ -15,7 +15,7 @@ import { AutomLabelComponent } from '../autom-label/autom-label.component';
 import { AutomTooltipDirective } from '../autom-tooltip/autom-tooltip.directive';
 import { IconModel } from '../../data-models/interface';
 import { ButtonThemes, ButtonTypes, ColorEnum, IconsEnum, InputTypeEnum, SizeEnum, TooltipPositionEnum, TooltipThemeEnum, TooltipTypesEnum } from '../../data-models/enums';
-import { map, Observable, of, startWith } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map, Observable, of, startWith, Subject } from 'rxjs';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 
 
@@ -156,6 +156,8 @@ export class InputFieldsComponent implements AfterViewInit, OnChanges, OnInit {
   minError = 'ERROR_MIN_VALUE_OF';
   minLengthError = 'ERROR_MIN_LENGTH_OF';
   numberError = 'ERROR_ENTER_VALID_NUMBER';
+
+  searchTerm$ = new Subject<string>();
 
   get inputHasErrorGetter(): boolean {
     const formCtrl = this.form?.controls?.['formCtrl'];
@@ -304,6 +306,17 @@ export class InputFieldsComponent implements AfterViewInit, OnChanges, OnInit {
         this.form?.get('formCtrl')?.setValue(this.autocompleteSelected.value);
       }
     }
+
+    if (this.type === this.inputTypes.SEARCH) {
+      this.searchTerm$
+        .pipe(
+          debounceTime(300),
+          distinctUntilChanged()
+        )
+        .subscribe(value => {
+          this.emitSelected.emit(value);
+        });
+    }
   }
 
   /**
@@ -419,7 +432,10 @@ export class InputFieldsComponent implements AfterViewInit, OnChanges, OnInit {
     });
   }
 
-
+  onSearchInputChange(): void {
+    const value = this.form?.controls['formCtrl']?.value;
+    this.searchTerm$.next(value);
+  }
 
   emitSelectedValue(): void {
     this.emitSelected.emit(this.form?.controls['formCtrl']?.value);

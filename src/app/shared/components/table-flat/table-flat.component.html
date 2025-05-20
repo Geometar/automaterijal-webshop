@@ -23,7 +23,10 @@
               <ng-container *ngSwitchCase="CellType.LINK">
                 <a
                   class="invoice-link"
-                  (click)="onLinkClick(row, column.callback)"
+                  [class.disabled]="column.disableLink?.(row)"
+                  [style.pointer-events]="column.disableLink?.(row) ? 'none' : 'auto'"
+                  [style.opacity]="column.disableLink?.(row) ? 0.6 : 1"
+                  (click)="!column.disableLink?.(row) && onLinkClick(row, column.callback)"
                 >
                   {{ getNestedValue(row, column.key) }}
                 </a>
@@ -81,13 +84,18 @@
                   "
                 />
               </ng-container>
-              <ng-container *ngSwitchCase="CellType.LINK">
-                <a
-                  class="invoice-link"
-                  (click)="onLinkClick(row, column.callback)"
-                >
-                  {{ getNestedValue(row, column.key) }}
-                </a>
+              <ng-container *ngSwitchCase="CellType.LINK"
+                ><ng-container *ngSwitchCase="CellType.LINK">
+                  <a
+                    class="invoice-link"
+                    [class.disabled]="column.disableLink?.(row)"
+                    [style.pointer-events]="column.disableLink?.(row) ? 'none' : 'auto'"
+                    [style.opacity]="column.disableLink?.(row) ? 0.6 : 1"
+                    (click)="!column.disableLink?.(row) && onLinkClick(row, column.callback)"
+                  >
+                    {{ getNestedValue(row, column.key) }}
+                  </a>
+                </ng-container>
               </ng-container>
               <ng-container *ngSwitchCase="CellType.CURRENCY">
                 {{ row[column.key] | rsdCurrency }}

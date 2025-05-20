@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { SessionStorageService } from 'ngx-webstorage';
+import { LocalStorageService } from 'ngx-webstorage';
 import { Account } from '../../data-models/model';
 
 @Injectable({
@@ -8,19 +8,19 @@ import { Account } from '../../data-models/model';
 export class AccountStateService {
   private storageKey = 'account';
 
-  constructor(private sessionStorage: SessionStorageService) {
+  constructor(private localStorageService: LocalStorageService) {
   }
 
   add(account: Account): void {
-    this.sessionStorage.store(this.storageKey, account);
+    this.localStorageService.store(this.storageKey, account);
   }
 
   get(): Account {
-    return this.sessionStorage.retrieve(this.storageKey);
+    return this.localStorageService.retrieve(this.storageKey);
   }
 
   remove(): void {
-    this.sessionStorage.clear(this.storageKey);
+    this.localStorageService.clear(this.storageKey);
   }
 
   isUserLoggedIn(): boolean {

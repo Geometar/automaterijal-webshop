@@ -21,12 +21,14 @@ import { Subject, takeUntil } from 'rxjs';
 
 // Automaterijal import
 import { AutomIconComponent } from '../shared/components/autom-icon/autom-icon.component';
+import { ButtonComponent } from '../shared/components/button/button.component';
+import { PopupComponent } from '../shared/components/popup/popup.component';
 
 // Data models
 import { Account } from '../shared/data-models/model';
 
 // Enums
-import { ColorEnum, IconsEnum } from '../shared/data-models/enums';
+import { ButtonThemes, ButtonTypes, ColorEnum, IconsEnum, PositionEnum, SizeEnum } from '../shared/data-models/enums';
 
 // Service
 import { CartStateService } from '../shared/service/utils/cart-state.service';
@@ -39,13 +41,15 @@ import { RsdCurrencyPipe } from '../shared/pipe/rsd-currency.pipe';
   standalone: true,
   imports: [
     AutomIconComponent,
+    ButtonComponent,
     CommonModule,
+    MatDividerModule,
+    MatIconModule,
+    MatMenuModule,
+    PopupComponent,
     RouterLink,
     RouterLinkActive,
-    MatMenuModule,
     RsdCurrencyPipe,
-    MatIconModule,
-    MatDividerModule
   ],
   providers: [CurrencyPipe],
   templateUrl: './navigation.component.html',
@@ -57,8 +61,12 @@ export class NavigationComponent implements OnInit, OnDestroy {
   cartSize: number = 0;
 
   // Enums
+  buttonThemes = ButtonThemes;
+  buttonTypes = ButtonTypes;
   colorEnum = ColorEnum;
   iconEnum = IconsEnum;
+  positionEnum = PositionEnum;
+  sizeEnum = SizeEnum;
 
   // Misc
   account: Account | null = null;
@@ -67,6 +75,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
   loggedIn = false;
   mobileSidebarClosing = false;
   mobileSidebarOpen = false;
+  showLogoutPopup = false;
 
   private destroy$ = new Subject<void>();
 
@@ -156,4 +165,18 @@ export class NavigationComponent implements OnInit, OnDestroy {
   logout() {
     this.loginService.logout();
   }
+
+  openLogoutPopup(): void {
+    this.showLogoutPopup = true;
+  }
+
+  closeLogoutPopup(): void {
+    this.showLogoutPopup = false;
+  }
+
+  confirmLogout(): void {
+    this.showLogoutPopup = false;
+    this.logout();
+  }
+
 }

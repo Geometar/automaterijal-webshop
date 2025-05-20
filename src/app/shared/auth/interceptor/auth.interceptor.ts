@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { HttpInterceptorFn } from '@angular/common/http';
-import { SessionStorageService } from 'ngx-webstorage';
+import { LocalStorageService } from 'ngx-webstorage';
 import { environment } from '../../../../environment/environment';
 import { Router } from '@angular/router';
 import { catchError } from 'rxjs/operators';
@@ -12,7 +12,7 @@ import { AccountStateService } from '../../service/utils/account-state.service';
 import { AccountService } from '../service/account.service';
 
 export const authInterceptor: HttpInterceptorFn = (request, next) => {
-  const sessionStorageService = inject(SessionStorageService);
+  const localStorageService = inject(LocalStorageService);
   const accountStateService = inject(AccountStateService);
   const accountService = inject(AccountService);
   const router = inject(Router);
@@ -33,7 +33,7 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
     );
   }
 
-  const token: string | null = sessionStorageService.retrieve('authenticationToken');
+  const token: string | null = localStorageService.retrieve('authenticationToken');
 
   const modifiedRequest = request.clone({
     setHeaders: {
@@ -48,7 +48,7 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
         // Optional: check if backend returned a specific error message
         console.warn('Authentication expired or unauthorized. Logging out.');
 
-        sessionStorageService.clear('authenticationToken');  // Remove authentication token
+        localStorageService.clear('authenticationToken');  // Remove authentication token
         accountStateService.remove(); // Remove logged in user
         accountService.authenticate(null); // Clear authentication state
         router.navigate(['/login']);   // Redirect to login

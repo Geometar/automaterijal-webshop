@@ -160,7 +160,7 @@
                 </div>
               </button>
 
-              <button mat-menu-item (click)="logout()">
+              <button mat-menu-item (click)="openLogoutPopup()">
                 <div class="menu-item-align">
                   <autom-icon [source]="iconEnum.LOG_OUT"></autom-icon>
                   <span>Izloguj se</span>
@@ -389,12 +389,12 @@
   </div>
 
   <!-- Logout -->
-  <div *ngIf="loggedIn" class="menu-section">
+  <div *ngIf="loggedIn" class="menu-section autom-margin--top__m">
     <span class="menu-section-label">Logout</span>
 
     <a
       class="menu-title menu-title--danger"
-      (click)="logout(); closeMobileSidebar()"
+      (click)="openLogoutPopup(); closeMobileSidebar()"
     >
       <autom-icon [source]="iconEnum.LOG_OUT"></autom-icon>
       Izloguj se
@@ -423,3 +423,49 @@
     </ul>
   </div>
 </nav>
+
+<!-- Logout Confirmation Popup -->
+<autom-popup
+  *ngIf="showLogoutPopup"
+  class="logout-popup"
+  [height]="sizeEnum.AUTO"
+  [position]="positionEnum.CENTER"
+  [rounded]="true"
+  [subPosition]="positionEnum.CENTER"
+  [width]="sizeEnum.MEDIUM"
+>
+  <div custom-body class="confirmation-container">
+    <div class="confirmation-container__icon">
+      <autom-icon
+        class="confirmation-container__icon--circle"
+        [source]="iconEnum.ALERT_TRIANGLE"
+      ></autom-icon>
+    </div>
+    <div class="confirmation-container__main">
+      <div class="confirmation-container__header">
+        <h2 class="h2">Obaveštenje</h2>
+      </div>
+      <div class="confirmation-container__body">
+        <h5>Da li ste sigurni da želite da se izlogujete?</h5>
+      </div>
+      <div class="confirmation-container__footer">
+        <div>
+          <autom-button
+            class="warning-popup__cancel-button"
+            [label]="'Odustani'"
+            [theme]="buttonThemes.LIGHT_GREY"
+            [type]="buttonTypes.TERNARY"
+            (clickEvent)="closeLogoutPopup()"
+          ></autom-button>
+
+          <autom-button
+            [label]="'Da, izloguj me'"
+            [theme]="buttonThemes.DEFAULT"
+            [type]="buttonTypes.PRIMARY"
+            (clickEvent)="confirmLogout()"
+          ></autom-button>
+        </div>
+      </div>
+    </div>
+  </div>
+</autom-popup>

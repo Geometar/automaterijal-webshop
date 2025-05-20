@@ -25,7 +25,7 @@ import {
   CellType,
 } from '../../../shared/data-models/enums/table.enum';
 import { HeadingLevelEnum } from '../../../shared/data-models/enums/heading.enum';
-import { ButtonThemes, ButtonTypes, InputTypeEnum } from '../../../shared/data-models/enums';
+import { ButtonThemes, ButtonTypes, IconsEnum, InputTypeEnum } from '../../../shared/data-models/enums';
 
 // Services
 import { InputFieldsComponent } from '../../../shared/components/input-fields/input-fields.component';
@@ -70,6 +70,7 @@ export class SalesReportsComponent implements OnInit, OnDestroy {
 
   // Enums
   headingLevelEnum = HeadingLevelEnum;
+  iconsEnum = IconsEnum;
   inputTypeEnum = InputTypeEnum;
 
   // Misc
@@ -81,8 +82,10 @@ export class SalesReportsComponent implements OnInit, OnDestroy {
   dateTo: Date | null = null;
   pageIndex = 0;
   rowsPerPage = 10;
+  searchTerm: string = '';
   selectedSalesPpid: number | null = null;
   totalItems = 0;
+
 
   // Table config
   columns: AutomTableColumn[] = [
@@ -110,8 +113,6 @@ export class SalesReportsComponent implements OnInit, OnDestroy {
   displayedColumns: string[] = this.columns.map((col) => col.key);
   dataSource = new MatTableDataSource<SalesReport>();
   @ViewChild(MatPaginator) paginator!: MatPaginator;
-
-  searchTerm = '';
 
   // Data
   salesPersonsSelectModel: SelectModel[] = [];
@@ -147,6 +148,7 @@ export class SalesReportsComponent implements OnInit, OnDestroy {
       dateTo: this.dateTo ? this.dateTo?.toISOString() : '',
       pageIndex: this.pageIndex,
       rowsPerPage: this.rowsPerPage,
+      searchTerm: this.searchTerm,
       selectedSalesPpid: this.selectedSalesPpid,
     });
 
@@ -193,6 +195,11 @@ export class SalesReportsComponent implements OnInit, OnDestroy {
 
   onFilterSalesPerson(selectModel: SelectModel): void {
     this.selectedSalesPpid = selectModel?.key ? +selectModel.key : null;
+    this.getSalesReports();
+  }
+
+  onSearchTerm(searchTerm: string): void {
+    this.searchTerm = searchTerm;
     this.getSalesReports();
   }
 

@@ -131,11 +131,11 @@
     .item-status::before {
       border-radius: 50%;
       content: "";
-      height: 6px;
-      left: 140px;
+      height: 15px;
+      left: 130px;
       position: absolute;
-      top: 9px;
-      width: 6px;
+      top: 4px;
+      width: 15px;
     }
 
     .item-status.green::before {

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 
 import { DragDropModule } from '@angular/cdk/drag-drop';
 
@@ -43,7 +43,8 @@ import { PositionEnum, SizeEnum } from '../../data-models/enums';
         animate('150ms ease-in', style({ opacity: 0 }))
       ])
     ])
-  ]
+  ],
+  encapsulation: ViewEncapsulation.None
 })
 export class PopupComponent implements OnInit {
   @Input() allowDrag = false;

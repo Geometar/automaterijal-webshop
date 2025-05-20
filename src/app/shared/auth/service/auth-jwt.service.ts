@@ -2,7 +2,7 @@ import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { environment } from '../../../../environment/environment';
 import { catchError, map, Observable, of, switchMap, throwError } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { SessionStorageService } from 'ngx-webstorage';
+import { LocalStorageService } from 'ngx-webstorage';
 import { Credentials, JwtToken } from '../../data-models/model';
 import { isPlatformBrowser } from '@angular/common';
 
@@ -15,10 +15,10 @@ const PARTNER_URL = environment.apiUrl + '/api/partner';
 })
 export class AuthServerProvider {
 
-  constructor(private http: HttpClient, private sessionStorageService: SessionStorageService, @Inject(PLATFORM_ID) private platformId: Object) { }
+  constructor(private http: HttpClient, private localStorageService: LocalStorageService, @Inject(PLATFORM_ID) private platformId: Object) { }
 
   getToken(): string {
-    const tokenInSessionStorage: string | null = this.sessionStorageService.retrieve('authenticationToken');
+    const tokenInSessionStorage: string | null = this.localStorageService.retrieve('authenticationToken');
     return tokenInSessionStorage ?? '';
   }
 
@@ -36,7 +36,7 @@ export class AuthServerProvider {
 
 
   logout(): Observable<void> {
-    const jwt = this.sessionStorageService.retrieve('authenticationToken');
+    const jwt = this.localStorageService.retrieve('authenticationToken');
 
     if (!jwt) return of();
 
@@ -44,7 +44,7 @@ export class AuthServerProvider {
       catchError((error: HttpErrorResponse) => throwError(error)),
       switchMap(() => {
         if (this.isBrowser()) {
-          this.sessionStorageService.clear('authenticationToken');
+          this.localStorageService.clear('authenticationToken');
         }
         return new Observable<void>((observer) => {
           observer.complete();
@@ -56,7 +56,7 @@ export class AuthServerProvider {
   private authenticateSuccess(response: JwtToken): void {
     const jwt = response.token;
     if (this.isBrowser()) {
-      this.sessionStorageService.store('authenticationToken', jwt);
+      this.localStorageService.store('authenticationToken', jwt);
     }
   }
   private isBrowser(): boolean {

@@ -307,3 +307,11 @@ $breakpoint-sm: 768px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
+
+@media (max-width: 991px) {
+  .logout-popup {
+    .confirmation-container {
+      padding-bottom: 80px;
+    }
+  }
+}

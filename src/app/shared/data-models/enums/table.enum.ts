@@ -15,4 +15,5 @@ export interface AutomTableColumn {
   callback?: (row: any) => void; // for clickable actions
   dateFormat?: string; // for date pipe (e.g. 'dd-MMM-yyyy')
   currencyCode?: string; // e.g. 'RSD', 'USD' (defaults to RSD if not provided)
+  disableLink?: (row: any) => boolean; // for disabling link action
 }

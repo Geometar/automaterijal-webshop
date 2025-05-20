@@ -1,7 +1,7 @@
 import { Component, HostListener, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
-import { finalize, Subject, takeUntil } from 'rxjs';
+import { finalize, mergeMap, Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 
 // Component imports
@@ -16,6 +16,7 @@ import {
   LogsLogin,
   LogWeb,
   PaginatedResponse,
+  Partner,
 } from '../../../shared/data-models/model';
 
 // Enums
@@ -28,6 +29,7 @@ import {
 
 // Services
 import { LogService } from '../../../shared/service/log.service';
+import { PartnerService } from '../../../shared/service/partner.service';
 import { UrlHelperService } from '../../../shared/service/utils/url-helper.service';
 
 export const LogHeader: HeaderData = {
@@ -53,6 +55,7 @@ export class LogsComponent implements OnInit, OnDestroy {
   headerData = LogHeader;
   // Data
   logId: number | null = null;
+  salesPersons: Partner[] = [];
 
   // Enums
   colorEnum = ColorEnum;
@@ -81,6 +84,7 @@ export class LogsComponent implements OnInit, OnDestroy {
       header: 'PPID',
       type: CellType.LINK,
       callback: (row) => this.onLogSelected(row.ppid),
+      disableLink: (row) => this.isSalesPerson(row.ppid), // 👈 ovde
     },
     {
       key: 'naziv',
@@ -141,13 +145,14 @@ export class LogsComponent implements OnInit, OnDestroy {
 
   constructor(
     private logService: LogService,
+    private partnerService: PartnerService,
     private urlHelperService: UrlHelperService
   ) { }
 
   /** Angular lifecycle hooks start */
 
   ngOnInit(): void {
-    this.getLogs();
+    this.initData();
   }
 
   ngOnDestroy(): void {
@@ -158,6 +163,17 @@ export class LogsComponent implements OnInit, OnDestroy {
   /** Angular lifecycle hooks end */
 
   /** Event start */
+  initData(): void {
+    this.loading = true;
+    this.partnerService.getAllSalesPersons().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (salesPersons: Partner[]) => {
+        this.salesPersons = salesPersons;
+        this.getLogs();
+      },
+    });
+  }
 
   getLogs(): void {
     this.urlHelperService.addOrUpdateQueryParams({
@@ -219,6 +235,10 @@ export class LogsComponent implements OnInit, OnDestroy {
   }
 
   /** Popup details start */
+
+  isSalesPerson(ppid: number): boolean {
+    return this.salesPersons.some(person => person.ppid === ppid);
+  }
 
   onPageChangeDetails(event: any): void {
     this.pageIndexDetails = event.pageIndex;

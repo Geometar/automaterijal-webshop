@@ -326,6 +326,22 @@
 	}
 }
 
+.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+  color: #999 !important;
+  cursor: not-allowed;
+  user-select: none;
+  text-decoration: none;
+
+  &:hover,
+  &:focus,
+  &:active {
+    color: #999 !important;
+    text-decoration: none;
+  }
+}
+
 .clear-btn {
 	cursor: pointer;
 	position: absolute;
