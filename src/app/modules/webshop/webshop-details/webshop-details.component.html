@@ -34,6 +34,13 @@
           </li>
         </ul>
       </div>
+      <div
+        *ngIf="!data.tehnickiOpis?.length"
+        class="product-description placeholder"
+      >
+        <h3>Opis</h3>
+        <p>Tehnički podaci trenutno nisu dostupni za ovaj proizvod.</p>
+      </div>
       <div class="product-stock-price">
         <p class="stock-status" *ngIf="data.stanje > 0">
           <span class="status-indicator"></span> Na stanju
