@@ -1,6 +1,7 @@
 export enum CellType {
   CURRENCY = 'currency',
   DATE = 'date',
+  DATE_ONLY = 'date-only',
   IMG = 'image',
   LINK = 'link',
   NUMBER = 'number',

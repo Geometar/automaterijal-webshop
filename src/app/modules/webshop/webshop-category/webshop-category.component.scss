@@ -54,8 +54,6 @@
   background-color: var(--figma-primary-600);
   color: #fff;
 
-  
-
   border-radius: 9999px !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 
@@ -93,6 +91,21 @@
     max-height: calc(100vh - 100px);
     overflow-y: auto;
     padding: 16px 16px 100px 16px;
+
+    .filter-buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-top: 2rem;
+
+      button {
+        width: 150px;
+      }
+
+      autom-button {
+        flex: 1;
+      }
+    }
   }
 }
 

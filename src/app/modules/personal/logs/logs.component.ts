@@ -1,8 +1,9 @@
 import { Component, HostListener, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
-import { finalize, mergeMap, Subject, takeUntil } from 'rxjs';
+import { finalize, Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 
 // Component imports
 import { AutomHeaderComponent } from '../../../shared/components/autom-header/autom-header.component';
@@ -121,12 +122,13 @@ export class LogsComponent implements OnInit, OnDestroy {
     {
       key: 'pretraga',
       header: 'Pretraga',
-      type: CellType.TEXT,
+      type: CellType.LINK,
+      callback: (row) => this.goToWebshopWithSearch(row.pretraga),
     },
     {
       key: 'vremePretrage',
       header: 'Vreme pretrage',
-      type: CellType.TEXT,
+      type: CellType.DATE_ONLY,
     },
   ];
 
@@ -146,6 +148,7 @@ export class LogsComponent implements OnInit, OnDestroy {
   constructor(
     private logService: LogService,
     private partnerService: PartnerService,
+    private router: Router,
     private urlHelperService: UrlHelperService
   ) { }
 
@@ -226,6 +229,12 @@ export class LogsComponent implements OnInit, OnDestroy {
     this.logId = logId;
     this.showLogsPopup = true;
     this.getLogDetails();
+  }
+
+  goToWebshopWithSearch(searchTerm: string) {
+    this.router.navigate(['/webshop'], {
+      queryParams: { searchTerm: searchTerm }
+    });
   }
 
   onPageChange(event: any): void {

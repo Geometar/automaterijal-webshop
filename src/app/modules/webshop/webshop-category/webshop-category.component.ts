@@ -149,4 +149,18 @@ export class WebshopCategoryComponent implements OnChanges {
       checked: selected.includes(m.proid!),
     }));
   }
+
+  resetFilters(): void {
+    this.filter = new Filter();
+
+    this.urlHelperService.addOrUpdateQueryParams({
+      naStanju: false,
+      podgrupe: [],
+      proizvodjaci: [],
+    });
+
+    this.manufacturerPreFilter = '';
+    this.buildManufactureModels();
+    this.openFilterPopup = false;
+  }
 }

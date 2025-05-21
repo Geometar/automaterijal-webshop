@@ -108,5 +108,20 @@
       [filterTerm]="''"
       (selectionChanged)="onManufactureChanged($event)"
     ></manufacture-filter>
+
+    <div class="filter-buttons">
+      <autom-button
+        [label]="'Resetuj'"
+        [type]="buttonTypes.SECONDARY"
+        [theme]="buttonThemes.LIGHT_ORANGE"
+        (clickEvent)="resetFilters()"
+      />
+      <autom-button
+        [label]="'Zatvori'"
+        [type]="buttonTypes.PRIMARY"
+        [theme]="buttonThemes.DEFAULT"
+        (clickEvent)="openFilterPopup = false"
+      />
+    </div>
   </div>
 </autom-popup>
