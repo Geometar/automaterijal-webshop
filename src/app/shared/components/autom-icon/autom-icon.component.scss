@@ -38,6 +38,10 @@
 
 	&.info-25 svg path {
 		stroke: var(--figma-info-25);
+	}
+
+	&.info-25-fill svg path {
+		stroke: var(--figma-info-25);
 		fill: var(--figma-info-25);
 	}
 

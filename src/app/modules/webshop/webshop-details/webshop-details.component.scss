@@ -1,5 +1,3 @@
-
-
 .spinner {
   align-items: center;
   display: flex;
@@ -210,6 +208,29 @@
   }
 }
 
+.admin-edit-footer {
+  max-width: 1200px;
+  margin: 40px auto 0 auto;
+  padding: 20px;
+  border-top: 2px dashed var(--figma-grey-400);
+  background-color: var(--figma-bg-light);
+  border-radius: 8px;
+  text-align: center;
+
+  .admin-edit-title {
+    font-weight: bold;
+    color: var(--figma-primary-800);
+    margin-bottom: 15px !important;
+  }
+
+  .admin-edit-actions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 18px;
+  }
+}
+
 .documentation {
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
@@ -258,6 +279,39 @@
 }
 
 @media (max-width: 991px) {
+  .admin-edit-footer {
+    margin: 30px 10px 0 10px;
+    padding: 16px;
+    border-top: 2px dashed var(--figma-grey-300);
+    background-color: var(--figma-bg-light);
+    border-radius: 8px;
+    text-align: center;
+
+    .admin-edit-title {
+      font-size: 20px !important;
+      margin-bottom: 15px !important;
+    }
+
+    .admin-edit-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 20px;
+
+      autom-button {
+        width: 100%;
+        font-size: 14px;
+
+        button {
+          width: 300px;
+        }
+
+        .mat-icon {
+          font-size: 20px;
+        }
+      }
+    }
+  }
   .product-container {
     margin: 20px 10px;
 

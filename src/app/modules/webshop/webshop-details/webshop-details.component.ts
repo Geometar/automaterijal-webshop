@@ -35,6 +35,7 @@ import { SpinnerComponent } from '../../../shared/components/spinner/spinner.com
 import { YouTubePlayer } from '@angular/youtube-player';
 
 // Services
+import { AccountStateService } from '../../../shared/service/utils/account-state.service';
 import { CartStateService } from '../../../shared/service/utils/cart-state.service';
 import { PictureService } from '../../../shared/service/utils/picture.service';
 import { RobaService } from '../../../shared/service/roba.service';
@@ -73,8 +74,11 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   sizeEnum = SizeEnum;
 
   // Misc
+  isAdmin = false;
   loading = false;
   quantity: number = 1;
+
+  // Tooltip
   pdfToolTip = {
     position: TooltipPositionEnum.TOP,
     subPosition: TooltipSubPositionsEnum.SUB_CENTER,
@@ -96,7 +100,8 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private seoService: SeoService,
     private snackbarService: SnackbarService,
-    private tecDocService: TecdocService
+    private tecDocService: TecdocService,
+    private accountStateService: AccountStateService
   ) { }
 
   /** Start of: Angular lifecycle hooks */
@@ -106,6 +111,8 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     if (this.id) {
       this.fetchData(this.id);
     }
+
+    this.isAdmin = this.accountStateService.isAdmin();
   }
 
   ngOnDestroy(): void {
@@ -236,6 +243,53 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     this.cartStateService.addToCart(this.data, this.quantity);
     this.snackbarService.showSuccess('Artikal je dodat u korpu');
   }
+
+  /**
+   * Admin tools: Start
+   */
+
+  onImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length || !this.id) return;
+
+    const file = input.files[0];
+
+    this.loading = true;
+    this.robaService
+      .uploadImage(this.id, file)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => (this.loading = false))
+      )
+      .subscribe({
+        next: () => {
+          this.snackbarService.showSuccess('Image uploaded successfully');
+          this.fetchData(this.id!); // refresh details to get new image
+        },
+        error: () => {
+          this.snackbarService.showError('Image upload failed');
+        },
+      });
+  }
+
+  triggerImageUpload(): void {
+    const input = document.getElementById('imageUpload') as HTMLInputElement;
+    if (input) {
+      input.click();
+    }
+  }
+
+  editAttributes(): void {
+    // Open a modal or navigate to attribute edit page
+  }
+
+  editDescription(): void {
+    // Open a modal or navigate to description edit
+  }
+
+  /**
+   * Admin tools: End
+   */
 
   private updateSeoTags(roba: Roba): void {
     const proizvodjac = roba.proizvodjac?.naziv || '';

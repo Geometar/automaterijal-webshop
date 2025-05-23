@@ -74,4 +74,15 @@ export class RobaService {
         catchError((error: any) => throwError(error))
       );
   }
+
+  public uploadImage(robaId: number, file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const url = `${DOMAIN_URL}${ROBA_URL}/${robaId}/image`;
+
+    return this.http.post(url, formData).pipe(
+      catchError((error: any) => throwError(() => error))
+    );
+  }
 }

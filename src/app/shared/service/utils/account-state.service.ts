@@ -8,15 +8,15 @@ import { Account } from '../../data-models/model';
 export class AccountStateService {
   private storageKey = 'account';
 
-  constructor(private localStorageService: LocalStorageService) {
-  }
+  constructor(private localStorageService: LocalStorageService) { }
 
   add(account: Account): void {
     this.localStorageService.store(this.storageKey, account);
   }
 
   get(): Account {
-    return this.localStorageService.retrieve(this.storageKey);
+    const raw = this.localStorageService.retrieve(this.storageKey);
+    return raw ? Object.assign(new Account(), raw) : new Account();
   }
 
   remove(): void {
@@ -29,8 +29,10 @@ export class AccountStateService {
 
   isEmployee(): boolean {
     const account = this.get();
-    const hasPpid = !!account?.ppid;
-    const hasPrivileges = (account?.privilegije ?? 0) >= 2043;
-    return hasPpid && hasPrivileges;
+    return !!account?.ppid && (account.privilegije ?? 0) >= 2043;
+  }
+
+  isAdmin(): boolean {
+    return this.get()?.isAdmin;
   }
 }

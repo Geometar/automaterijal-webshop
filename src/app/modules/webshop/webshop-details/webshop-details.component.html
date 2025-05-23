@@ -173,6 +173,49 @@
       </li>
     </ul>
   </div>
+  <div *ngIf="isAdmin" class="admin-edit-footer">
+    <h3 class="admin-edit-title">Admin tools</h3>
+    <div class="admin-edit-actions">
+      <autom-button
+        [label]="'Upload image'"
+        [iconSource]="iconEnum.IMAGE"
+        [iconColor]="colorEnum.INFO_25"
+        [iconPrefix]="true"
+        [theme]="buttonTheme.LIGHT_ORANGE"
+        [type]="buttonType.PRIMARY"
+        (clickEvent)="triggerImageUpload()"
+      ></autom-button>
+
+      <autom-button
+        [label]="'Edit attributes'"
+        [iconSource]="iconEnum.SETTINGS"
+        [iconColor]="colorEnum.INFO_25"
+        [iconPrefix]="true"
+        [theme]="buttonTheme.LIGHT_ORANGE"
+        [type]="buttonType.PRIMARY"
+        (clickEvent)="editAttributes()"
+      ></autom-button>
+
+      <autom-button
+        [label]="'Edit description'"
+        [iconSource]="iconEnum.EDIT"
+        [iconColor]="colorEnum.INFO_25"
+        [iconPrefix]="true"
+        [theme]="buttonTheme.LIGHT_ORANGE"
+        [type]="buttonType.PRIMARY"
+        (clickEvent)="editDescription()"
+      ></autom-button>
+    </div>
+
+    <!-- Hidden file input for image upload -->
+    <input
+      type="file"
+      id="imageUpload"
+      accept="image/*"
+      (change)="onImageSelected($event)"
+      hidden
+    />
+  </div>
 </section>
 <div *ngIf="loading" class="spinner">
   <spinner></spinner>
