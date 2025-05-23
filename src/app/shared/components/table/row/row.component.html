@@ -2,8 +2,10 @@
   <!-- Image Section -->
   <div class="image-container" [class.image-smaller]="showPriceOnly">
     <img
-      [src]="data!.slika!.slikeUrl"
+      class="clickable-image"
       [alt]="data.proizvodjac?.naziv + ' ' + data.naziv"
+      [src]="data!.slika!.slikeUrl"
+      (click)="openImageZoom(data!.slika!.slikeUrl!)"
     />
   </div>
 
@@ -224,4 +226,16 @@
       (click)="removeEvent.emit(data.robaid)"
     ></autom-icon>
   </div>
+</div>
+
+<div
+  class="image-zoom-overlay"
+  *ngIf="zoomedImageUrl"
+  (click)="zoomedImageUrl = null"
+>
+  <img
+    class="zoomed-image"
+    [src]="zoomedImageUrl"
+    (click)="$event.stopPropagation()"
+  />
 </div>

@@ -28,7 +28,14 @@ import { PopupComponent } from '../shared/components/popup/popup.component';
 import { Account } from '../shared/data-models/model';
 
 // Enums
-import { ButtonThemes, ButtonTypes, ColorEnum, IconsEnum, PositionEnum, SizeEnum } from '../shared/data-models/enums';
+import {
+  ButtonThemes,
+  ButtonTypes,
+  ColorEnum,
+  IconsEnum,
+  PositionEnum,
+  SizeEnum,
+} from '../shared/data-models/enums';
 
 // Service
 import { CartStateService } from '../shared/service/utils/cart-state.service';
@@ -105,18 +112,20 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // Subscribe to the state
-    this.accountService.authenticationState.subscribe((account: Account | null) => {
-      if (account) {
-        this.account = Object.assign(new Account(), account);
+    this.accountService.authenticationState.subscribe(
+      (account: Account | null) => {
+        if (account) {
+          this.account = Object.assign(new Account(), account);
 
-        this.loggedIn = true;
-        this.isAdmin = this.account.isAdmin; // now it works ✅
-      } else {
-        this.account = null;
-        this.loggedIn = false;
-        this.isAdmin = false;
+          this.loggedIn = true;
+          this.isAdmin = this.account.isAdmin; // now it works ✅
+        } else {
+          this.account = null;
+          this.loggedIn = false;
+          this.isAdmin = false;
+        }
       }
-    });
+    );
 
     this.syncOnCartItemSize();
 
@@ -128,7 +137,10 @@ export class NavigationComponent implements OnInit, OnDestroy {
             window.location.origin
           );
           this.currentUrl = parsedUrl.pathname;
-          window.scrollTo(0, 0);
+
+          setTimeout(() => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }, 50);
         }
       });
     }
@@ -178,5 +190,4 @@ export class NavigationComponent implements OnInit, OnDestroy {
     this.showLogoutPopup = false;
     this.logout();
   }
-
 }

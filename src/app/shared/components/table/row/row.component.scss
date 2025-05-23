@@ -35,8 +35,6 @@
   align-items: flex-start;
   gap: 16px;
 
- 
-
   .image-container {
     align-items: center;
     display: flex;
@@ -44,6 +42,14 @@
     justify-content: center;
     overflow: hidden; /* Ovo osigurava da ništa ne prelazi granice */
     width: 200px;
+
+    .clickable-image {
+      cursor: zoom-in;
+      transition: transform 0.2s ease;
+    }
+    .clickable-image:hover {
+      transform: scale(1.03);
+    }
   }
 
   .image-smaller {
@@ -168,7 +174,7 @@
       order: -1;
       align-self: flex-end;
       margin-bottom: 8px;
-  
+
       autom-icon {
         font-size: 20px;
         cursor: pointer;
@@ -275,4 +281,25 @@
   .mobile-quantity-cart {
     flex-direction: row !important;
   }
+}
+
+.image-zoom-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  cursor: zoom-out;
+}
+
+.zoomed-image {
+  max-width: 90%;
+  max-height: 90%;
+  box-shadow: 0 0 20px #000;
+  cursor: auto;
 }

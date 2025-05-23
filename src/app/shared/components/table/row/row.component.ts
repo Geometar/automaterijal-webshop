@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
@@ -66,6 +66,7 @@ export class RowComponent implements OnInit {
   // Data
   displayedLinkageCriteria: any[] = [];
   displayedTehnickiOpis: any[] = [];
+  zoomedImageUrl: string | null = null;
 
   // Misc
   hasMoreThanFiveSpecs = false;
@@ -80,6 +81,11 @@ export class RowComponent implements OnInit {
 
     const regex = new RegExp(`^${manufacturer}\\s+`, 'i'); // starts with manufacturer + space
     return name.replace(regex, '');
+  }
+
+  @HostListener('document:keydown.escape', ['$event'])
+  onEscape(event: KeyboardEvent) {
+    this.zoomedImageUrl = null;
   }
 
   constructor(
@@ -148,5 +154,9 @@ export class RowComponent implements OnInit {
 
   isInCart(robaId: number): boolean {
     return this.cartStateService.isInCart(robaId);
+  }
+
+  openImageZoom(url: string) {
+    this.zoomedImageUrl = url;
   }
 }
