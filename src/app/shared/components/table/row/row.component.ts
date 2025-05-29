@@ -84,7 +84,7 @@ export class RowComponent implements OnInit {
   }
 
   @HostListener('document:keydown.escape', ['$event'])
-  onEscape(event: KeyboardEvent) {
+  onEscape() {
     this.zoomedImageUrl = null;
   }
 

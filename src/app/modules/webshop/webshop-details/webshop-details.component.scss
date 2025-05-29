@@ -206,6 +206,66 @@
       }
     }
   }
+
+  .editor-textarea {
+    width: 100%;
+    min-height: 200px;
+    padding: 12px;
+    font-family: monospace;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    resize: vertical;
+  }
+
+  .edit-description-actions {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+
+  .product-rich-text {
+    margin-top: 15px;
+    padding-top: 10px;
+
+    p {
+      margin-bottom: 10px;
+      line-height: 1.6;
+      font-size: 14px;
+      color: #444;
+    }
+
+    ul,
+    ol {
+      margin-left: 20px;
+      margin-bottom: 10px;
+    }
+
+    li {
+      line-height: 1.5;
+    }
+
+    strong,
+    b {
+      font-weight: bold;
+    }
+
+    em,
+    i {
+      font-style: italic;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+      margin: 15px 0 10px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #222;
+    }
+  }
 }
 
 .admin-edit-footer {

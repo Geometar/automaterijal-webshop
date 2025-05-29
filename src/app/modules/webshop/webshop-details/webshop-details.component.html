@@ -173,6 +173,44 @@
       </li>
     </ul>
   </div>
+
+  <div
+    *ngIf="data.tekst && !editingText"
+    class="product-container documentation"
+  >
+    <h3 class="oe-title">Informacije o proizvodu</h3>
+    <div
+      *ngIf="data.tekst"
+      class="product-rich-text"
+      [innerHTML]="sanitizedText"
+      aria-label="Detaljan opis proizvoda"
+    ></div>
+  </div>
+
+  <div *ngIf="editingText" class="product-container documentation">
+    <h3 class="oe-title">Informacije o proizvodu</h3>
+    <autom-text-area
+      [placeholder]="'Unesite vas opis ovde'"
+      [value]="data.tekst!"
+      [maxLength]="2000"
+      [editable]="true"
+      (emitSelected)="textChanged($event)"
+    ></autom-text-area>
+    <div *ngIf="editingText" class="edit-description-actions">
+      <autom-button
+        [label]="'Otkaži'"
+        [theme]="buttonTheme.LIGHT_GREY"
+        [type]="buttonType.TERNARY"
+        (clickEvent)="cancelTextEdit()"
+      ></autom-button>
+      <autom-button
+        [label]="'Sačuvaj opis'"
+        [theme]="buttonTheme.DEFAULT"
+        [type]="buttonType.PRIMARY"
+        (clickEvent)="saveTextDescription()"
+      ></autom-button>
+    </div>
+  </div>
   <div *ngIf="isAdmin" class="admin-edit-footer">
     <h3 class="admin-edit-title">Admin tools</h3>
     <div class="admin-edit-actions">
@@ -205,6 +243,26 @@
         [type]="buttonType.PRIMARY"
         (clickEvent)="editDescription()"
       ></autom-button>
+
+      <autom-button
+        [label]="'Izbrisi svu dokumentaciju'"
+        [iconSource]="iconEnum.DELETE"
+        [iconColor]="colorEnum.INFO_25"
+        [iconPrefix]="true"
+        [theme]="buttonTheme.DARK_RED"
+        [type]="buttonType.PRIMARY"
+        (clickEvent)="showDeleteWarningPopup = true"
+      ></autom-button>
+
+      <autom-button
+        [label]="'Izbrisi sliku'"
+        [iconSource]="iconEnum.DELETE"
+        [iconColor]="colorEnum.INFO_25"
+        [iconPrefix]="true"
+        [theme]="buttonTheme.DARK_RED"
+        [type]="buttonType.PRIMARY"
+        (clickEvent)="showImageDeleteWarningPopup = true"
+      ></autom-button>
     </div>
 
     <!-- Hidden file input for image upload -->
@@ -217,6 +275,106 @@
     />
   </div>
 </section>
+
+<add-attributes
+  *ngIf="showAddAttributes"
+  [data]="data"
+  (close)="showAddAttributes = false"
+  (saved)="refreshDetails()"
+></add-attributes>
+
+<autom-popup
+  *ngIf="showDeleteWarningPopup"
+  class="logout-popup"
+  [height]="sizeEnum.AUTO"
+  [position]="positionEnum.CENTER"
+  [rounded]="true"
+  [subPosition]="positionEnum.CENTER"
+  [width]="sizeEnum.MEDIUM"
+>
+  <div custom-body class="confirmation-container">
+    <div class="confirmation-container__icon">
+      <autom-icon
+        class="confirmation-container__icon--circle"
+        [source]="iconEnum.ALERT_TRIANGLE"
+      ></autom-icon>
+    </div>
+    <div class="confirmation-container__main">
+      <div class="confirmation-container__header">
+        <h2 class="h2">Obaveštenje</h2>
+      </div>
+      <div class="confirmation-container__body">
+        <h5>
+          Da li ste sigurni da želite da se izbrišete atribute i dokumentaciju
+          artikla?
+        </h5>
+      </div>
+      <div class="confirmation-container__footer">
+        <div>
+          <autom-button
+            class="warning-popup__cancel-button"
+            [label]="'Odustani'"
+            [theme]="buttonTheme.LIGHT_GREY"
+            [type]="buttonType.TERNARY"
+            (clickEvent)="showDeleteWarningPopup = false"
+          ></autom-button>
+
+          <autom-button
+            [label]="'Da, izbriši'"
+            [theme]="buttonTheme.DEFAULT"
+            [type]="buttonType.PRIMARY"
+            (clickEvent)="removeAttributes()"
+          ></autom-button>
+        </div>
+      </div>
+    </div>
+  </div>
+</autom-popup>
+
+<autom-popup
+  *ngIf="showImageDeleteWarningPopup"
+  class="logout-popup"
+  [height]="sizeEnum.AUTO"
+  [position]="positionEnum.CENTER"
+  [rounded]="true"
+  [subPosition]="positionEnum.CENTER"
+  [width]="sizeEnum.MEDIUM"
+>
+  <div custom-body class="confirmation-container">
+    <div class="confirmation-container__icon">
+      <autom-icon
+        class="confirmation-container__icon--circle"
+        [source]="iconEnum.ALERT_TRIANGLE"
+      ></autom-icon>
+    </div>
+    <div class="confirmation-container__main">
+      <div class="confirmation-container__header">
+        <h2 class="h2">Obaveštenje</h2>
+      </div>
+      <div class="confirmation-container__body">
+        <h5>Da li ste sigurni da želite da se izbrišete sliku artikla?</h5>
+      </div>
+      <div class="confirmation-container__footer">
+        <div>
+          <autom-button
+            class="warning-popup__cancel-button"
+            [label]="'Odustani'"
+            [theme]="buttonTheme.LIGHT_GREY"
+            [type]="buttonType.TERNARY"
+            (clickEvent)="showImageDeleteWarningPopup = false"
+          ></autom-button>
+
+          <autom-button
+            [label]="'Da, izbriši'"
+            [theme]="buttonTheme.DEFAULT"
+            [type]="buttonType.PRIMARY"
+            (clickEvent)="removeImage()"
+          ></autom-button>
+        </div>
+      </div>
+    </div>
+  </div>
+</autom-popup>
 <div *ngIf="loading" class="spinner">
   <spinner></spinner>
 </div>

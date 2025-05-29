@@ -1,0 +1,132 @@
+<autom-popup
+  class="add-attributes-popup"
+  [rounded]="true"
+  [overlay]="true"
+  [width]="sizeEnum.MEDIUM"
+  [height]="sizeEnum.AUTO"
+  [position]="positionEnum.CENTER"
+  [subPosition]="positionEnum.CENTER"
+>
+  <!-- Header -->
+  <div custom-header class="page-details__header">
+    <div class="page-details__title--row">
+      <h3 class="h3">Dodaj TecDoc Atribute</h3>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div
+    custom-body
+    class="page-details__body page-details__height--auto body display--flex autom-flex-direction--column add-attributes-details"
+  >
+    <form [formGroup]="form" class="attribute-form">
+      <div formArrayName="attributes" class="attribute-list">
+        <div
+          class="attribute-group"
+          *ngFor="let group of attributes.controls; let i = index"
+          [formGroupName]="i"
+        >
+          <div class="form-row">
+            <autom-input-fields
+              [formControlName]="'attrShortName'"
+              [label]="'Naziv'"
+              [placeholder]="'Npr. Dimenzija'"
+              [required]="true"
+              (emitSelected)="
+                setAttributeFormValues(i, 'attrShortName', $event)
+              "
+              ngDefaultControl
+            ></autom-input-fields>
+          </div>
+
+          <div class="form-row">
+            <autom-input-fields
+              [formControlName]="'attrValue'"
+              [label]="'Vrednost'"
+              [placeholder]="'Npr. 205/55 R16'"
+              [required]="true"
+              (emitSelected)="setAttributeFormValues(i, 'attrValue', $event)"
+              ngDefaultControl
+            ></autom-input-fields>
+          </div>
+
+          <div class="form-row">
+            <autom-input-fields
+              [formControlName]="'attrUnit'"
+              [label]="'Jedinica'"
+              [placeholder]="'mm / bar / kg...'"
+              (emitSelected)="setAttributeFormValues(i, 'attrUnit', $event)"
+              ngDefaultControl
+            ></autom-input-fields>
+          </div>
+
+          <div class="form-row">
+            <autom-select
+              [label]="'Tip'"
+              [required]="true"
+              [selectionList]="attrTypesSelectModels"
+              (emitSelected)="
+                setAttributeFormValues(i, 'attrType', $event.key!)
+              "
+              ngDefaultControl
+            ></autom-select>
+          </div>
+
+          <div class="form-row right-align">
+            <autom-button
+              class="remove-btn add-attributes-buttons"
+              [iconSource]="iconsEnum.TRASH_2"
+              [iconPrefix]="true"
+              [iconColor]="colorEnum.INFO_25"
+              [theme]="buttonThemes.DEFAULT"
+              [label]="'Remove'"
+              (clickEvent)="removeAttribute(i)"
+            >
+            </autom-button>
+          </div>
+
+          <hr class="divider" />
+        </div>
+      </div>
+
+      <div class="popup-actions">
+        <button type="button" class="add-btn" (click)="addAttribute()">
+          + Add attribute
+        </button>
+      </div>
+    </form>
+
+    <div custom-footer class="page-details__footer page-details__footer-row">
+      <autom-button
+        class="add-attributes-buttons"
+        [theme]="buttonThemes.DARK_RED"
+        [iconPrefix]="true"
+        [iconSource]="iconsEnum.SUNSET"
+        [iconColor]="colorEnum.INFO_25_FILL"
+        [label]="'Cancel'"
+        (clickEvent)="cancel()"
+      >
+      </autom-button>
+      <autom-button
+        class="add-attributes-buttons"
+        [iconSource]="iconsEnum.COMPLETE_WHEEL"
+        [iconPrefix]="true"
+        [iconColor]="colorEnum.INFO_25"
+        [theme]="buttonThemes.DEFAULT"
+        [label]="'Add attribute'"
+        (clickEvent)="addAttribute()"
+      >
+      </autom-button>
+      <autom-button
+        class="add-attributes-buttons"
+        [iconPrefix]="true"
+        [iconSource]="iconsEnum.COFFEE"
+        [iconColor]="colorEnum.INFO_25_FILL"
+        [theme]="buttonThemes.DEFAULT"
+        [label]="'Save'"
+        (clickEvent)="submit()"
+      >
+      </autom-button>
+    </div>
+  </div>
+</autom-popup>

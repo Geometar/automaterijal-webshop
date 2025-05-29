@@ -27,6 +27,7 @@ export class TextAreaComponent implements AfterViewInit, OnChanges {
   @Input() cols = 30;
   @Input() counter = false;
   @Input() disableInput = false;
+  @Input() editable = false;
   @Input() height = SizeEnum.SMALL;
   @Input() hint = '';
   @Input() label = '';
@@ -88,7 +89,7 @@ export class TextAreaComponent implements AfterViewInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['value'] && !this.init) return;
+    if (changes['value'] && !this.init && !this.editable) return;
 
     if (changes['value']) {
       this.textArea = changes['value'].currentValue;

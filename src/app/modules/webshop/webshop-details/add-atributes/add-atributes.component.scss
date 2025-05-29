@@ -1,0 +1,119 @@
+.add-attributes-popup {
+  .add-attributes-details {
+    width: 100%;
+    padding: 10px;
+  }
+  .attribute-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 15px;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+
+  .attribute-group {
+    background: var(--figma-bg-light);
+    padding: 15px;
+    border-radius: 6px;
+    box-shadow: var(--figma-shadow-xs);
+  }
+
+  .form-row {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+
+    label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--figma-grey-800);
+      margin-bottom: 4px;
+    }
+
+    input,
+    select {
+      padding: 6px 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+  }
+
+  .right-align {
+    display: flex;
+    justify-content: flex-end;
+
+    .remove-btn {
+      text-align: center;
+      margin-top: 25px;
+    }
+  }
+
+  .divider {
+    margin-top: 10px;
+    border: none;
+    height: 1px;
+    background: #e0e0e0;
+  }
+
+  .popup-actions {
+    text-align: center;
+
+    .add-btn {
+      background-color: var(--figma-primary-800);
+      color: white;
+      padding: 6px 14px;
+      font-size: 13px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .add-btn:hover {
+      background-color: var(--figma-primary-700);
+    }
+  }
+
+  .popup-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+
+    .submit-btn {
+      background-color: var(--figma-success-600);
+      color: white;
+      padding: 6px 14px;
+      font-size: 13px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .submit-btn:disabled {
+      background-color: #c8e6c9;
+      cursor: not-allowed;
+    }
+
+    .cancel-btn {
+      background-color: var(--figma-error-500);
+      color: white;
+      padding: 6px 14px;
+      font-size: 13px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .cancel-btn:hover {
+      background-color: var(--figma-error-700);
+    }
+  }
+
+  .add-attributes-buttons {
+    button {
+      width: 100px;
+      height: 40px;
+    }
+  }
+}

@@ -85,4 +85,32 @@ export class RobaService {
       catchError((error: any) => throwError(() => error))
     );
   }
+
+  public saveTecDocAttributes(robaId: number, attributes: any[]): Observable<void> {
+    const url = `${DOMAIN_URL}${ROBA_URL}/${robaId}/atributi`;
+    return this.http.post<void>(url, attributes).pipe(
+      catchError((error: any) => throwError(() => error))
+    );
+  }
+
+  public removeTecDocAttributes(robaId: number): Observable<void> {
+    const url = `${DOMAIN_URL}${ROBA_URL}/${robaId}/atributi`;
+    return this.http.delete<void>(url).pipe(
+      catchError((error: any) => throwError(() => error))
+    );
+  }
+
+  public removeImage(robaId: number): Observable<void> {
+    const url = `${DOMAIN_URL}${ROBA_URL}/${robaId}/image`;
+    return this.http.delete<void>(url).pipe(
+      catchError((error: any) => throwError(() => error))
+    );
+  }
+
+  public saveText(robaId: number, text: string): Observable<void> {
+    const url = `${DOMAIN_URL}/roba/${robaId}`;
+    return this.http.post<void>(url, text, {
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
 }

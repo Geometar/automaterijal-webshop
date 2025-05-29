@@ -1,7 +1,8 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { finalize, Subject, takeUntil } from 'rxjs';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 // Enums
 import {
@@ -10,6 +11,7 @@ import {
   ColorEnum,
   IconsEnum,
   InputTypeEnum,
+  PositionEnum,
   SizeEnum,
   TooltipPositionEnum,
   TooltipSubPositionsEnum,
@@ -26,12 +28,15 @@ import {
 import { TooltipModel } from '../../../shared/data-models/interface';
 
 // Components imports
+import { AddAttributesComponent } from './add-atributes/add-atributes.component';
 import { AutomIconComponent } from '../../../shared/components/autom-icon/autom-icon.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { InputFieldsComponent } from '../../../shared/components/input-fields/input-fields.component';
+import { PopupComponent } from '../../../shared/components/popup/popup.component';
 import { RsdCurrencyPipe } from '../../../shared/pipe/rsd-currency.pipe';
 import { SpinnerComponent } from '../../../shared/components/spinner/spinner.component';
+import { TextAreaComponent } from '../../../shared/components/text-area/text-area.component';
 import { YouTubePlayer } from '@angular/youtube-player';
 
 // Services
@@ -41,20 +46,23 @@ import { PictureService } from '../../../shared/service/utils/picture.service';
 import { RobaService } from '../../../shared/service/roba.service';
 import { SeoService } from '../../../shared/service/seo.service';
 import { SnackbarService } from '../../../shared/service/utils/snackbar.service';
-import { TecdocService } from '../../../shared/service/tecdoc.service';
+import { TecdocService } from '../../../shared/service/tecdoc.service'
 
 @Component({
   selector: 'app-webshop-details',
   standalone: true,
   imports: [
-    InputFieldsComponent,
-    CommonModule,
-    SpinnerComponent,
-    RsdCurrencyPipe,
-    ButtonComponent,
-    YouTubePlayer,
+    AddAttributesComponent,
     AutomIconComponent,
+    ButtonComponent,
+    CommonModule,
+    InputFieldsComponent,
+    PopupComponent,
     RouterLink,
+    RsdCurrencyPipe,
+    SpinnerComponent,
+    TextAreaComponent,
+    YouTubePlayer,
   ],
   providers: [CurrencyPipe],
   templateUrl: './webshop-details.component.html',
@@ -71,12 +79,18 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   colorEnum = ColorEnum;
   iconEnum = IconsEnum;
   inputTypeEnum = InputTypeEnum;
+  positionEnum = PositionEnum;
   sizeEnum = SizeEnum;
 
   // Misc
+  editingText = false;
   isAdmin = false;
   loading = false;
   quantity: number = 1;
+  sanitizedText: SafeHtml = '';
+  showAddAttributes = false;
+  showDeleteWarningPopup = false;
+  showImageDeleteWarningPopup = false;
 
   // Tooltip
   pdfToolTip = {
@@ -93,15 +107,23 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
+  @HostListener('document:keydown.escape', ['$event'])
+  onEscape() {
+    this.showDeleteWarningPopup = false;
+    this.showImageDeleteWarningPopup = false;
+  }
+
   constructor(
+    private accountStateService: AccountStateService,
     private cartStateService: CartStateService,
     private pictureService: PictureService,
     private robaService: RobaService,
     private route: ActivatedRoute,
+    private sanitizer: DomSanitizer,
     private seoService: SeoService,
+    private snackBar: SnackbarService,
     private snackbarService: SnackbarService,
     private tecDocService: TecdocService,
-    private accountStateService: AccountStateService
   ) { }
 
   /** Start of: Angular lifecycle hooks */
@@ -122,7 +144,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
 
   /** End of: Angular lifecycle hooks */
 
-  // Start of: Events
+  /** Start of: API event */
 
   fetchData(id: number): void {
     this.loading = true;
@@ -138,6 +160,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
           this.data = response;
           this.fillDocumentation();
           this.fillOeNumbers();
+          this.setSanitizedText();
           this.updateSeoTags(response);
         },
         error: (err: HttpErrorResponse) => {
@@ -163,7 +186,78 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     window.open(doc.docUrl, '_blank');
   }
 
-  // End of: Events
+
+  onImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length || !this.id) return;
+
+    const file = input.files[0];
+
+    this.loading = true;
+    this.robaService
+      .uploadImage(this.id, file)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => (this.loading = false))
+      )
+      .subscribe({
+        next: () => {
+          this.snackbarService.showSuccess('Image uploaded successfully');
+          this.fetchData(this.id!); // refresh details to get new image
+        },
+        error: () => {
+          this.snackbarService.showError('Image upload failed');
+        },
+      });
+  }
+
+
+  removeAttributes(): void {
+    this.robaService.removeTecDocAttributes(this.data.robaid!).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.snackBar.showSuccess('Atributi uspešno izbrisani');
+        this.showDeleteWarningPopup = false;
+        this.refreshDetails();
+      },
+      error: () => {
+        this.snackBar.showSuccess('Greška pri brisanju atributa');
+        this.showDeleteWarningPopup = false;
+      }
+    });
+  }
+
+
+  removeImage(): void {
+    this.robaService.removeImage(this.data.robaid!).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.snackBar.showSuccess('Atributi uspešno izbrisani');
+        this.showDeleteWarningPopup = false;
+        this.refreshDetails();
+      },
+      error: () => {
+        this.snackBar.showSuccess('Greška pri brisanju atributa');
+        this.showDeleteWarningPopup = false;
+      }
+    });
+  }
+
+
+  saveTextDescription(): void {
+    this.robaService.saveText(this.data.robaid!, this.data.tekst!).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.snackBar.showSuccess('Opis uspešno sačuvan');
+        this.editingText = false;
+        this.refreshDetails();
+      },
+      error: () => {
+        this.snackBar.showError('Greška pri čuvanju opisa');
+        this.editingText = false;
+      },
+    });
+  }
+
+  /** End of: API event */
+
   fillDocumentation() {
     if (!this.data.dokumentacija) {
       return;
@@ -216,6 +310,13 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
+  setSanitizedText(): void {
+    if (this.data?.tekst) {
+      const textWithBreaks = this.data.tekst.replace(/\n/g, '<br>');
+      this.sanitizedText = this.sanitizer.bypassSecurityTrustHtml(textWithBreaks);
+    }
+  }
+
   getDocumentByKey(key: string): TecDocDokumentacija[] {
     return this.fetchDocument(key);
   }
@@ -248,30 +349,6 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
    * Admin tools: Start
    */
 
-  onImageSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (!input.files?.length || !this.id) return;
-
-    const file = input.files[0];
-
-    this.loading = true;
-    this.robaService
-      .uploadImage(this.id, file)
-      .pipe(
-        takeUntil(this.destroy$),
-        finalize(() => (this.loading = false))
-      )
-      .subscribe({
-        next: () => {
-          this.snackbarService.showSuccess('Image uploaded successfully');
-          this.fetchData(this.id!); // refresh details to get new image
-        },
-        error: () => {
-          this.snackbarService.showError('Image upload failed');
-        },
-      });
-  }
-
   triggerImageUpload(): void {
     const input = document.getElementById('imageUpload') as HTMLInputElement;
     if (input) {
@@ -280,11 +357,39 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   }
 
   editAttributes(): void {
-    // Open a modal or navigate to attribute edit page
+    this.showAddAttributes = true;
   }
 
   editDescription(): void {
-    // Open a modal or navigate to description edit
+    this.editingText = !this.editingText;
+  }
+
+  refreshDetails(): void {
+    if (this.showAddAttributes) {
+      this.showAddAttributes = false;
+    }
+
+    if (this.showDeleteWarningPopup) {
+      this.showDeleteWarningPopup = false;
+    }
+
+    if (this.showImageDeleteWarningPopup) {
+      this.showImageDeleteWarningPopup = false;
+    }
+
+    this.fetchData(this.id!);
+  }
+
+  toggleTextEdit(): void {
+    this.editingText = !this.editingText;
+  }
+
+  textChanged(event: string): void {
+    this.data.tekst = event;
+  }
+
+  cancelTextEdit(): void {
+    this.editingText = false;
   }
 
   /**

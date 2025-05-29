@@ -89,6 +89,6 @@ export class SnackbarService {
   }
 
   private getVerticalPosition(userDefined?: SnackbarPosition): SnackbarPosition {
-    return isPlatformBrowser(this.platformId) && window.innerWidth < 991 ? SnackbarPosition.TOP : (userDefined ?? SnackbarPosition.BOTTOM);
+    return isPlatformBrowser(this.platformId) && window.innerWidth < 991 ? SnackbarPosition.TOP : (userDefined ?? SnackbarPosition.TOP);
   }
 }
