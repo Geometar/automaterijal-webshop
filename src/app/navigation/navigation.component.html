@@ -1,8 +1,10 @@
 <div
+  appSwipeClose
   *ngIf="mobileSidebarOpen"
   class="overlay-mobile"
   data-overlay
   (click)="closeMobileSidebar()"
+  (swipeLeft)="closeMobileSidebar()"
 ></div>
 <nav class="header desktop-navigation-menu" data-header>
   <div class="container">
@@ -253,9 +255,11 @@
 </div>
 
 <nav
+  appSwipeClose
   *ngIf="mobileSidebarOpen"
   class="mobile-navigation-menu has-scrollbar-mobile"
   [ngClass]="{ 'slide-out': mobileSidebarClosing }"
+  (swipeLeft)="closeMobileSidebar()"
 >
   <div class="menu-top">
     <h2 class="menu-title">Meni</h2>

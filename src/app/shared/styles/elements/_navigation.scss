@@ -78,12 +78,12 @@
 }
 
 .menu-top {
-  padding-bottom: 15px;
-  margin-bottom: 10px;
-  display: flex;
-  justify-content: space-between;
   align-items: center;
   border-bottom: 2px solid var(--figma-grey-100);
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-bottom: 2px;
 }
 
 .menu-top .menu-title {

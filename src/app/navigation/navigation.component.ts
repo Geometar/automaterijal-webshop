@@ -23,6 +23,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { AutomIconComponent } from '../shared/components/autom-icon/autom-icon.component';
 import { ButtonComponent } from '../shared/components/button/button.component';
 import { PopupComponent } from '../shared/components/popup/popup.component';
+import { SwipeCloseDirective } from '../shared/components/directive/autom-swipe-close.directive';
 
 // Data models
 import { Account } from '../shared/data-models/model';
@@ -57,6 +58,7 @@ import { RsdCurrencyPipe } from '../shared/pipe/rsd-currency.pipe';
     RouterLink,
     RouterLinkActive,
     RsdCurrencyPipe,
+    SwipeCloseDirective,
   ],
   providers: [CurrencyPipe],
   templateUrl: './navigation.component.html',

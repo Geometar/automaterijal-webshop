@@ -137,11 +137,11 @@
     .item-status::before {
       border-radius: 50%;
       content: "";
-      height: 15px;
+      height: 18px;
       left: 130px;
       position: absolute;
-      top: 4px;
-      width: 15px;
+      top: 2px;
+      width: 18px;
     }
 
     .item-status.green::before {
