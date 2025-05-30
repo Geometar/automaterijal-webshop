@@ -56,6 +56,7 @@ export class LogsComponent implements OnInit, OnDestroy {
   headerData = LogHeader;
   // Data
   logId: number | null = null;
+  logName: string | null = null;
   salesPersons: Partner[] = [];
 
   // Enums
@@ -84,7 +85,7 @@ export class LogsComponent implements OnInit, OnDestroy {
       key: 'ppid',
       header: 'PPID',
       type: CellType.LINK,
-      callback: (row) => this.onLogSelected(row.ppid),
+      callback: (row) => this.onLogSelected(row),
       disableLink: (row) => this.isSalesPerson(row.ppid), // 👈 ovde
     },
     {
@@ -104,11 +105,6 @@ export class LogsComponent implements OnInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   columnsDetails: AutomTableColumn[] = [
-    {
-      key: 'ppid',
-      header: 'PPID',
-      type: CellType.TEXT,
-    },
     {
       key: 'proizvodjac',
       header: 'Proizvodjac',
@@ -225,8 +221,9 @@ export class LogsComponent implements OnInit, OnDestroy {
 
   /** Event end */
 
-  onLogSelected(logId: number): void {
-    this.logId = logId;
+  onLogSelected(log: LogsLogin): void {
+    this.logId = log.ppid;
+    this.logName = log.naziv;
     this.showLogsPopup = true;
     this.getLogDetails();
   }
