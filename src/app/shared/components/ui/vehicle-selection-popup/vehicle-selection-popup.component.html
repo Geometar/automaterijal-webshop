@@ -24,6 +24,18 @@
     custom-body
     class="page-details__body page-details__height--auto body util__flex--center autom-flex-direction--column"
   >
+    <div class="vehicle-type-tab-group">
+      <div
+        *ngFor="let type of vehicleTypes"
+        class="vehicle-type-tab"
+        [class.selected]="type.value === selectedVehicleCategory"
+        [automTooltip]="type.toolTip.tooltipText"
+        [automTooltipPosition]="type.toolTip.position"
+        (click)="selectVehicleCategory(type.value)"
+      >
+        <autom-icon [source]="type.icon"></autom-icon>
+      </div>
+    </div>
     <autom-select
       *ngIf="vehicleSelectModel.length"
       class="element-width"

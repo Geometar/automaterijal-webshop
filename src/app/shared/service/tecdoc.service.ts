@@ -27,27 +27,39 @@ export class TecdocService {
       .pipe(catchError((error: any) => throwError(() => new Error(error))));
   }
 
-  public getManufactures(): Observable<TDManufacture[]> {
+  public getManufactures(type: string = 'PO'): Observable<TDManufacture[]> {
     const fullUrl = DOMAIN_URL + '/manufactures';
 
+    const parameterObject = {} as any;
+    parameterObject['type'] = type;
+    const parametersString = this.helperService.formatQueryParameters(parameterObject);
+
     return this.http
-      .get<TDManufacture[]>(fullUrl)
+      .get<TDManufacture[]>(fullUrl + parametersString)
       .pipe(catchError((error: any) => throwError(() => new Error(error))));
   }
 
-  public getModels(manufactureId: number): Observable<TDModels[]> {
+  public getModels(manufactureId: number, type: string = 'PO'): Observable<TDModels[]> {
     const fullUrl = DOMAIN_URL + '/manufactures/' + manufactureId;
 
+    const parameterObject = {} as any;
+    parameterObject['type'] = type;
+    const parametersString = this.helperService.formatQueryParameters(parameterObject);
+
     return this.http
-      .get<TDModels[]>(fullUrl)
+      .get<TDModels[]>(fullUrl + parametersString)
       .pipe(catchError((error: any) => throwError(() => new Error(error))));
   }
 
-  public getTypeOfModel(manufactureId: number, modelId: number): Observable<TDVehicleDetails[]> {
+  public getTypeOfModel(manufactureId: number, modelId: number, type: string = 'PO'): Observable<TDVehicleDetails[]> {
     const fullUrl = DOMAIN_URL + '/manufactures/' + manufactureId + '/' + modelId;
 
+    const parameterObject = {} as any;
+    parameterObject['type'] = type;
+    const parametersString = this.helperService.formatQueryParameters(parameterObject);
+
     return this.http
-      .get<TDVehicleDetails[]>(fullUrl)
+      .get<TDVehicleDetails[]>(fullUrl + parametersString)
       .pipe(catchError((error: any) => throwError(() => new Error(error))));
   }
 

@@ -27,6 +27,9 @@ import {
   TecdocSearchHistory,
 } from '../../../data-models/model/tecdoc';
 
+// Directive
+import { AutomTooltipDirective } from '../../autom-tooltip/autom-tooltip.directive';
+
 // Enums
 import {
   ButtonThemes,
@@ -36,6 +39,9 @@ import {
   InputTypeEnum,
   PositionEnum,
   SizeEnum,
+  TooltipPositionEnum,
+  TooltipThemeEnum,
+  TooltipTypesEnum,
 } from '../../../data-models/enums';
 
 // Service
@@ -44,15 +50,24 @@ import { TecdocSearchHistoryService } from '../../../service/utils/tecdoc-search
 import { SelectComponent } from '../../select/select.component';
 import { SelectModel } from '../../../data-models/interface';
 
+enum VehicleCategoryType {
+  PASSENGER = 'V',         // Putničko vozilo
+  LIGHT_COMMERCIAL = 'L',  // Kombi
+  TRUCK = 'C',  // Kombi
+  MOTORCYCLE = 'B',        // Motor,
+  TRACTOR = 'T',        // Motor
+}
+
 @Component({
   selector: 'vehicle-selection-popup',
   standalone: true,
   imports: [
-    InputFieldsComponent,
-    CommonModule,
-    PopupComponent,
     AutomIconComponent,
+    AutomTooltipDirective,
     ButtonComponent,
+    CommonModule,
+    InputFieldsComponent,
+    PopupComponent,
     SelectComponent,
   ],
   templateUrl: './vehicle-selection-popup.component.html',
@@ -65,6 +80,50 @@ export class VehicleSelectionPopupComponent implements OnInit, OnDestroy {
 
   title = 'Izaberite vozilo';
 
+  // Consts
+  vehicleTypes = [
+    {
+      value: VehicleCategoryType.PASSENGER, icon: IconsEnum.CAR_TAB, toolTip: {
+        position: TooltipPositionEnum.BOTTOM,
+        theme: TooltipThemeEnum.DARK,
+        tooltipText: 'Putničko vozilo',
+        type: TooltipTypesEnum.TEXT,
+      }
+    },
+    {
+      value: VehicleCategoryType.LIGHT_COMMERCIAL, icon: IconsEnum.LIGHT_COMMERCIAL_TAB, toolTip: {
+        position: TooltipPositionEnum.BOTTOM,
+        theme: TooltipThemeEnum.DARK,
+        tooltipText: 'Komercijalno vozilo',
+        type: TooltipTypesEnum.TEXT,
+      }
+    },
+    {
+      value: VehicleCategoryType.TRUCK, icon: IconsEnum.TRUCK_TAB, toolTip: {
+        position: TooltipPositionEnum.BOTTOM,
+        theme: TooltipThemeEnum.DARK,
+        tooltipText: 'Transporter',
+        type: TooltipTypesEnum.TEXT,
+      }
+    },
+    {
+      value: VehicleCategoryType.MOTORCYCLE, icon: IconsEnum.MOTORCYCLE_TAB, toolTip: {
+        position: TooltipPositionEnum.BOTTOM,
+        theme: TooltipThemeEnum.DARK,
+        tooltipText: 'Motocikl',
+        type: TooltipTypesEnum.TEXT,
+      }
+    },
+    {
+      value: VehicleCategoryType.TRACTOR, icon: IconsEnum.TRACTOR_TAB, toolTip: {
+        position: TooltipPositionEnum.BOTTOM,
+        theme: TooltipThemeEnum.DARK,
+        tooltipText: 'Traktor',
+        type: TooltipTypesEnum.TEXT,
+      }
+    },
+  ];
+
   // Enums
   buttonTheme = ButtonThemes;
   buttonType = ButtonTypes;
@@ -73,8 +132,12 @@ export class VehicleSelectionPopupComponent implements OnInit, OnDestroy {
   inputTypeEnum = InputTypeEnum
   positionEnum = PositionEnum;
   sizeEnum = SizeEnum;
+  tooltipPosition = TooltipPositionEnum;
+  tooltipTheme = TooltipThemeEnum;
+  tooltipType = TooltipTypesEnum;
 
   // Misc
+  isMobile = false;
   loadingManufactures = true;
   loadingModels = true;
   loadingType = true;
@@ -88,6 +151,9 @@ export class VehicleSelectionPopupComponent implements OnInit, OnDestroy {
   typeaheadManufactures: TypeaheadItem[] = [];
   typeaheadModels: TypeaheadItem[] = [];
   typeaheadType: TypeaheadItem[] = [];
+
+  // Tab configuration
+  selectedVehicleCategory: VehicleCategoryType = VehicleCategoryType.PASSENGER;
 
   selectedManufacture: number | null = null;
   selectedModel: number | null = null;
@@ -118,7 +184,7 @@ export class VehicleSelectionPopupComponent implements OnInit, OnDestroy {
   /** Start of: Angular lifecycle hooks */
 
   ngOnInit(): void {
-    this.setManufactures();
+    this.initManufactures();
     this.setSearchHistory();
   }
 
@@ -137,24 +203,37 @@ export class VehicleSelectionPopupComponent implements OnInit, OnDestroy {
 
   setSearchHistory(): void {
     this.vehicleSearchHistory = this.searchHistoryService.getVehiclesArray();
+    this.vehicleSelectModel = [];
     this.vehicleSearchHistory.forEach((data: TecdocSearchHistory) => {
-      this.vehicleSelectModel.push({
-        key: data.id.toString(),
-        value: data.description,
-      } as SelectModel);
+      if (data.type === this.selectedVehicleCategory) {
+        this.vehicleSelectModel.push({
+          key: data.id.toString(),
+          value: data.description,
+        } as SelectModel);
+      }
     });
   }
 
-  setManufactures(): void {
+  selectVehicleCategory(category: VehicleCategoryType): void {
+    this.selectedVehicleCategory = category;
+    this.resetManufactures();
+    this.resetModels();
+    this.resetType();
+    this.initManufactures();
+    this.setSearchHistory();
+  }
+
+  initManufactures(): void {
     this.loadingManufactures = true;
     this.tecdocService
-      .getManufactures()
+      .getManufactures(this.selectedVehicleCategory)
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => (this.loadingManufactures = false))
       )
       .subscribe({
         next: (response: TDManufacture[]) => {
+          this.typeaheadManufactures = [];
           response.forEach((value: TDManufacture) => {
             const taItem = {
               key: value.id,
@@ -174,7 +253,7 @@ export class VehicleSelectionPopupComponent implements OnInit, OnDestroy {
     this.resetType();
     this.loadingModels = true;
     this.tecdocService
-      .getModels(manufactureId)
+      .getModels(manufactureId, this.selectedVehicleCategory)
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => (this.loadingModels = false))
@@ -182,21 +261,24 @@ export class VehicleSelectionPopupComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (response: TDModels[]) => {
           response.forEach((value: TDModels) => {
-            const fromYear = value.constructedFrom?.toString().substring(0, 4);
-            const fromMonth = value.constructedFrom
-              ?.toString()
-              .substring(4, 6)
-              .padStart(2, '0');
-            const toYear = value.constructedTo
-              ? value.constructedTo.toString().substring(0, 4)
-              : '';
-            const toMonth = value.constructedTo
-              ? value.constructedTo.toString().substring(4, 6).padStart(2, '0')
-              : '';
+            const fromRaw = value.constructedFrom?.toString() ?? '';
+            const toRaw = value.constructedTo?.toString() ?? '';
 
-            const dateRange = toYear
-              ? `${fromMonth}.${fromYear} - ${toMonth}.${toYear}`
-              : `${fromMonth}.${fromYear} - Trenutno`;
+            const fromYear = fromRaw.substring(0, 4);
+            const fromMonth = fromRaw.substring(4, 6).padStart(2, '0');
+
+            const toYear = toRaw.substring(0, 4);
+            const toMonth = toRaw.substring(4, 6).padStart(2, '0');
+
+            let dateRange = 'Datum proizvodnje nepoznat';
+
+            if (fromYear && fromMonth) {
+              dateRange = toYear && toMonth
+                ? `${fromMonth}.${fromYear} - ${toMonth}.${toYear}`
+                : `${fromMonth}.${fromYear} - Trenutno`;
+            } else if (toYear && toMonth) {
+              dateRange = `Nepoznat početak - ${toMonth}.${toYear}`;
+            }
 
             const taItem = {
               key: value.modelId,
@@ -216,7 +298,7 @@ export class VehicleSelectionPopupComponent implements OnInit, OnDestroy {
     this.resetType();
     this.loadingType = true;
     this.tecdocService
-      .getTypeOfModel(manufactureId, modelId)
+      .getTypeOfModel(manufactureId, modelId, this.selectedVehicleCategory)
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => (this.loadingType = false))
@@ -343,7 +425,7 @@ export class VehicleSelectionPopupComponent implements OnInit, OnDestroy {
       description,
       engineType,
       linkageTargetId,
-      linkageTargetType,
+      subLinkageTargetType,
       kiloWattsTo,
     } = this.selectedVehicleDetails;
     const vehicleDescription =
@@ -351,7 +433,7 @@ export class VehicleSelectionPopupComponent implements OnInit, OnDestroy {
 
     this.searchHistoryService.saveVehicle({
       id: linkageTargetId!,
-      type: linkageTargetType!,
+      type: subLinkageTargetType!,
       description: vehicleDescription,
     } as TecdocSearchHistory);
   }

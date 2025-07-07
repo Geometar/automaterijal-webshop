@@ -17,6 +17,7 @@
   .total {
     display: flex;
     flex-direction: column;
+    flex: 1;
     padding: 20px 0;
   }
 
@@ -48,6 +49,31 @@
       width: 100%;
     }
   }
+
+  .free-shipping-info {
+    margin-top: 16px;
+    font-size: 15px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 8px;
+
+    &.warning {
+      color: #b35c00;
+      background-color: #fff6e5;
+    }
+
+    &.success {
+      color: #2e7d32;
+      background-color: #e6f4ea;
+    }
+
+    .info-icon {
+      font-size: 18px;
+    }
+  }
 }
 
 @media (max-width: 991px) {
@@ -57,7 +83,7 @@
     flex-direction: column;
     justify-content: center;
     min-height: calc(100vh - 57px);
-    padding-bottom: 70px; 
+    padding-bottom: 70px;
   }
   .cart {
     padding: 0 15px;

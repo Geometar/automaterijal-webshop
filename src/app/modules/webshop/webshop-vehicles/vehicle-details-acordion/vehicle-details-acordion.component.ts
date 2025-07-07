@@ -45,6 +45,8 @@ export class VehicleDetailsAcordionComponent implements OnInit, OnChanges {
   initVehicleImg(): void {
     if (this.vehicleDetails?.vehicleImages?.length) {
       this.vehicleImg = this.vehicleDetails.vehicleImages[0].imageURL200 ? this.vehicleDetails.vehicleImages[0].imageURL200 : this.vehicleDetails.vehicleImages[0].imageURL100;
+    } else {
+      this.vehicleImg = undefined; // Reset if no images are available
     }
   }
 

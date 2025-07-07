@@ -21,9 +21,10 @@ import { MatAutocompleteModule, MatAutocompleteSelectedEvent, MatAutocompleteTri
 
 export const MAX_VALUE = 999999999;
 export interface TypeaheadItem {
+  img?: string;
+  item?: any;
   key?: string | number;
   value?: string;
-  img?: string;
 }
 
 @Component({

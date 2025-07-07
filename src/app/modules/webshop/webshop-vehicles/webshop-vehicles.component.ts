@@ -89,7 +89,7 @@ export class WebshopVehiclesComponent implements OnInit, OnDestroy, OnChanges {
     this.tecdocService
       .getAssemblyGroups(
         this.vehicleDetails?.linkageTargetId!,
-        this.vehicleDetails?.linkageTargetType!
+        this.vehicleDetails?.subLinkageTargetType!
       )
       .pipe(
         takeUntil(this.destroy$),
