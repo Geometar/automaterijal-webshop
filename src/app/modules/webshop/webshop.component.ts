@@ -357,13 +357,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
 
     switch (this.currentState) {
       case WebShopState.SHOW_VEHICLE_DETAILS:
-        if (
-          this.tecdocId &&
-          (!this.selectedVehicleDetails ||
-            this.selectedVehicleDetails.linkageTargetId !== this.tecdocId)
-        ) {
-          this.getTDVehicleDetails(this.tecdocId, this.tecdocType!);
-        }
+        // Vehicle details are already fetched in updateVehicleIfNeeded
         break;
       case WebShopState.SHOW_ARTICLES_WITH_VEHICLE_DETAILS:
         if (this.tecdocId) {

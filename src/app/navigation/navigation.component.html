@@ -64,7 +64,7 @@
         </li>
         <li *ngIf="!loggedIn" class="navbar-item">
           <a
-            href="/login"
+            routerLink="/login"
             [ngClass]="currentUrl.includes('/login') ? 'nav-active' : null"
             class="navbar-link color--figma-error-600"
             >Login</a
