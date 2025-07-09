@@ -184,6 +184,7 @@ export class VehicleSelectionPopupComponent implements OnInit, OnDestroy {
   /** Start of: Angular lifecycle hooks */
 
   ngOnInit(): void {
+    this.isMobile = this.isMobileView();
     this.initManufactures();
     this.setSearchHistory();
   }
@@ -216,6 +217,7 @@ export class VehicleSelectionPopupComponent implements OnInit, OnDestroy {
 
   selectVehicleCategory(category: VehicleCategoryType): void {
     this.selectedVehicleCategory = category;
+    this.resetSelectedVehicleFromHistory();
     this.resetManufactures();
     this.resetModels();
     this.resetType();
@@ -339,6 +341,10 @@ export class VehicleSelectionPopupComponent implements OnInit, OnDestroy {
     this.selectedModel = null;
     this.typeaheadModels = [];
     this.loadingModels = true;
+  }
+
+  resetSelectedVehicleFromHistory(): void {
+    this.searchHistorySelected = null;
   }
 
   resetType(): void {
