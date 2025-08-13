@@ -1,4 +1,118 @@
+/* Card shell */
+.mf-card {
+  background: #fff;
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.04);
+  padding: 12px;
+}
+
+/* Header with title, count and clear */
+.mf-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(0,0,0,.06);
+}
+
+.mf-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: #0f172a;
+
+  .mf-count {
+    margin-left: 8px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--figma-primary-700);
+    background: color-mix(in oklab, var(--figma-primary-700) 10%, #fff);
+    border: 1px solid color-mix(in oklab, var(--figma-primary-700) 30%, #fff);
+  }
+}
+
+.mf-clear {
+  background: transparent;
+  border: 0;
+  color: #64748b;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 8px;
+  transition: background .12s ease, color .12s ease;
+  &:hover { background: #f1f5f9; color: #0f172a; }
+}
+
+/* Quick picks row (optional) */
+.mf-quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 0 6px;
+}
+.mf-chip-btn {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  background: #f5f6f7;
+  border: 1px solid rgba(0,0,0,.08);
+  cursor: pointer;
+  transition: background .12s ease, border-color .12s ease;
+  &:hover { background: #fff; border-color: rgba(0,0,0,.14); }
+}
+
+/* Mobile: selected chips */
+.mf-selected-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 6px 0;
+}
+.mf-chip-selected {
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  color: #1e3a8a;
+  cursor: pointer;
+  .x { margin-left: 6px; opacity: .8; }
+}
+
+/* Desktop list holder (your component is vertical) */
 .autom-checkbox__vertical {
   max-height: 340px;
   overflow-y: auto;
+  margin-top: 8px;
+  padding-right: 4px;
+}
+
+/* Make each option look like a chip-row */
+::ng-deep autom-checkbox .mat-checkbox {
+  border-radius: 10px;
+  padding: 6px 8px;
+  transition: background .12s ease;
+}
+::ng-deep autom-checkbox .mat-checkbox:hover {
+  background: #f8fafc;
+}
+
+/* Actions */
+.mf-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+.mf-more, .mf-less {
+  border: 1px dashed #cbd5e1;
+  background: #fff;
+  color: #475569;
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background .12s ease, color .12s ease, border-color .12s ease;
+  &:hover { background: #f8fafc; color: #0f172a; border-color: #cbd5e1; }
 }

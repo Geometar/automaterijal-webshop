@@ -1,8 +1,14 @@
 <div class="webshop webshop-container">
-  <div class="webshop__navigation">
-    <div>
-      <div class="webshop__navigation-search util__flex--center">
+  <header
+    class="webshop__navigation"
+    [class.is-scrolled]="scrolled"
+    [class.is-glass]="true"
+  >
+    <div class="nav-wrap">
+      <!-- Toolbar -->
+      <div class="nav-toolbar" role="search">
         <autom-button
+          class="nav-btn"
           [iconSource]="'car'"
           [iconPrefix]="true"
           [iconColor]="colorEnum.INFO_25_FILL"
@@ -12,62 +18,76 @@
           (clickEvent)="chooseVehicleVisible = true"
         >
         </autom-button>
-        <autom-input-fields
-          class="search-input"
-          [placeholder]="'Unesite kataloski ili OE broj'"
-          [round]="true"
-          [size]="sizeEnum.FULL"
-          [suffixIcon]="'search'"
-          [value]="searchTerm"
-          [warning]="
-            selectedVehicle?.linkageTargetId
-              ? 'Pretraga ce resetovati izabrano vozilo'
-              : ''
-          "
-          (customActionEvent)="emitValue($event)"
-          (emitSelected)="searchTerm = $event"
-        ></autom-input-fields>
+
+        <div class="nav-search">
+          <autom-input-fields
+            class="nav-input"
+            [placeholder]="'Unesite kataloski ili OE broj'"
+            [round]="true"
+            [size]="sizeEnum.FULL"
+            [suffixIcon]="'search'"
+            [value]="searchTerm"
+            (customActionEvent)="emitValue($event)"
+            (emitSelected)="searchTerm = $event"
+          >
+          </autom-input-fields>
+          <!-- warning sits under the input, never overlaps -->
+          <small class="nav-warning" *ngIf="selectedVehicle?.linkageTargetId">
+            Pretraga će resetovati izabrano vozilo
+          </small>
+        </div>
+
         <autom-button
-          [iconSource]="iconEnum.STOCK"
+          class="nav-btn"
+          [iconSource]="iconEnum.LIST"
           [iconPrefix]="true"
-          [iconColor]="colorEnum.INFO_25"
+          [iconColor]="colorEnum.INFO_25_FILL"
           [type]="buttonType.PRIMARY"
-          [theme]="buttonTheme.LIGHT_ORANGE"
+          [theme]="buttonTheme.BLUE"
           [label]="'Kategorije'"
           (clickEvent)="chooseCategoryVisible = true"
         >
         </autom-button>
       </div>
-    </div>
-    <div *ngIf="secondNavigation" class="util__flex--center">
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li [class.active]="!thirdNavigation">
+
+      <!-- Breadcrumbs -->
+      <nav
+        *ngIf="secondNavigation"
+        class="nav-breadcrumbs"
+        aria-label="breadcrumb"
+      >
+        <ol class="crumbs">
+          <li class="crumb" [class.is-active]="!thirdNavigation">
             <a (click)="goToMainPage()">Početna</a>
           </li>
-          <li [class.active]="!thirdNavigation" *ngIf="secondNavigation">
+          <li class="crumb" [class.is-active]="!thirdNavigation">
             <a
               *ngIf="thirdNavigation; else activeSecond"
               (click)="goToSecondPage()"
-              >{{ secondNavigation }}</a
             >
-            <ng-template #activeSecond>{{ secondNavigation }}</ng-template>
+              {{ secondNavigation }}
+            </a>
+            <ng-template #activeSecond>
+              <span>{{ secondNavigation }}</span>
+            </ng-template>
           </li>
-          <li class="active" *ngIf="thirdNavigation">
-            {{ thirdNavigation }}
+          <li class="crumb is-active" *ngIf="thirdNavigation">
+            <span>{{ thirdNavigation }}</span>
           </li>
         </ol>
       </nav>
     </div>
-  </div>
+  </header>
 </div>
 
+<!-- popups ostaju isto -->
 <vehicle-selection-popup
   *ngIf="chooseVehicleVisible"
   (closePopupModal)="chooseVehicleVisible = false"
   (emitVehicle)="handleSelectedVehicle($event)"
 >
 </vehicle-selection-popup>
+
 <categories-popup
   *ngIf="chooseCategoryVisible"
   [open]="chooseCategoryVisible"

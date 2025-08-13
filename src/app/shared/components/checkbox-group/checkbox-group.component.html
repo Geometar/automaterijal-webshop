@@ -1,34 +1,69 @@
-<autom-label *ngIf="label" [label]="label"></autom-label>
+<autom-label *ngIf="label" [label]="label" class="gc-title"></autom-label>
 
-<section class="grouped-checkbox">
-  <ng-container *ngFor="let task of tasks(); let taskIndex = index"
-    ><span class="parent" (click)="toggleExpand(taskIndex)">
-      <mat-checkbox
-        [checked]="task.completed"
-        [indeterminate]="partiallyComplete()[taskIndex]"
-        (click)="$event.stopPropagation()"
-        (change)="update($event.checked, taskIndex)"
-      >
-        <b class="parent-label">{{ task.name }}</b>
-      </mat-checkbox>
+<section class="gc gc--sidebar gc--dense">
+  <ng-container *ngFor="let task of tasks(); let i = index">
+    <article class="gc-group">
+      <!-- HEADER: checkbox + label + right tools (badge + chevron) -->
+      <div class="gc-h">
+        <mat-checkbox
+          class="gc-h__cb"
+          [checked]="task.completed"
+          [indeterminate]="partiallyComplete()[i]"
+          (click)="$event.stopPropagation()"
+          (change)="update($event.checked, i)"
+        >
+          <span class="gc-h__label" [matTooltip]="task.name">{{
+            task.name
+          }}</span>
+        </mat-checkbox>
 
-      <autom-icon
-        class="expand-icon"
-        [source]="task.expanded ? iconsEnum.CHEVRON_UP : iconsEnum.CHEVRON_DOWN"
-      />
-    </span>
-    <span *ngIf="task.expanded" class="child">
-      <ul>
-        <li *ngFor="let subtask of task.subtasks; let subtaskIndex = index">
-          <mat-checkbox
-            class="autom-checkbox"
-            [checked]="subtask.completed"
-            (change)="update($event.checked, taskIndex, subtaskIndex)"
+        <div class="gc-h__tools">
+          <span class="gc-badge" *ngIf="task.subtasks?.length">
+            {{ countSelected(task) }}/{{ countTotal(task) }}
+          </span>
+
+          <button
+            class="gc-toggle"
+            type="button"
+            [attr.aria-expanded]="task.expanded"
+            (click)="toggleExpand(i)"
           >
-            {{ subtask.name }}
-          </mat-checkbox>
-        </li>
-      </ul>
-    </span>
+            <autom-icon
+              class="gc-chev"
+              [source]="
+                task.expanded ? iconsEnum.CHEVRON_UP : iconsEnum.CHEVRON_DOWN
+              "
+            >
+            </autom-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- BODY: *ngIf collapse (stabilno, bez trzaja) -->
+      <div class="gc-b" *ngIf="task.expanded">
+        <ul class="gc-list">
+          <li *ngFor="let sub of task.subtasks; let j = index" class="gc-row">
+            <mat-checkbox
+              class="gc-row__cb"
+              [checked]="sub.completed"
+              (click)="$event.stopPropagation()"
+              (change)="update($event.checked, i, j)"
+            >
+              <span class="gc-row__label" [matTooltip]="sub.name">{{
+                sub.name
+              }}</span>
+            </mat-checkbox>
+          </li>
+        </ul>
+
+        <!-- Optional: Show more/less for very long child lists -->
+        <!--
+        <div class="gc-actions" *ngIf="(task.subtasks?.length || 0) > 12">
+          <button type="button" class="gc-more">Prikaži još</button>
+          <button type="button" class="gc-less">Manje</button>
+        </div>
+        -->
+      </div>
+    </article>
   </ng-container>
 </section>

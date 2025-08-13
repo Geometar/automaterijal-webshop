@@ -1,4 +1,36 @@
+/* Scrollable area for long lists (desktop) */
 .grouped-checkbox {
   max-height: 340px;
   overflow-y: auto;
+  padding-right: 4px; /* keeps text clear from scrollbar */
+}
+
+/* Subtle hover inside your checkbox-group without touching its logic */
+::ng-deep checkbox-group .option,
+::ng-deep checkbox-group .mat-mdc-checkbox {
+  border-radius: 8px;
+}
+::ng-deep checkbox-group .option:hover {
+  background: #f8fafc;
+}
+
+/* Consistent label visual */
+.filter-selection {
+  --label-color: #0f172a;
+  --label-size: 14px;
+
+  ::ng-deep .autom-label,
+  ::ng-deep .group-label,
+  ::ng-deep .mat-mdc-form-field-infix label {
+    color: var(--label-color) !important;
+    font-size: var(--label-size) !important;
+    font-weight: 600 !important;
+  }
+}
+
+/* Nice thin scrollbars */
+.grouped-checkbox::-webkit-scrollbar { width: 8px; }
+.grouped-checkbox::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,.18);
+  border-radius: 4px;
 }

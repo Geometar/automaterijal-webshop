@@ -1,18 +1,67 @@
-<autom-select
-  *ngIf="isMobile && selectReady"
-  [label]="'Proizvođači'"
-  [selectedValue]="selectedOption"
-  [selectionList]="state()"
-  (emitSelected)="onSelectChange($event)"
-></autom-select>
+<div class="mf-card">
+  <div class="mf-header">
+    <div class="mf-title">
+      Proizvođači
+      <span class="mf-count" *ngIf="selectedCount()">{{
+        selectedCount()
+      }}</span>
+    </div>
 
-<autom-checkbox
-  *ngIf="!isMobile"
-  class="filter-selection"
-  [horizontal]="false"
-  [items]="filterTerm ? filteredManufactures() : state()"
-  [label]="'Proizvođači'"
-  [size]="sizeEnum.AUTO"
-  [theme]="orientationEnum.VERTICAL"
-  (emitCheckbox)="emitChanges($event)"
-></autom-checkbox>
+    <button
+      class="mf-clear"
+      type="button"
+      *ngIf="selectedCount()"
+      (click)="clearAll()"
+    >
+      Očisti
+    </button>
+  </div>
+
+  <!-- Mobile: single select + selected chips -->
+  <autom-select
+    *ngIf="isMobile && selectReady"
+    [label]="'Proizvođači'"
+    [selectedValue]="selectedOption"
+    [selectionList]="selectOptions"
+    (emitSelected)="onSelectChange($event)"
+  >
+  </autom-select>
+
+  <div class="mf-selected-chips" *ngIf="isMobile && selectedCount()">
+    <button
+      class="mf-chip-selected"
+      *ngFor="let s of selectedLabels()"
+      type="button"
+      (click)="removeSelectedByLabel(s)"
+    >
+      {{ s }} <span class="x">×</span>
+    </button>
+  </div>
+
+  <!-- Desktop: checkbox list with paging -->
+  <autom-checkbox
+    *ngIf="!isMobile"
+    class="filter-selection autom-checkbox__vertical"
+    [horizontal]="false"
+    [items]="visibleItems()"
+    [label]="''"
+    [size]="sizeEnum.AUTO"
+    [theme]="orientationEnum.VERTICAL"
+    (emitCheckbox)="emitChanges($event)"
+  >
+  </autom-checkbox>
+
+  <div class="mf-actions" *ngIf="!isMobile && hasMore()">
+    <button type="button" class="mf-more" (click)="showMore()">
+      Prikaži još
+    </button>
+    <button
+      type="button"
+      class="mf-less"
+      *ngIf="visibleLimit() > basePage"
+      (click)="showLess()"
+    >
+      Manje
+    </button>
+  </div>
+</div>

@@ -63,20 +63,27 @@ export class UrlHelperService {
   }
 
   /** Removes multiple query parameters (case-insensitive). */
-  removeQueryParams(paramNames: string[]): void {
-    const merged = { ...this.activatedRoute.snapshot.queryParams };
+  removeQueryParams(paramNames: string[], opts: { replaceUrl?: boolean } = {}): void {
+    const current = this.activatedRoute.snapshot.queryParams ?? {};
     const targets = paramNames.map(p => p.toLowerCase());
 
-    Object.keys(merged).forEach(k => {
+    // Nađi stvarne ključeve (case-insensitive)
+    const toNullify: Record<string, null> = {};
+    Object.keys(current).forEach((k) => {
       if (targets.includes(k.toLowerCase())) {
-        delete merged[k];
+        toNullify[k] = null; // <-- ovako Angular zna da obriše param
       }
     });
 
+    // Ako nema šta da se briše, nema navigacije
+    if (Object.keys(toNullify).length === 0) return;
+
     this.router.navigate([], {
       relativeTo: this.activatedRoute,
-      queryParams: merged,
-      queryParamsHandling: ''
+      // NULIRAMO ono što brišemo i MERGUJEMO sa postojećim -> rezultat = postojeći - ovi ključevi
+      queryParams: toNullify,
+      queryParamsHandling: 'merge',
+      replaceUrl: opts.replaceUrl ?? true,  // ne puni history; po želji stavi false
     });
   }
 

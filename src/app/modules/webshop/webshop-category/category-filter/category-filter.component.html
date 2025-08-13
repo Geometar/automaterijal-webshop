@@ -1,12 +1,15 @@
+<!-- Desktop (checkbox list) -->
 <ng-container *ngIf="!isMobileView(); else mobileSelect">
   <checkbox-group
-    class="filter-selection"
+    class="filter-selection grouped-checkbox"
     [items]="tasks"
     [label]="'Kategorije'"
     (clickEvent)="emitSelectedSubgroups($event)"
-  ></checkbox-group>
+  >
+  </checkbox-group>
 </ng-container>
 
+<!-- Mobile (select) -->
 <ng-template #mobileSelect>
   <autom-select
     *ngIf="selectReady"
@@ -16,5 +19,6 @@
     [selectedValue]="selectedOption"
     [selectionList]="selectOptions"
     (emitSelected)="onSelectChange($event)"
-  ></autom-select>
+  >
+  </autom-select>
 </ng-template>

@@ -1,46 +1,64 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { ChangeDetectorRef, Component, EventEmitter, HostListener, Inject, Input, OnChanges, OnInit, Output, PLATFORM_ID, SimpleChanges, ViewEncapsulation } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  HostListener,
+  Inject,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  PLATFORM_ID,
+  SimpleChanges,
+  ViewEncapsulation,
+} from '@angular/core';
 
 // Automaterijal imports
 import { CheckboxGroupComponent, Task } from '../../../../shared/components/checkbox-group/checkbox-group.component';
 import { SelectComponent } from '../../../../shared/components/select/select.component';
 import { SelectModel } from '../../../../shared/data-models/interface';
 
-
 @Component({
   selector: 'category-filter',
   standalone: true,
   imports: [CommonModule, CheckboxGroupComponent, SelectComponent],
   templateUrl: './category-filter.component.html',
-  styleUrl: './category-filter.component.scss',
+  styleUrls: ['./category-filter.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
 export class CategoryFilterComponent implements OnChanges, OnInit {
+  /** Full categories object: { [groupLabel]: Array<{ id, naziv, grupa }> } */
   @Input() categories: any = null;
+
+  /** Selected subGroup ids coming from parent (URL-driven) */
   @Input() selectedSubgroupIds: string[] = [];
 
+  /** Emits normalized list of selected subGroup ids (as strings) */
   @Output() subgroupsChanged = new EventEmitter<string[]>();
 
-  // Misc
+  // View mode
   isMobile = false;
   selectReady = false;
 
-  // Select elements
-  selectOptions: SelectModel[] = [];
+  // Models for UI
+  tasks: Task[] = [];                       // desktop (checkbox-group)
+  selectOptions: SelectModel[] = [];        // mobile (select)
   selectedOption: SelectModel | null = null;
 
-  tasks: Task[] = [];
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private cdr: ChangeDetectorRef
+  ) { }
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object, private cdr: ChangeDetectorRef) { }
-
-  @HostListener('window:resize', ['$event'])
+  // Keep mobile breakpoint in sync
+  @HostListener('window:resize')
   onResize(): void {
     this.isMobile = isPlatformBrowser(this.platformId) && window.innerWidth < 991;
   }
 
-  /** Start of: Angular lifecycle hooks */
-
-  ngOnInit() {
+  /** Lifecycle */
+  ngOnInit(): void {
     this.isMobile = isPlatformBrowser(this.platformId) && window.innerWidth < 991;
   }
 
@@ -50,66 +68,89 @@ export class CategoryFilterComponent implements OnChanges, OnInit {
     }
   }
 
-  /** End of: Angular lifecycle hooks */
+  /** Build flat models for desktop + mobile */
+  private buildTasks(): void {
+    if (!this.categories) {
+      this.tasks = [];
+      this.selectOptions = [];
+      this.selectedOption = null;
+      this.selectReady = false;
+      return;
+    }
 
-  buildTasks(): void {
-    if (!this.categories) return;
+    // Normalize selected ids to strings (URL may provide numbers)
+    const selected = new Set((this.selectedSubgroupIds || []).map(String));
 
-    this.tasks = Object.keys(this.categories).map((key) => {
-      const subtasks = this.categories[key].map((item: any) => ({
-        name: item.naziv,
-        completed: this.selectedSubgroupIds.includes(item.id.toString()),
-        id: item.id,
-        grupa: item.grupa,
-      }));
+    // Sort groups by label (stable UX)
+    const groupKeys = Object.keys(this.categories).sort((a, b) =>
+      a.localeCompare(b, 'sr', { sensitivity: 'base' })
+    );
 
-      const allCompleted = subtasks.length > 0 && subtasks.every((t: Task) => t.completed);
+    // Build checkbox "tasks" (desktop)
+    const tasks: Task[] = groupKeys.map((groupKey) => {
+      const subs = [...(this.categories[groupKey] || [])]
+        .sort((a: any, b: any) => (a?.naziv || '').localeCompare(b?.naziv || '', 'sr', { sensitivity: 'base' }))
+        .map((item: any) => ({
+          name: item?.naziv ?? '',
+          completed: selected.has(String(item?.id)),
+          id: item?.id,
+          grupa: item?.grupa,     // keep for compatibility
+          expanded: false
+        }));
+
+      const allCompleted = subs.length > 0 && subs.every((s: Task) => s.completed);
 
       return {
-        name: key,
         completed: allCompleted,
-        id: key,
-        subtasks,
-        expanded: true
-      };
+        expanded: false,          // let your CheckboxGroup decide expand UI
+        id: groupKey,
+        name: groupKey,
+        subtasks: subs,
+      } as Task;
     });
 
-    this.selectOptions = this.tasks.flatMap(task =>
-      task.subtasks!.map(sub => ({
-        key: sub.id.toString(),
-        value: sub.name
+    this.tasks = tasks;
+
+    // Build select options (mobile) – show "Group • Subgroup" for clarity
+    this.selectOptions = tasks.flatMap(t =>
+      (t.subtasks || []).map(sub => ({
+        key: String(sub.id),
+        value: `${t.name} • ${sub.name}`,
       }))
     );
 
-    // Optionally: auto-select the first value
-    if (this.selectedSubgroupIds?.length) {
-      const match = this.selectOptions.find(opt =>
-        this.selectedSubgroupIds.includes(opt.key!.toString())
-      );
-      this.selectedOption = match ?? null;
-    }
+    // Sync mobile selected option to first selected id (if any)
+    const firstSelected = this.selectedSubgroupIds?.[0];
+    this.selectedOption = firstSelected
+      ? this.selectOptions.find(o => o.key === String(firstSelected)) ?? null
+      : null;
 
-    // ✅ Trigger outside change detection cycle
-    setTimeout(() => {
+    // Ready flag (avoid ExpressionChanged) – schedule in microtask
+    queueMicrotask(() => {
       this.selectReady = true;
-      this.cdr.detectChanges(); // <--- ovo garantuje da Angular ne baci NG0100
+      this.cdr.detectChanges();
     });
   }
 
+  /** Desktop: CheckboxGroup emits full Task[] back – compute all checked subtasks */
   emitSelectedSubgroups(updatedTasks: Task[]): void {
-    const selectedIds = updatedTasks
-      .flatMap(task => task.subtasks || [])
-      .filter(sub => sub.completed)
-      .map(sub => sub.id.toString());
+    const selectedIds = (updatedTasks || [])
+      .flatMap(t => t?.subtasks || [])
+      .filter(sub => !!sub?.completed)
+      .map(sub => String(sub?.id));
 
-    this.subgroupsChanged.emit(selectedIds);
+    // Emit once (microtask) to avoid multiple URL writes when UI toggles many boxes at once
+    queueMicrotask(() => this.subgroupsChanged.emit(selectedIds));
   }
 
+  /** Mobile: single select → emit one id (or empty array) */
   onSelectChange(selected: SelectModel): void {
     this.selectedOption = selected;
-    !!selected.key ? this.subgroupsChanged.emit([selected.key]) : this.subgroupsChanged.emit([]);
+    const key = selected?.key ? String(selected.key) : null;
+    queueMicrotask(() => this.subgroupsChanged.emit(key ? [key] : []));
   }
 
+  /** Template helper for SSR-safe media query */
   isMobileView(): boolean {
     return this.isMobile;
   }

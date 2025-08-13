@@ -9,6 +9,7 @@ export enum ButtonThemes {
 	DARK_GREY = 'dark-grey',
 	DARK_RED = 'dark-red',
 	ORANGE = 'orange',
+	BLUE = 'blue',
 	LIGHT_GREY = 'light-grey',
 	LIGHT_ORANGE = 'light-orange',
 	LIGHT_RED = 'light-red'

@@ -4,6 +4,7 @@ import {
   Inject,
   Input,
   OnChanges,
+  OnInit,
   PLATFORM_ID,
   SimpleChanges,
   ViewEncapsulation,
@@ -63,7 +64,7 @@ export enum FilterEnum {
   styleUrl: './webshop-category.component.scss',
   encapsulation: ViewEncapsulation.None,
 })
-export class WebshopCategoryComponent implements OnChanges {
+export class WebshopCategoryComponent implements OnChanges, OnInit {
   @Input() categories: any = null;
   @Input() filter: Filter = new Filter();
   @Input() manufactures: Manufacture[] | undefined = [];
@@ -150,15 +151,43 @@ export class WebshopCategoryComponent implements OnChanges {
     }));
   }
 
+  // --- Accordion state (persist to localStorage) ---
+  private readonly collapseKey = 'ws_filters_collapse';
+  collapseState: Record<'availability' | 'categories' | 'manufacturers', boolean> = {
+    availability: false,
+    categories: false,
+    manufacturers: false
+  };
+
+  // Restore persisted collapse on init
+  ngOnInit(): void {
+    const saved = localStorage.getItem(this.collapseKey);
+    if (saved) {
+      try { this.collapseState = { ...this.collapseState, ...JSON.parse(saved) }; } catch { }
+    }
+  }
+
+  // Toggle helpers
+  toggleSection(name: 'availability' | 'categories' | 'manufacturers') {
+    this.collapseState[name] = !this.collapseState[name];
+    localStorage.setItem(this.collapseKey, JSON.stringify(this.collapseState));
+  }
+  isCollapsed(name: 'availability' | 'categories' | 'manufacturers') {
+    return !!this.collapseState[name];
+  }
+
+  // Optional counters for chips (safe if arrays are missing)
+  get selectedSubgroupsCount(): number { return this.filter?.podgrupe?.length || 0; }
+  get selectedManufacturersCount(): number { return this.filter?.proizvodjaci?.length || 0; }
+
+  // Reset (atomic URL update; zatvori mobilni popup)
   resetFilters(): void {
     this.filter = new Filter();
-
-    this.urlHelperService.addOrUpdateQueryParams({
-      naStanju: false,
-      podgrupe: [],
-      proizvodjaci: [],
+    this.urlHelperService.setQueryParams({
+      naStanju: null,
+      podgrupe: null,
+      proizvodjaci: null
     });
-
     this.manufacturerPreFilter = '';
     this.buildManufactureModels();
     this.openFilterPopup = false;

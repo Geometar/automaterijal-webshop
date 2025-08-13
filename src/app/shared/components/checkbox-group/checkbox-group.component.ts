@@ -17,6 +17,7 @@ import { AutomIconComponent } from '../autom-icon/autom-icon.component';
 
 // Enums
 import { IconsEnum } from '../../data-models/enums';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 export interface Task {
   completed: boolean;
@@ -35,6 +36,7 @@ export interface Task {
     CommonModule,
     FormsModule,
     MatCheckboxModule,
+    MatTooltipModule
   ],
   templateUrl: './checkbox-group.component.html',
   styleUrl: './checkbox-group.component.scss',
@@ -91,5 +93,15 @@ export class CheckboxGroupComponent {
       tasks[taskIndex].expanded = !tasks[taskIndex].expanded;
       return [...tasks];
     });
+  }
+
+  // Koliko je čekirano u datoj grupi
+  countSelected(task: Task): number {
+    return task.subtasks?.filter(s => s.completed).length ?? 0;
+  }
+
+  // Ukupan broj podstavki u grupi
+  countTotal(task: Task): number {
+    return task.subtasks?.length ?? 0;
   }
 }

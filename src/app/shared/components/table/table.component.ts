@@ -120,6 +120,7 @@ export class TableComponent implements OnChanges {
     return isPaginatedResponse<Roba>(this.data);
   }
 
+
   removeFilter(chip: Chip): void {
     // If Grupe or Mandatory Proid is removed, cleare all filters
     if (chip.label === 'Grupe' || (chip.label === 'Proizvodjaci' && this.urlHelperService.hasQueryParam('mandatoryproid'))) {

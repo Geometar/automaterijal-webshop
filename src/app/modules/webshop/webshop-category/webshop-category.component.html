@@ -1,16 +1,17 @@
-<!-- Button to open mobile filters (visible only on mobile) -->
+<!-- Mobile FAB -->
 <autom-button
   *ngIf="isMobileView() && !openFilterPopup"
   class="mobile-filter-btn"
-  [label]="'Filter'"
+  [label]="'Filteri'"
   [type]="buttonTypes.PRIMARY"
   [theme]="buttonThemes.DEFAULT"
   [iconSource]="iconEnums.FILTER"
   [iconPrefix]="true"
   (clickEvent)="openFilterPopup = true"
-></autom-button>
+>
+</autom-button>
 
-<!-- Sidebar filter (visible only on desktop) -->
+<!-- DESKTOP SIDEBAR -->
 <div
   *ngIf="
     !isMobileView() &&
@@ -20,47 +21,100 @@
   class="sidebar"
 >
   <div class="filter-section">
-    <!-- Availability filter -->
-    <div class="filter-container">
-      <availability-filter
-        [onStock]="filter.naStanju!"
-        (availabilityChanged)="onAvailabilityChanged($event)"
-      ></availability-filter>
-    </div>
+    <!-- Availability -->
+    <div class="filter-card" [class.collapsed]="isCollapsed('availability')">
+      <button
+        class="section-title"
+        type="button"
+        (click)="toggleSection('availability')"
+      >
+        <span>Raspoloživost</span>
+        <i class="chevron" [class.expanded]="!isCollapsed('availability')"></i>
+      </button>
 
-    <!-- Category filter -->
-    <div class="filter-container" *ngIf="categories && categories !== null">
-      <category-filter
-        *ngIf="openCategoriesFilters"
-        [categories]="categories"
-        [selectedSubgroupIds]="filter.podgrupe || []"
-        (subgroupsChanged)="onSubgroupsChanged($event)"
-      ></category-filter>
-    </div>
-
-    <!-- Manufacturer filter -->
-    <div class="filter-container" *ngIf="manufactures && manufactures.length">
-      <div class="filter-prefilter" *ngIf="manufactures.length > 7">
-        <autom-input-fields
-          [placeholder]="'Filter manufacturers'"
-          [suffixIcon]="iconEnums.FILTER"
-          [type]="inputTypeEnum.SEARCH"
-          (emitSelected)="preFilterManufactures($event)"
-        ></autom-input-fields>
+      <div class="section-body">
+        <availability-filter
+          [onStock]="filter.naStanju!"
+          (availabilityChanged)="onAvailabilityChanged($event)"
+        >
+        </availability-filter>
       </div>
+    </div>
 
-      <manufacture-filter
-        *ngIf="openManufacturesFilters"
-        [manufactures]="manufacturesModels"
-        [selected]="filter.proizvodjaci || []"
-        [filterTerm]="manufacturerPreFilter"
-        (selectionChanged)="onManufactureChanged($event)"
-      ></manufacture-filter>
+    <!-- Categories -->
+    <div
+      class="filter-card"
+      *ngIf="categories"
+      [class.collapsed]="isCollapsed('categories')"
+    >
+      <button
+        class="section-title"
+        type="button"
+        (click)="toggleSection('categories')"
+      >
+        <span>Kategorije</span>
+        <span class="count-chip" *ngIf="selectedSubgroupsCount">{{
+          selectedSubgroupsCount
+        }}</span>
+        <i class="chevron" [class.expanded]="!isCollapsed('categories')"></i>
+      </button>
+
+      <div class="section-body">
+        <div class="filter-container">
+          <category-filter
+            *ngIf="openCategoriesFilters"
+            [categories]="categories"
+            [selectedSubgroupIds]="filter.podgrupe || []"
+            (subgroupsChanged)="onSubgroupsChanged($event)"
+          >
+          </category-filter>
+        </div>
+      </div>
+    </div>
+
+    <!-- Manufacturers -->
+    <div
+      class="filter-card"
+      *ngIf="manufactures?.length"
+      [class.collapsed]="isCollapsed('manufacturers')"
+    >
+      <button
+        class="section-title"
+        type="button"
+        (click)="toggleSection('manufacturers')"
+      >
+        <span>Proizvođači</span>
+        <span class="count-chip" *ngIf="selectedManufacturersCount">{{
+          selectedManufacturersCount
+        }}</span>
+        <i class="chevron" [class.expanded]="!isCollapsed('manufacturers')"></i>
+      </button>
+
+      <div class="section-body">
+        <div class="filter-prefilter" *ngIf="manufactures?.length ?? 0 > 7">
+          <autom-input-fields
+            [placeholder]="'Pretraži proizvođače...'"
+            [suffixIcon]="iconEnums.FILTER"
+            [type]="inputTypeEnum.SEARCH"
+            (emitSelected)="preFilterManufactures($event)"
+          >
+          </autom-input-fields>
+        </div>
+
+        <manufacture-filter
+          *ngIf="openManufacturesFilters"
+          [manufactures]="manufacturesModels"
+          [selected]="filter.proizvodjaci || []"
+          [filterTerm]="manufacturerPreFilter"
+          (selectionChanged)="onManufactureChanged($event)"
+        >
+        </manufacture-filter>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- Filter popup (visible only on mobile) -->
+<!-- MOBILE POPUP -->
 <autom-popup
   class="mobile-filters"
   *ngIf="isMobileView() && openFilterPopup"
@@ -72,42 +126,92 @@
 >
   <div custom-header class="page-details__header">
     <div class="page-details__title--row">
-      <h3 class="h3">Filter</h3>
+      <h3 class="h3">Filteri</h3>
     </div>
     <autom-icon
-      mat-dialog-close
       [color]="colorEnum.GREY_400"
       [source]="iconEnums.X"
       (click)="openFilterPopup = false"
-    ></autom-icon>
+    >
+    </autom-icon>
   </div>
 
-  <div
-    custom-body
-    class="page-details__body page-details__height--auto body util__flex--center autom-flex-direction--column"
-  >
-    <!-- Availability -->
-    <availability-filter
-      [onStock]="filter.naStanju!"
-      (availabilityChanged)="onAvailabilityChanged($event)"
-    ></availability-filter>
+  <div custom-body class="page-details__body">
+    <div class="filter-card">
+      <button
+        class="section-title"
+        type="button"
+        (click)="toggleSection('availability')"
+      >
+        <span>Raspoloživost</span>
+        <i class="chevron" [class.expanded]="!isCollapsed('availability')"></i>
+      </button>
+      <div class="section-body" [class.collapsed]="isCollapsed('availability')">
+        <availability-filter
+          [onStock]="filter.naStanju!"
+          (availabilityChanged)="onAvailabilityChanged($event)"
+        >
+        </availability-filter>
+      </div>
+    </div>
 
-    <!-- Categories -->
-    <category-filter
-      *ngIf="openCategoriesFilters"
-      [categories]="categories"
-      [selectedSubgroupIds]="filter.podgrupe || []"
-      (subgroupsChanged)="onSubgroupsChanged($event)"
-    ></category-filter>
+    <div class="filter-card" *ngIf="categories">
+      <button
+        class="section-title"
+        type="button"
+        (click)="toggleSection('categories')"
+      >
+        <span>Kategorije</span>
+        <span class="count-chip" *ngIf="selectedSubgroupsCount">{{
+          selectedSubgroupsCount
+        }}</span>
+        <i class="chevron" [class.expanded]="!isCollapsed('categories')"></i>
+      </button>
+      <div class="section-body" [class.collapsed]="isCollapsed('categories')">
+        <category-filter
+          [categories]="categories"
+          [selectedSubgroupIds]="filter.podgrupe || []"
+          (subgroupsChanged)="onSubgroupsChanged($event)"
+        >
+        </category-filter>
+      </div>
+    </div>
 
-    <!-- Manufacturers -->
-    <manufacture-filter
-      *ngIf="openManufacturesFilters"
-      [manufactures]="manufacturesModels"
-      [selected]="filter.proizvodjaci || []"
-      [filterTerm]="''"
-      (selectionChanged)="onManufactureChanged($event)"
-    ></manufacture-filter>
+    <div class="filter-card" *ngIf="manufactures?.length">
+      <button
+        class="section-title"
+        type="button"
+        (click)="toggleSection('manufacturers')"
+      >
+        <span>Proizvođači</span>
+        <span class="count-chip" *ngIf="selectedManufacturersCount">{{
+          selectedManufacturersCount
+        }}</span>
+        <i class="chevron" [class.expanded]="!isCollapsed('manufacturers')"></i>
+      </button>
+      <div
+        class="section-body"
+        [class.collapsed]="isCollapsed('manufacturers')"
+      >
+        <div class="filter-prefilter" *ngIf="manufactures?.length ?? 0 > 7">
+          <autom-input-fields
+            [placeholder]="'Pretraži proizvođače...'"
+            [suffixIcon]="iconEnums.FILTER"
+            [type]="inputTypeEnum.SEARCH"
+            (emitSelected)="preFilterManufactures($event)"
+          >
+          </autom-input-fields>
+        </div>
+
+        <manufacture-filter
+          [manufactures]="manufacturesModels"
+          [selected]="filter.proizvodjaci || []"
+          [filterTerm]="manufacturerPreFilter"
+          (selectionChanged)="onManufactureChanged($event)"
+        >
+        </manufacture-filter>
+      </div>
+    </div>
 
     <div class="filter-buttons">
       <autom-button
@@ -115,13 +219,15 @@
         [type]="buttonTypes.SECONDARY"
         [theme]="buttonThemes.LIGHT_ORANGE"
         (clickEvent)="resetFilters()"
-      />
+      >
+      </autom-button>
       <autom-button
         [label]="'Zatvori'"
         [type]="buttonTypes.PRIMARY"
         [theme]="buttonThemes.DEFAULT"
         (clickEvent)="openFilterPopup = false"
-      />
+      >
+      </autom-button>
     </div>
   </div>
 </autom-popup>

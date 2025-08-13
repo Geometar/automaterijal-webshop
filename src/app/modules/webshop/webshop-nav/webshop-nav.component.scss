@@ -1,109 +1,392 @@
 .webshop {
-  &__navigation {
-    background: linear-gradient(135deg, #132530, #1b455e);
-    &-search {
-      height: 100px;
-      gap: 10px;
-
-      .search-input {
-        width: 450px;
-      }
-    }
-  }
-
-  .autom-warning {
-    position: absolute;
-    top: 35px;
-    left: 80px;
-    color: var(--figma-grey-25);
-  }
-
   &-container {
     display: flex;
-    justify-content: center;
-    flex-direction: column;
-  }
-  .breadcrumb {
-    align-items: center;
-    color: rgba(255, 255, 255, 0.8);
-    display: flex;
-    font-size: 14px;
-    justify-content: left;
-    list-style: none;
-    margin: 5px auto;
-    width: 610px;
-  }
-  
-  .breadcrumb li {
-    display: flex;
-    align-items: center;
-  }
-  
-  .breadcrumb li:not(:last-child)::after {
-    content: " > ";
-    margin: 0 8px;
-    color: rgba(255, 255, 255, 0.5);
-  }
-  
-  .breadcrumb li a {
-    text-decoration: none;
-    color: rgba(255, 255, 255, 0.9);
-    transition: color 0.3s ease, opacity 0.3s ease;
-  }
-  
-  .breadcrumb li a:hover {
-    color: #ffcc00;
-    opacity: 1;
-  }
-  
-  .breadcrumb li.active {
-    color: #ffcc00;
-    font-weight: bold;
-    cursor: auto;
-  }
-}
-
-@media (max-width: 991px) {
-  .webshop__navigation-search {
     flex-direction: column;
     align-items: stretch;
-    gap: 12px;
-    padding: 10px 10px;
-    margin-bottom: 10px;
   }
 
-  autom-button {
-    width: 100%;
-    margin-top: 5px;
-    text-align: center;
-  }
-
-  .search-input {
-    width: 100% !important;
-  }
-
-  .breadcrumb {
-    width: 100%;
-    padding: 0 10px;
-    flex-wrap: wrap;
-    font-size: 13px;
-  }
-
-  .breadcrumb li:not(:last-child)::after {
-    content: ">";
-    margin: 0 5px;
+  /* Sticky gradient header */
+  &__navigation {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: radial-gradient(1200px 400px at 70% -100px, #1b455e 0%, #132530 55%);
+    padding: 14px 0;
   }
 }
 
-@media (max-width: 600px) {
-  .breadcrumb {
-    flex-direction: row;
-    align-items: flex-start !important;
-    width: 100% !important;
-    gap: 5px;
+/* constrain content width */
+.nav-wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* pill toolbar */
+.nav-toolbar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;a/* ===============================
+   Webshop Navigation (premium)
+   =============================== */
+
+.webshop {
+  &-container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  .breadcrumb li {
-    margin-bottom: 2px;
+  /* Sticky gradient header (glass + auto-shadow) */
+  &__navigation {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+
+    /* osnovni tamni gradient (fallback kad glass off) */
+    background: radial-gradient(1200px 400px at 70% -120px, #1b455e 0%, #132530 55%);
+    padding: 12px 0;
+
+    /* glass/blur mod (uključi klasom .is-glass na header) */
+    &.is-glass {
+      background: color-mix(in oklab, #10212c 82%, transparent);
+      backdrop-filter: blur(8px) saturate(120%);
+      -webkit-backdrop-filter: blur(8px) saturate(120%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    /* auto-shadow na scroll (dodaje se klasom .is-scrolled iz TS-a) */
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+    transition: box-shadow .25s ease, backdrop-filter .25s ease, background-color .25s ease;
+
+    &.is-scrolled {
+      box-shadow:
+        0 6px 18px rgba(0, 0, 0, .18),
+        0 1px 0 rgba(255, 255, 255, .04) inset;
+    }
   }
+}
+
+/* accessibility: ako korisnik želi manje transparencije */
+@media (prefers-reduced-transparency: reduce) {
+  .webshop__navigation.is-glass {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: #173141 !important;
+  }
+}
+
+/* Content width constraint */
+.nav-wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* ===== Toolbar (vehicle | search | categories) ===== */
+.nav-toolbar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Unify buttons */
+.nav-btn {
+  height: 46px;
+  border-radius: 9999px !important;
+  padding: 0 16px;
+  font-weight: 700;
+  transition: transform .08s ease, filter .2s ease;
+
+  &:hover { filter: brightness(1.02); }
+  &:active { transform: translateY(1px) scale(.99); }
+
+  /* icon tweaks inside our custom autom-button */
+  ::ng-deep .mat-icon,
+  ::ng-deep svg {
+    width: 18px; height: 18px;
+    margin-right: 6px;
+  }
+
+  button {
+    height: 42px;
+  }
+}
+
+/* Search block with warning line under */
+.nav-search {
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* enables ellipsis internally */
+}
+
+/* Search field visuals (works with autom-input-fields) */
+.nav-input {
+  height: 46px;
+  display: block;
+  width: 100%;
+  border-radius: 9999px;
+
+  ::ng-deep .mat-mdc-form-field {
+    width: 100% !important;
+  }
+
+  ::ng-deep .mdc-text-field {
+    height: 46px;
+    border-radius: 9999px !important;
+    background: #fff;
+    transition: box-shadow .2s ease, outline-color .2s ease;
+    outline: 2px solid transparent; /* keyboard focus ring */
+    outline-offset: 2px;
+    padding-right: 42px; /* room for suffix icon */
+  }
+
+  /* rounded outline segments */
+  ::ng-deep .mdc-text-field--outlined .mdc-notched-outline__leading,
+  ::ng-deep .mdc-text-field--outlined .mdc-notched-outline__trailing {
+    border-radius: 9999px !important;
+  }
+
+  /* suffix icon spacing */
+  ::ng-deep .mat-mdc-form-field-icon-suffix {
+    right: 8px;
+  }
+}
+
+/* Nice focus glow */
+.nav-input:focus-within ::ng-deep .mdc-text-field {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .12);
+}
+.nav-input :is(input, textarea, .mdc-text-field):focus-visible {
+  outline-color: color-mix(in oklab, var(--figma-primary-600) 70%, #fff);
+}
+
+/* Subtle warning below search */
+.nav-warning {
+  margin-top: 6px;
+  color: rgba(255, 255, 255, .85);
+  font-size: 12px;
+  line-height: 1.2;
+  opacity: .9;
+}
+
+/* ===== Breadcrumbs ===== */
+.nav-breadcrumbs { margin-top: 10px; }
+
+.crumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  color: rgba(255, 255, 255, .85);
+  font-size: 13px;
+}
+
+.crumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  a, span {
+    display: inline-flex;
+    align-items: center;
+    max-width: 280px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: rgba(255, 255, 255, .92) !important;
+    text-decoration: none !important;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    transition: background .2s ease, color .2s ease;
+  }
+
+  a:hover {
+    background: rgba(255, 255, 255, .08);
+    color: #fff;
+  }
+
+  &.is-active span {
+    background: rgba(255, 255, 255, .12);
+    color: #ffcc00;
+    font-weight: 700;
+  }
+
+  &:not(:last-child)::after {
+    content: '›';
+    color: rgba(255, 255, 255, .45);
+    padding: 0 2px;
+  }
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 992px) {
+  .nav-toolbar {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "vehicle categories"
+      "search  search";
+    gap: 10px;
+  }
+  .nav-btn:first-child { grid-area: vehicle; }
+  .nav-btn:last-child  { grid-area: categories; }
+  .nav-search          { grid-area: search; }
+
+  .crumbs { flex-wrap: wrap; gap: 6px; }
+}
+
+@media (max-width: 560px) {
+  .nav-toolbar {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "search"
+      "vehicle"
+      "categories";
+  }
+  .nav-btn,
+  .nav-input ::ng-deep .mdc-text-field { height: 44px; }
+}
+}
+
+/* unify button look & height */
+.nav-btn {
+  height: 46px;
+  border-radius: 9999px !important;
+  padding: 0 16px;
+  font-weight: 700;
+
+  /* icon alignment inside our custom button */
+  ::ng-deep .mat-icon,
+  ::ng-deep svg {
+    width: 18px; height: 18px;
+    margin-right: 6px;
+  }
+}
+
+/* search block keeps warning below */
+.nav-search {
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* allows ellipsis inside */
+}
+
+.nav-input {
+  height: 46px;
+  display: block;
+  width: 100%;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,.15));
+  border-radius: 9999px;
+
+  /* force rounded & tight field */
+  ::ng-deep .mat-mdc-form-field {
+    width: 100% !important;
+  }
+  ::ng-deep .mdc-text-field {
+    height: 46px;
+    border-radius: 9999px !important;
+    padding-right: 42px; /* room for suffix icon */
+    background: #fff;
+  }
+  ::ng-deep .mdc-text-field--outlined .mdc-notched-outline__leading,
+  ::ng-deep .mdc-text-field--outlined .mdc-notched-outline__trailing {
+    border-radius: 9999px !important;
+  }
+  ::ng-deep .mat-mdc-form-field-icon-suffix {
+    right: 8px;
+  }
+}
+
+/* small, non-blocking warning */
+.nav-warning {
+  margin-top: 6px;
+  color: #e2e8f0;
+  font-size: 12px;
+  line-height: 1.2;
+  opacity: .9;
+}
+
+/* breadcrumbs */
+.nav-breadcrumbs {
+  margin-top: 10px;
+}
+
+.crumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  color: rgba(255,255,255,.85);
+  font-size: 13px;
+}
+
+/* each crumb as a subtle chip */
+.crumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  a, span {
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: rgba(255,255,255,.9) !important;
+    text-decoration: none !important;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    transition: background .2s ease, color .2s ease;
+  }
+
+  a:hover {
+    background: rgba(255,255,255,.08);
+    color: #fff;
+  }
+
+  &.is-active span {
+    background: rgba(255,255,255,.12);
+    color: #ffcc00;
+    font-weight: 700;
+  }
+
+  /* separator chevron */
+  &:not(:last-child)::after {
+    content: '›';
+    color: rgba(255,255,255,.45);
+    padding: 0 2px;
+  }
+}
+
+/* responsive */
+@media (max-width: 992px) {
+  .nav-toolbar {
+    grid-template-columns: 1fr 1fr;  /* two columns */
+    grid-template-areas:
+      "vehicle categories"
+      "search  search";
+    gap: 10px;
+  }
+  .nav-btn:first-child { grid-area: vehicle; }
+  .nav-btn:last-child  { grid-area: categories; }
+  .nav-search          { grid-area: search; }
+
+  .nav-input { filter: drop-shadow(0 2px 6px rgba(0,0,0,.12)); }
+  .crumbs { flex-wrap: wrap; gap: 6px; }
+}
+
+@media (max-width: 560px) {
+  .nav-toolbar {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "search search"
+      "vehicle categories";
+    gap: 8px;
+  }
+  .nav-btn,
+  .nav-input ::ng-deep .mdc-text-field { height: 44px; }
 }

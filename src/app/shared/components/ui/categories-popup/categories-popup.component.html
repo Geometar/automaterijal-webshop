@@ -1,74 +1,136 @@
 <autom-popup
   class="categories-selection"
-  *ngIf="open"
   [height]="sizeEnum.FULL_VH"
   [position]="positionEnum.LEFT"
-  [width]="sizeEnum.EXTRA_LARGE"
-  [rounded]="false"
+  [width]="sizeEnum.LARGE"
+  [rounded]="true"
   (close)="close.emit()"
 >
-  <!-- HEADER SLOT -->
+  <!-- HEADER / HERO (sticky) -->
   <div custom-header class="cp-header">
-    <h3 class="cp-title">{{ title }}</h3>
+    <div class="cp-hero">
+      <div class="cp-hero__left">
+        <h3 class="cp-title">{{ title }}</h3>
+        <p class="cp-subtitle">
+          Brza navigacija kroz 27 grupa i 150+ podgrupa.
+        </p>
+      </div>
 
-    <autom-input-fields
-      class="cp-search-input"
-      [type]="inputTypeEnum.SEARCH"
-      [label]="'Pretraži kategorije...'"
-      (emitSelected)="onSearch($event)"
-    ></autom-input-fields>
+      <div class="cp-hero__right">
+        <!-- Use your autom-input-fields as a controlled search input -->
+        <autom-input-fields
+          class="cp-search-input"
+          [type]="inputTypeEnum.SEARCH"
+          [label]="'Pretraži kategorije...'"
+          (emitValue)="onSearch($event)"
+          (emitSelected)="onSearch($event)"
+          (emitValueDebounced)="onSearch($event)"
+        ></autom-input-fields>
+      </div>
 
-    <autom-icon
-      class="cp-close"
-      [color]="colorEnum.GREY_400"
-      [source]="iconsEnum.X"
-      (click)="close.emit()"
-    ></autom-icon>
+      <!-- Close button -->
+      <autom-icon
+        class="cp-close"
+        [color]="colorEnum.GREY_400"
+        [source]="iconsEnum.X"
+        (click)="close.emit()"
+      ></autom-icon>
+    </div>
+
+    <!-- QUICK TAGS -->
+    <div class="cp-quick-tags" *ngIf="!loading()">
+      <button
+        *ngFor="let t of quickTags"
+        class="cp-tag"
+        type="button"
+        (click)="useQuickTag(t.id)"
+      >
+        {{ t.label }}
+      </button>
+      <button class="cp-tag ghost" type="button" (click)="reset()">
+        Reset
+      </button>
+    </div>
   </div>
 
-  <!-- BODY SLOT -->
-  <div custom-body class="cp-body" role="tree">
-    <ng-container *ngIf="filtered() as groups">
-      <!-- One-column accordion (group -> subgroups). Modern, clean, responsive. -->
-      <div
-        *ngFor="let g of groups; trackBy: trackGroup"
-        class="cp-group"
-        role="treeitem"
-        [attr.aria-expanded]="expanded().has(g.groupId || '')"
-      >
-        <!-- Group row -->
-        <button class="cp-group-row" (click)="toggle(g.groupId)">
-          <i
-            class="cp-chevron"
-            [class.expanded]="expanded().has(g.groupId || '')"
-          ></i>
-          <span class="cp-group-name">{{ g.name }}</span>
-        </button>
+  <!-- BODY: side-nav (groups) + cards (subgroups) -->
+  <div custom-body class="cp-body">
+    <!-- LEFT: groups with icons & separators -->
+    <aside class="cp-groups">
+      <ng-container *ngIf="!loading(); else skeletonLeft">
+        <div
+          *ngFor="let g of filtered(); trackBy: trackGroup"
+          class="cp-group-item"
+          [class.active]="g.groupId === selectedGroupId()"
+          (click)="selectGroup(g)"
+        >
+          <span class="cp-group-icon" [style.--accent]="accentForGroup(g)">
+            <autom-icon [source]="iconForGroup(g)"></autom-icon>
+          </span>
 
-        <!-- Children -->
-        <div class="cp-children" *ngIf="expanded().has(g.groupId || '')">
-          <button
-            *ngFor="let s of g.articleSubGroups; trackBy: trackSub"
-            class="cp-leaf"
-            (click)="pickSub(s)"
-            role="treeitem"
-          >
-            <span class="cp-leaf-dot"></span>
-            <span class="cp-leaf-name">{{ s.name }}</span>
-          </button>
+          <div class="cp-group-text">
+            <div class="cp-group-name">{{ g.name }}</div>
+            <div class="cp-group-meta">
+              <!-- Optional: if you have counts in future, place them here -->
+              <!-- <span class="cp-badge">{{ g.articleSubGroups?.length || 0 }}</span> -->
+              <span class="cp-divider"></span>
+              <span class="cp-hint">Klikni za podgrupe</span>
+            </div>
+          </div>
 
-          <!-- Optional: pick the whole group -->
-          <button class="cp-leaf cp-all" (click)="pickGroup(g)" role="treeitem">
-            <span class="cp-leaf-dot"></span>
-            <span class="cp-leaf-name">Sve iz: {{ g.name }}</span>
+          <span class="cp-arrow"></span>
+        </div>
+      </ng-container>
+
+      <ng-template #skeletonLeft>
+        <div class="skeleton-line" *ngFor="let i of [].constructor(8)"></div>
+      </ng-template>
+    </aside>
+
+    <!-- RIGHT: animated cards grid for subgroups -->
+    <section class="cp-subgroups">
+      <ng-container *ngIf="selectedGroup() as sel; else pickPrompt">
+        <div class="cp-subgroups-header">
+          <div class="cp-subgroups-title">
+            {{ sel.name }}
+            <span
+              class="cp-dot"
+              [style.background]="accentForGroup(sel)"
+            ></span>
+          </div>
+
+          <button class="cp-all-btn" type="button" (click)="pickGroup(sel)">
+            Sve iz: {{ sel.name }}
           </button>
         </div>
-      </div>
-    </ng-container>
 
-    <!-- Empty state -->
-    <div class="cp-empty" *ngIf="!filtered()?.length">
-      Nema rezultata za zadatu pretragu.
-    </div>
+        <div class="cp-subgrid">
+          <button
+            *ngFor="
+              let s of sel.articleSubGroups;
+              let idx = index;
+              trackBy: trackSub
+            "
+            class="cp-card"
+            type="button"
+            [style.--delay]="idx * 30 + 'ms'"
+            (click)="pickSub(s)"
+          >
+            <div
+              class="cp-card__icon"
+              [style.borderColor]="accentForGroup(sel)"
+            >
+              <autom-icon [source]="iconForGroup(sel)"></autom-icon>
+            </div>
+            <div class="cp-card__name">{{ s.name }}</div>
+            <div class="cp-card__cta">Prikaži</div>
+          </button>
+        </div>
+      </ng-container>
+
+      <ng-template #pickPrompt>
+        <div class="cp-empty-state">Izaberite grupu sa leve strane</div>
+      </ng-template>
+    </section>
   </div>
 </autom-popup>

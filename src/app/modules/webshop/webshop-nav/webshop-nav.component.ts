@@ -3,12 +3,12 @@ import {
   EventEmitter,
   Input,
   OnChanges,
-  OnInit,
   Output,
   SimpleChanges,
   ViewEncapsulation,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HostListener } from '@angular/core';
 
 // Component Imports
 import { ButtonComponent } from '../../../shared/components/button/button.component';
@@ -71,12 +71,19 @@ export class WebshopNavComponent implements OnChanges {
   thirdNavigation: string = '';
 
   // Misc
-  chooseVehicleVisible = false;
+  scrolled = false;
   chooseCategoryVisible = false;
+  chooseVehicleVisible = false;
 
   // Consts
   categories: Categories[] = [];
   manufacturers: Categories[] = [];
+
+  @HostListener('window:scroll')
+  onScroll() {
+    // tiny threshold da se senka ne “trese”
+    this.scrolled = (window?.scrollY || document.documentElement.scrollTop || 0) > 4;
+  }
 
   constructor(
     private configService: ConfigService,

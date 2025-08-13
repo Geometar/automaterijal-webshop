@@ -1,374 +1,347 @@
-.grouped-checkbox {
-  display: flex;
-  flex-direction: column;
-  
-  .parent {
-    align-items: center;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    padding-right: 8px;
-  }
-  
-  .parent mat-checkbox {
-    font-size: 16px;
-    color: var(--figma-grey-500);
-  }
+/* ===== Sidebar accordion – compact, reliable collapse ===== */
 
-  .expand-icon {
-    & mat-icon {
-      width: 22px;
-      height: 22px;
-
-      & svg path {
-        stroke: var(--figma-grey-500);
-      }
-    }
-  }
-
-  .parent-label {
-    font-weight: 600;
-  }
-
-  .child {
-    margin-left: 15px; // or match it to whatever you like
-  }
-
-  .child ul {
-    margin: 0;
-    padding: 0;
-    list-style: none; // optional, but makes layout cleaner
-  }
-
-  .autom-checkbox {
-    margin-right: var(--space-xs);
-  
-    &__card {
-      align-items: center;
-      align-self: stretch;
-      background: var(--figma-base-white);
-      border-radius: var(--space-xs);
-      border: var(--space-default) solid var(--figma-grey-200);
-      box-sizing: border-box;
-      cursor: pointer;
-      display: flex;
-      flex-direction: row;
-      flex-grow: 0;
-      height: calc(var(--space-xxs) * 13);
-      margin-top: 0;
-      padding: var(--space-s);
-      position: relative;
-      width: calc(var(--space-s) * 20);
-  
-      & .mat-checkbox-inner-container {
-        margin: unset;
-        margin-right: var(--space-xs);
-      }
-  
-      &:hover,
-      &--active {
-        background-color: var(--figma-primary-50);
-        border: var(--space-default) solid var(--figma-primary-300);
-      }
-  
-      &--disabled {
-        background-color: var(--figma-grey-25) !important;
-        border: var(--space-default) solid var(--figma-grey-200) !important;
-        cursor: default;
-        pointer-events: none;
-      }
-    }
-  
-    &--auto {
-      width: auto;
-    }
-  
-    &--full {
-      width: var(--size-full);
-    }
-  
-    &--extra-small {
-      width: var(--size-extra-small);
-    }
-  
-    &--small {
-      width: var(--size-small);
-    }
-  
-    &--medium {
-      width: var(--size-medium);
-    }
-  
-    &--large {
-      width: var(--size-large);
-    }
-  
-    &-group {
-      &__card {
-        &--horizontal,
-        &--vertical {
-          align-items: flex-start;
-          display: flex;
-          flex-wrap: wrap;
-          gap: calc(var(--space-xxs) * 3);
-        }
-  
-        &--horizontal {
-          flex-direction: row;
-        }
-  
-        &--vertical {
-          flex-direction: column;
-        }
-      }
-    }
-  
-    &__vertical {
-      align-items: flex-start;
-      display: flex;
-      flex-direction: column;
-  
-      mat-checkbox {
-        margin: var(--space-xxs) 0;
-      }
-  
-      .autom-label {
-        margin: 0;
-      }
-    }
-  
-    &__wrapper {
-      margin: 0;
-      min-width: calc(var(--space-xxs) * 50);
-      padding: 0;
-      position: relative;
-    }
-  
-    .autom-label {
-      font-weight: normal;
-    }
-  
-    .mat-checkbox-label {
-      color: var(--figma-grey-700);
-      font-size: var(--text-sm);
-      font-weight: var(--font-weight-regular);
-    }
-  
-    .mat-checkbox-frame {
-      background-color: var(--figma-base-white);
-      border: var(--space-default) solid var(--figma-grey-300) !important;
-      border-radius: calc(var(--space-xxxs) * 3) !important;
-      height: calc(var(--space-xxs) * 5);
-      width: calc(var(--space-xxs) * 5);
-    }
-  
-    &__checked {
-      .mat-checkbox-frame {
-        background-color: var(--figma-primary-50);
-        border: var(--space-default) solid var(--figma-primary-600) !important;
-      }
-    }
-  
-    &__disabled {
-      .mat-checkbox-frame {
-        background-color: var(--figma-grey-100);
-        border: var(--space-default) solid var(--figma-grey-200) !important;
-      }
-    }
-  
-    .mat-checkbox-checked:not(.mat-checkbox-disabled).mat-accent .mat-ripple-element,
-    .mat-checkbox:active:not(.mat-checkbox-disabled).mat-accent .mat-ripple-element {
-      background: var(--figma-primary-600) !important;
-    }
-  
-    .mat-checkbox-background {
-      background-color: transparent !important;
-    }
-  
-    .mat-checkbox-inner-container {
-      height: calc(var(--space-xxs) * 5);
-      width: calc(var(--space-xxs) * 5);
-    }
-  
-    .mat-checkbox-checkmark-path {
-      stroke: var(--figma-primary-600) !important;
-    }
-  
-    .mat-checkbox-mixedmark {
-      background-color: var(--figma-primary-600) !important;
-    }
-  
-    &__disabled {
-      .mat-checkbox-checkmark-path {
-        stroke: var(--figma-grey-200) !important;
-      }
-    }
-  }
-  
-
+/* tunables */
+:root {
+  --g-font-xs: 11.5px;
+  --g-font-sm: 12.5px;
+  --g-font-md: 13.5px;
+  --g-pad-xs: 6px;
+  --g-pad-sm: 8px;
+  --g-pad-md: 12px;
+  --g-sep: rgba(0,0,0,.08);
 }
 
-.autom-checkbox {
-  margin-right: var(--space-xs);
+/* title */
+.gc-section-title {
+  display: block;
+  margin: 0 0 6px;
+  font-weight: 700;
+  font-size: var(--g-font-md);a/* ===== E‑commerce sidebar filter (compact) ===== */
 
-  &__card {
-    align-items: center;
-    align-self: stretch;
-    background: var(--figma-base-white);
-    border-radius: var(--space-xs);
-    border: var(--space-default) solid var(--figma-grey-200);
-    box-sizing: border-box;
-    cursor: pointer;
-    display: flex;
-    flex-direction: row;
-    flex-grow: 0;
-    height: calc(var(--space-xxs) * 13);
-    margin-top: 0;
-    padding: var(--space-s);
-    position: relative;
-    width: calc(var(--space-s) * 20);
+:root {
+  --g-font-xs: 11.5px;
+  --g-font-sm: 12.5px;
+  --g-font-md: 13.5px;
 
-    & .mat-checkbox-inner-container {
-      margin: unset;
-      margin-right: var(--space-xs);
-    }
+  --g-pad-xxs: 4px;
+  --g-pad-xs: 6px;
+  --g-pad-sm: 8px;
+  --g-pad-md: 12px;
 
-    &:hover,
-    &--active {
-      background-color: var(--figma-primary-50);
-      border: var(--space-default) solid var(--figma-primary-300);
-    }
+  --g-sep: rgba(0,0,0,.08);
+}
 
-    &--disabled {
-      background-color: var(--figma-grey-25) !important;
-      border: var(--space-default) solid var(--figma-grey-200) !important;
-      cursor: default;
-      pointer-events: none;
-    }
-  }
+.gc-title {
+  display: block;
+  margin: 0 0 6px;
+  font-weight: 700;
+  font-size: var(--g-font-md);
+  color: #0f172a;
+}
 
-  &--auto {
-    width: auto;
-  }
+/* Root container for 320px sidebar */
+.gc.gc--sidebar {
+  display: grid;
+  gap: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
 
-  &--full {
-    width: var(--size-full);
-  }
+/* Group = divider‑based block */
+.gc-group {
+  border-bottom: 1px solid var(--g-sep);
+  background: #fff;
+}
 
-  &--extra-small {
-    width: var(--size-extra-small);
-  }
+/* Header row: 2 kolone -> label (flex) + tools (fixed) */
+.gc-h {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 
-  &--small {
-    width: var(--size-small);
-  }
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 6px;
+  padding: var(--g-pad-xs) 8px;
 
-  &--medium {
-    width: var(--size-medium);
-  }
+  &:hover { background: #fafafa; }
+}
 
-  &--large {
-    width: var(--size-large);
-  }
+/* Checkbox + label area */
+.gc-h__cb {
+  display: flex;
+  align-items: center;
+  min-height: 32px;            /* veliki tap target, malo vertikalno */
+  min-width: 0;                /* važno za ellipsis */
+}
 
-  &-group {
-    &__card {
-      &--horizontal,
-      &--vertical {
-        align-items: flex-start;
-        display: flex;
-        flex-wrap: wrap;
-        gap: calc(var(--space-xxs) * 3);
-      }
+.gc-h__cb .mat-checkbox-inner-container {
+  width: 16px !important;
+  height: 16px !important;
+  margin-right: 10px;
+}
 
-      &--horizontal {
-        flex-direction: row;
-      }
+.gc-h__cb .mat-checkbox-frame {
+  border: 1px solid #d1d5db !important;
+  border-radius: 4px !important;
+  background: #fff;
+}
+.gc-h__cb .mat-checkbox-checkmark-path { stroke: var(--figma-primary-600) !important; }
 
-      &--vertical {
-        flex-direction: column;
-      }
-    }
-  }
+/* Label: ellipsis + tooltip */
+.gc-h__label {
+  display: inline-block;
+  flex: 1;
+  min-width: 0;
+  font-weight: 700;
+  font-size: var(--g-font-md);
+  color: #111827;
+  letter-spacing: .2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: none;        /* izbegni pucanje dijakritika */
+}
 
-  &__vertical {
-    align-items: flex-start;
-    display: flex;
-    flex-direction: column;
+/* Tools area: fiksna širina da CHEVRON ne “pobegne” desno */
+.gc-h__tools {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  max-width: 96px;             /* rezerviši desni stub za badge + chevron */
+}
 
-    mat-checkbox {
-      margin: var(--space-xxs) 0;
-    }
+/* Small count badge */
+.gc-badge {
+  font-size: var(--g-font-xs);
+  font-weight: 700;
+  padding: 1px 6px;
+  line-height: 1;
+  border-radius: 999px;
+  color: var(--figma-primary-700);
+  background: color-mix(in oklab, var(--figma-primary-700) 12%, #fff);
+  border: 1px solid color-mix(in oklab, var(--figma-primary-700) 28%, #fff);
+}
 
-    .autom-label {
-      margin: 0;
-    }
-  }
+/* Chevron button (klik za collapse) */
+.gc-toggle {
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  padding: 2px;
+  cursor: pointer;
+}
+.gc-chev { opacity: .9; }
+.gc-chev mat-icon, .gc-chev svg { width: 16px; height: 16px; }
 
-  &__wrapper {
-    margin: 0;
-    min-width: calc(var(--space-xxs) * 50);
-    padding: 0;
-    position: relative;
-  }
+/* Body (lista childova) */
+.gc-b { padding: 2px 0 6px; }
 
-  .autom-label {
-    font-weight: normal;
-  }
+.gc-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
 
-  .mat-checkbox-label {
-    color: var(--figma-grey-700);
-    font-size: var(--text-sm);
-    font-weight: var(--font-weight-regular);
-  }
+/* Jedan child red */
+.gc-row {
+  border-top: 1px solid rgba(0,0,0,.05);
 
-  .mat-checkbox-frame {
-    background-color: var(--figma-base-white);
-    border: var(--space-default) solid var(--figma-grey-300) !important;
-    border-radius: calc(var(--space-xxxs) * 3) !important;
-    height: calc(var(--space-xxs) * 5);
-    width: calc(var(--space-xxs) * 5);
-  }
+  &:first-child { border-top: 1px solid rgba(0,0,0,.06); }
+}
 
-  &__checked {
-    .mat-checkbox-frame {
-      background-color: var(--figma-primary-50);
-      border: var(--space-default) solid var(--figma-primary-600) !important;
-    }
-  }
+.gc-row__cb {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  min-height: 32px;
+  padding: 0 8px;
+  box-sizing: border-box;
 
-  &__disabled {
-    .mat-checkbox-frame {
-      background-color: var(--figma-grey-100);
-      border: var(--space-default) solid var(--figma-grey-200) !important;
-    }
-  }
-
-  .mat-checkbox-checked:not(.mat-checkbox-disabled).mat-accent .mat-ripple-element,
-  .mat-checkbox:active:not(.mat-checkbox-disabled).mat-accent .mat-ripple-element {
-    background: var(--figma-primary-600) !important;
-  }
-
-  .mat-checkbox-background {
-    background-color: transparent !important;
-  }
+  font-size: var(--g-font-sm);
+  color: #374151;
+  background: #fff;
+  border-radius: 6px;
 
   .mat-checkbox-inner-container {
-    height: calc(var(--space-xxs) * 5);
-    width: calc(var(--space-xxs) * 5);
+    width: 16px !important;
+    height: 16px !important;
+    margin-right: 10px;
   }
 
-  .mat-checkbox-checkmark-path {
-    stroke: var(--figma-primary-600) !important;
-  }
-
-  .mat-checkbox-mixedmark {
-    background-color: var(--figma-primary-600) !important;
-  }
-
-  &__disabled {
-    .mat-checkbox-checkmark-path {
-      stroke: var(--figma-grey-200) !important;
-    }
-  }
+  &:hover { background: #f8fafc; }
 }
+
+/* Child label: ellipsis + tooltip */
+.gc-row__label {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: none;
+}
+
+/* Dense mode (još kompaktnije) */
+.gc--dense {
+  .gc-h__label { font-size: var(--g-font-sm); }
+  .gc-row__cb  { min-height: 30px; }
+}
+
+/* Smaller ripple */
+::ng-deep .mat-checkbox .mat-checkbox-ripple,
+::ng-deep .mdc-checkbox__ripple { transform: scale(.8); }
+}
+
+/* root */
+.gc.gc--sidebar {
+  display: grid;
+  gap: 0;                 /* nema rupe između grupa */
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* single group */
+.gc-group {
+  border-bottom: 1px solid var(--g-sep);
+  background: #fff;
+}
+
+/* header row (kompaktno, 320px safe) */
+.gc-h {
+  width: 100%;
+  max-width: 100%;
+  padding: var(--g-pad-xs) 8px; /* smanjen padding da sve staje */
+  box-sizing: border-box;
+
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+
+  &:hover { background: #fafafa; }
+}
+
+/* checkbox + title */
+.gc-h__cb {
+  display: flex;
+  align-items: center;
+  min-height: 32px;
+
+  .mat-checkbox-inner-container {
+    width: 16px !important;
+    height: 16px !important;
+    margin-right: 10px;
+  }
+  .mat-checkbox-frame {
+    border: 1px solid #d1d5db !important;
+    border-radius: 4px !important;
+    background: #fff;
+  }
+  .mat-checkbox-checkmark-path { stroke: var(--figma-primary-600) !important; }
+}
+
+.gc-h__title {
+  flex: 1;
+  min-width: 0;
+  font-weight: 700;
+  font-size: var(--g-font-md);
+  color: #111827;
+  letter-spacing: .2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* right side: badge + toggle button */
+.gc-h__right {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.gc-badge {
+  font-size: var(--g-font-xs);
+  font-weight: 700;
+  padding: 1px 6px;
+  line-height: 1;
+  border-radius: 999px;
+  color: var(--figma-primary-700);
+  background: color-mix(in oklab, var(--figma-primary-700) 12%, #fff);
+  border: 1px solid color-mix(in oklab, var(--figma-primary-700) 28%, #fff);
+}
+
+/* toggle chevron */
+.gc-h__toggle {
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  padding: 2px;
+  cursor: pointer;
+}
+.gc-h__chev { opacity: .9; mat-icon, svg { width: 16px; height: 16px; } }
+
+/* body – *ngIf već rešava collapse; držimo basic paddings */
+.gc-b {
+  padding: 2px 0 6px;
+}
+
+/* children flat list */
+.gc-list {
+  margin: 0; padding: 0;
+  list-style: none;
+}
+
+/* child row */
+.gc-row {
+  border-top: 1px solid rgba(0,0,0,.05);
+
+  &:first-child { border-top: 1px solid rgba(0,0,0,.06); }
+}
+
+.gc-row__cb {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  min-height: 32px;
+  padding: 0 8px;
+  box-sizing: border-box;
+
+  font-size: var(--g-font-sm);
+  color: #374151;
+  background: #fff;
+  border-radius: 6px;
+
+  .mat-checkbox-inner-container {
+    width: 16px !important;
+    height: 16px !important;
+    margin-right: 10px;
+  }
+
+  &:hover { background: #f8fafc; }
+}
+
+.gc-row__label {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* dense mod (još manje) */
+.gc--dense {
+  .gc-h__title { font-size: var(--g-font-sm); }
+  .gc-row__cb  { min-height: 30px; }
+}
+
+/* manji ripple */
+::ng-deep .mat-checkbox .mat-checkbox-ripple,
+::ng-deep .mdc-checkbox__ripple { transform: scale(.8); }
