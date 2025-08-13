@@ -1585,15 +1585,14 @@ body {
 }
 
 .no-result {
+  align-items: center;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  width: 100%;
   max-width: 1050px;
   padding: 20px 15px;
-  margin: 0 auto;
-  align-items: center;
   text-align: center;
+  width: 100%;
 
   h5 {
     width: 100%;

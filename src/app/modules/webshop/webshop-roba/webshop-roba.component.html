@@ -20,33 +20,52 @@
   ></autom-table>
   <div
     *ngIf="!magacin?.robaDto?.content?.length && !loading"
-    class="util__flex--center util__height no-result"
+    class="empty-state"
   >
-    <h5 *ngIf="searchTerm">🔍 Nema rezultata za : "{{ searchTerm }}".</h5>
-    <h5 *ngIf="vehicleDetails && vehicleDetails?.linkageTargetId">
-      ✅ Filtrirano po vozilu : {{ vehicleDetails.mfrName }}
-      {{ vehicleDetails.hmdMfrModelName }} {{ vehicleDetails.description }}.
-    </h5>
-    <h5 *ngIf="assemblyGroupName">✅ Kategorija : {{ assemblyGroupName }}</h5>
-    <h5 *ngIf="filter.mandatoryProid && filter.mandatoryProid.length">
-      ✅ Filtrirano po proizvodjacu : {{ filter.mandatoryProid }}.
-    </h5>
-    <h5 *ngIf="filter.proizvodjaci && filter.proizvodjaci.length">
-      ✅ Filtrirano po proizvodjacu : {{ filter.proizvodjaci }}.
-    </h5>
-    <h5 *ngIf="filter.grupe && filter.grupe.length">
-      ✅ Filtrirano po grupi : {{ filter.grupe }}.
-    </h5>
-    <h5 *ngIf="filter.podgrupe && filter.podgrupe.length">
-      ✅ Filtrirano po kategoriji : {{ filter.podgrupe }}.
-    </h5>
-    <autom-button
-      class="autom-margin--top__s"
-      [label]="'Resetuj pretragu'"
-      [theme]="buttonThemes.DEFAULT"
-      [type]="buttonTypes.PRIMARY"
-      (clickEvent)="resetSearchTerm()"
-    ></autom-button>
+    <div class="empty-card">
+      <div class="ill" aria-hidden="true">
+        <autom-icon [source]="iconEnum.SEARCH"></autom-icon>
+      </div>
+
+      <h3 class="title">Nema rezultata</h3>
+
+      <p class="subtitle" *ngIf="searchTerm; else noSearchCopy">
+        Ne postoje rezultati za vašu pretragu
+        <strong>“{{ searchTerm }}”</strong>.
+      </p>
+      <ng-template #noSearchCopy>
+        <p class="subtitle">Nijedna stavka ne odgovara trenutnim filterima.</p>
+      </ng-template>
+
+      <!-- Active filters summary as chips -->
+      <div class="chips" *ngIf="activeChips?.length">
+        <span class="chip" *ngFor="let c of activeChips">{{ c }}</span>
+      </div>
+
+      <!-- Quick hints -->
+      <ul class="hints">
+        <li>Pokušajte sa drugim ključnim rečima ili kataloškim brojem.</li>
+        <li>Obrišite filtere ili proširite kategorije.</li>
+        <li>Proverite da li je uključen prikaz dostupnih proizvoda.</li>
+      </ul>
+
+      <!-- Actions -->
+      <div class="actions">
+        <autom-button
+          [label]="'Obriši sve filtere'"
+          [type]="buttonTypes.PRIMARY"
+          [theme]="buttonThemes.DEFAULT"
+          (clickEvent)="clearAllFilters()"
+        ></autom-button>
+
+        <autom-button
+          [label]="'Resetuj pretragu'"
+          [type]="buttonTypes.SECONDARY"
+          [theme]="buttonThemes.LIGHT_ORANGE"
+          (clickEvent)="resetSearchTerm()"
+        ></autom-button>
+      </div>
+    </div>
   </div>
   <div *ngIf="loading" class="spinner">
     <spinner></spinner>

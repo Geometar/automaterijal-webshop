@@ -171,7 +171,7 @@
       color: white;
 
       autom-icon svg path {
-        stroke: var(--figma-grey-700);
+        stroke: var(--figma-base-white) !important;
       }
 
       &:hover {
@@ -180,14 +180,10 @@
         color: white;
       }
 
-      &:disabled {
+      .crumb &:disabled {
         background: var(--figma-base-white);
         border-color: var(--figma-grey-200);
         color: var(--figma-grey-300);
-
-        autom-icon svg rect {
-          fill: var(--figma-grey-300);
-        }
       }
     }
 
@@ -242,33 +238,6 @@
       // :normal
       background: var(--figma-base-white);
       border-color: var(--figma-grey-300);
-      color: var(--figma-grey-700);
-
-      autom-icon svg path {
-        stroke: var(--figma-grey-700);
-      }
-
-      &:hover {
-        background: var(--figma-grey-50);
-        border-color: var(--figma-grey-300);
-        color: var(--figma-grey-800);
-      }
-
-      &:disabled {
-        background: var(--figma-base-white);
-        border-color: var(--figma-grey-200);
-        color: var(--figma-grey-300);
-
-        autom-icon svg rect {
-          fill: var(--figma-grey-300);
-        }
-      }
-    }
-
-    &[theme~="blue"] {
-      // :normal
-      background: var(--figma-base-white);
-      border-color: var(--figma-primary-500);
       color: var(--figma-grey-700);
 
       autom-icon svg path {

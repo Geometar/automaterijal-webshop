@@ -2,11 +2,12 @@
 <autom-button
   *ngIf="isMobileView() && !openFilterPopup"
   class="mobile-filter-btn"
-  [label]="'Filteri'"
-  [type]="buttonTypes.PRIMARY"
-  [theme]="buttonThemes.DEFAULT"
-  [iconSource]="iconEnums.FILTER"
+  [iconColor]="colorEnum.INFO_25"
   [iconPrefix]="true"
+  [iconSource]="iconEnums.FILTER"
+  [label]="'Filteri'"
+  [theme]="buttonThemes.DEFAULT"
+  [type]="buttonTypes.PRIMARY"
   (clickEvent)="openFilterPopup = true"
 >
 </autom-button>

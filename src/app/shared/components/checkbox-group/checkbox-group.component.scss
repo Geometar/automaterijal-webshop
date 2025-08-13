@@ -1,23 +1,9 @@
-/* ===== Sidebar accordion – compact, reliable collapse ===== */
+/* ================================
+   E‑commerce Sidebar (Material 18)
+   Compact, readable, 320px‑safe
+   ================================ */
 
-/* tunables */
-:root {
-  --g-font-xs: 11.5px;
-  --g-font-sm: 12.5px;
-  --g-font-md: 13.5px;
-  --g-pad-xs: 6px;
-  --g-pad-sm: 8px;
-  --g-pad-md: 12px;
-  --g-sep: rgba(0,0,0,.08);
-}
-
-/* title */
-.gc-section-title {
-  display: block;
-  margin: 0 0 6px;
-  font-weight: 700;
-  font-size: var(--g-font-md);a/* ===== E‑commerce sidebar filter (compact) ===== */
-
+/* Tunables */
 :root {
   --g-font-xs: 11.5px;
   --g-font-sm: 12.5px;
@@ -26,11 +12,11 @@
   --g-pad-xxs: 4px;
   --g-pad-xs: 6px;
   --g-pad-sm: 8px;
-  --g-pad-md: 12px;
 
   --g-sep: rgba(0,0,0,.08);
 }
 
+/* Title above the accordion */
 .gc-title {
   display: block;
   margin: 0 0 6px;
@@ -47,13 +33,13 @@
   box-sizing: border-box;
 }
 
-/* Group = divider‑based block */
+/* One group block */
 .gc-group {
   border-bottom: 1px solid var(--g-sep);
   background: #fff;
 }
 
-/* Header row: 2 kolone -> label (flex) + tools (fixed) */
+/* Group header: label + tools (badge + chevron) */
 .gc-h {
   width: 100%;
   max-width: 100%;
@@ -68,28 +54,25 @@
   &:hover { background: #fafafa; }
 }
 
-/* Checkbox + label area */
+/* Master checkbox + label (Material 18‑friendly) */
 .gc-h__cb {
   display: flex;
   align-items: center;
-  min-height: 32px;            /* veliki tap target, malo vertikalno */
-  min-width: 0;                /* važno za ellipsis */
+  min-height: 32px;
+  min-width: 0; /* enables ellipsis */
+
+  /* Keep these selectors minimal so they survive Material updates */
+  :is(.mat-mdc-checkbox .mdc-checkbox) {
+    /* leave internals alone; rely on spacing below */
+  }
+
+  /* Spacing next to the box without poking internals too much */
+  ::ng-deep .mat-mdc-checkbox .mdc-checkbox {
+    margin-right: 10px;
+  }
 }
 
-.gc-h__cb .mat-checkbox-inner-container {
-  width: 16px !important;
-  height: 16px !important;
-  margin-right: 10px;
-}
-
-.gc-h__cb .mat-checkbox-frame {
-  border: 1px solid #d1d5db !important;
-  border-radius: 4px !important;
-  background: #fff;
-}
-.gc-h__cb .mat-checkbox-checkmark-path { stroke: var(--figma-primary-600) !important; }
-
-/* Label: ellipsis + tooltip */
+/* Parent label: bold + ellipsis */
 .gc-h__label {
   display: inline-block;
   flex: 1;
@@ -101,19 +84,19 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-transform: none;        /* izbegni pucanje dijakritika */
+  text-transform: none; /* keep diacritics safe */
 }
 
-/* Tools area: fiksna širina da CHEVRON ne “pobegne” desno */
+/* Right tools area: fixed width so chevron never overflows */
 .gc-h__tools {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   flex-shrink: 0;
-  max-width: 96px;             /* rezerviši desni stub za badge + chevron */
+  max-width: 96px;
 }
 
-/* Small count badge */
+/* Count badge */
 .gc-badge {
   font-size: var(--g-font-xs);
   font-weight: 700;
@@ -125,7 +108,7 @@
   border: 1px solid color-mix(in oklab, var(--figma-primary-700) 28%, #fff);
 }
 
-/* Chevron button (klik za collapse) */
+/* Chevron button */
 .gc-toggle {
   display: grid;
   place-items: center;
@@ -137,7 +120,7 @@
 .gc-chev { opacity: .9; }
 .gc-chev mat-icon, .gc-chev svg { width: 16px; height: 16px; }
 
-/* Body (lista childova) */
+/* Body */
 .gc-b { padding: 2px 0 6px; }
 
 .gc-list {
@@ -146,7 +129,7 @@
   list-style: none;
 }
 
-/* Jedan child red */
+/* Child row (flat) */
 .gc-row {
   border-top: 1px solid rgba(0,0,0,.05);
 
@@ -167,9 +150,8 @@
   background: #fff;
   border-radius: 6px;
 
-  .mat-checkbox-inner-container {
-    width: 16px !important;
-    height: 16px !important;
+  /* Give the checkbox a bit of breathing room in a Material‑safe way */
+  ::ng-deep .mat-mdc-checkbox .mdc-checkbox {
     margin-right: 10px;
   }
 
@@ -186,162 +168,40 @@
   text-transform: none;
 }
 
-/* Dense mode (još kompaktnije) */
+/* Dense mode (tighter) */
 .gc--dense {
   .gc-h__label { font-size: var(--g-font-sm); }
   .gc-row__cb  { min-height: 30px; }
 }
 
-/* Smaller ripple */
-::ng-deep .mat-checkbox .mat-checkbox-ripple,
-::ng-deep .mdc-checkbox__ripple { transform: scale(.8); }
-}
+/* ============ Visual differentiation: parent vs children ============ */
 
-/* root */
-.gc.gc--sidebar {
-  display: grid;
-  gap: 0;                 /* nema rupe između grupa */
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-/* single group */
-.gc-group {
-  border-bottom: 1px solid var(--g-sep);
-  background: #fff;
-}
-
-/* header row (kompaktno, 320px safe) */
+/* Parent “card” feel + left accent */
 .gc-h {
-  width: 100%;
-  max-width: 100%;
-  padding: var(--g-pad-xs) 8px; /* smanjen padding da sve staje */
-  box-sizing: border-box;
-
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: 8px;
-
-  &:hover { background: #fafafa; }
+  position: relative;
+  border-radius: 10px;
+}
+.gc-h::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 6px; bottom: 6px;
+  width: 3px;
+  border-radius: 3px;
+  background: #cbd5e1; /* neutral by default */
 }
 
-/* checkbox + title */
-.gc-h__cb {
-  display: flex;
-  align-items: center;
-  min-height: 32px;
-
-  .mat-checkbox-inner-container {
-    width: 16px !important;
-    height: 16px !important;
-    margin-right: 10px;
+/* When there are selected children -> accent color on the parent */
+@supports(selector(:has(*))) {
+  .gc-group:has(.gc-badge:not(:empty)) .gc-h::before {
+    background: var(--figma-primary-600);
   }
-  .mat-checkbox-frame {
-    border: 1px solid #d1d5db !important;
-    border-radius: 4px !important;
-    background: #fff;
-  }
-  .mat-checkbox-checkmark-path { stroke: var(--figma-primary-600) !important; }
 }
 
-.gc-h__title {
-  flex: 1;
-  min-width: 0;
-  font-weight: 700;
-  font-size: var(--g-font-md);
-  color: #111827;
-  letter-spacing: .2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+/* Optional fallback (if želiš 100% bez :has):
+   dodaj klasu .has-selected na .gc-group iz TS-a kad countSelected(task)>0
+.gc-group.has-selected .gc-h::before { background: var(--figma-primary-600); }
+*/
 
-/* right side: badge + toggle button */
-.gc-h__right {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
-.gc-badge {
-  font-size: var(--g-font-xs);
-  font-weight: 700;
-  padding: 1px 6px;
-  line-height: 1;
-  border-radius: 999px;
-  color: var(--figma-primary-700);
-  background: color-mix(in oklab, var(--figma-primary-700) 12%, #fff);
-  border: 1px solid color-mix(in oklab, var(--figma-primary-700) 28%, #fff);
-}
-
-/* toggle chevron */
-.gc-h__toggle {
-  display: grid;
-  place-items: center;
-  border: 0;
-  background: transparent;
-  padding: 2px;
-  cursor: pointer;
-}
-.gc-h__chev { opacity: .9; mat-icon, svg { width: 16px; height: 16px; } }
-
-/* body – *ngIf već rešava collapse; držimo basic paddings */
-.gc-b {
-  padding: 2px 0 6px;
-}
-
-/* children flat list */
-.gc-list {
-  margin: 0; padding: 0;
-  list-style: none;
-}
-
-/* child row */
-.gc-row {
-  border-top: 1px solid rgba(0,0,0,.05);
-
-  &:first-child { border-top: 1px solid rgba(0,0,0,.06); }
-}
-
-.gc-row__cb {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  max-width: 100%;
-  min-height: 32px;
-  padding: 0 8px;
-  box-sizing: border-box;
-
-  font-size: var(--g-font-sm);
-  color: #374151;
-  background: #fff;
-  border-radius: 6px;
-
-  .mat-checkbox-inner-container {
-    width: 16px !important;
-    height: 16px !important;
-    margin-right: 10px;
-  }
-
-  &:hover { background: #f8fafc; }
-}
-
-.gc-row__label {
-  flex: 1;
-  min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* dense mod (još manje) */
-.gc--dense {
-  .gc-h__title { font-size: var(--g-font-sm); }
-  .gc-row__cb  { min-height: 30px; }
-}
-
-/* manji ripple */
-::ng-deep .mat-checkbox .mat-checkbox-ripple,
-::ng-deep .mdc-checkbox__ripple { transform: scale(.8); }
+/* Smaller ripples (subtle) */
+::ng-deep .mat-mdc-checkbox .mat-mdc-focus-indicator,
+::ng-deep .mdc-checkbox__ripple { transform: scale(.86); }

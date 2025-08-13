@@ -1,9 +1,13 @@
 <autom-label *ngIf="label" [label]="label" class="gc-title"></autom-label>
 
-<section class="gc gc--sidebar gc--dense">
+<section class="gc gc--sidebar gc--dense" role="tree">
   <ng-container *ngFor="let task of tasks(); let i = index">
-    <article class="gc-group">
-      <!-- HEADER: checkbox + label + right tools (badge + chevron) -->
+    <article
+      class="gc-group"
+      role="treeitem"
+      [attr.aria-expanded]="task.expanded"
+    >
+      <!-- HEADER: group master -->
       <div class="gc-h">
         <mat-checkbox
           class="gc-h__cb"
@@ -25,6 +29,7 @@
           <button
             class="gc-toggle"
             type="button"
+            [attr.aria-label]="task.expanded ? 'Sažmi' : 'Proširi'"
             [attr.aria-expanded]="task.expanded"
             (click)="toggleExpand(i)"
           >
@@ -33,16 +38,19 @@
               [source]="
                 task.expanded ? iconsEnum.CHEVRON_UP : iconsEnum.CHEVRON_DOWN
               "
-            >
-            </autom-icon>
+            ></autom-icon>
           </button>
         </div>
       </div>
 
-      <!-- BODY: *ngIf collapse (stabilno, bez trzaja) -->
+      <!-- BODY: children -->
       <div class="gc-b" *ngIf="task.expanded">
-        <ul class="gc-list">
-          <li *ngFor="let sub of task.subtasks; let j = index" class="gc-row">
+        <ul class="gc-list" role="group">
+          <li
+            *ngFor="let sub of task.subtasks; let j = index"
+            class="gc-row"
+            role="treeitem"
+          >
             <mat-checkbox
               class="gc-row__cb"
               [checked]="sub.completed"
@@ -55,14 +63,6 @@
             </mat-checkbox>
           </li>
         </ul>
-
-        <!-- Optional: Show more/less for very long child lists -->
-        <!--
-        <div class="gc-actions" *ngIf="(task.subtasks?.length || 0) > 12">
-          <button type="button" class="gc-more">Prikaži još</button>
-          <button type="button" class="gc-less">Manje</button>
-        </div>
-        -->
       </div>
     </article>
   </ng-container>

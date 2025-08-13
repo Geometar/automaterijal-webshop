@@ -13,15 +13,17 @@ import { TableComponent } from '../../../shared/components/table/table.component
 import { WebshopCategoryComponent } from '../webshop-category/webshop-category.component';
 
 // Enums
-import { ButtonThemes, ButtonTypes } from '../../../shared/data-models/enums';
+import { ButtonThemes, ButtonTypes, IconsEnum } from '../../../shared/data-models/enums';
 
 // Services
 import { UrlHelperService } from '../../../shared/service/utils/url-helper.service';
+import { MatIconModule } from '@angular/material/icon';
+import { AutomIconComponent } from '../../../shared/components/autom-icon/autom-icon.component';
 
 @Component({
   selector: 'webshop-roba',
   standalone: true,
-  imports: [CommonModule, TableComponent, WebshopCategoryComponent, SpinnerComponent, ButtonComponent],
+  imports: [AutomIconComponent, CommonModule, TableComponent, WebshopCategoryComponent, SpinnerComponent, ButtonComponent],
   templateUrl: './webshop-roba.component.html',
   styleUrl: './webshop-roba.component.scss',
 })
@@ -39,6 +41,7 @@ export class WebshopRobaComponent {
   // Enums
   buttonThemes = ButtonThemes;
   buttonTypes = ButtonTypes;
+  iconEnum = IconsEnum;
 
   constructor(private urlHelperService: UrlHelperService) { }
 
@@ -49,4 +52,42 @@ export class WebshopRobaComponent {
   resetSearchTerm(): void {
     this.urlHelperService.removeQueryParams(['searchTerm', 'podgrupe', 'proizvodjaci', 'naStanju']);
   }
+
+  // Build concise chips for active filters
+  get activeChips(): string[] {
+    const chips: string[] = [];
+
+    if (this.searchTerm?.trim()) {
+      chips.push(`Pretraga: “${this.searchTerm.trim()}”`);
+    }
+    if (this.vehicleDetails?.linkageTargetId) {
+      const v = this.vehicleDetails;
+      chips.push(`Vozilo: ${v.mfrName} ${v.vehicleModelSeriesName ?? v.hmdMfrModelName ?? ''} ${v.description ?? ''}`.trim());
+    }
+    if (this.assemblyGroupName) {
+      chips.push(`Kategorija: ${this.assemblyGroupName}`);
+    }
+    if (this.filter?.mandatoryProid?.length) {
+      chips.push(`Brend: ${this.filter.mandatoryProid.join(', ')}`);
+    }
+    if (this.filter?.proizvodjaci?.length) {
+      chips.push(`Proizvođači: ${this.filter.proizvodjaci.length}`);
+    }
+    if (this.filter?.grupe?.length) {
+      chips.push(`Grupe: ${this.filter.grupe.join(', ')}`);
+    }
+    if (this.filter?.podgrupe?.length) {
+      chips.push(`Podgrupe: ${this.filter.podgrupe.join(', ')}`);
+    }
+    if (this.filter?.naStanju === true) {
+      chips.push('Samo na stanju');
+    }
+    return chips;
+  }
+
+  // Clear all filters & search in one go (URL-based like ostatak)
+  clearAllFilters(): void {
+    this.urlHelperService.removeQueryParams(['podgrupe', 'proizvodjaci', 'naStanju']);
+  }
+
 }
