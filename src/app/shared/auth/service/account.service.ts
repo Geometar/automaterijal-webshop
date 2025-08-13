@@ -5,8 +5,8 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environment/environment';
 
 // Services
+import { AccountStateService } from '../../service/state/account-state.service';
 import { ServiceHelpersService } from '../../service/utils/service-helpers.service';
-import { AccountStateService } from '../../service/utils/account-state.service';
 
 const PARTNER_URL = environment.apiUrl + '/api/partner';
 

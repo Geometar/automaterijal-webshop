@@ -8,7 +8,7 @@ import { throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 
 // Services
-import { AccountStateService } from '../../service/utils/account-state.service';
+import { AccountStateService } from '../../service/state/account-state.service';
 import { AccountService } from '../service/account.service';
 
 export const authInterceptor: HttpInterceptorFn = (request, next) => {

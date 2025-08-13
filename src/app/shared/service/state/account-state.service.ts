@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { LocalStorageService } from 'ngx-webstorage';
+
+// Data models
 import { Account } from '../../data-models/model';
 
 @Injectable({

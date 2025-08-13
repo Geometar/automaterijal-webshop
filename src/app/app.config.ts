@@ -23,7 +23,7 @@ import { routes } from './app.routes';
 
 // Services
 import { AccountService } from './shared/auth/service/account.service';
-import { AccountStateService } from './shared/service/utils/account-state.service';
+import { AccountStateService } from './shared/service/state/account-state.service';
 
 
 export const appInitializer = (

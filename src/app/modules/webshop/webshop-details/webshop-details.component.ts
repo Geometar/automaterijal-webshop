@@ -40,8 +40,8 @@ import { TextAreaComponent } from '../../../shared/components/text-area/text-are
 import { YouTubePlayer } from '@angular/youtube-player';
 
 // Services
-import { AccountStateService } from '../../../shared/service/utils/account-state.service';
-import { CartStateService } from '../../../shared/service/utils/cart-state.service';
+import { AccountStateService } from '../../../shared/service/state/account-state.service';
+import { CartStateService } from '../../../shared/service/state/cart-state.service';
 import { PictureService } from '../../../shared/service/utils/picture.service';
 import { RobaService } from '../../../shared/service/roba.service';
 import { SeoService } from '../../../shared/service/seo.service';

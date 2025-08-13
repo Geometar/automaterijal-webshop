@@ -27,6 +27,16 @@
           (customActionEvent)="emitValue($event)"
           (emitSelected)="searchTerm = $event"
         ></autom-input-fields>
+        <autom-button
+          [iconSource]="iconEnum.STOCK"
+          [iconPrefix]="true"
+          [iconColor]="colorEnum.INFO_25"
+          [type]="buttonType.PRIMARY"
+          [theme]="buttonTheme.LIGHT_ORANGE"
+          [label]="'Kategorije'"
+          (clickEvent)="chooseCategoryVisible = true"
+        >
+        </autom-button>
       </div>
     </div>
     <div *ngIf="secondNavigation" class="util__flex--center">
@@ -58,3 +68,10 @@
   (emitVehicle)="handleSelectedVehicle($event)"
 >
 </vehicle-selection-popup>
+<categories-popup
+  *ngIf="chooseCategoryVisible"
+  [open]="chooseCategoryVisible"
+  (categorySelected)="categorySelected($event)"
+  (close)="chooseCategoryVisible = false"
+>
+</categories-popup>

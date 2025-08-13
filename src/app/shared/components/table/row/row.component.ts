@@ -25,8 +25,8 @@ import {
 import { RsdCurrencyPipe } from '../../../pipe/rsd-currency.pipe';
 
 // Services
-import { AccountStateService } from '../../../service/utils/account-state.service';
-import { CartStateService } from '../../../service/utils/cart-state.service';
+import { AccountStateService } from '../../../service/state/account-state.service';
+import { CartStateService } from '../../../service/state/cart-state.service';
 import { SnackbarService } from '../../../service/utils/snackbar.service';
 
 @Component({

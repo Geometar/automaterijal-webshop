@@ -22,7 +22,7 @@ import {
 import { ColorEnum, IconsEnum } from '../../../../shared/data-models/enums';
 
 // Service
-import { AccountStateService } from '../../../../shared/service/utils/account-state.service';
+import { AccountStateService } from '../../../../shared/service/state/account-state.service';
 import { InvoiceService } from '../../../../shared/service/invoice.service';
 import { PictureService } from '../../../../shared/service/utils/picture.service';
 

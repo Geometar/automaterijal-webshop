@@ -12,6 +12,7 @@ import { CommonModule } from '@angular/common';
 
 // Component Imports
 import { ButtonComponent } from '../../../shared/components/button/button.component';
+import { CategoriesPopupComponent, CategoryPick } from '../../../shared/components/ui/categories-popup/categories-popup.component';
 import { InputFieldsComponent } from '../../../shared/components/input-fields/input-fields.component';
 import { VehicleSelectionPopupComponent } from '../../../shared/components/ui/vehicle-selection-popup/vehicle-selection-popup.component';
 
@@ -46,6 +47,7 @@ export class NavTitles {
     CommonModule,
     InputFieldsComponent,
     VehicleSelectionPopupComponent,
+    CategoriesPopupComponent
   ],
   templateUrl: './webshop-nav.component.html',
   styleUrl: './webshop-nav.component.scss',
@@ -70,6 +72,7 @@ export class WebshopNavComponent implements OnChanges {
 
   // Misc
   chooseVehicleVisible = false;
+  chooseCategoryVisible = false;
 
   // Consts
   categories: Categories[] = [];
@@ -139,6 +142,25 @@ export class WebshopNavComponent implements OnChanges {
       return;
     }
     this.selectedVehicleDetailsEmit.emit(vehicleDetails);
+  }
+
+  categorySelected(ev: CategoryPick): void {
+    const current = this.urlHelperService.readQueryParams();
+
+    const next = {
+      ...current,
+      tecdocId: null,
+      tecdocType: null,
+      assembleGroupId: null,
+      assemblyGroupName: null,
+      grupe: ev.groupId ?? null,
+      podgrupe: ev.kind === 'subgroup' ? ev.subGroupId ?? null : null,
+      page: 0,
+      searchTerm: null,
+    };
+
+    this.urlHelperService.setQueryParams(next);
+    this.chooseCategoryVisible = false;
   }
 
   goToMainPage(): void {

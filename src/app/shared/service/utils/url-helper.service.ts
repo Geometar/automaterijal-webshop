@@ -6,131 +6,105 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 })
 export class UrlHelperService {
 
-  constructor(private activatedRoute: ActivatedRoute, private router: Router) { }
+  constructor(
+    private activatedRoute: ActivatedRoute,
+    private router: Router
+  ) { }
 
   /**
-   * Adds or updates query parameters in the current URL
-   * @param params Object containing query parameters to add or update
+   * Adds or updates query parameters in the current URL.
+   * Passing null/undefined/'' will remove the parameter.
    */
   addOrUpdateQueryParams(params: { [key: string]: any }): void {
-    const queryParams: { [key: string]: string | string[] } = {};
+    const merged = { ...this.activatedRoute.snapshot.queryParams };
 
-    Object.keys(params).forEach((key) => {
-      const value = params[key];
-      if (Array.isArray(value)) {
-        queryParams[key] = value.join(','); // Directly assign arrays to let Angular handle them as `key=value1&key=value2`
-      } else if (value !== null && value !== undefined) {
-        queryParams[key] = String(value); // Convert non-array values to strings
+    Object.keys(params).forEach(key => {
+      const v = params[key];
+      if (v === null || v === undefined || v === '') {
+        delete merged[key];
+      } else if (Array.isArray(v)) {
+        merged[key] = v.join(','); // join array to CSV
+      } else {
+        merged[key] = String(v);
       }
     });
 
     this.router.navigate([], {
-      queryParams,
-      queryParamsHandling: 'merge', // Merge with existing query parameters
+      relativeTo: this.activatedRoute,
+      queryParams: merged,
+      queryParamsHandling: ''
     });
   }
 
   /**
- * Clears all existing query parameters and sets new ones
- * @param params Object containing new query parameters
- */
+   * Clears all existing query parameters and sets new ones.
+   * Passing null/undefined/'' will skip that param.
+   */
   setQueryParams(params: { [key: string]: any }): void {
-    const queryParams: { [key: string]: string | string[] } = {};
+    const next: { [key: string]: string } = {};
 
-    Object.keys(params).forEach((key) => {
-      const value = params[key];
-      if (Array.isArray(value)) {
-        queryParams[key] = value.join(','); // Handle arrays as comma-separated values
-      } else if (value !== null && value !== undefined) {
-        queryParams[key] = String(value); // Convert non-array values to strings
+    Object.keys(params).forEach(key => {
+      const v = params[key];
+      if (v !== null && v !== undefined && v !== '') {
+        next[key] = Array.isArray(v) ? v.join(',') : String(v);
       }
     });
 
     this.router.navigate([], {
-      queryParams,
-      queryParamsHandling: '', // Clear existing parameters and replace with new ones
+      relativeTo: this.activatedRoute,
+      queryParams: next,
+      queryParamsHandling: ''
     });
   }
 
-
-  /**
-   * Removes a query parameter from the current URL
-   * @param paramName The name of the query parameter to remove
-   */
+  /** Removes a single query parameter (case-insensitive). */
   removeQueryParam(paramName: string): void {
-    const queryParams = { ...this.activatedRoute.snapshot.queryParams }; // Get the current query parameters
-    const targetParam = paramName.toLowerCase(); // Convert the parameter name to lowercase
-
-    // Find the key in queryParams matching targetParam in a case-insensitive way
-    const matchedKey = Object.keys(queryParams).find(
-      key => key.toLowerCase() === targetParam
-    );
-
-    if (matchedKey) {
-      delete queryParams[matchedKey]; // Remove the matched parameter
-      this.router.navigate([], {
-        queryParams,
-        queryParamsHandling: '', // Do not merge with existing query parameters
-      });
-    }
+    this.removeQueryParams([paramName]);
   }
 
-  /**
- * Removes multiple query parameters from the current URL.
- * @param paramNames An array of query parameter names to remove.
- */
+  /** Removes multiple query parameters (case-insensitive). */
   removeQueryParams(paramNames: string[]): void {
-    const queryParams = { ...this.activatedRoute.snapshot.queryParams }; // Copy current query params
-    const lowerCaseParams = paramNames.map(param => param.toLowerCase()); // Convert to lowercase for case-insensitivity
+    const merged = { ...this.activatedRoute.snapshot.queryParams };
+    const targets = paramNames.map(p => p.toLowerCase());
 
-    // Remove all matching keys
-    Object.keys(queryParams).forEach(key => {
-      if (lowerCaseParams.includes(key.toLowerCase())) {
-        delete queryParams[key];
+    Object.keys(merged).forEach(k => {
+      if (targets.includes(k.toLowerCase())) {
+        delete merged[k];
       }
     });
 
-    // Update the URL without the removed parameters
     this.router.navigate([], {
-      queryParams,
-      queryParamsHandling: '', // Do not merge with existing query parameters
+      relativeTo: this.activatedRoute,
+      queryParams: merged,
+      queryParamsHandling: ''
     });
   }
 
-  /**
- * Keeps only the specified query parameters and removes all others.
- * @param paramNames Names of the parameters to retain.
- */
+  /** Keeps only the specified query parameters and removes all others. */
   retainOnlyQueryParams(paramNames: string[]): void {
-    const currentParams = this.activatedRoute.snapshot.queryParams;
-    const retainedParams: { [key: string]: string } = {};
+    const current = this.activatedRoute.snapshot.queryParams;
+    const retained: { [key: string]: string } = {};
 
-    paramNames.forEach((key) => {
-      const value = currentParams[key];
-      if (value !== undefined) {
-        retainedParams[key] = value;
+    paramNames.forEach(k => {
+      const v = current[k];
+      if (v !== undefined) {
+        retained[k] = v;
       }
     });
 
     this.router.navigate([], {
-      queryParams: retainedParams,
-      queryParamsHandling: '', // Replace all query parameters
+      relativeTo: this.activatedRoute,
+      queryParams: retained,
+      queryParamsHandling: ''
     });
   }
 
-  /**
-   * Reads query parameters from the current route
-   * @returns An object containing all query parameters
-   */
+  /** Reads query parameters from the current route snapshot. */
   readQueryParams(): Params {
     return this.activatedRoute.snapshot.queryParams;
   }
 
-  /**
-   * Reads query parameters from a given URL
-   * @param url The URL to extract query parameters from
-   * @returns An object containing query parameters
-   */
+  /** Parses query parameters from a given URL string. */
   parseQueryParamsFromUrl(url: string): { [key: string]: string } {
     const params: { [key: string]: string } = {};
     const queryString = new URL(url, window.location.origin).search;
@@ -140,24 +114,27 @@ export class UrlHelperService {
     return params;
   }
 
-  /**
- * Clears all query parameters in the current URL
- */
+  /** Clears all query parameters from the current URL. */
   clearQueryParams(): void {
     this.router.navigate([], {
-      queryParams: {}, // Pass an empty object to clear all query parameters
-      queryParamsHandling: '', // This ensures existing parameters are not merged
+      relativeTo: this.activatedRoute,
+      queryParams: {},
+      queryParamsHandling: ''
     });
   }
 
-  /**
-   * Checks if a specific query parameter exists and has data
-   * @param paramName The name of the query parameter to check
-   * @returns True if the query parameter exists and has data, otherwise false
-   */
+  /** Checks if a query parameter exists and is non-empty. */
   hasQueryParam(paramName: string): boolean {
-    const queryParams = this.activatedRoute.snapshot.queryParams;
-    const value = queryParams[paramName];
-    return value !== undefined && value !== null && value.trim() !== '';
+    const v = this.activatedRoute.snapshot.queryParams[paramName];
+    if (v === null || v === undefined) return false;
+    return String(v).trim() !== '';
+  }
+
+  /** QoL helper: set category selection (group + optional subgroup). */
+  setCategorySelection(groupId?: string, subGroupId?: number): void {
+    this.addOrUpdateQueryParams({
+      grupe: groupId ?? null,
+      podgrupe: subGroupId ?? null
+    });
   }
 }

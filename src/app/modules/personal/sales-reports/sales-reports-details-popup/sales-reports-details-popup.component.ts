@@ -48,7 +48,7 @@ import {
 } from '../../../../shared/data-models/enums';
 
 // Services
-import { AccountStateService } from '../../../../shared/service/utils/account-state.service';
+import { AccountStateService } from '../../../../shared/service/state/account-state.service';
 import { SalesReportsService } from '../../../../shared/service/sales-reports.service';
 import { SnackbarService } from '../../../../shared/service/utils/snackbar.service';
 

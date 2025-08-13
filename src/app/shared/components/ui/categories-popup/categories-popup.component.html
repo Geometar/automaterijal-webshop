@@ -1,0 +1,74 @@
+<autom-popup
+  class="categories-selection"
+  *ngIf="open"
+  [height]="sizeEnum.FULL_VH"
+  [position]="positionEnum.LEFT"
+  [width]="sizeEnum.EXTRA_LARGE"
+  [rounded]="false"
+  (close)="close.emit()"
+>
+  <!-- HEADER SLOT -->
+  <div custom-header class="cp-header">
+    <h3 class="cp-title">{{ title }}</h3>
+
+    <autom-input-fields
+      class="cp-search-input"
+      [type]="inputTypeEnum.SEARCH"
+      [label]="'Pretraži kategorije...'"
+      (emitSelected)="onSearch($event)"
+    ></autom-input-fields>
+
+    <autom-icon
+      class="cp-close"
+      [color]="colorEnum.GREY_400"
+      [source]="iconsEnum.X"
+      (click)="close.emit()"
+    ></autom-icon>
+  </div>
+
+  <!-- BODY SLOT -->
+  <div custom-body class="cp-body" role="tree">
+    <ng-container *ngIf="filtered() as groups">
+      <!-- One-column accordion (group -> subgroups). Modern, clean, responsive. -->
+      <div
+        *ngFor="let g of groups; trackBy: trackGroup"
+        class="cp-group"
+        role="treeitem"
+        [attr.aria-expanded]="expanded().has(g.groupId || '')"
+      >
+        <!-- Group row -->
+        <button class="cp-group-row" (click)="toggle(g.groupId)">
+          <i
+            class="cp-chevron"
+            [class.expanded]="expanded().has(g.groupId || '')"
+          ></i>
+          <span class="cp-group-name">{{ g.name }}</span>
+        </button>
+
+        <!-- Children -->
+        <div class="cp-children" *ngIf="expanded().has(g.groupId || '')">
+          <button
+            *ngFor="let s of g.articleSubGroups; trackBy: trackSub"
+            class="cp-leaf"
+            (click)="pickSub(s)"
+            role="treeitem"
+          >
+            <span class="cp-leaf-dot"></span>
+            <span class="cp-leaf-name">{{ s.name }}</span>
+          </button>
+
+          <!-- Optional: pick the whole group -->
+          <button class="cp-leaf cp-all" (click)="pickGroup(g)" role="treeitem">
+            <span class="cp-leaf-dot"></span>
+            <span class="cp-leaf-name">Sve iz: {{ g.name }}</span>
+          </button>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Empty state -->
+    <div class="cp-empty" *ngIf="!filtered()?.length">
+      Nema rezultata za zadatu pretragu.
+    </div>
+  </div>
+</autom-popup>

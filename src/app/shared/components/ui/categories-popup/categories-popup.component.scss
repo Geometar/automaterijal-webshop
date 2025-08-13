@@ -1,0 +1,165 @@
+/* Popup base */
+.categories-selection {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: linear-gradient(to bottom, #ffffff, #f9f9f9);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Header styling */
+.cp-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 20px;
+  background: #fff;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+
+  .cp-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #222;
+  }
+
+  .cp-search-input {
+    width: 100%;
+  }
+
+  .cp-close {
+    position: absolute;
+    top: 14px;
+    right: 20px;
+    cursor: pointer;
+    transition: transform 0.2s;
+    &:hover { transform: rotate(90deg); }
+  }
+}
+
+/* Body styling */
+.cp-body {
+  max-height: calc(100vh - 70px);
+  overflow-y: auto;
+  padding: 12px;
+  width: 100%;
+}
+
+/* Group row */
+.cp-group {
+  border-radius: 10px;
+  margin-bottom: 8px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+
+.cp-group-row {
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  outline: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: #444;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 102, 0, 0.08); /* orange tint on hover */
+    color: #ff6600;
+  }
+}
+
+/* Chevron icon */
+.cp-chevron {
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid #666;
+  border-bottom: 2px solid #666;
+  transform: rotate(-45deg);
+  transition: transform 0.2s ease;
+
+  &.expanded {
+    transform: rotate(45deg);
+  }
+}
+
+/* Children list */
+.cp-children {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 10px 12px 32px;
+  background: #fafafa;
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+/* Subgroup buttons */
+.cp-leaf {
+  padding: 6px 10px;
+  background: #fff;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: #333;
+  border: 1px solid rgba(0,0,0,0.06);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #ff6600;
+    color: #fff;
+    border-color: #ff6600;
+  }
+}
+
+.cp-leaf-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: #ff6600;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.cp-leaf-name {
+  vertical-align: middle;
+}
+
+/* All in group special button */
+.cp-all {
+  font-style: italic;
+  color: #666;
+  border-style: dashed;
+  &:hover {
+    background: rgba(0,0,0,0.05);
+    color: #222;
+  }
+}
+
+/* Empty state */
+.cp-empty {
+  text-align: center;
+  color: #999;
+  font-size: 0.9rem;
+  padding: 20px;
+}
+
+/* Scrollbar styling for better UX */
+.cp-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.cp-body::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.15);
+  border-radius: 4px;
+}
+
+.cp-body::-webkit-scrollbar-track {
+  background: transparent;
+}

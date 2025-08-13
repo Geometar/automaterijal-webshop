@@ -26,7 +26,7 @@ import { InputFieldsComponent } from "../../../shared/components/input-fields/in
 import { TableFlatComponent } from '../../../shared/components/table-flat/table-flat.component';
 
 // Services
-import { AccountStateService } from '../../../shared/service/utils/account-state.service';
+import { AccountStateService } from '../../../shared/service/state/account-state.service';
 import { InvoiceService } from '../../../shared/service/invoice.service';
 import { UrlHelperService } from '../../../shared/service/utils/url-helper.service';
 

@@ -16,13 +16,13 @@ import { TablePage } from '../../shared/data-models/model/page';
 import { TDVehicleDetails } from '../../shared/data-models/model/tecdoc';
 
 // Services
-import { CartStateService } from '../../shared/service/utils/cart-state.service';
+import { CartStateService } from '../../shared/service/state/cart-state.service';
 import { PictureService } from '../../shared/service/utils/picture.service';
 import { RobaService } from '../../shared/service/roba.service';
 import { SpinnerComponent } from '../../shared/components/spinner/spinner.component';
 import { TecdocService } from '../../shared/service/tecdoc.service';
 import { WebshopLogicService } from '../../shared/service/utils/webshop-logic.service';
-import { WebshopStateService } from '../../shared/service/utils/webshop-state.service';
+import { WebshopStateService } from '../../shared/service/state/webshop-state.service';
 import { SeoService } from '../../shared/service/seo.service';
 
 export enum WebShopState {

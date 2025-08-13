@@ -39,7 +39,7 @@ import {
 } from '../shared/data-models/enums';
 
 // Service
-import { CartStateService } from '../shared/service/utils/cart-state.service';
+import { CartStateService } from '../shared/service/state/cart-state.service';
 import { AccountService } from '../shared/auth/service/account.service';
 import { LoginService } from '../shared/service/login.service';
 import { RsdCurrencyPipe } from '../shared/pipe/rsd-currency.pipe';

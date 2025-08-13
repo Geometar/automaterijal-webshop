@@ -1,11 +1,15 @@
 import { Injectable } from '@angular/core';
 import { AuthServerProvider } from '../auth/service/auth-jwt.service';
-import { Account, Credentials } from '../data-models/model';
 import { catchError, mergeMap, Observable, throwError } from 'rxjs';
-import { AccountService } from '../auth/service/account.service';
 import { Router } from '@angular/router';
-import { CartStateService } from './utils/cart-state.service';
-import { AccountStateService } from './utils/account-state.service';
+
+// Data models
+import { Account, Credentials } from '../data-models/model';
+
+// Services
+import { AccountService } from '../auth/service/account.service';
+import { CartStateService } from './state/cart-state.service';
+import { AccountStateService } from './state/account-state.service';
 
 @Injectable({
   providedIn: 'root',
