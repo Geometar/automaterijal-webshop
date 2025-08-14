@@ -1,6 +1,6 @@
 <!-- Mobile FAB -->
 <autom-button
-  *ngIf="isMobileView() && !openFilterPopup"
+  *ngIf="isMobileView && !openFilterPopup"
   class="mobile-filter-btn"
   [iconColor]="colorEnum.INFO_25"
   [iconPrefix]="true"
@@ -15,7 +15,7 @@
 <!-- DESKTOP SIDEBAR -->
 <div
   *ngIf="
-    !isMobileView() &&
+    !isMobileView &&
     ((categories && categories !== null) ||
       (manufactures && manufactures.length))
   "
@@ -92,7 +92,10 @@
       </button>
 
       <div class="section-body">
-        <div class="filter-prefilter" *ngIf="manufactures?.length ?? 0 > 7">
+        <div
+          class="filter-prefilter"
+          *ngIf="!isMobileView && (manufactures?.length ?? 0 > 7)"
+        >
           <autom-input-fields
             [placeholder]="'Pretraži proizvođače...'"
             [suffixIcon]="iconEnums.FILTER"
@@ -118,7 +121,7 @@
 <!-- MOBILE POPUP -->
 <autom-popup
   class="mobile-filters"
-  *ngIf="isMobileView() && openFilterPopup"
+  *ngIf="isMobileView && openFilterPopup"
   [height]="sizeEnum.AUTO"
   [position]="positionEnum.BOTTOM"
   [subPosition]="positionEnum.BOTTOM"
@@ -194,16 +197,6 @@
         class="section-body"
         [class.collapsed]="isCollapsed('manufacturers')"
       >
-        <div class="filter-prefilter" *ngIf="manufactures?.length ?? 0 > 7">
-          <autom-input-fields
-            [placeholder]="'Pretraži proizvođače...'"
-            [suffixIcon]="iconEnums.FILTER"
-            [type]="inputTypeEnum.SEARCH"
-            (emitSelected)="preFilterManufactures($event)"
-          >
-          </autom-input-fields>
-        </div>
-
         <manufacture-filter
           [manufactures]="manufacturesModels"
           [selected]="filter.proizvodjaci || []"

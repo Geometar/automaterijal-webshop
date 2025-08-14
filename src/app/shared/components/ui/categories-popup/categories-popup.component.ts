@@ -1,18 +1,26 @@
 // categories-popup.component.ts
-import { Component, EventEmitter, Input, Output, signal, computed, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { PopupComponent } from '../../popup/popup.component';
-import { ButtonComponent } from '../../button/button.component';
+import { Component, EventEmitter, Input, Output, signal, computed, inject, ViewChild, ElementRef, ViewEncapsulation, PLATFORM_ID, Inject } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { toSignal } from '@angular/core/rxjs-interop';
+
+// Autom import
+import { AutomIconComponent } from '../../autom-icon/autom-icon.component';
 import { AutomTooltipDirective } from '../../autom-tooltip/autom-tooltip.directive';
+import { ButtonComponent } from '../../button/button.component';
+import { InputFieldsComponent } from '../../input-fields/input-fields.component';
+import { PopupComponent } from '../../popup/popup.component';
+
+// Data Models
+import { ArticleCategories, SubCategories } from '../../../data-models/model/article-categories';
+
+// Enums
 import {
   ButtonThemes, ButtonTypes, ColorEnum, IconsEnum, InputTypeEnum,
   PositionEnum, SizeEnum, TooltipPositionEnum, TooltipThemeEnum, TooltipTypesEnum,
 } from '../../../data-models/enums';
-import { toSignal } from '@angular/core/rxjs-interop';
+
+// Services
 import { CategoriesStateService } from '../../../service/state/categories-state.service';
-import { ArticleCategories, SubCategories } from '../../../data-models/model/article-categories';
-import { InputFieldsComponent } from '../../input-fields/input-fields.component';
-import { AutomIconComponent } from '../../autom-icon/autom-icon.component';
 
 export type CategoryPick =
   | { kind: 'group'; groupId?: string; name?: string }
@@ -30,7 +38,8 @@ export type CategoryPick =
     AutomIconComponent
   ],
   templateUrl: './categories-popup.component.html',
-  styleUrls: ['./categories-popup.component.scss']
+  styleUrls: ['./categories-popup.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class CategoriesPopupComponent {
   // UI
@@ -60,6 +69,16 @@ export class CategoriesPopupComponent {
   categories = toSignal(this.categoriesState.getCategories$(), { initialValue: [] as ArticleCategories[] });
   loading = computed(() => !this.categories().length); // naive loading flag
 
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+  }
+
+  get isMobileView(): boolean {
+    if (isPlatformBrowser(this.platformId)) {
+      return window.innerWidth < 991;
+    }
+    return false; // fallback za server-side render
+  }
+
   // Map groupId (or name) -> icon + accent; adjust to your taxonomy codes
   private iconMap: Record<string, IconsEnum> = {
     // Filters
@@ -82,6 +101,15 @@ export class CategoriesPopupComponent {
 
     DEFAULT: this.iconsEnum.LIST
   };
+
+  @ViewChild('groupsRef') groupsRef!: ElementRef<HTMLElement>;
+
+  scrollGroups(dir: 1 | -1) {
+    const el = this.groupsRef?.nativeElement;
+    if (!el) return;
+    const page = el.clientWidth * 0.9;         // skoro širina ekrana
+    el.scrollBy({ left: dir * page, behavior: 'smooth' });
+  }
 
   private accentMap: Record<string, string> = {
     FILPUT: '#2d8cf0',

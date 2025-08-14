@@ -100,7 +100,7 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
     private urlHelperService: UrlHelperService
   ) { }
 
-  isMobileView(): boolean {
+  get isMobileView(): boolean {
     if (isPlatformBrowser(this.platformId)) {
       return window.innerWidth < 991;
     }

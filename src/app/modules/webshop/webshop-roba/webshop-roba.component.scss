@@ -50,112 +50,133 @@
   }
 }
 
-/* ===== Empty state (clean e‑commerce style) ===== */
 .empty-state {
-    align-items: center;
-    display: flex;
-    height: fit-content;
-    justify-content: center;
-    padding: 24px 12px;
-    width: 1050px;
-}
-
-.empty-card {
-  width: 100%;
-  max-width: 760px;
-  background: #fff;
-  border: 1px solid rgba(0,0,0,.06);
-  border-radius: 16px;
-  padding: 24px;
-  text-align: center;
-  box-shadow: 0 8px 28px rgba(0, 0, 0, .06);
-}
-
-.empty-card .ill {
-  width: 56px;
-  height: 56px;
-  margin: 0 auto 10px;
-  border-radius: 14px;
-  background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%);
-  display: grid;
-  place-items: center;
-}
-.empty-card .ill autom-icon svg,
-.empty-card .ill mat-icon {
-  width: 22px; height: 22px;
-  opacity: .75;
-}
-
-.empty-card .title {
-  margin: 6px 0 4px;
-  font-size: 18px;
-  font-weight: 800;
-  color: #0f172a;
-}
-
-.empty-card .subtitle {
-  margin: 0 auto 12px;
-  max-width: 560px;
-  color: #334155;
-  font-size: 14px;
-}
-
-.chips {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
   justify-content: center;
-  margin: 8px 0 14px;
-}
-.chip {
-  padding: 4px 10px;
-  border-radius: 9999px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #0f172a;
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
-  max-width: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+  align-items: center;
+  padding: 20px;
+  min-height: 50vh;
 
-.hints {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 14px;
-  display: grid;
-  gap: 6px;
-  color: #475569;
-  font-size: 13px;
-}
-.hints li::before {
-  content: "•";
-  color: #94a3b8;
-  margin-right: 6px;
-}
-
-.actions {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-}
-.actions autom-button {
-  min-width: 170px;
-}
-
-/* mobile */
-@media (max-width: 991px) {
   .empty-card {
-    border-radius: 14px;
-    padding: 18px 14px;
-  }
-  .actions {
-    flex-direction: column;
-  }
-  .actions autom-button {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px 32px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    max-width: 600px;
     width: 100%;
-    min-width: 0;
+    text-align: center;
+
+    .ill {
+      font-size: 48px;
+      color: var(--figma-primary-500);
+      margin-bottom: 16px;
+
+      autom-icon {
+        width: 48px;
+        height: 48px;
+      }
+    }
+
+    .title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      color: #666;
+      margin-bottom: 16px;
+
+      strong {
+        color: var(--figma-primary-700);
+      }
+    }
+
+    .chips {
+      margin-bottom: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+
+      .chip {
+        background: var(--figma-primary-50);
+        color: var(--figma-primary-700);
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+      }
+    }
+
+    .hints {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 20px;
+      font-size: 0.9rem;
+      color: #777;
+
+      li {
+        margin-bottom: 6px;
+        position: relative;
+        padding-left: 18px;
+
+        &::before {
+          content: "•";
+          position: absolute;
+          left: 0;
+          color: var(--figma-primary-500);
+        }
+      }
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+  }
+}
+
+/* 📱 Mobile optimizacija */
+@media (max-width: 576px) {
+  .empty-state {
+    padding: 10px;
+
+    .empty-card {
+      padding: 20px 16px;
+      border-radius: 8px;
+
+      .ill {
+        font-size: 40px;
+
+        autom-icon {
+          width: 40px;
+          height: 40px;
+        }
+      }
+
+      .title {
+        font-size: 1.3rem;
+      }
+
+      .subtitle {
+        font-size: 0.95rem;
+      }
+
+      .hints {
+        font-size: 0.85rem;
+        text-align: left;
+      }
+
+      .actions {
+        flex-direction: column;
+
+        autom-button {
+          width: 100%;
+        }
+      }
+    }
   }
 }

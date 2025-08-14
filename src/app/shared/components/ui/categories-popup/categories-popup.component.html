@@ -6,7 +6,7 @@
   [rounded]="true"
   (close)="close.emit()"
 >
-  <!-- HEADER / HERO (sticky) -->
+  <!-- HEADER -->
   <div custom-header class="cp-header">
     <div class="cp-hero">
       <div class="cp-hero__left">
@@ -17,7 +17,6 @@
       </div>
 
       <div class="cp-hero__right">
-        <!-- Use your autom-input-fields as a controlled search input -->
         <autom-input-fields
           class="cp-search-input"
           [type]="inputTypeEnum.SEARCH"
@@ -28,7 +27,6 @@
         ></autom-input-fields>
       </div>
 
-      <!-- Close button -->
       <autom-icon
         class="cp-close"
         [color]="colorEnum.GREY_400"
@@ -37,7 +35,6 @@
       ></autom-icon>
     </div>
 
-    <!-- QUICK TAGS -->
     <div class="cp-quick-tags" *ngIf="!loading()">
       <button
         *ngFor="let t of quickTags"
@@ -53,33 +50,33 @@
     </div>
   </div>
 
-  <!-- BODY: side-nav (groups) + cards (subgroups) -->
+  <!-- BODY -->
   <div custom-body class="cp-body">
-    <!-- LEFT: groups with icons & separators -->
+    <!-- LEVO: GRUPE -->
     <aside class="cp-groups">
       <ng-container *ngIf="!loading(); else skeletonLeft">
-        <div
+        <button
           *ngFor="let g of filtered(); trackBy: trackGroup"
+          type="button"
           class="cp-group-item"
           [class.active]="g.groupId === selectedGroupId()"
           (click)="selectGroup(g)"
+          [title]="g.name"
         >
           <span class="cp-group-icon" [style.--accent]="accentForGroup(g)">
             <autom-icon [source]="iconForGroup(g)"></autom-icon>
           </span>
 
-          <div class="cp-group-text">
-            <div class="cp-group-name">{{ g.name }}</div>
-            <div class="cp-group-meta">
-              <!-- Optional: if you have counts in future, place them here -->
-              <!-- <span class="cp-badge">{{ g.articleSubGroups?.length || 0 }}</span> -->
+          <span class="cp-group-text">
+            <span class="cp-group-name">{{ g.name }}</span>
+            <span class="cp-group-meta">
               <span class="cp-divider"></span>
               <span class="cp-hint">Klikni za podgrupe</span>
-            </div>
-          </div>
+            </span>
+          </span>
 
           <span class="cp-arrow"></span>
-        </div>
+        </button>
       </ng-container>
 
       <ng-template #skeletonLeft>
@@ -87,7 +84,7 @@
       </ng-template>
     </aside>
 
-    <!-- RIGHT: animated cards grid for subgroups -->
+    <!-- DESNO: PODGRUPE -->
     <section class="cp-subgroups">
       <ng-container *ngIf="selectedGroup() as sel; else pickPrompt">
         <div class="cp-subgroups-header">
@@ -98,7 +95,6 @@
               [style.background]="accentForGroup(sel)"
             ></span>
           </div>
-
           <button class="cp-all-btn" type="button" (click)="pickGroup(sel)">
             Sve iz: {{ sel.name }}
           </button>
@@ -115,6 +111,7 @@
             type="button"
             [style.--delay]="idx * 30 + 'ms'"
             (click)="pickSub(s)"
+            [title]="s.name"
           >
             <div
               class="cp-card__icon"
@@ -129,7 +126,10 @@
       </ng-container>
 
       <ng-template #pickPrompt>
-        <div class="cp-empty-state">Izaberite grupu sa leve strane</div>
+        <div class="cp-empty-state" *ngIf="!isMobileView">
+          Izaberite grupu sa leve strane
+        </div>
+        <div class="cp-empty-state" *ngIf="isMobileView">Izaberite grupu</div>
       </ng-template>
     </section>
   </div>

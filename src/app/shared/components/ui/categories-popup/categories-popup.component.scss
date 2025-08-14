@@ -3,7 +3,8 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+    Arial;
 }
 
 /* ---------- HEADER / HERO ---------- */
@@ -11,10 +12,13 @@
   position: sticky;
   top: 0;
   z-index: 10;
-  background:
-    radial-gradient(1200px 200px at 20% -80%, rgba(255,102,0,.16), transparent 60%),
+  background: radial-gradient(
+      1200px 200px at 20% -80%,
+      rgba(255, 102, 0, 0.16),
+      transparent 60%
+    ),
     linear-gradient(#fff, #fff);
-  border-bottom: 1px solid rgba(0,0,0,.06);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   padding: 14px 18px 10px;
 
   .cp-hero {
@@ -45,7 +49,9 @@
   }
 
   .cp-hero__right {
-    .cp-search-input { width: 100%; }
+    .cp-search-input {
+      width: 100%;
+    }
   }
 
   .cp-close {
@@ -53,8 +59,10 @@
     top: 8px;
     right: 8px;
     cursor: pointer;
-    transition: transform .2s ease;
-    &:hover { transform: rotate(90deg); }
+    transition: transform 0.2s ease;
+    &:hover {
+      transform: rotate(90deg);
+    }
   }
 
   .cp-quick-tags {
@@ -64,19 +72,25 @@
     margin-top: 10px;
 
     .cp-tag {
-      border: 1px solid rgba(0,0,0,.08);
+      border: 1px solid rgba(0, 0, 0, 0.08);
       background: #fff;
       padding: 6px 10px;
       border-radius: 999px;
       font-size: 12px;
       color: #374151;
       cursor: pointer;
-      transition: all .15s ease;
-      &:hover { border-color: #ff6600; color: #ff6600; }
+      transition: all 0.15s ease;
+      &:hover {
+        border-color: #ff6600;
+        color: #ff6600;
+      }
       &.ghost {
         background: #f3f4f6;
         border-color: transparent;
-        &:hover { background: #e5e7eb; color: #111827; }
+        &:hover {
+          background: #e5e7eb;
+          color: #111827;
+        }
       }
     }
   }
@@ -88,6 +102,7 @@
   grid-template-columns: 35% 65%;
   height: calc(100vh - 120px);
   overflow: hidden;
+  width: 100%;
 
   @media (max-width: 900px) {
     grid-template-columns: 1fr;
@@ -99,12 +114,13 @@
 .cp-groups {
   overflow-y: auto;
   background: #f8fafc;
-  border-right: 1px solid rgba(0,0,0,.06);
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
   padding: 6px 6px 12px;
 }
 
 .cp-group-item {
   display: grid;
+  width: 100%;
   grid-template-columns: 44px 1fr 12px;
   align-items: center;
   gap: 10px;
@@ -114,14 +130,15 @@
   cursor: pointer;
   color: #111827;
   background: #fff;
-  border: 1px solid rgba(0,0,0,.06);
-  transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease, background .12s ease;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  transition: transform 0.12s ease, border-color 0.12s ease,
+    box-shadow 0.12s ease, background 0.12s ease;
 
   &:hover {
     transform: translateY(-1px);
-    border-color: rgba(0,0,0,.12);
+    border-color: rgba(0, 0, 0, 0.12);
     background: #ffffff;
-    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   }
 
   &.active {
@@ -132,7 +149,8 @@
     --accent: #ff6600;
     display: grid;
     place-items: center;
-    width: 40px; height: 40px;
+    width: 40px;
+    height: 40px;
     border-radius: 12px;
     background: color-mix(in hsl, var(--accent) 12%, #fff);
     border: 1px solid color-mix(in hsl, var(--accent) 40%, #fff);
@@ -163,7 +181,8 @@
       font-weight: 600;
     }
     .cp-divider {
-      width: 6px; height: 6px;
+      width: 6px;
+      height: 6px;
       border-right: 2px solid #cbd5e1;
       border-bottom: 2px solid #cbd5e1;
       transform: rotate(-45deg);
@@ -175,7 +194,8 @@
   }
 
   .cp-arrow {
-    width: 6px; height: 6px;
+    width: 6px;
+    height: 6px;
     border-right: 2px solid #9ca3af;
     border-bottom: 2px solid #9ca3af;
     transform: rotate(-45deg);
@@ -193,8 +213,12 @@
   animation: shimmer 1.2s infinite;
 }
 @keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 /* ---------- RIGHT: SUBGROUPS ---------- */
@@ -220,7 +244,9 @@
   }
 
   .cp-dot {
-    width: 10px; height: 10px; border-radius: 999px;
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
     background: #ff6600;
   }
 
@@ -232,8 +258,11 @@
     border-radius: 10px;
     font-size: 12px;
     cursor: pointer;
-    transition: all .12s ease;
-    &:hover { background: #f8fafc; color: #0f172a; }
+    transition: all 0.12s ease;
+    &:hover {
+      background: #f8fafc;
+      color: #0f172a;
+    }
   }
 }
 
@@ -256,25 +285,27 @@
   gap: 6px;
   padding: 12px;
   background: #ffffff;
-  border: 1px solid rgba(0,0,0,.06);
+  border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: 14px;
   cursor: pointer;
   transform: translateY(6px);
   opacity: 0;
-  animation: cardIn .28s ease forwards;
+  animation: cardIn 0.28s ease forwards;
   animation-delay: var(--delay);
-  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+  transition: transform 0.12s ease, box-shadow 0.12s ease,
+    border-color 0.12s ease;
 
   &:hover {
     transform: translateY(-2px) !important;
-    box-shadow: 0 6px 16px rgba(0,0,0,.08);
-    border-color: rgba(0,0,0,.12);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    border-color: rgba(0, 0, 0, 0.12);
   }
 
   .cp-card__icon {
     display: grid;
     place-items: center;
-    width: 44px; height: 44px;
+    width: 44px;
+    height: 44px;
     border-radius: 12px;
     border: 2px solid #ff6600;
     background: #fff7f3;
@@ -296,8 +327,14 @@
 }
 
 @keyframes cardIn {
-  from { transform: translateY(6px); opacity: 0; }
-  to   { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(6px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 /* Prompt when no group selected */
@@ -307,4 +344,162 @@
   height: 60%;
   color: #94a3b8;
   font-size: 14px;
+}
+
+/* ===== Mobile layout: 2–3 reda grupa, horizontal scroll, ~full screen ===== */
+@media (max-width: 900px) {
+  .cp-arrow {
+    display: none; /* sakrij strelicu na mobilnom */
+  }
+  /* Koliko je visok header u popupu – uskladi ako ti treba */
+  .categories-selection {
+    --cp-header-h: 112px; /* sticky header height */
+    --cp-gap: 8px; /* gap između elemenata */
+    --cp-row-h: 90px; /* visina jednog reda kartice grupe */
+    --cp-item-w: 160px; /* širina jedne kartice grupe */
+    --cp-rows: 1; /* podrazumevano 2 reda (vidi niže za 3) */
+  }
+
+  /* Viewport: zauzmi skoro ceo ekran ispod headera */
+  .cp-viewport {
+    height: calc(100vh - var(--cp-header-h));
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* spreči dvostruki scroll */
+  }
+
+  /* Panovi jedan ispod drugog (grupe gore, podgrupe dole) */
+  .cp-panels {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  /* GRUPE – multi‑row horizontal scroll */
+  .cp-panel--groups {
+    flex: 0 0 auto; /* visina definisana preko .cp-groups */
+  }
+
+  .cp-groups {
+    order: 1;
+    padding: 8px 12px;
+    background: transparent;
+    border-right: none;
+
+    /* Horizontal scroll */
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+
+    /* 2–3 reda kroz CSS Grid sa "auto-flow: column"
+       -> puni se po kolonama i lomi u redove */
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: var(--cp-item-w); /* širina jedne kolone (kartice) */
+    grid-template-rows: repeat(1, 64px);
+    gap: var(--cp-gap);
+
+    /* Vizuelni fade na ivicama počas horizontalnog scrolla */
+    position: relative;
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 16px,
+      #000 calc(100% - 16px),
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 16px,
+      #000 calc(100% - 16px),
+      transparent 100%
+    );
+
+    /* Fiksna visina da lepo stanu 2 reda + gap */
+    height: calc(
+      var(--cp-rows) * var(--cp-row-h) + (var(--cp-rows) - 1) * var(--cp-gap)
+    );
+  }
+
+  .cp-group-item {
+    /* svaki item je “kolona” u gridu; fiks širina i visina po redu */
+    width: var(--cp-item-w);
+    height: var(--cp-row-h);
+    margin: 0;
+    flex: 0 0 auto; /* defensive, iako je grid */
+    scroll-snap-align: start;
+    display: grid;
+    grid-template-columns: 40px 1fr 12px;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+  }
+
+  /* finoća: lakše “parkiranje” pri scrollu */
+  .cp-groups {
+    scroll-snap-type: x proximity;
+    height: 100px;
+    margin-bottom: 10px;
+  }
+
+  /* PODGRUPE – zauzmi ostatak visine */
+  .cp-panel--subs {
+    flex: 1 1 auto;
+    min-height: 0; /* bitno da overflow radi */
+  }
+
+  .cp-subgroups {
+    order: 2;
+    padding: 12px;
+  }
+
+  .cp-subgroups-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+
+    .cp-all-btn {
+      width: 100%;
+      text-align: center;
+    }
+  }
+
+  .cp-subgrid {
+    gap: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    height: 160px;
+    margin-bottom: 60px;
+    overflow-y: auto;
+  }
+
+  /* Opcioni sticky back dugme iznad podgrupa na mobilnom */
+  .cp-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: #fff;
+    font-size: 12px;
+  }
+
+  .cp-group-meta {
+    .cp-divider {
+      display: none;
+    }
+  }
+}
+
+/* Ako je uređaj nizak ali “viši” mobilni (ili tablet u portretu), možeš 3 reda */
+@media (max-width: 900px) and (min-height: 740px) {
+  .categories-selection {
+    --cp-rows: 3;
+  .popup-container { 
+    height: 100vh;
+  }
+  }
 }

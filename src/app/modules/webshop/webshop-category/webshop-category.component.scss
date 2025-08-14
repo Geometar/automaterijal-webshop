@@ -2,7 +2,7 @@
 .sidebar {
   width: 320px;
   position: sticky;
-  top: 88px;           /* uskladi sa visinom headera */
+  top: 88px; /* uskladi sa visinom headera */
   align-self: flex-start;
 }
 
@@ -17,20 +17,23 @@
 /* Card */
 .filter-card {
   background: #fff;
-  border: 1px solid rgba(0,0,0,.08);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 12px;
-  box-shadow: 0 1px 2px rgba(0,0,0,.04);
-  transition: border-color .15s ease, box-shadow .15s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
   overflow: hidden;
 
-  &:hover { border-color: rgba(0,0,0,.12); box-shadow: 0 4px 16px rgba(0,0,0,.06); }
+  &:hover {
+    border-color: rgba(0, 0, 0, 0.12);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  }
 }
 
 /* Section header (clickable) */
 .section-title {
   width: 100%;
   display: grid;
-  grid-template-columns: 1fr auto 14px;  /* label | chip | chevron */
+  grid-template-columns: 1fr auto 14px; /* label | chip | chevron */
   align-items: center;
   gap: 8px;
   padding: 12px 12px;
@@ -38,7 +41,7 @@
   font-size: 14px;
   color: #0f172a;
   background: linear-gradient(#fff, #fbfbfb);
-  border-bottom: 1px solid rgba(0,0,0,.06);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   cursor: pointer;
 
   .count-chip {
@@ -53,12 +56,15 @@
   }
 
   .chevron {
-    width: 8px; height: 8px;
+    width: 8px;
+    height: 8px;
     border-right: 2px solid #94a3b8;
     border-bottom: 2px solid #94a3b8;
     transform: rotate(-45deg);
-    transition: transform .2s ease;
-    &.expanded { transform: rotate(45deg); }
+    transition: transform 0.2s ease;
+    &.expanded {
+      transform: rotate(45deg);
+    }
   }
 }
 
@@ -67,7 +73,7 @@
   padding: 10px 12px 12px;
   max-height: 800px;
   overflow: clip;
-  transition: max-height .25s ease, padding .2s ease;
+  transition: max-height 0.25s ease, padding 0.2s ease;
 
   .filter-container {
     padding-top: 4px;
@@ -83,15 +89,19 @@
 }
 
 /* Prefilter spacing */
-.filter-prefilter { margin-bottom: 8px; }
+.filter-prefilter {
+  margin-bottom: 8px;
+}
 
 /* Inner option hover (without touching child logic) */
 ::ng-deep category-filter .option,
 ::ng-deep manufacture-filter .option {
   padding: 6px 6px;
   border-radius: 8px;
-  transition: background .12s ease;
-  &:hover { background: #f8fafc; }
+  transition: background 0.12s ease;
+  &:hover {
+    background: #f8fafc;
+  }
 }
 
 /* Tall lists get own scroll */
@@ -101,26 +111,35 @@
   overflow-y: auto;
 }
 ::ng-deep category-filter::-webkit-scrollbar,
-::ng-deep manufacture-filter::-webkit-scrollbar { width: 8px; }
+::ng-deep manufacture-filter::-webkit-scrollbar {
+  width: 8px;
+}
 ::ng-deep category-filter::-webkit-scrollbar-thumb,
-::ng-deep manufacture-filter::-webkit-scrollbar-thumb { background: rgba(0,0,0,.18); border-radius: 4px; }
+::ng-deep manufacture-filter::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.18);
+  border-radius: 4px;
+}
 
 /* Mobile FAB */
 .mobile-filter-btn {
-    background: var(--figma-primary-600);
-    border-radius: 9999px !important;
-    bottom: 72px;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
-    font-weight: 700;
-    height: 43px;
-    padding: 4px 11px;
-    position: fixed;
-    right: 16px;
-    transition: transform 0.2s ease, background-color 0.2s ease;
-    z-index: 100;
+  background: var(--figma-primary-600);
+  border-radius: 9999px !important;
+  bottom: 72px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  font-weight: 700;
+  height: 43px;
+  padding: 4px 11px;
+  position: fixed;
+  right: 16px;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  z-index: 100;
 
-  &:hover { transform: translateY(-2px); }
-  &:active { transform: scale(.98); }
+  &:hover {
+    transform: translateY(-2px);
+  }
+  &:active {
+    transform: scale(0.98);
+  }
 }
 
 /* Mobile popup layout */
@@ -138,17 +157,28 @@
     .filter-buttons {
       position: sticky;
       bottom: 0;
-      background: linear-gradient(to top, #fff, rgba(255,255,255,.92));
+      background: linear-gradient(to top, #fff, rgba(255, 255, 255, 0.92));
       padding-top: 10px;
       display: flex;
-      gap: 12px;
-      autom-button { flex: 1; }
+      gap: 50px;
+      margin-right: auto;
+      margin-left: auto;
+      autom-button {
+        flex: 1;
+      }
     }
   }
 }
 
 /* Responsive */
 @media (max-width: 991px) {
-  .sidebar { position: static; width: 100%; padding: 8px 12px; }
-  .filter-section { gap: 12px; margin-bottom: 40px; }
+  .sidebar {
+    position: static;
+    width: 100%;
+    padding: 8px 12px;
+  }
+  .filter-section {
+    gap: 12px;
+    margin-bottom: 40px;
+  }
 }
