@@ -106,7 +106,7 @@
 
   @media (max-width: 900px) {
     grid-template-columns: 1fr;
-    height: auto;
+    height: fit-content;
   }
 }
 
@@ -398,7 +398,7 @@
     display: grid;
     grid-auto-flow: column;
     grid-auto-columns: var(--cp-item-w); /* širina jedne kolone (kartice) */
-    grid-template-rows: repeat(1, 64px);
+    grid-template-rows: repeat(2, 94px);
     gap: var(--cp-gap);
 
     /* Vizuelni fade na ivicama počas horizontalnog scrolla */
@@ -441,7 +441,7 @@
   /* finoća: lakše “parkiranje” pri scrollu */
   .cp-groups {
     scroll-snap-type: x proximity;
-    height: 100px;
+    height: 200px;
     margin-bottom: 10px;
   }
 
@@ -470,7 +470,7 @@
   .cp-subgrid {
     gap: 10px;
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    height: 160px;
+    height: 100%;
     margin-bottom: 60px;
     overflow-y: auto;
   }

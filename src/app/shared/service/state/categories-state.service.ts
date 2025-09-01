@@ -3,7 +3,7 @@ import { BehaviorSubject, Observable, of } from 'rxjs';
 import { catchError, finalize, shareReplay, tap } from 'rxjs/operators';
 
 // Data Models
-import { ArticleCategories } from '../../data-models/model/article-categories';
+import { ArticleCategories, SubCategories } from '../../data-models/model/article-categories';
 
 //Services
 import { ArticleGroupService } from '../article-group.service';
@@ -11,7 +11,10 @@ import { ArticleGroupService } from '../article-group.service';
 @Injectable({ providedIn: 'root' })
 export class CategoriesStateService {
   /** Holds the cached categories once loaded */
-  private readonly categories$ = new BehaviorSubject<ArticleCategories[] | null>(null);
+  private readonly categories$ = new BehaviorSubject<
+    ArticleCategories[] | null
+  >(null);
+  private categoryCache: ArticleCategories[] = [];
 
   /** In-flight request shared by concurrent callers */
   private inFlight$?: Observable<ArticleCategories[]>;
@@ -26,16 +29,19 @@ export class CategoriesStateService {
   getCategories$(): Observable<ArticleCategories[]> {
     const cached = this.categories$.value;
     if (cached) {
+      this.categoryCache = cached;
       return of(cached);
     }
 
     if (!this.inFlight$) {
       this.inFlight$ = this.api.fetchCategories().pipe(
-        tap(data => this.categories$.next(data)),     // cache on success
-        finalize(() => (this.inFlight$ = undefined)), // clear in-flight flag
-        shareReplay(1),                                // share among subscribers
-        catchError(err => {                            // do not poison cache on error
-          // optional: you could push null or keep old cache
+        tap((data) => {
+          this.categoryCache = data;
+          this.categories$.next(data);
+        }),
+        finalize(() => (this.inFlight$ = undefined)),
+        shareReplay(1),
+        catchError((err) => {
           throw err;
         })
       );
@@ -47,7 +53,7 @@ export class CategoriesStateService {
   /** Optional: force refresh ignoring cache */
   refresh$(): Observable<ArticleCategories[]> {
     this.inFlight$ = this.api.fetchCategories().pipe(
-      tap(data => this.categories$.next(data)),
+      tap((data) => this.categories$.next(data)),
       finalize(() => (this.inFlight$ = undefined)),
       shareReplay(1)
     );
@@ -57,5 +63,16 @@ export class CategoriesStateService {
   /** Optional: clear cache so next getCategories$ will call API */
   invalidate(): void {
     this.categories$.next(null);
+  }
+
+  getCategoryLabelById(id: string): ArticleCategories | undefined {
+    return this.categoryCache.find((c) => c.groupId === id);
+  }
+
+  getCategorySubgroupsLabelById(id: string): SubCategories | undefined {
+    return this.categoryCache
+      .map((c) => c.articleSubGroups)
+      .flat()
+      .find((s) => s.subGroupId?.toString() === id);
   }
 }

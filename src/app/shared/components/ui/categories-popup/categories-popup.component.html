@@ -16,7 +16,7 @@
         </p>
       </div>
 
-      <div class="cp-hero__right">
+      <div class="cp-hero__right" *ngIf="!isMobileView">
         <autom-input-fields
           class="cp-search-input"
           [type]="inputTypeEnum.SEARCH"
@@ -35,7 +35,7 @@
       ></autom-icon>
     </div>
 
-    <div class="cp-quick-tags" *ngIf="!loading()">
+    <div class="cp-quick-tags" *ngIf="!loading() && !isMobileView">
       <button
         *ngFor="let t of quickTags"
         class="cp-tag"
@@ -71,7 +71,9 @@
             <span class="cp-group-name">{{ g.name }}</span>
             <span class="cp-group-meta">
               <span class="cp-divider"></span>
-              <span class="cp-hint">Klikni za podgrupe</span>
+              <span class="cp-hint" *ngIf="!isMobileView"
+                >Klikni za podgrupe</span
+              >
             </span>
           </span>
 

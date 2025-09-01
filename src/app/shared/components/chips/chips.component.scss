@@ -1,27 +1,150 @@
-.chip {
+.filters-bar {
+  --border: var(--figma-grey-150, #e6e8eb);
+  --text: var(--figma-grey-900, #1d2433);
+  --muted: var(--figma-grey-600, #667085);
+  --accent: var(--figma-info-700, #1069c9);
+  --chip-bg: #fff;
+  --chip-border: rgba(16,105,201,.18);
+  --chip-hover: rgba(16,105,201,.06);
+
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  display: flex;
-  .autom-icon {
-    height: 18px;
-    position: relative;
-    top: 3px;
-    width: 18px;
-  }
-  
-  .mdc-evolution-chip-set__chips {
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
+
+  .filters-left {
+    display: inline-flex;
     align-items: center;
-    margin-left: 0 !important;
+    gap: 8px;
+
+    .funnel { width: 24px; height: 24px; opacity: .85; }
+    .title  { color: var(--text); font-weight: 700; }
+    .count  {
+      margin-left: 2px;
+      padding: 2px 6px;
+      font-size: 12px; font-weight: 700;
+      color: var(--accent);
+      border: 1px solid var(--chip-border);
+      background: rgba(16,105,201,.08);
+      border-radius: 999px;
+      line-height: 1;
+    }
   }
 
-  .label {
-    align-items: center;
-    color: var(--figma-grey-900);
+  .chips {
     display: flex;
-    font-weight: 600;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 2px 0;
+    scrollbar-width: thin;
   }
 
-  .value {
-    color: var(--figma-info-700);
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;             /* tanji čip */
+    border-radius: 999px;
+    border: 1px solid var(--chip-border);
+    background: var(--chip-bg);
+    color: var(--text);
     font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background .12s ease, border-color .12s ease, transform .12s ease;
+
+    &:hover { background: var(--chip-hover); border-color: var(--accent); transform: translateY(-1px); }
+
+    .chip__label { color: var(--muted); font-weight: 600; }
+    .chip__value { color: var(--accent); text-decoration: underline; }
+    .chip__x     { width: 24px; height: 24px; opacity: .7; }
+  }
+
+  .clear {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    border: none;
+    background: transparent;
+    color: var(--figma-danger-700, #c21f3a);
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background .12s ease;
+
+    &:hover { background: rgba(194,31,58,.08); }
+    .clear__icon { width: 16px; height: 16px; }
+  }
+}
+
+/* Mobilni – reset ispod, naslov kompaktniji */
+@media (max-width: 768px) {
+  .filters-bar {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "left clear"
+      "chips chips";
+    row-gap: 8px;
+
+    .filters-left { grid-area: left; }
+    .chips        { grid-area: chips; }
+    .clear        { grid-area: clear; }
+
+    .filters-left .title { display: none; }  /* ostavi ikonu + broj */
+    .chip { padding: 5px 9px; }
+  }
+}
+
+/* MOBILNI – čist full-width stil za čipove */
+@media (max-width: 576px) {
+  .filters-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px;
+
+    .filters-left { align-self: flex-start; }
+
+    .chips {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow: visible; /* više nije potreban horizontalni scroll */
+      padding: 0;
+    }
+
+    .chip {
+      width: 100%;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--chip-border);
+      background: #fff;
+      gap: 10px;
+
+      /* tipografija jasnija */
+      .chip__label { font-weight: 700; color: var(--figma-grey-900); }
+      .chip__value { margin-left: auto; text-decoration: underline; color: var(--figma-info-700); }
+      .chip__x { width: 18px; height: 18px; opacity: .75; }
+
+      &:hover { transform: none; background: rgba(16,105,201,.04); }
+    }
+
+    /* vizuelni “active” naglasak za sve čipove koji imaju vrednosti */
+    .chip--active {
+      border-color: var(--figma-info-700);
+      box-shadow: 0 0 0 2px rgba(16,105,201,.08) inset;
+    }
+
+    .clear {
+      align-self: center;
+      padding: 8px 10px;
+    }
   }
 }

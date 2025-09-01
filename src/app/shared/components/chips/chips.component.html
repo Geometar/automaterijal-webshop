@@ -1,27 +1,41 @@
-<mat-chip-set
-  *ngIf="chips.length"
-  class="chip"
-  cdkDropList
-  cdkDropListOrientation="horizontal"
->
-  <mat-label class="label">Filteri: </mat-label>
-  @for (chip of chips; track chip.label) {
-  <mat-chip (click)="remove(chip)">
-    <span class="value display--inline">
-      {{ chip.label }}:
-      {{
-        chip.values.join(", ").length > 25
-          ? chip.values.join(", ").slice(0, 25) + "..."
-          : chip.values.join(", ")
-      }}
-    </span>
-    <autom-icon [source]="iconSource.X"></autom-icon>
-  </mat-chip>
-  }
+<section class="filters-bar" *ngIf="chips.length">
+  <div class="filters-left">
+    <autom-icon class="funnel" [source]="iconSource.FILTER"></autom-icon>
+    <span class="title">Filteri</span>
+    <span class="count">{{ chips.length }}</span>
+  </div>
+
+  <div class="chips" cdkDropList cdkDropListOrientation="horizontal">
+    @for (chip of chips; track chip.label) {
+    <button
+      type="button"
+      class="chip"
+      (click)="remove(chip)"
+      [attr.aria-label]="'Ukloni: ' + chip.label"
+      [automTooltip]="chip.label + ': ' + chip.values.join(', ')"
+      matTooltipPosition="above"
+    >
+      <span class="chip__label">{{ chip.label }}</span>
+      <a
+        class="chip__value"
+        (click)="$event.stopPropagation()"
+        (keydown)="$event.stopPropagation()"
+      >
+        {{
+          chip.values.length === 1
+            ? chip.values[0]
+            : chip.values.length + " izabrano"
+        }}
+      </a>
+      <autom-icon class="chip__x" [source]="iconSource.X"></autom-icon>
+    </button>
+    }
+  </div>
+
   <autom-button
     [label]="'Resetuj filtere'"
     [theme]="buttonThemes.DARK_RED"
     [type]="buttonTypes.TERNARY"
     (clickEvent)="removeAll()"
   ></autom-button>
-</mat-chip-set>
+</section>

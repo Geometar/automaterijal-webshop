@@ -51,11 +51,12 @@
 }
 
 .empty-state {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  min-height: 50vh;
+    align-items: flex-start;
+    background: transparent;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+    width: 1050px;
 
   .empty-card {
     background: #fff;
@@ -143,7 +144,7 @@
 @media (max-width: 576px) {
   .empty-state {
     padding: 10px;
-
+    width: 100%;
     .empty-card {
       padding: 20px 16px;
       border-radius: 8px;
