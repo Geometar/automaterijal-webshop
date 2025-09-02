@@ -12,7 +12,7 @@ import { HostListener } from '@angular/core';
 
 // Component Imports
 import { ButtonComponent } from '../../../shared/components/button/button.component';
-import { CategoriesPopupComponent, CategoryPick } from '../../../shared/components/ui/categories-popup/categories-popup.component';
+import { CategoriesPopupComponent } from '../../../shared/components/ui/categories-popup/categories-popup.component';
 import { InputFieldsComponent } from '../../../shared/components/input-fields/input-fields.component';
 import { VehicleSelectionPopupComponent } from '../../../shared/components/ui/vehicle-selection-popup/vehicle-selection-popup.component';
 
@@ -33,6 +33,7 @@ import {
 // Service
 import { ConfigService } from '../../../shared/service/config.service';
 import { UrlHelperService } from '../../../shared/service/utils/url-helper.service';
+import { CategoryPick } from '../../../shared/data-models/model';
 
 export class NavTitles {
   title: string = '';
@@ -152,6 +153,11 @@ export class WebshopNavComponent implements OnChanges {
   }
 
   categorySelected(ev: CategoryPick): void {
+    if (ev.groupId === 'TECDOC') {
+      this.chooseVehicleVisible = true;
+      this.chooseCategoryVisible = false;
+      return;
+    }
     const current = this.urlHelperService.readQueryParams();
 
     const next = {

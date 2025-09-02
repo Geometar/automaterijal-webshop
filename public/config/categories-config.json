@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "defaults": {
+    "fallbackParent": "AUTODELOVI"
+  },
+  "parents": [
+    {
+      "key": "PRIORITETNE",
+      "label": "Pribor & Dodaci",
+      "order": 10,
+      "icon": "Toolbox",
+      "include": ["ADO", "PRI", "ALATI"],
+      "exclude": [],
+      "show": true
+    },
+    {
+      "key": "MAZIVA",
+      "label": "Maziva & Hemija",
+      "order": 20,
+      "icon": "Oil",
+      "include": ["MPU", "MTR", "MIZ", "MOM", "MOS"],
+      "exclude": [],
+      "show": true
+    },
+    {
+      "key": "FILTERI",
+      "label": "Filteri",
+      "order": 30,
+      "icon": "Filter",
+      "include": ["FILPUT", "FILTTE"],
+      "exclude": [],
+      "show": true
+    },
+    {
+      "key": "AUTODELOVI",
+      "label": "Auto delovi (TecDoc)",
+      "order": 40,
+      "icon": "Car",
+      "include": "*",
+      "exclude": ["ADO","PRI","ALATI","MPU","MTR","MIZ","MOM","MOS","FILPUT","FILTTE"],
+      "show": true
+    }
+  ],
+  "overrides": {
+    "FILPUT": { "label": "Filteri – putnički" },
+    "FILTTE": { "label": "Filteri – teretni" }
+  }
+}

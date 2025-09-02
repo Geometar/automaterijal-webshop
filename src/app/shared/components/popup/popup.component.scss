@@ -1,260 +1,161 @@
-.popup {
-  &-container {
-    z-index: 101 !important;
-    background: var(--figma-base-white);
-    box-shadow: var(--figma-shadow-xl);
-    display: flex;
-    flex-direction: column;
-    isolation: isolate;
-    max-width: 100vw;
-    padding: 0;
-    position: fixed;
-    z-index: var(--z-index-6);
+/* =========================
+   POPUP (kompatibilni total SCSS)
+   - Rešava "ide ispod" skrol: flex kolona + min-height:0 + overflow u telu
+   - 100vh -> 100dvh da ne seče na mobilnim
+   - Overlay ispod prozora; z-index slojevi čisti
+   - Nema lomljenja postojećih modifikatora
+   ========================= */
 
-    &--loading {
-      background: transparent;
-      height: 67vh;
-      position: relative;
-      width: 100%;
-      z-index: var(--z-index-0);
-    }
+/* Overlay */
+.popup-overlay,
+.popup-overlay .popup-overlay {
+  background: rgba(63, 63, 70, 0.7);
+  -webkit-backdrop-filter: blur(var(--space-xs));
+  backdrop-filter: blur(var(--space-xs));
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh; /* fix za mobilne address barove */
+  z-index: 100;   /* overlay ispod prozora */
+}
 
-    &--rounded {
-      border-radius: calc(var(--space-xxs) * 3);
+/* Container */
+.popup-container,
+.popup-container .popup-container {
+  isolation: isolate;
+  position: fixed;
+  inset: auto;
+  max-width: 100vw;
+  width: auto;
+  padding: 0;
 
-      .page-details__footer {
-        border-radius: 0 0 calc(var(--space-xxs) * 3) calc(var(--space-xxs) * 3);
-      }
-    }
+  /* FLEX KOLONA — KLJUČNO ZA JEDAN SKROL U TELU */
+  display: flex;
+  flex-direction: column;
 
-    &__body {
-      z-index: 101;
-      display: flex;
-      width: 100%;
-    }
+  background: var(--figma-base-white);
+  box-shadow: var(--figma-shadow-xl);
 
-    &__bottom {
-      &--center {
-        bottom: calc(var(--space-xxxs) * -1);
-        left: 50%;
-        // fix the blurry glitch issue with the centered modal
-        transform: translateX(-50%) translateY(calc(0% - 2px));
-      }
+  /* z-index sloj iznad overlay-a */
+  z-index: 101; /* očisti duple zapise/var(--z-index-x) */
 
-      &--left,
-      &--right {
-        bottom: 0;
-      }
+  /* visinski preset-i */
+  &.popup-container__height--auto   { height: auto; }
+  &.popup-container__height--small  { height: var(--size-small); }
+  &.popup-container__height--extra-small { height: var(--size-extra-small); }
+  &.popup-container__height--extra-large { height: 85dvh; } /* ranije 85vh */
+  &.popup-container__height--full   { height: 100dvh; }     /* ranije 100% */
+  &.popup-container__height--full-vh{ height: 100dvh; }     /* ranije 100vh */
 
-      &--left {
-        left: 0;
-      }
+  /* širinski preset-i */
+  &.popup-container__width--auto        { width: auto; }
+  &.popup-container__width--extra-small { width: var(--size-extra-small); }
+  &.popup-container__width--small       { width: var(--size-small); }
+  &.popup-container__width--medium      { width: var(--size-medium); }
+  &.popup-container__width--large       { width: var(--size-large); }
+  &.popup-container__width--extra-large { width: var(--size-extra-large); }
+  &.popup-container__width--full        { width: 100%; }
+  &.popup-container__width--full-vw     { width: 100vw; }
 
-      &--right {
-        right: 0;
-      }
-    }
+  /* pozicije */
+  &.popup-container__bottom--center {
+    left: 50%;
+    bottom: calc(var(--space-xxxs) * -1);
+    transform: translateX(-50%) translateY(calc(0% - 2px)); /* subpixel fix */
+  }
+  &.popup-container__bottom--left   { left: 0; bottom: 0; }
+  &.popup-container__bottom--right  { right: 0; bottom: 0; }
 
-    &__center {
-      &--center {
-        left: 50%;
-        top: 50%;
-        // fix the blurry glitch issue with the centered modal
-        transform: translateX(-50%) translateY(calc(-50% - 2px));
-      }
+  &.popup-container__center--center {
+    left: 50%;
+    top: 50%;
+    transform: translateX(-50%) translateY(calc(-50% - 2px));
+  }
+  &.popup-container__center--left  { left: 0;  top: 50%; transform: translateY(calc(-50% - 2px)); }
+  &.popup-container__center--right { right: 0; top: 50%; transform: translateY(calc(-50% - 2px)); }
 
-      &--left,
-      &--right {
-        top: 50%;
-        // fix the blurry glitch issue with the centered modal
-        transform: translateX(0) translateY(calc(-50% - 2px));
-      }
+  &.popup-container__left--top  { left: 0;  top: 0; }
+  &.popup-container__right--top { right: 0; top: 0; }
 
-      &--left {
-        left: 0;
-      }
+  &.popup-container__top--center {
+    left: 50%;
+    top: var(--space-xxxs);
+    transform: translateX(-50%) translateY(calc(0% - 2px));
+  }
 
-      &--right {
-        right: 0;
-      }
-    }
+  /* deo kad se prikazuje loader kao full telo */
+  &.popup-container--loading {
+    background: transparent;
+    width: 100%;
+    height: 67vh; /* ok i ostaje, u realnosti može i 67dvh ali nije kritično */
+    position: relative;
+    z-index: 0;
+  }
 
-    &__left {
-      &--top {
-        left: 0;
-        top: 0;
-      }
-    }
+  /* zaobljenja */
+  &.popup-container--rounded {
+    border-radius: calc(var(--space-xxs) * 3);
 
-    &__right {
-      &--top {
-        right: 0;
-        top: 0;
-      }
-    }
-
-    &__top {
-      &--center {
-        left: 50%;
-        top: var(--space-xxxs);
-        // fix the blurry glitch issue with the centered modal
-        transform: translateX(-50%) translateY(calc(0% - 2px));
-      }
-    }
-
-    &__height {
-      &--auto {
-        height: auto;
-      }
-
-      &--extra-large {
-        height: 85vh;
-      }
-
-      &--full {
-        height: 100%;
-      }
-
-      &--full-vh {
-        height: 100vh;
-      }
-
-      &--small {
-        height: var(--size-small);
-      }
-
-      &--extra-small {
-        height: var(--size-extra-small);
-      }
-    }
-
-    &__width {
-      &--auto {
-        width: auto;
-      }
-
-      &--small {
-        width: var(--size-small);
-      }
-
-      &--medium {
-        width: var(--size-medium);
-      }
-
-      &--large {
-        width: var(--size-large);
-      }
-
-      &--extra-large {
-        width: var(--size-extra-large);
-      }
-
-      &--extra-small {
-        width: var(--size-extra-small);
-      }
-
-      &--full {
-        width: 100%;
-      }
-
-      &--full-vw {
-        width: 100vw;
-      }
+    .page-details__footer {
+      border-radius: 0 0 calc(var(--space-xxs) * 3) calc(var(--space-xxs) * 3);
     }
   }
 
-  &-header {
-    display: flex;
-    align-self: center;
-
-    &__title {
-      text-align: left;
-    }
-
-    &__action {
-      flex: 9;
-      text-align: right;
-    }
+  /* HEADER / FOOTER — ne skroluju */
+  &__header,
+  &__footer {
+    flex: 0 0 auto;
+    z-index: 1;
   }
 
-  &-overlay {
-    background: rgba(63, 63, 70, 0.7);
-    -webkit-backdrop-filter: blur(var(--space-xs));
-    backdrop-filter: blur(var(--space-xs));
-    height: 100vh;
-    position: fixed;
-    right: 0;
-    top: 0;
-    width: 100vw;
-    z-index: var(--z-index-6);
-  }
+  /* BODY — JEDINI SKROL KONTEJNER */
+  &__body {
+    /* radi i ako je element <body> ili <div> sa ovom klasom */
+    flex: 1 1 auto;     /* KLJUČNO */
+    min-height: 0;      /* KLJUČNO za flex/grid decu */
+    width: 100%;
+    display: flex;      /* ako unutra imaš grid/flex raspored */
+    overflow: auto;     /* JEDAN skrol ovde */
+    -webkit-overflow-scrolling: touch;
+    z-index: 1;
 
-  &-slide-in {
-    -webkit-animation: slide-in 0.5s forwards;
-    -webkit-transform: translateX(-100%);
-    animation: slide-in 0.5s forwards;
-    transform: translateX(-100%);
-  }
-
-  &-slide-out {
-    -webkit-animation: slide-out 0.5s forwards;
-    -webkit-transform: translateX(100%);
-    animation: slide-out 0.5s forwards;
-    transform: translateX(100%);
+    /* da poslednji sadržaj ne upadne ispod ivice/home bara na mobilnim */
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
   }
 }
 
-.narrow-card {
-  aspect-ratio: 1 / 2.7;
+/* Header alignment helper (ostavljeno iz tvog koda) */
+.popup-header,
+.popup-header .popup-header {
+  display: flex;
+  align-self: center;
+
+  &__title { text-align: left; }
+  &__action { flex: 9; text-align: right; }
 }
 
+/* Slide animacije (ne diram semantiku) */
+.popup-slide-in  { -webkit-animation: slide-in 0.5s forwards;  animation: slide-in 0.5s forwards;  transform: translateX(-100%); }
+.popup-slide-out { -webkit-animation: slide-out 0.5s forwards; animation: slide-out 0.5s forwards; transform: translateX(100%); }
+
+@keyframes slide-in   { 0% { transform: translateX(100%); } 100% { transform: translateX(0%); } }
+@-webkit-keyframes slide-in { 0% { -webkit-transform: translateX(100%); } 100% { -webkit-transform: translateX(0%); } }
+
+@keyframes slide-out  { 0% { transform: translateX(0%); } 100% { transform: translateX(100%); } }
+@-webkit-keyframes slide-out{ 0% { -webkit-transform: translateX(0%); } 100% { -webkit-transform: translateX(100%); } }
+
+/* Aspect helper (ostavljen) */
+.narrow-card { aspect-ratio: 1 / 2.7; }
+
+/* Kontejner specifičan primer (ostavljeno) */
 .service-reports-details {
   > .popup-container {
-    height: calc(var(--size-full-vh) - var(--space-xl));
-    width: calc(var(--size-full-vw) - var(--space-xl));
+    height: calc(var(--size-full-vh) - var(--space-xl)); /* ako koristiš, može i 100dvh-var() */
+    width:  calc(var(--size-full-vw) - var(--space-xl));
   }
 }
 
-@keyframes slide-in {
-  0% {
-    transform: translateX(100%);
-  }
-
-  100% {
-    transform: translateX(0%);
-  }
-}
-
-@-webkit-keyframes slide-in {
-  0% {
-    -webkit-transform: translateX(100%);
-  }
-
-  100% {
-    -webkit-transform: translateX(0%);
-  }
-}
-
-@keyframes slide-out {
-  0% {
-    transform: translateX(0%);
-  }
-
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-@-webkit-keyframes slide-out {
-  0% {
-    -webkit-transform: translateX(0%);
-  }
-
-  100% {
-    -webkit-transform: translateX(100%);
-  }
-}
-
+/* MOBILE */
 @media (max-width: 768px) {
   .popup-container__bottom--center {
     left: 0;
@@ -262,7 +163,7 @@
     width: 100vw;
     border-radius: 12px 12px 0 0;
     transform: none !important;
-    max-height: 90vh;
+    max-height: 90dvh; /* ranije 90vh */
     height: auto;
     padding: 0;
   }
@@ -282,67 +183,17 @@
   }
 }
 
-.confirmation-container {
-  display: flex;
-  align-items: stretch;
-  justify-content: flex-start;
-  padding: calc(var(--space-xs) * 3);
-  width: 100%;
+/* =========================
+   DODATNE NAPOMENE (ne-kritične)
+   - Ako negde imaš dodatni skrol (npr. unutar contenta), pazi da ne praviš nested scroll:
+     najbolje je da unutrašnje sekcije budu overflow: visible, a da skrol ostane na __body.
+   - Ako koristiš sticky header unutar tela, izbegni transform na roditeljima tog sticky bloka.
+   ========================= */
 
-  &__footer {
-    display: flex;
-    justify-content: flex-end;
-    padding-top: var(--space-s);
-
-    autom-button {
-      margin-left: var(--space-xs);
-    }
-  }
-
-  &__body {
-    padding: var(--space-s) 0;
-  }
-
-  &__icon {
-    flex: 1;
-    align-items: flex-start;
-    display: flex;
-    justify-content: center;
-    margin-right: var(--space-s);
-    width: 100%;
-
-    &--circle {
-      background: var(--figma-primary-50);
-      border-radius: 50%;
-      height: calc(var(--space-s) * 3);
-      position: relative;
-      width: calc(var(--space-s) * 3);
-
-      & .mat-icon {
-        left: calc(var(--space-xxs) * 3);
-        position: relative;
-        top: calc(var(--space-xxs) * 3);
-
-        & path {
-          stroke: var(--figma-primary-600) !important;
-        }
-      }
-
-      &-error {
-        @extend .confirmation-container__icon--circle;
-        background: var(--figma-error-50);
-
-        & .mat-icon path {
-          stroke: var(--figma-error-600) !important;
-        }
-      }
-    }
-  }
-
-  &__main {
-    display: flex;
-    flex: 9;
-    flex-direction: column;
-    max-width: 85%;
+   @media (max-width: 768px) {
+  .popup-container__body,
+  .confirmation-container {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important; 
+    /* 80px ≈ visina mobilnog bottom nav-a */
   }
 }

@@ -1,138 +1,155 @@
 <autom-popup
-  class="categories-selection"
+  class="categories-popup"
   [height]="sizeEnum.FULL_VH"
   [position]="positionEnum.LEFT"
-  [width]="sizeEnum.LARGE"
   [rounded]="true"
+  [width]="sizeEnum.LARGE"
   (close)="close.emit()"
 >
-  <!-- HEADER -->
+  <!-- ========== HEADER / HERO ========== -->
   <div custom-header class="cp-header">
     <div class="cp-hero">
-      <div class="cp-hero__left">
-        <h3 class="cp-title">{{ title }}</h3>
-        <p class="cp-subtitle">
-          Brza navigacija kroz 27 grupa i 150+ podgrupa.
-        </p>
+      <div class="cp-hero__title cp-header--main">
+        <div>
+          <h3 class="cp-title">Kategorije</h3>
+          <p class="cp-subtitle">
+            Brzo pronađi maziva, pribor, alate ili filtere. Za autodelove
+            koristi pretragu po vozilu.
+          </p>
+        </div>
+
+        <button
+          class="cp-close"
+          type="button"
+          (click)="close.emit()"
+          aria-label="Zatvori"
+        >
+          ✕
+        </button>
       </div>
 
-      <div class="cp-hero__right" *ngIf="!isMobileView">
+      <div class="cp-hero__actions">
+        <!-- Search -->
         <autom-input-fields
-          class="cp-search-input"
+          class="cp-search"
           [type]="inputTypeEnum.SEARCH"
-          [label]="'Pretraži kategorije...'"
-          (emitValue)="onSearch($event)"
+          placeholder="Pretraži grupe…"
           (emitSelected)="onSearch($event)"
-          (emitValueDebounced)="onSearch($event)"
+          aria-label="Pretraga kategorija"
         ></autom-input-fields>
+
+        <!-- TecDoc CTA -->
+        <button
+          class="btn-cta"
+          type="button"
+          (click)="
+            selected.emit({
+              kind: 'group',
+              groupId: 'TECDOC',
+              groupName: 'TecDoc'
+            })
+          "
+        >
+          Pretraži po vozilu
+        </button>
       </div>
-
-      <autom-icon
-        class="cp-close"
-        [color]="colorEnum.GREY_400"
-        [source]="iconsEnum.X"
-        (click)="close.emit()"
-      ></autom-icon>
-    </div>
-
-    <div class="cp-quick-tags" *ngIf="!loading() && !isMobileView">
-      <button
-        *ngFor="let t of quickTags"
-        class="cp-tag"
-        type="button"
-        (click)="useQuickTag(t.id)"
-      >
-        {{ t.label }}
-      </button>
-      <button class="cp-tag ghost" type="button" (click)="reset()">
-        Reset
-      </button>
     </div>
   </div>
 
-  <!-- BODY -->
+  <!-- ========== BODY ========== -->
   <div custom-body class="cp-body">
-    <!-- LEVO: GRUPE -->
-    <aside class="cp-groups">
-      <ng-container *ngIf="!loading(); else skeletonLeft">
-        <button
-          *ngFor="let g of filtered(); trackBy: trackGroup"
-          type="button"
-          class="cp-group-item"
-          [class.active]="g.groupId === selectedGroupId()"
-          (click)="selectGroup(g)"
-          [title]="g.name"
+    <!-- LEFT: Buckets & Groups -->
+    <aside class="cp-left">
+      <ng-container *ngIf="vm$ | async as buckets">
+        <section
+          class="bucket"
+          *ngFor="let bucket of buckets; trackBy: trackBucket"
+          [attr.aria-label]="bucket.label"
         >
-          <span class="cp-group-icon" [style.--accent]="accentForGroup(g)">
-            <autom-icon [source]="iconForGroup(g)"></autom-icon>
-          </span>
+          <div class="bucket__header">
+            <h4 class="bucket__title">{{ bucket.label }}</h4>
+            <span class="bucket__count" *ngIf="bucket.groups?.length">{{
+              bucket.groups.length
+            }}</span>
+          </div>
 
-          <span class="cp-group-text">
-            <span class="cp-group-name">{{ g.name }}</span>
-            <span class="cp-group-meta">
-              <span class="cp-divider"></span>
-              <span class="cp-hint" *ngIf="!isMobileView"
-                >Klikni za podgrupe</span
-              >
-            </span>
-          </span>
+          <ul class="group-list">
+            <li
+              class="group-item"
+              *ngFor="let group of bucket.groups; trackBy: trackGroup"
+              [class.is-active]="activeGroup?.code === group.code"
+              (click)="selectGroup(group)"
+              tabindex="0"
+              (keyup.enter)="selectGroup(group)"
+              [attr.aria-label]="group.name"
+            >
+              <div class="group-item__inner fade-in">
+                <div class="group-item__title">
+                  <!-- ikonica iz override-a ako je dodaš (nije obavezno) -->
+                  <autom-icon
+                    *ngIf="group.icon"
+                    [source]="group.icon"
+                    class="group-item__icon"
+                  ></autom-icon>
+                  <span class="group-item__name">{{ group.name }}</span>
+                </div>
+                <span class="group-item__chev">›</span>
+              </div>
+            </li>
+          </ul>
+        </section>
 
-          <span class="cp-arrow"></span>
-        </button>
+        <!-- Empty state kad filter ne nađe ništa -->
+        <div class="empty-state" *ngIf="!hasAnyGroups(buckets)">
+          <div class="empty-state__card fade-in">
+            <div class="empty-state__icon">🤷‍♂️</div>
+            <div class="empty-state__text">
+              Nema rezultata za taj upit. Pokušaj drugim pojmom.
+            </div>
+          </div>
+        </div>
       </ng-container>
-
-      <ng-template #skeletonLeft>
-        <div class="skeleton-line" *ngFor="let i of [].constructor(8)"></div>
-      </ng-template>
     </aside>
 
-    <!-- DESNO: PODGRUPE -->
-    <section class="cp-subgroups">
-      <ng-container *ngIf="selectedGroup() as sel; else pickPrompt">
-        <div class="cp-subgroups-header">
-          <div class="cp-subgroups-title">
-            {{ sel.name }}
-            <span
-              class="cp-dot"
-              [style.background]="accentForGroup(sel)"
-            ></span>
-          </div>
-          <button class="cp-all-btn" type="button" (click)="pickGroup(sel)">
-            Sve iz: {{ sel.name }}
-          </button>
-        </div>
-
-        <div class="cp-subgrid">
+    <!-- RIGHT: Subgroups (shows when a group is selected) -->
+    <section class="cp-right" *ngIf="activeGroup as g">
+      <header class="group-head slide-in">
+        <div class="group-head__left">
           <button
-            *ngFor="
-              let s of sel.articleSubGroups;
-              let idx = index;
-              trackBy: trackSub
-            "
-            class="cp-card"
+            class="btn-back"
             type="button"
-            [style.--delay]="idx * 30 + 'ms'"
-            (click)="pickSub(s)"
-            [title]="s.name"
+            (click)="activeGroup = null"
+            aria-label="Nazad na grupe"
           >
-            <div
-              class="cp-card__icon"
-              [style.borderColor]="accentForGroup(sel)"
-            >
-              <autom-icon [source]="iconForGroup(sel)"></autom-icon>
-            </div>
-            <div class="cp-card__name">{{ s.name }}</div>
-            <div class="cp-card__cta">Prikaži</div>
+            ‹
           </button>
+          <h4 class="group-title">{{ g.name }}</h4>
         </div>
-      </ng-container>
+        <button class="btn-outline" type="button" (click)="pickGroup(g)">
+          Prikaži sve iz grupe
+        </button>
+      </header>
 
-      <ng-template #pickPrompt>
-        <div class="cp-empty-state" *ngIf="!isMobileView">
-          Izaberite grupu sa leve strane
-        </div>
-        <div class="cp-empty-state" *ngIf="isMobileView">Izaberite grupu</div>
-      </ng-template>
+      <div class="subgrid">
+        <button
+          class="subcard fade-in"
+          *ngFor="let sub of g.subgroups; trackBy: trackSub"
+          type="button"
+          (click)="pickSubgroup(g, sub)"
+          [attr.aria-label]="sub.name"
+        >
+          <span class="subcard__name">{{ sub.name }}</span>
+          <span class="subcard__chev">›</span>
+        </button>
+      </div>
+
+      <!-- fallback kad grupa nema podgrupe -->
+      <div class="empty-subgroups fade-in" *ngIf="!g.subgroups?.length">
+        <p>Ova grupa trenutno nema podgrupe.</p>
+        <button class="btn-outline" type="button" (click)="pickGroup(g)">
+          Otvori celu grupu
+        </button>
+      </div>
     </section>
   </div>
 </autom-popup>

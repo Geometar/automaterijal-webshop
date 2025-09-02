@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { catchError, finalize, shareReplay, tap } from 'rxjs/operators';
 
 // Data Models
@@ -39,21 +39,22 @@ export class CategoriesStateService {
           this.categoryCache = data;
           this.categories$.next(data);
         }),
+        catchError((err) => throwError(() => err)), // <-- pre shareReplay
         finalize(() => (this.inFlight$ = undefined)),
-        shareReplay(1),
-        catchError((err) => {
-          throw err;
-        })
+        shareReplay(1)
       );
     }
-
     return this.inFlight$;
   }
 
   /** Optional: force refresh ignoring cache */
   refresh$(): Observable<ArticleCategories[]> {
     this.inFlight$ = this.api.fetchCategories().pipe(
-      tap((data) => this.categories$.next(data)),
+      tap((data) => {
+        this.categoryCache = data;
+        this.categories$.next(data);
+      }),
+      catchError((err) => throwError(() => err)),
       finalize(() => (this.inFlight$ = undefined)),
       shareReplay(1)
     );
@@ -62,6 +63,7 @@ export class CategoriesStateService {
 
   /** Optional: clear cache so next getCategories$ will call API */
   invalidate(): void {
+    this.categoryCache = [];                    // <-- očisti i lokalni cache
     this.categories$.next(null);
   }
 

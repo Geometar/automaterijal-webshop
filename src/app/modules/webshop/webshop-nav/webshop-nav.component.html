@@ -88,10 +88,9 @@
 >
 </vehicle-selection-popup>
 
-<categories-popup
+<autom-categories-popup
   *ngIf="chooseCategoryVisible"
-  [open]="chooseCategoryVisible"
-  (categorySelected)="categorySelected($event)"
+  (selected)="categorySelected($event)"
   (close)="chooseCategoryVisible = false"
 >
-</categories-popup>
+</autom-categories-popup>

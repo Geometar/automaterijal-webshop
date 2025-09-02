@@ -1,505 +1,289 @@
-/* Root */
-.categories-selection {
+/* ====== Variables ====== */
+:root {
+  --cp-bg: #fff;
+  --cp-fg: #111;
+  --cp-muted: #6b7280; /* gray-500 */
+  --cp-border: #e5e7eb; /* gray-200 */
+  --cp-accent: #0ea5e9; /* sky-500 */
+  --cp-accent-weak: #e0f2fe; /* sky-100 */
+  --cp-radius: 16px;
+  --cp-gap: 12px;
+  --cp-gap-lg: 20px;
+}
+
+/* ====== WRAPPER ====== */
+.categories-popup {
   display: flex;
   flex-direction: column;
   height: 100%;
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
-    Arial;
+  background: var(--cp-bg);
+  color: var(--cp-fg);
+  font-family: system-ui, sans-serif;
 }
 
-/* ---------- HEADER / HERO ---------- */
+/* ====== HEADER ====== */
 .cp-header {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: radial-gradient(
-      1200px 200px at 20% -80%,
-      rgba(255, 102, 0, 0.16),
-      transparent 60%
-    ),
-    linear-gradient(#fff, #fff);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  padding: 14px 18px 10px;
+  background: var(--cp-bg);
+  border-bottom: 1px solid var(--cp-border);
+  padding: var(--cp-gap-lg);
+
+  &--main {
+    display: flex;
+    justify-content: space-between;
+  }
 
   .cp-hero {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    align-items: center;
-    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--cp-gap);
 
-    @media (max-width: 900px) {
-      grid-template-columns: 1fr;
-      gap: 10px;
-    }
-  }
-
-  .cp-hero__left {
     .cp-title {
-      margin: 0 0 4px 0;
-      font-weight: 700;
-      font-size: 20px;
-      color: #111827;
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 600;
     }
+
     .cp-subtitle {
       margin: 0;
-      color: #6b7280;
-      font-size: 13px;
+      font-size: 0.875rem;
+      color: var(--cp-muted);
     }
-  }
 
-  .cp-hero__right {
-    .cp-search-input {
-      width: 100%;
+    .cp-hero__actions {
+      display: flex;
+      align-items: center;
+      gap: var(--cp-gap);
+
+      .cp-search {
+        flex: 1;
+      }
+
+      .btn-cta {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        background: var(--cp-accent);
+        color: white;
+        border-radius: var(--cp-radius);
+        border: none;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background 0.2s;
+
+        &:hover {
+          background: color-mix(in srgb, var(--cp-accent) 90%, black);
+
+          @supports not (background: color-mix(in srgb, red 90%, black)) {
+            filter: brightness(0.92);
+          }
+        }
+      }
     }
   }
 
   .cp-close {
-    position: absolute;
-    top: 8px;
-    right: 8px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
     cursor: pointer;
-    transition: transform 0.2s ease;
+    color: var(--cp-muted);
+
     &:hover {
-      transform: rotate(90deg);
+      color: var(--cp-fg);
     }
   }
+}
 
-  .cp-quick-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 10px;
+/* ====== BODY LAYOUT ====== */
+/* spolja skroluje */
+.mobile-filters .page-details__body {
+  max-height: calc(100dvh - 100px);
+  overflow-y: auto;
+}
 
-    .cp-tag {
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      background: #fff;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      color: #374151;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      &:hover {
-        border-color: #ff6600;
-        color: #ff6600;
-      }
-      &.ghost {
-        background: #f3f4f6;
-        border-color: transparent;
+/* unutra ne skroluje */
+.cp-left,
+.cp-right {
+  overflow: visible;
+  max-height: none;
+}
+.cp-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  min-height: 0; /* important for flex/grid scroll */
+}
+
+/* ====== LEFT PANEL ====== */
+.cp-left {
+  border-right: 1px solid var(--cp-border);
+  overflow-y: auto;
+  padding: var(--cp-gap-lg);
+
+  .bucket {
+    margin-bottom: var(--cp-gap-lg);
+
+    .bucket__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--cp-gap);
+    }
+
+    .bucket__title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--cp-muted);
+      text-transform: uppercase;
+    }
+
+    .bucket__count {
+      background: var(--cp-accent-weak);
+      color: var(--cp-accent);
+      border-radius: 9999px;
+      padding: 0 6px;
+      font-size: 0.75rem;
+    }
+
+    .group-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      .group-item {
+        margin-bottom: 4px;
+        cursor: pointer;
+        border-radius: var(--cp-radius);
+        padding: 6px 10px;
+        transition: background 0.2s;
+
         &:hover {
-          background: #e5e7eb;
-          color: #111827;
+          background: var(--cp-accent-weak);
+        }
+
+        &.is-active {
+          background: var(--cp-accent);
+          color: white;
+        }
+
+        .group-item__inner {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
         }
       }
     }
   }
 }
 
-/* ---------- BODY LAYOUT ---------- */
-.cp-body {
-  display: grid;
-  grid-template-columns: 35% 65%;
-  height: calc(100vh - 120px);
-  overflow: hidden;
-  width: 100%;
-
-  @media (max-width: 900px) {
-    grid-template-columns: 1fr;
-    height: fit-content;
-  }
-}
-
-/* ---------- LEFT: GROUPS ---------- */
-.cp-groups {
+/* ====== RIGHT PANEL ====== */
+.cp-right {
   overflow-y: auto;
-  background: #f8fafc;
-  border-right: 1px solid rgba(0, 0, 0, 0.06);
-  padding: 6px 6px 12px;
-}
+  padding: var(--cp-gap-lg);
 
-.cp-group-item {
-  display: grid;
-  width: 100%;
-  grid-template-columns: 44px 1fr 12px;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 10px;
-  margin: 6px 2px;
-  border-radius: 14px;
-  cursor: pointer;
-  color: #111827;
-  background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  transition: transform 0.12s ease, border-color 0.12s ease,
-    box-shadow 0.12s ease, background 0.12s ease;
-
-  &:hover {
-    transform: translateY(-1px);
-    border-color: rgba(0, 0, 0, 0.12);
-    background: #ffffff;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  }
-
-  &.active {
-    box-shadow: inset 0 0 0 2px #ff6600;
-  }
-
-  .cp-group-icon {
-    --accent: #ff6600;
-    display: grid;
-    place-items: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    background: color-mix(in hsl, var(--accent) 12%, #fff);
-    border: 1px solid color-mix(in hsl, var(--accent) 40%, #fff);
-  }
-
-  .cp-group-text {
-    display: grid;
-    align-items: center;
-  }
-
-  .cp-group-name {
-    font-weight: 700;
-    font-size: 14px;
-    color: #0f172a;
-  }
-
-  .cp-group-meta {
+  .group-head {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 8px;
-    margin-top: 2px;
-    .cp-badge {
-      background: #f1f5f9;
-      color: #334155;
-      border-radius: 999px;
-      padding: 2px 8px;
-      font-size: 11px;
+    margin-bottom: var(--cp-gap-lg);
+
+    .group-title {
+      font-size: 1.1rem;
       font-weight: 600;
     }
-    .cp-divider {
-      width: 6px;
-      height: 6px;
-      border-right: 2px solid #cbd5e1;
-      border-bottom: 2px solid #cbd5e1;
-      transform: rotate(-45deg);
+
+    .btn-back {
+      background: none;
+      border: none;
+      font-size: 1.75rem;
+      cursor: pointer;
+      color: var(--bittersweet);
+      margin-right: var(--cp-gap);
     }
-    .cp-hint {
-      font-size: 11px;
-      color: #64748b;
-    }
-  }
 
-  .cp-arrow {
-    width: 6px;
-    height: 6px;
-    border-right: 2px solid #9ca3af;
-    border-bottom: 2px solid #9ca3af;
-    transform: rotate(-45deg);
-    justify-self: end;
-  }
-}
+    .btn-outline {
+      border: 1px solid var(--cp-accent);
+      background: transparent;
+      color: var(--cp-accent);
+      border-radius: var(--cp-radius);
+      padding: 4px 10px;
+      cursor: pointer;
+      font-size: 0.85rem;
 
-/* Skeleton shimmer for groups */
-.skeleton-line {
-  height: 48px;
-  margin: 6px;
-  border-radius: 12px;
-  background: linear-gradient(90deg, #f3f4f6, #e5e7eb, #f3f4f6);
-  background-size: 200% 100%;
-  animation: shimmer 1.2s infinite;
-}
-@keyframes shimmer {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
-}
-
-/* ---------- RIGHT: SUBGROUPS ---------- */
-.cp-subgroups {
-  overflow-y: auto;
-  padding: 16px 16px 24px;
-  background: #fff;
-}
-
-.cp-subgroups-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 14px;
-
-  .cp-subgroups-title {
-    font-weight: 800;
-    font-size: 16px;
-    color: #0f172a;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .cp-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 999px;
-    background: #ff6600;
-  }
-
-  .cp-all-btn {
-    border: 1px dashed #cbd5e1;
-    background: #fff;
-    color: #475569;
-    padding: 6px 10px;
-    border-radius: 10px;
-    font-size: 12px;
-    cursor: pointer;
-    transition: all 0.12s ease;
-    &:hover {
-      background: #f8fafc;
-      color: #0f172a;
+      &:hover {
+        background: var(--cp-accent-weak);
+      }
     }
   }
-}
 
-/* Cards grid + enter animation with stagger */
-.cp-subgrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 12px;
-
-  @media (max-width: 900px) {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  }
-}
-
-.cp-card {
-  --delay: 0ms; /* will be set inline */
-  display: grid;
-  grid-template-rows: 44px auto 18px;
-  align-items: center;
-  gap: 6px;
-  padding: 12px;
-  background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  border-radius: 14px;
-  cursor: pointer;
-  transform: translateY(6px);
-  opacity: 0;
-  animation: cardIn 0.28s ease forwards;
-  animation-delay: var(--delay);
-  transition: transform 0.12s ease, box-shadow 0.12s ease,
-    border-color 0.12s ease;
-
-  &:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-    border-color: rgba(0, 0, 0, 0.12);
-  }
-
-  .cp-card__icon {
+  .subgrid {
     display: grid;
-    place-items: center;
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    border: 2px solid #ff6600;
-    background: #fff7f3;
-    justify-self: start;
-  }
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: var(--cp-gap);
 
-  .cp-card__name {
-    font-size: 14px;
-    font-weight: 700;
-    color: #0f172a;
-    text-align: left;
-  }
+    .subcard {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      background: #f9fafb;
+      border: 1px solid var(--cp-border);
+      border-radius: var(--cp-radius);
+      cursor: pointer;
+      transition: background 0.2s;
 
-  .cp-card__cta {
-    font-size: 12px;
-    color: #ff6600;
-    justify-self: start;
+      &:hover {
+        background: var(--cp-accent-weak);
+      }
+    }
   }
 }
 
-@keyframes cardIn {
+/* ====== ANIMATIONS ====== */
+.fade-in {
+  animation: fadeIn 0.2s ease-in;
+}
+.slide-in {
+  animation: slideIn 0.25s ease-out;
+}
+
+@keyframes fadeIn {
   from {
-    transform: translateY(6px);
     opacity: 0;
   }
   to {
-    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes slideIn {
+  from {
+    transform: translateX(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
     opacity: 1;
   }
 }
 
-/* Prompt when no group selected */
-.cp-empty-state {
-  display: grid;
-  place-content: center;
-  height: 60%;
-  color: #94a3b8;
-  font-size: 14px;
-}
-
-/* ===== Mobile layout: 2–3 reda grupa, horizontal scroll, ~full screen ===== */
-@media (max-width: 900px) {
-  .cp-arrow {
-    display: none; /* sakrij strelicu na mobilnom */
-  }
-  /* Koliko je visok header u popupu – uskladi ako ti treba */
-  .categories-selection {
-    --cp-header-h: 112px; /* sticky header height */
-    --cp-gap: 8px; /* gap između elemenata */
-    --cp-row-h: 90px; /* visina jednog reda kartice grupe */
-    --cp-item-w: 160px; /* širina jedne kartice grupe */
-    --cp-rows: 1; /* podrazumevano 2 reda (vidi niže za 3) */
+/* ====== RESPONSIVE ====== */
+@media (max-width: 991px) {
+  .cp-body {
+    grid-template-columns: 1fr; /* collapse to 1 column */
   }
 
-  /* Viewport: zauzmi skoro ceo ekran ispod headera */
-  .cp-viewport {
-    height: calc(100vh - var(--cp-header-h));
-    display: flex;
-    flex-direction: column;
-    overflow: hidden; /* spreči dvostruki scroll */
-  }
-
-  /* Panovi jedan ispod drugog (grupe gore, podgrupe dole) */
-  .cp-panels {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    overflow: hidden;
-  }
-
-  /* GRUPE – multi‑row horizontal scroll */
-  .cp-panel--groups {
-    flex: 0 0 auto; /* visina definisana preko .cp-groups */
-  }
-
-  .cp-groups {
-    order: 1;
-    padding: 8px 12px;
-    background: transparent;
+  .cp-left {
     border-right: none;
-
-    /* Horizontal scroll */
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-
-    /* 2–3 reda kroz CSS Grid sa "auto-flow: column"
-       -> puni se po kolonama i lomi u redove */
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: var(--cp-item-w); /* širina jedne kolone (kartice) */
-    grid-template-rows: repeat(2, 94px);
-    gap: var(--cp-gap);
-
-    /* Vizuelni fade na ivicama počas horizontalnog scrolla */
-    position: relative;
-    mask-image: linear-gradient(
-      to right,
-      transparent 0,
-      #000 16px,
-      #000 calc(100% - 16px),
-      transparent 100%
-    );
-    -webkit-mask-image: linear-gradient(
-      to right,
-      transparent 0,
-      #000 16px,
-      #000 calc(100% - 16px),
-      transparent 100%
-    );
-
-    /* Fiksna visina da lepo stanu 2 reda + gap */
-    height: calc(
-      var(--cp-rows) * var(--cp-row-h) + (var(--cp-rows) - 1) * var(--cp-gap)
-    );
+    border-bottom: 1px solid var(--cp-border);
+    max-height: 40vh; /* limit left panel height */
   }
 
-  .cp-group-item {
-    /* svaki item je “kolona” u gridu; fiks širina i visina po redu */
-    width: var(--cp-item-w);
-    height: var(--cp-row-h);
-    margin: 0;
-    flex: 0 0 auto; /* defensive, iako je grid */
-    scroll-snap-align: start;
-    display: grid;
-    grid-template-columns: 40px 1fr 12px;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 10px;
-  }
-
-  /* finoća: lakše “parkiranje” pri scrollu */
-  .cp-groups {
-    scroll-snap-type: x proximity;
-    height: 200px;
-    margin-bottom: 10px;
-  }
-
-  /* PODGRUPE – zauzmi ostatak visine */
-  .cp-panel--subs {
-    flex: 1 1 auto;
-    min-height: 0; /* bitno da overflow radi */
-  }
-
-  .cp-subgroups {
-    order: 2;
-    padding: 12px;
-  }
-
-  .cp-subgroups-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-
-    .cp-all-btn {
-      width: 100%;
-      text-align: center;
-    }
-  }
-
-  .cp-subgrid {
-    gap: 10px;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    height: 100%;
-    margin-bottom: 60px;
-    overflow-y: auto;
-  }
-
-  /* Opcioni sticky back dugme iznad podgrupa na mobilnom */
-  .cp-back-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 10px;
-    border-radius: 10px;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    background: #fff;
-    font-size: 12px;
-  }
-
-  .cp-group-meta {
-    .cp-divider {
-      display: none;
-    }
-  }
-}
-
-/* Ako je uređaj nizak ali “viši” mobilni (ili tablet u portretu), možeš 3 reda */
-@media (max-width: 900px) and (min-height: 740px) {
-  .categories-selection {
-    --cp-rows: 3;
-  .popup-container { 
-    height: 100vh;
-  }
+  .cp-right {
+    max-height: 60vh;
+    min-height: 35vh;
   }
 }

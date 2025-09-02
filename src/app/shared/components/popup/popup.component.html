@@ -26,15 +26,12 @@
   </header>
 
   <!-- Popup Body -->
-  <body
-    class="popup-container__body"
-    [class.popup-container--rounded]="rounded"
-  >
+  <div class="popup-container__body" [class.popup-container--rounded]="rounded">
     <ng-content *ngIf="!loading" select="[custom-body]"></ng-content>
     <div *ngIf="loading" class="spinner">
       <spinner></spinner>
     </div>
-  </body>
+  </div>
 
   <!-- Footer Part -->
   <footer
