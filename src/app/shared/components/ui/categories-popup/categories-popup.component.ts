@@ -1,19 +1,20 @@
 import { Component, EventEmitter, HostListener, Output, ViewEncapsulation } from '@angular/core';
 import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
-import { CategoriesBucketsService } from '../../../service/utils/categories-buckets.service';
-import { Bucket, BucketGroup, CategoryPick } from '../../../data-models/model';
-import { AutomIconComponent } from '../../autom-icon/autom-icon.component';
-import { PopupComponent } from '../../popup/popup.component';
-import { InputFieldsComponent } from '../../input-fields/input-fields.component';
-import { InputTypeEnum, PositionEnum, SizeEnum } from '../../../data-models/enums';
 import { CommonModule } from '@angular/common';
 
-export interface CategorySelection {
-  groupCode: string;
-  groupName: string;
-  subGroupId?: number;
-  subGroupName?: string;
-}
+// Autom imports
+import { AutomIconComponent } from '../../autom-icon/autom-icon.component';
+import { InputFieldsComponent } from '../../input-fields/input-fields.component';
+import { PopupComponent } from '../../popup/popup.component';
+
+// Data models
+import { Bucket, BucketGroup, CategoryPick } from '../../../data-models/model';
+
+// Enums
+import { InputTypeEnum, PositionEnum, SizeEnum } from '../../../data-models/enums';
+
+// Services
+import { CategoriesBucketsService } from '../../../service/utils/categories-buckets.service';
 
 @Component({
   selector: 'autom-categories-popup',

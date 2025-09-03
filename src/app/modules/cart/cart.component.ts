@@ -121,6 +121,7 @@ export class CartComponent implements OnInit, OnDestroy {
       comment: [''],
       payment: ['', Validators.required],
       transport: ['', Validators.required],
+      vin: [''],
     });
     this.userForm = this.fb.group({
       city: ['', Validators.required],
@@ -131,6 +132,7 @@ export class CartComponent implements OnInit, OnDestroy {
       street: ['', Validators.required],
       surname: ['', Validators.required],
       pib: [''],
+      vin: [''],
       comment: [''],
     });
   }
@@ -292,34 +294,66 @@ export class CartComponent implements OnInit, OnDestroy {
 
   private buildAnonymousNote(): string {
     const f = this.userForm.controls;
-    return [
-      `Ime i Prezime: ${f['name'].value} ${f['surname'].value}`,
-      `Telefon i Email: ${f['phone'].value} ${f['email'].value}`,
-      `Adresa: ${f['street'].value}`,
-      f['pib'].value ? `Tax ID (PIB): ${f['pib'].value}` : null,
-      `Grad i Postal Code: ${f['city'].value} ${f['postalcode'].value}`,
-      f['comment'].value ? `Komentar: ${f['comment'].value}` : null,
-    ]
-      .filter(Boolean)
-      .join('; ') + ';';
+    const parts: string[] = [];
+
+    // full name
+    if (f['name'].value || f['surname'].value) {
+      parts.push(`Ime i Prezime: ${f['name'].value} ${f['surname'].value}`.trim());
+    }
+
+    // phone + email
+    if (f['phone'].value || f['email'].value) {
+      parts.push(`Telefon i Email: ${f['phone'].value} ${f['email'].value}`.trim());
+    }
+
+    // address
+    if (f['street'].value) {
+      parts.push(`Adresa: ${f['street'].value}`);
+    }
+
+    // city + postal
+    if (f['city'].value || f['postalcode'].value) {
+      parts.push(`Grad i Poštanski broj: ${f['city'].value} ${f['postalcode'].value}`.trim());
+    }
+
+    // PIB
+    if (f['pib'].value) {
+      parts.push(`Tax ID (PIB): ${f['pib'].value}`);
+    }
+
+    // VIN
+    if (f['vin']?.value) {
+      parts.push(`VIN: ${f['vin'].value}`);
+    }
+
+    // comment
+    if (f['comment'].value) {
+      parts.push(`Komentar: ${f['comment'].value}`);
+    }
+
+    return parts.join('; ') + ';';
   }
 
   private buildLoggedUserNote(): string {
     const formAddress = this.cartForm.get('address')?.value?.trim();
-    const userAddress = this.account?.adresa?.trim(); // prilagodi ako je adresa složenija
+    const userAddress = this.account?.adresa?.trim();
     const comment = this.cartForm.get('comment')?.value?.trim();
+    const vin = this.cartForm.get('vin')?.value?.trim();
 
     const addressChanged =
       formAddress && userAddress && formAddress !== userAddress;
 
-    const noteParts = [];
+    const noteParts: string[] = [];
 
     if (addressChanged) {
       noteParts.push(`Adresa je promenjena. Nova adresa: ${formAddress}`);
-      if (comment) {
-        noteParts.push(`Komentar: ${comment}`);
-      }
-    } else if (comment) {
+    }
+
+    if (vin) {
+      noteParts.push(`VIN: ${vin}`);
+    }
+
+    if (comment) {
       noteParts.push(`Komentar: ${comment}`);
     }
 
@@ -329,7 +363,6 @@ export class CartComponent implements OnInit, OnDestroy {
 
     return noteParts.length === 1 ? noteParts[0] : noteParts.join('; ') + ';';
   }
-
 
   /** Basket send: end */
 }

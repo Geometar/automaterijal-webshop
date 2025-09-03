@@ -74,6 +74,13 @@
       font-size: 18px;
     }
   }
+
+  .form-hint {
+    display: block;
+    margin-top: 4px;
+    font-size: 13px;
+    color: var(--figma-neutral-600);
+  }
 }
 
 @media (max-width: 991px) {

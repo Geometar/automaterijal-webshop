@@ -46,6 +46,26 @@
         (emitSelected)="setCartSelectionValue('comment', $event)"
         ngDefaultControl
       ></autom-text-area>
+      <autom-input-fields
+        class="flex--1"
+        [clearBtn]="true"
+        [formControlName]="'vin'"
+        [label]="'VIN'"
+        [placeholder]="'npr. WDBUF56X28B123456'"
+        [required]="false"
+        [maxLength]="17"
+        [attr.aria-describedby]="'vinHelp'"
+        (emitSelected)="setUserSelectionValue('vin', $event)"
+        ngDefaultControl
+      ></autom-input-fields>
+
+      <small id="vinHelp" class="form-hint">
+        <strong>Opciono polje:</strong> Ako unesete VIN broj, naš tim može uz
+        pomoć profesionalnih alata proveriti da li deo koji ste pronašli zaista
+        odgovara vašem vozilu. Za isti model automobila može postojati više
+        različitih varijanti delova iz mnogo razloga (oprema, motor, godina,
+        tržište…). VIN nam omogućava da budete sigurni u ispravnost izbora.
+      </small>
     </form>
     <form *ngIf="!loggedIn" class="information" [formGroup]="userForm">
       <div class="display--flex gap-7">
@@ -137,6 +157,26 @@
         (emitSelected)="setUserSelectionValue('comment', $event)"
         ngDefaultControl
       ></autom-text-area>
+      <autom-input-fields
+        class="flex--1"
+        [clearBtn]="true"
+        [formControlName]="'vin'"
+        [label]="'VIN'"
+        [placeholder]="'npr. WDBUF56X28B123456'"
+        [required]="false"
+        [maxLength]="17"
+        [attr.aria-describedby]="'vinHelp'"
+        (emitSelected)="setUserSelectionValue('vin', $event)"
+        ngDefaultControl
+      ></autom-input-fields>
+
+      <small id="vinHelp" class="form-hint">
+        <strong>Opciono polje:</strong> Ako unesete VIN broj, naš tim može uz
+        pomoć profesionalnih alata proveriti da li deo koji ste pronašli zaista
+        odgovara vašem vozilu. Za isti model automobila može postojati više
+        različitih varijanti delova iz mnogo razloga (oprema, motor, godina,
+        tržište…). VIN nam omogućava da budete sigurni u ispravnost izbora.
+      </small>
     </form>
     <div *ngIf="total" class="total">
       <table>
