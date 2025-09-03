@@ -5,6 +5,10 @@
       class="clickable-image"
       [alt]="data.proizvodjac?.naziv + ' ' + data.naziv"
       [src]="data!.slika!.slikeUrl"
+      decoding="async"
+      height="180"
+      loading="lazy"
+      width="200"
       (click)="openImageZoom(data!.slika!.slikeUrl!)"
     />
   </div>
@@ -21,7 +25,7 @@
       {{ nameWithoutManufacturer }}
     </h3>
     <p class="autom-margin__none">
-      Kataloski broj:
+      Kataloški broj:
       <span class="color--figma-primary-800 display--inline font-medium">{{
         data!.katbr
       }}</span>
@@ -41,6 +45,7 @@
     <table
       *ngIf="!showPriceOnly"
       class="specifications"
+      id="specTable"
       aria-label="Specifikacije artikla"
     >
       <tbody>
@@ -90,6 +95,8 @@
       <autom-button
         [type]="buttonType.TERNARY"
         [label]="showAllSpecs ? 'Prikaži manje' : 'Prikaži više'"
+        [attr.aria-expanded]="showAllSpecs"
+        [attr.aria-controls]="'specTable'"
         (click)="toggleSpecifications()"
       >
       </autom-button>
@@ -120,14 +127,11 @@
     >
       -{{ data.rabat }}%
     </p>
-    <p
-      *ngIf="data.podGrupa !== 1000000 && data.podGrupa !== 1000000"
-      class="price"
-    >
+    <p *ngIf="data.podGrupa !== 1000000" class="price">
       {{ data.cena ? (data.cena! | rsdCurrency) : (0 | rsdCurrency) }}
     </p>
     <p *ngIf="data.podGrupa !== 1000000" class="mobile-row autom-align__right">
-      Cena sa pdv-om
+      Cena sa PDV-om
     </p>
     <div class="mobile-quantity-cart util__flex--center">
       <div *ngIf="data.podGrupa === 1000000" class="helper-article">
@@ -166,7 +170,12 @@
         (clickEvent)="addToShoppingCart(data)"
       />
     </div>
-    <div *ngIf="isInCart(data.robaid ?? 0)" class="util__flex--center">
+    <div
+      *ngIf="isInCart(data.robaid ?? 0)"
+      class="util__flex--center"
+      role="status"
+      aria-live="polite"
+    >
       <autom-icon
         aria-label="Artikal je već dodat u korpu"
         class="in-cart"
@@ -231,11 +240,17 @@
 <div
   class="image-zoom-overlay"
   *ngIf="zoomedImageUrl"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Uvećana slika"
   (click)="zoomedImageUrl = null"
+  (keydown.escape)="zoomedImageUrl = null"
+  tabindex="0"
 >
   <img
     class="zoomed-image"
     [src]="zoomedImageUrl"
+    alt="Uvećana slika proizvoda"
     (click)="$event.stopPropagation()"
   />
 </div>
