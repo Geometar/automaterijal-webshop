@@ -144,4 +144,13 @@ export class UrlHelperService {
       podgrupe: subGroupId ?? null
     });
   }
+
+  /** Navigate to absolute path (utility method) */
+  navigateTo(path: string | any[]): void {
+    if (typeof path === 'string') {
+      this.router.navigate([path]);
+    } else {
+      this.router.navigate(path);
+    }
+  }
 }

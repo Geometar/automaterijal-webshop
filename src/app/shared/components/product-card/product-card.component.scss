@@ -1,0 +1,129 @@
+.product-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 1.2rem;
+  border-radius: 1rem;
+  border: 1px solid var(--figma-border-strong);
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+  }
+
+  .product-image {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 0.75rem;
+    margin-bottom: 1rem;
+    background: var(--figma-surface-subtle);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+  }
+
+  .product-details {
+    margin-bottom: 0.75rem;
+
+    .product-title {
+      font-size: 1.05rem !important;
+      font-weight: 600 !important;
+      color: var(--figma-text-default);
+      line-height: 1.4 !important;
+      margin-bottom: 0.25rem !important;
+      height: 3.9em;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .product-katbr {
+      font-size: 0.85rem;
+      color: var(--figma-text-secondary);
+    }
+  }
+
+  .product-price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--figma-success-700);
+    margin-bottom: 0.5rem;
+
+    .old-price {
+      font-size: 0.95rem;
+      text-decoration: line-through;
+      color: var(--figma-text-tertiary);
+    }
+
+    .discount {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--figma-danger-700);
+    }
+
+    .final-price {
+      font-weight: 700;
+    }
+  }
+
+  .product-stock {
+    font-size: 0.85rem;
+    font-weight: 500;
+    height: 1.25rem; // fiksirano da ne skače
+    margin-bottom: 1rem;
+
+    &.green {
+      color: var(--figma-success-700);
+    }
+
+    &.red {
+      color: var(--figma-danger-600);
+    }
+  }
+
+  .product-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-top: auto;
+
+    .quantity-size {
+      width: 100%;
+    }
+
+    autom-button {
+      width: 100%;
+
+      .icon {
+        margin-right: 0.4rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      span {
+        display: inline-block;
+        transform: translateY(1px);
+      }
+    }
+  }
+
+  .in-cart-indicator {
+    position: absolute;
+    top: 0.8rem;
+    right: 0.8rem;
+  }
+}

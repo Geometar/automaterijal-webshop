@@ -1,0 +1,76 @@
+.showcase-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  padding: 2rem 1rem;
+  border-radius: 1rem;
+}
+
+.showcase-section {
+  padding: 2rem;
+  border-radius: 1rem;
+  transition: background-color 0.3s ease;
+
+  .section-title {
+    font-size: 1.75rem;
+    margin-bottom: 1.5rem;
+    color: var(--figma-primary-800);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-left: 4px solid var(--figma-primary-500);
+    padding-left: 0.75rem;
+  }
+
+  .grid-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    max-width: 1320px; // npr. 6 kartica * 220px + 5 * 24px gap
+    width: 100%;
+
+    autom-product-card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+      }
+    }
+  }
+}
+
+// Alternating background themes
+.theme-0 {
+  background-color: #f9f9f9;
+}
+.theme-1 {
+  background-color: #f4f6f8;
+}
+.theme-2 {
+  background-color: #ffffff;
+}
+
+.loading-placeholder {
+  padding: 2rem;
+  text-align: center;
+  font-style: italic;
+  color: var(--figma-neutral-600);
+
+  img {
+    margin-bottom: 1rem;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}

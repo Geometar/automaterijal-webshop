@@ -1,41 +1,43 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { take } from 'rxjs/operators';
 
-// Data models
+// Models & Enums
 import { Category } from '../../../shared/data-models/interface';
-
-// Enums
 import { IconsEnum } from '../../../shared/data-models/enums';
 
-// Service
+// Services
 import { UrlHelperService } from '../../../shared/service/utils/url-helper.service';
 import { ConfigService } from '../../../shared/service/config.service';
+
+// Components
+import { ShowcaseComponent } from '../../../shared/components/showcase/showcase.component';
 
 @Component({
   selector: 'webshop-empty',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ShowcaseComponent],
   templateUrl: './webshop-empty.component.html',
-  styleUrl: './webshop-empty.component.scss'
+  styleUrl: './webshop-empty.component.scss',
+  encapsulation: ViewEncapsulation.None
 })
-export class WebshopEmptyComponent {
+export class WebshopEmptyComponent implements OnInit {
   iconEnum = IconsEnum;
 
   brands: Category[] = [];
-  categories: Category[] = [];
 
-  constructor(private urlHelperService: UrlHelperService, private configService: ConfigService) {
-    this.configService.getConfig().subscribe(config => {
-      this.categories = config.categories.filter(b => b.visible !== false);
-      this.brands = config.brands.filter(b => b.visible !== false);;
+  constructor(
+    private urlHelperService: UrlHelperService,
+    private configService: ConfigService
+  ) { }
+
+  ngOnInit(): void {
+    this.configService.getConfig().pipe(take(1)).subscribe(config => {
+      this.brands = config.brands.filter(brand => brand.visible !== false);
     });
   }
 
   filterByBrand(id: string): void {
-    this.urlHelperService.addOrUpdateQueryParams({ "mandatoryproid": id });
-  }
-
-  filterByCategory(id: string): void {
-    this.urlHelperService.addOrUpdateQueryParams({ "grupe": id });
+    this.urlHelperService.addOrUpdateQueryParams({ mandatoryproid: id });
   }
 }

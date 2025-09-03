@@ -1,179 +1,269 @@
-.container {
-  display: flex;
-  margin: 0 auto;
-  max-width: 1200px;
-  padding: 20px;
-;
-}
-
-.heading {
-  color: #1b455e;
-  font-size: 1.4rem ! IMPORTANT;
-  margin-bottom: 0px !important;
-  text-align: center;
-}
-
-/* Grid Layout */
-.product-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
-}
-
-/* Card Styles */
-.product--card {
-  background-color: #b2b2b21a;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  cursor: pointer;
-  height: 200px;
-  padding: 10px;
-  text-align: center;
-  transition: transform 0.3s, box-shadow 0.3s;
-  width: 150px;
-}
-
-/* Card Styles */
-.category--card {
-  background-color: #b2b2b21a;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  cursor: pointer;
-  height: 200px;
-  padding: 10px;
-  text-align: center;
-  transition: transform 0.3s, box-shadow 0.3s;
-  width: 240px;
-}
-
-.product--card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.category--card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Image Wrapper to Center Images */
-.image-wrapper {
-  align-items: center;
-  display: flex;
-  height: 100px; /* Adjust to your needs */
-  justify-content: center;
-  margin-bottom: 30px;
-}
-
-.image-wrapper img {
-  max-height: 100%;
-  max-width: 100%;
-  object-fit: contain;
-}
-
-
-.category-image-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 120px; /* Adjust to your needs */
-  margin-bottom: 10px;
-}
-
-.category-image-wrapper img {
-  max-height: 100%;
-  max-width: 100%;
-  object-fit: contain;
-}
-
-/* Line with Dot */
-.line {
-  background-color: #ddd;
-  height: 1px;
-  margin: 10px 0;
+/* ============================================================
+   HERO SECTION
+   ============================================================ */
+.webshop-hero {
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  padding: 140px 20px;
+  background: linear-gradient(135deg, #f4faff, #ffffff);
+  border-radius: 16px;
+  overflow: hidden;
+
+  .hero-content {
+    z-index: 2;
+    max-width: 720px;
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      color: #1b455e;
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 1.25rem;
+      color: #444;
+      margin-bottom: 32px;
+
+      strong {
+        color: #1b455e;
+      }
+    }
+
+    .cta-button {
+      background-color: #ffd600;
+      color: #1b455e;
+      font-weight: 700;
+      padding: 16px 36px;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: #ffc107;
+      }
+    }
+  }
+
+  .hero-bg-image {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    max-width: 800px;
+    width: 100%;
+    transform: translate(-50%, -50%);
+    opacity: 0.07;
+    z-index: 1;
+
+    img {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 80px 16px;
+
+    .hero-content {
+      h1 {
+        font-size: 2.4rem;
+      }
+      p {
+        font-size: 1.1rem;
+      }
+      .cta-button {
+        font-size: 1rem;
+        padding: 14px 28px;
+      }
+    }
+
+    .hero-bg-image {
+      max-width: 600px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    padding: 60px 12px;
+
+    .hero-content {
+      h1 {
+        font-size: 2rem;
+      }
+      p {
+        font-size: 1rem;
+      }
+      .cta-button {
+        font-size: 0.95rem;
+        padding: 12px 24px;
+      }
+    }
+
+    .hero-bg-image {
+      max-width: 400px;
+    }
+  }
 }
 
-.line .dot {
-  background-color: red;
-  border-radius: 50%;
-  height: 8px;
-  left: 50%;
-  position: absolute;
-  top: -4px;
-  transform: translateX(-50%);
-  width: 8px;
+/* ============================================================
+   GENERIC SECTION TITLE
+   ============================================================ */
+.section {
+  margin: 0 auto;
+
+  h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: #1b455e;
+    text-align: center;
+  }
 }
 
-/* Label Styles */
-.product-label {
-  color: #333;
-  font-size: 1rem;
-  font-weight: bold;
-  margin-top: 10px;
-}
+/* ============================================================
+   CARD GRID (Generic style used across sections)
+   ============================================================ */
+.card-grid {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  justify-content: center;
+  list-style: none;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 1050px;
+  padding: 0;
 
-@media (max-width: 991px) {
-  .container {
+  li {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    padding: 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    display: flex;
     flex-direction: column;
-    padding: 15px;
+    align-items: center;
+    justify-content: center;
+    height: 140px;
+
+    &:hover {
+      transform: translateY(-4px);
+    }
+
+    img {
+      width: 60px;
+      height: auto;
+      object-fit: contain;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      font-size: 0.85rem;
+      color: #333;
+      font-weight: 500;
+    }
   }
 
-  .product-grid {
-    gap: 15px;
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+
+    li {
+      height: 120px;
+
+      img {
+        width: 50px;
+      }
+    }
   }
 
-  .product--card,
-  .category--card {
-    width: 45%; // 2 kartice u redu
-    height: auto;
-    padding: 10px;
-  }
-
-  .image-wrapper,
-  .category-image-wrapper {
-    height: 80px; // manje slike
-    margin-bottom: 15px;
-  }
-
-  .product-label {
-    font-size: 0.9rem;
+  @media (max-width: 480px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
   }
 }
 
+/* ============================================================
+   BRANDS SECTION (Proizvođači)
+   ============================================================ */
+.brands-section {
+  margin: 60px auto;
+  text-align: center;
+  padding: 0 20px;
 
-@media (max-width: 991px) {
-
-
-  .heading {
-    padding: 50px;
-  }
-}
-
-@media (max-width: 576px) {
-  .product--card,
-  .category--card {
-    width: 100%; // samo 1 u redu
-  }
-
-  .heading {
-    font-size: 1.2rem;
+  h2 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #1b455e;
+    margin-bottom: 2rem;
   }
 
-  .image-wrapper,
-  .category-image-wrapper {
-    height: 60px;
-    margin-bottom: 10px;
-  }
+  // Override .card-grid styling for brands
+  .card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1.5rem;
 
-  .line .dot {
-    width: 6px;
-    height: 6px;
-    top: -3px;
-  }
+    li {
+      background: linear-gradient(#ffffff, #ffffff) padding-box,
+        linear-gradient(135deg, #ffd600, #1b455e) border-box;
+      border: 2px solid transparent;
+      border-radius: 14px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+      padding: 1.2rem;
+      height: 150px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
 
-  .product-label {
-    font-size: 0.85rem;
+      &:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 6px 30px rgba(0, 0, 0, 0.12);
+      }
+
+      img {
+        width: 60px;
+        height: auto;
+        object-fit: contain;
+        margin-bottom: 0.75rem;
+        transition: transform 0.3s ease;
+
+        &:hover {
+          transform: scale(1.1);
+        }
+      }
+
+      p {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #1b455e;
+        margin: 0;
+      }
+    }
+
+    @media (max-width: 768px) {
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+
+      li {
+        height: 130px;
+
+        img {
+          width: 50px;
+        }
+      }
+    }
+
+    @media (max-width: 480px) {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
   }
 }

@@ -1,0 +1,79 @@
+<div class="product-card" (click)="handleClick()" role="button" tabindex="0">
+  <!-- Slika -->
+  <div class="product-image">
+    <img
+      [src]="roba.slika?.slikeUrl || '/assets/images/fallback.jpg'"
+      [alt]="roba.naziv || 'Artikal'"
+      loading="lazy"
+    />
+  </div>
+
+  <!-- Naziv -->
+  <div class="product-details">
+    <h3 class="product-title">
+      {{ roba.proizvodjac?.naziv }} {{ roba.naziv }}
+    </h3>
+    <p class="product-katbr">Kat. broj: {{ roba.katbr }}</p>
+  </div>
+
+  <!-- Cena -->
+  <div class="product-price">
+    <p *ngIf="hasDiscount" class="old-price">{{ oldPrice | rsdCurrency }}</p>
+    <p *ngIf="hasDiscount" class="discount">-{{ roba.rabat }}%</p>
+    <p class="final-price">{{ roba.cena! | rsdCurrency }}</p>
+  </div>
+
+  <!-- Stanje -->
+  <div
+    class="product-stock"
+    [ngClass]="{ green: !isOutOfStock, red: isOutOfStock }"
+  >
+    {{
+      isTecDocOnly
+        ? "TecDoc artikal"
+        : isOutOfStock
+        ? "Nema na stanju"
+        : "Na stanju"
+    }}
+  </div>
+
+  <!-- Količina i korpa -->
+  <div class="product-actions" *ngIf="!isTecDocOnly">
+    <autom-input-fields
+      [clearBtn]="false"
+      [disableInput]="isOutOfStock"
+      [customClass]="'quantity-size'"
+      [max]="roba.stanje"
+      [min]="1"
+      [roundOff]="true"
+      [size]="sizeEnum.MEDIUM"
+      [type]="inputTypeEnum.QUANTITY"
+      [validators]="[
+        { name: 'max', value: roba.stanje },
+        { name: 'min', value: 1 }
+      ]"
+      [step]="1"
+      [value]="quantity"
+      (emitSelected)="modifyQuantity($event)"
+      ngDefaultControl
+    ></autom-input-fields>
+
+    <autom-button
+      [label]="'Dodaj u korpu'"
+      [iconSource]="iconEnum.SHOPPING_CART"
+      [iconPrefix]="true"
+      [disabled]="isOutOfStock"
+      [iconColor]="colorEnum.INFO_25_FILL"
+      (clickEvent)="handleAddToCart()"
+    ></autom-button>
+  </div>
+
+  <!-- Ikonica da je u korpi -->
+  <div class="in-cart-indicator" *ngIf="isInCart">
+    <autom-icon
+      [color]="colorEnum.GREEN_700"
+      [source]="iconEnum.SHOPPING_BAG"
+      [tooltip]="{ tooltipText: 'Artikal je u korpi' }"
+    ></autom-icon>
+  </div>
+</div>
