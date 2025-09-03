@@ -178,6 +178,7 @@
           color: #000;
           margin-bottom: 5px;
         }
+        .price { font-variant-numeric: tabular-nums; } /* poravnavanje cifara */
 
         .vat-info {
           font-size: 12px;

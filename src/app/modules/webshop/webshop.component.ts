@@ -375,10 +375,11 @@ export class WebshopComponent implements OnDestroy, OnInit {
     }
   }
   private updateSeoTagsForState(): void {
-    let title = 'Webshop | Automaterijal - Auto delovi, filteri i maziva';
-    let description = 'Kupite auto delove, filtere i maziva online putem našeg Webshopa. Pretraga po vozilu, brendu ili kategoriji. Brza isporuka širom Srbije.';
-    const pageUrl = 'https://www.automaterijal.com/webshop';
+    const baseUrl = 'https://www.automaterijal.com/webshop';
+    const page = this.pageIndex ?? 0;
+    const perPage = this.rowsPerPage ?? 10;
 
+    // podaci iz state-a
     const brandName =
       this.magacinData?.proizvodjaci?.[0]?.naziv ||
       this.filter?.proizvodjaci?.[0] ||
@@ -388,8 +389,13 @@ export class WebshopComponent implements OnDestroy, OnInit {
       ? Object.keys(this.magacinData.categories)
       : [];
 
-    const searchTerm = this.searchTerm?.trim();
+    const searchTerm = (this.searchTerm || '').trim();
     const resultCount = this.magacinData?.robaDto?.totalElements ?? 0;
+
+    // title/desc
+    let title = 'Webshop | Automaterijal - Auto delovi, filteri i maziva';
+    let description =
+      'Kupite auto delove, filtere i maziva online putem našeg Webshopa. Pretraga po vozilu, brendu ili kategoriji. Brza isporuka širom Srbije.';
 
     if (this.filter.mandatoryProid && brandName) {
       title = `Webshop | ${brandName} delovi - Automaterijal`;
@@ -403,18 +409,85 @@ export class WebshopComponent implements OnDestroy, OnInit {
     }
 
     if (searchTerm && resultCount > 0) {
-      title = `Webshop pretraga: "${searchTerm}" - Automaterijal`;
+      title = `Webshop pretraga: "${searchTerm}"${page ? ` (str. ${page + 1})` : ''} - Automaterijal`;
       description = `Pronađeno ${resultCount} rezultata za "${searchTerm}". Pogledajte delove, filtere i maziva dostupne za online porudžbinu.`;
     } else if (searchTerm) {
       title = `Webshop pretraga: "${searchTerm}" - Automaterijal`;
       description = `Nažalost, nema rezultata za "${searchTerm}". Pokušajte sa drugim nazivom ili kataloškim brojem.`;
+    } else if (page > 0) {
+      // bez searchTerm-a, ali na višoj strani
+      title += ` (str. ${page + 1})`;
     }
 
-    // ✅ Use SeoService to update tags
+    // canonical + prev/next
+    const canonical = this.buildCanonicalUrl(baseUrl, {
+      searchTerm,
+      grupe: this.filter.grupe?.join(',') || '',
+      proizvodjaci: this.filter.proizvodjaci?.join(',') || '',
+      page: page > 0 ? String(page + 1) : '', // 1-based u URL-u, ali prazno za 1. stranu
+      size: perPage !== 10 ? String(perPage) : '', // ne upisuj default
+    });
+
     this.seoService.updateSeoTags({
       title,
       description,
-      url: pageUrl
+      url: canonical,           // koristi canonical i kao og:url
+      type: 'website',
+      siteName: 'Automaterijal',
+      locale: 'sr_RS',
+      // kad je 0 rezultata – signalizuj crawleru
+      robots: searchTerm && resultCount === 0 ? 'noindex,follow' : undefined,
+      // po želji: image (može hero iz webshopa)
+      image: 'https://www.automaterijal.com/images/logo/logo.svg',
+      imageAlt: 'Automaterijal'
     });
+
+    // rel=prev/next (ako si dodao helper u SeoService – vidi niže)
+    this.setPaginationLinks(canonical, page, perPage, resultCount);
+
+    // (opciono) JSON-LD za listing
+    this.seoService.setJsonLd({
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": title.replace(' - Automaterijal', ''),
+      "isPartOf": { "@type": "WebSite", "name": "Automaterijal", "url": "https://www.automaterijal.com/" },
+      "about": searchTerm ? `Rezultati pretrage za: ${searchTerm}` : 'Lista artikala',
+      "url": canonical,
+      "numberOfItems": resultCount
+    }, 'seo-jsonld-webshop');
+  }
+
+  /** Sastavlja canonical sa samo bitnim parametrima; prazne izostavlja */
+  private buildCanonicalUrl(base: string, params: Record<string, string>): string {
+    const sp = new URLSearchParams();
+    Object.entries(params).forEach(([k, v]) => { if (v) sp.set(k, v); });
+    const qp = sp.toString();
+    return qp ? `${base}?${qp}` : base;
+  }
+
+  /** rel=prev/next – zahteva male izmene u SeoService (vidi ispod) */
+  private setPaginationLinks(canonical: string, page: number, size: number, total: number) {
+    const totalPages = Math.ceil((total || 0) / (size || 10));
+    if (!totalPages || totalPages <= 1) {
+      this.seoService.setLinkRel('prev', null);
+      this.seoService.setLinkRel('next', null);
+      return;
+    }
+    // canonical je već sa ?page=N (1-based) ako > 1
+    const url = new URL(canonical);
+    // prev
+    if (page > 0) {
+      url.searchParams.set('page', String(page)); // (pageIndex 1-based = pageIndex)
+      this.seoService.setLinkRel('prev', url.toString());
+    } else {
+      this.seoService.setLinkRel('prev', null);
+    }
+    // next
+    if (page + 1 < totalPages) {
+      url.searchParams.set('page', String(page + 2));
+      this.seoService.setLinkRel('next', url.toString());
+    } else {
+      this.seoService.setLinkRel('next', null);
+    }
   }
 }

@@ -397,19 +397,66 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
    */
 
   private updateSeoTags(roba: Roba): void {
-    const proizvodjac = roba.proizvodjac?.naziv || '';
-    const naziv = roba.naziv || '';
-    const katbr = roba.katbr || '';
+    const brand = roba.proizvodjac?.naziv?.trim() ?? '';
+    const name = roba.naziv?.trim() ?? '';
+    const sku = roba.katbr?.trim() ?? '';
+    const id = roba.robaid ?? '';
+    const price = roba.cena ?? undefined;         // broj (RSD)
+    const inStock = (roba.stanje ?? 0) > 0;
+    const productImg = roba.slika?.slikeUrl || ''; // bolje od logotipa
+    const logoFallback = 'https://www.automaterijal.com/images/logo/logo.svg';
 
+    // Title (≤ 60–65 znakova kad može)
+    const baseTitle = [brand, name].filter(Boolean).join(' ');
+    const title = sku ? `${baseTitle} (${sku}) | Automaterijal`
+      : `${baseTitle} | Automaterijal`;
+
+    // Meta description (≤ ~155–160c)
+    const descBase = sku
+      ? `Kupite ${brand} ${name} (${sku}) online. Proverena dostupnost, brza dostava, dokumentacija i OE brojevi.`
+      : `Kupite ${brand} ${name} online. Proverena dostupnost, brza dostava, dokumentacija i OE brojevi.`;
+    const description = descBase.slice(0, 158);
+
+    const url = `https://www.automaterijal.com/webshop/${id}`;
+
+    // JSON-LD Product
+    const productJsonLd: any = {
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: baseTitle || name || brand || 'Proizvod',
+      sku: sku || String(id),
+      brand: brand ? { '@type': 'Brand', name: brand } : undefined,
+      image: productImg || logoFallback,
+      url,
+      offers: {
+        '@type': 'Offer',
+        priceCurrency: 'RSD',
+        availability: inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+        url,
+        ...(price ? { price: String(price) } : {})
+      }
+    };
+
+    // Og image alt (pristupačnost + bolji preview)
+    const ogImageAlt = baseTitle || (brand && name ? `${brand} ${name}` : 'Automaterijal proizvod');
+
+    // Ako tvoj seoService prima “extras”, prosledi ih; u suprotnom proširi servis
     this.seoService.updateSeoTags({
-      title: `${proizvodjac} ${naziv} (${katbr}) | Automaterijal`,
-      description: `Kupite ${proizvodjac} ${naziv} (${katbr}) online. Proverena dostupnost, brza dostava, originalna dokumentacija i OE brojevi.`,
-      url: `https://www.automaterijal.com/webshop/${roba.robaid}`,
+      title,
+      description,
+      url,
       type: 'product',
-      image:
-        typeof roba.proizvodjacLogo === 'string'
-          ? roba.proizvodjacLogo
-          : 'https://www.automaterijal.com/images/logo/logo.svg',
+      image: productImg || logoFallback,
+      // dodatne OG/Twitter stvari
+      siteName: 'Automaterijal',
+      locale: 'sr_RS',
+      imageAlt: ogImageAlt,
+      twitterCard: 'summary_large_image',
+      // canonical preporuka
+      canonical: url
     });
+
+    // JSON-LD (ako imaš metodu u servisu)
+    this.seoService.updateJsonLd(productJsonLd);
   }
 }

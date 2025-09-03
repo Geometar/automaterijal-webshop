@@ -16,8 +16,12 @@
         />
         <img
           class="product-img"
-          [src]="data.slika!.slikeUrl"
           [alt]="data.proizvodjac?.naziv + ' ' + data.naziv"
+          [src]="data.slika!.slikeUrl"
+          decoding="async"
+          height="350"
+          loading="lazy"
+          width="350"
         />
       </div>
       <div *ngIf="data.tehnickiOpis?.length" class="product-description">
@@ -42,7 +46,12 @@
         <p>Tehnički podaci trenutno nisu dostupni za ovaj proizvod.</p>
       </div>
       <div class="product-stock-price">
-        <p class="stock-status" *ngIf="data.stanje > 0">
+        <p
+          class="stock-status"
+          role="status"
+          aria-live="polite"
+          *ngIf="data.stanje > 0"
+        >
           <span class="status-indicator"></span> Na stanju
         </p>
         <p class="stock-status" *ngIf="data.stanje === 0">

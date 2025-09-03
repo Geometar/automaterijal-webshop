@@ -28,9 +28,32 @@ export class HomeComponent implements OnInit {
   private updateSeoTags(): void {
     this.seoService.updateSeoTags({
       title: 'Automaterijal | Auto delovi, filteri i maziva',
-      description: 'Automaterijal - prodaja auto delova, filtera i maziva za sve vrste vozila. Širok asortiman, kvalitetne marke, brza dostava.',
+      description:
+        'Automaterijal - prodaja auto delova, filtera i maziva za sve vrste vozila. Širok asortiman, kvalitetne marke, brza dostava.',
       url: 'https://www.automaterijal.com/',
-      keywords: 'auto delovi, filteri, maziva, Automaterijal, rezervni delovi, Šabac, Srbija, motorna ulja, servisna oprema',
+      keywords:
+        'auto delovi, filteri, maziva, Automaterijal, rezervni delovi, Šabac, Srbija, motorna ulja, servisna oprema',
+      siteName: 'Automaterijal',
+      locale: 'sr_RS',
+      image: 'https://www.automaterijal.com/images/logo/logo.svg',
+      imageAlt: 'Automaterijal logo',
+    });
+
+    // JSON-LD za organizaciju
+    this.seoService.setJsonLd({
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Automaterijal",
+      "url": "https://www.automaterijal.com/",
+      "logo": "https://www.automaterijal.com/images/logo/logo.svg",
+      "contactPoint": [
+        {
+          "@type": "ContactPoint",
+          "contactType": "customer service",
+          "areaServed": "RS",
+          "telephone": "+381 15 319 000"
+        }
+      ]
     });
   }
 }
