@@ -43,6 +43,7 @@ import { CartStateService } from '../shared/service/state/cart-state.service';
 import { AccountService } from '../shared/auth/service/account.service';
 import { LoginService } from '../shared/service/login.service';
 import { RsdCurrencyPipe } from '../shared/pipe/rsd-currency.pipe';
+import { ShowcaseStateService } from '../shared/service/state/showcase-state.service';
 
 @Component({
   selector: 'autom-navigation',
@@ -93,6 +94,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
     private accountService: AccountService,
     private cartStateService: CartStateService,
     private loginService: LoginService,
+    private showcaseStateService: ShowcaseStateService,
     private router: Router
   ) { }
 
@@ -178,6 +180,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
   logout() {
     this.loginService.logout();
+    this.showcaseStateService.clear();
   }
 
   openLogoutPopup(): void {

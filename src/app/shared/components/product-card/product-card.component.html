@@ -60,6 +60,8 @@
     <p class="final-price">
       {{ roba.cena! | rsdCurrency }}
     </p>
+    <!-- Mali tekst: cena sa PDV-om -->
+    <p class="price-note">Cena sa PDV-om</p>
 
     <!-- Ušteda (opciono, diskretno) -->
     <p *ngIf="hasDiscount && savings" class="saving">
