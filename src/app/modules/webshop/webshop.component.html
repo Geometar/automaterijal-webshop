@@ -17,6 +17,7 @@
   </webshop-vehicles>
   <webshop-empty
     *ngIf="currentState === state.SHOW_EMPTY_CONTAINER && !loading"
+    (selectedVehicleDetailsEmit)="selectVehicleDetailsEventHandle($event)"
   ></webshop-empty>
   <webshop-roba
     *ngIf="

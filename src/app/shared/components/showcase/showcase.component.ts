@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { map } from 'rxjs/operators';
+import { map, filter as rxfilter } from 'rxjs/operators';
 import { forkJoin } from 'rxjs';
 
 // Data models
@@ -83,6 +83,7 @@ export class ShowcaseComponent implements OnInit {
             res.robaDto!.content.filter((r) => r.slika?.slikeUrl)// && !r.slika!.slikeUrl!.includes('no-image'))
           ),
           map((artikli) => this.getRandomSubset(artikli, 5)),
+          rxfilter((artikli) => artikli.length > 1),
           map((artikli) => ({
             podgrupa: podgrupa.name!,
             artikli,

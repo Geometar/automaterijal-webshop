@@ -1,13 +1,14 @@
 .product-card {
-  position: relative;
+  background-color: #fff;
+  border-radius: 1rem;
+  border: 1px solid var(--figma-grey-100);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;
   height: 100%;
+  max-width: 250px;
   padding: 1.2rem;
-  border-radius: 1rem;
-  border: 1px solid var(--figma-grey-100);
-  background-color: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  position: relative;
   transition: box-shadow 0.2s ease, transform 0.2s ease;
   cursor: pointer;
 
@@ -97,47 +98,47 @@
 
   /* --- Price block --- */
   .product-price {
-  align-items: flex-start;
-  color: var(--figma-grey-800); /* tamna siva za glavni tekst */
-  display: flex;
-  flex-direction: column; /* da tekst ide ispod cene */
-  flex-wrap: wrap;
-  font-size: 1.1rem;
-  font-weight: 700;
-  gap: 0.5rem;
-  margin-bottom: 0.3rem;
-
-  .price-note {
-    font-size: 0.75rem;
-    font-style: italic;
-    color: var(--figma-grey-500);
-    margin: 0;
-  }
-
-  .old-price {
-    font-size: 0.95rem;
-    color: var(--figma-grey-500); /* siva */
-    text-decoration: line-through;
-  }
-
-  .discount {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: var(--figma-error-700);
-  }
-
-  .final-price {
-    color: var(--figma-grey-800);
+    align-items: flex-start;
+    color: var(--figma-grey-800); /* tamna siva za glavni tekst */
+    display: flex;
+    flex-direction: column; /* da tekst ide ispod cene */
+    flex-wrap: wrap;
+    font-size: 1.1rem;
     font-weight: 700;
-  }
+    gap: 0.5rem;
+    margin-bottom: 0.3rem;
 
-  .saving {
-    color: var(--figma-success-700);
-    font-size: 0.85rem;
-    font-weight: 600;
-    margin-left: auto;
+    .price-note {
+      font-size: 0.75rem;
+      font-style: italic;
+      color: var(--figma-grey-500);
+      margin: 0;
+    }
+
+    .old-price {
+      font-size: 0.95rem;
+      color: var(--figma-grey-500); /* siva */
+      text-decoration: line-through;
+    }
+
+    .discount {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--figma-error-700);
+    }
+
+    .final-price {
+      color: var(--figma-grey-800);
+      font-weight: 700;
+    }
+
+    .saving {
+      color: var(--figma-success-700);
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-left: auto;
+    }
   }
-}
 
   .unit-price {
     font-size: 0.8rem;

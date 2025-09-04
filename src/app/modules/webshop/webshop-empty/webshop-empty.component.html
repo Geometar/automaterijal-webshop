@@ -6,7 +6,9 @@
       <p>
         Preko <strong>80.000 delova</strong> spremnih za isporuku širom Srbije
       </p>
-      <button class="cta-button">Odaberi vozilo</button>
+      <button class="cta-button" (click)="chooseVehicleVisible = true">
+        Odaberi vozilo
+      </button>
     </div>
 
     <div class="hero-bg-image">
@@ -17,6 +19,9 @@
     </div>
   </section>
 
+  <section class="webshop-empty-recommendation">
+    <h2>Izdvajamo iz ponude</h2>
+  </section>
   <autom-showcase></autom-showcase>
 
   <!-- BRANDS -->
@@ -73,3 +78,10 @@
     </div>
   </section>
 </section>
+
+<vehicle-selection-popup
+  *ngIf="chooseVehicleVisible"
+  (closePopupModal)="chooseVehicleVisible = false"
+  (emitVehicle)="handleSelectedVehicle($event)"
+>
+</vehicle-selection-popup>
