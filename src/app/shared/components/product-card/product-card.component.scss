@@ -1,28 +1,63 @@
 .product-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;
   padding: 1.2rem;
   border-radius: 1rem;
-  border: 1px solid var(--figma-border-strong);
+  border: 1px solid  var(--figma-grey-100);
   background-color: #fff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   transition: box-shadow 0.2s ease, transform 0.2s ease;
+  cursor: pointer;
 
   &:hover {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
     transform: translateY(-2px);
   }
 
+  /* --- Discount badge --- */
+  .discount-badge {
+    background: var(--figma-error-600);
+    color: var(--figma-base-white);
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1;
+    position: absolute;
+    top: 0.8rem;
+    z-index: 2;
+    align-items: center;
+    border-radius: 9999px; /* kružno */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    display: flex;
+    justify-content: center;
+    left: auto;
+    min-height: 2.4rem;
+    min-width: 2.4rem;
+    padding: 0; /* centriramo broj u krugu */
+    right: 0.8rem; /* ↔ prešlo sa left na right */
+  }
+
+  /* --- In-cart icon --- */
+  .in-cart-indicator {
+    position: absolute;
+    top: 0.8rem;
+    left: 0.8rem; /* ↔ prešlo na levo da ne udara u badge */
+    right: auto;
+    z-index: 2;
+  }
+
+  /* --- Image --- */
   .product-image {
     width: 100%;
     aspect-ratio: 1 / 1;
     border-radius: 0.75rem;
     margin-bottom: 1rem;
-    background: var(--figma-surface-subtle);
+    background: var(--figma-neutral-25);
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
 
     img {
       max-width: 100%;
@@ -31,13 +66,14 @@
     }
   }
 
+  /* --- Details --- */
   .product-details {
     margin-bottom: 0.75rem;
 
     .product-title {
       font-size: 1.05rem !important;
       font-weight: 600 !important;
-      color: var(--figma-text-default);
+      color: var(--figma-grey-800) !important;
       line-height: 1.4 !important;
       margin-bottom: 0.25rem !important;
       height: 3.9em;
@@ -49,40 +85,65 @@
 
     .product-katbr {
       font-size: 0.85rem;
-      color: var(--figma-text-secondary);
+      color: var(--figma-grey-600);
+    }
+
+    .compat {
+      font-size: 0.8rem;
+      color: var(--figma-grey-500);
+      margin-top: 0.25rem;
     }
   }
 
+  /* --- Price block --- */
   .product-price {
     display: flex;
+    flex-wrap: wrap;
     align-items: baseline;
     gap: 0.5rem;
     font-size: 1.1rem;
     font-weight: 700;
-    color: var(--figma-success-700);
-    margin-bottom: 0.5rem;
+    color: var(--figma-text-default);
+    margin-bottom: 0.3rem;
 
     .old-price {
       font-size: 0.95rem;
+      color: var(---figma-grey-500); /* siva */
       text-decoration: line-through;
-      color: var(--figma-text-tertiary);
     }
 
     .discount {
       font-size: 0.9rem;
       font-weight: 500;
-      color: var(--figma-danger-700);
+      color: var(--figma-error-700);
     }
 
     .final-price {
+      color: var(--figma-text-default);
       font-weight: 700;
+    }
+
+    .saving {
+      color: var(
+        --figma-success-700
+      ); /* možeš i --figma-success-600 ako želiš blaže */
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-left: auto;
     }
   }
 
+  .unit-price {
+    font-size: 0.8rem;
+    color: var(--figma-text-secondary);
+    margin-bottom: 0.5rem;
+  }
+
+  /* --- Stock --- */
   .product-stock {
     font-size: 0.85rem;
     font-weight: 500;
-    height: 1.25rem; // fiksirano da ne skače
+    height: 1.25rem; // fixed height to avoid layout shift
     margin-bottom: 1rem;
 
     &.green {
@@ -90,10 +151,11 @@
     }
 
     &.red {
-      color: var(--figma-danger-600);
+      color: var(--figma-error-600);
     }
   }
 
+  /* --- Actions --- */
   .product-actions {
     display: flex;
     flex-direction: column;
@@ -106,6 +168,10 @@
 
     autom-button {
       width: 100%;
+
+      button {
+        width: 100%;
+      }
 
       .icon {
         margin-right: 0.4rem;
@@ -120,10 +186,19 @@
       }
     }
   }
+}
 
-  .in-cart-indicator {
-    position: absolute;
-    top: 0.8rem;
-    right: 0.8rem;
+/* Responsive tweaks */
+@media (max-width: 480px) {
+  .product-card {
+    padding: 1rem;
+
+    .product-title {
+      font-size: 0.95rem;
+    }
+
+    .product-price {
+      font-size: 1rem;
+    }
   }
 }

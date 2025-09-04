@@ -159,10 +159,10 @@
     }
 
     img {
-      width: 60px;
       height: auto;
-      object-fit: contain;
       margin-bottom: 0.5rem;
+      object-fit: contain;
+      width: 80px;
     }
 
     p {
@@ -230,7 +230,7 @@
       }
 
       img {
-        width: 60px;
+        width: 90px;
         height: auto;
         object-fit: contain;
         margin-bottom: 0.75rem;
@@ -256,7 +256,7 @@
         height: 130px;
 
         img {
-          width: 50px;
+          width: 80px;
         }
       }
     }

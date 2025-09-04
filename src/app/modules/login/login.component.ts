@@ -40,6 +40,7 @@ import { AccountService } from '../../shared/auth/service/account.service';
 import { EmailService } from '../../shared/service/email.service';
 import { LoginService } from '../../shared/service/login.service';
 import { SeoService } from '../../shared/service/seo.service';
+import { ShowcaseStateService } from '../../shared/service/state/showcase-state.service';
 import { SnackbarService } from '../../shared/service/utils/snackbar.service';
 
 // Animation
@@ -115,7 +116,8 @@ export class LoginComponent implements OnDestroy, OnInit {
     private loginService: LoginService,
     private router: Router,
     private seoService: SeoService,
-    private snackbarService: SnackbarService
+    private snackbarService: SnackbarService,
+    private showcaseStateService: ShowcaseStateService
   ) {
     this.loginForm = this.fb.group({
       username: ['', Validators.required],
@@ -151,6 +153,7 @@ export class LoginComponent implements OnDestroy, OnInit {
   logout(): void {
     this.authenticationToken = '';
     this.loginService.logout();
+    this.resetShowcaseState();
   }
 
   login(): void {
@@ -171,6 +174,7 @@ export class LoginComponent implements OnDestroy, OnInit {
             return;
           }
           this.routeToPage();
+          this.resetShowcaseState();
         },
         error: (err: HttpErrorResponse) => {
           if (err.status === 400) {
@@ -181,6 +185,11 @@ export class LoginComponent implements OnDestroy, OnInit {
   }
 
   /** Main event: end */
+
+  // Changes to the discounted price should be reflected in the UI immediately
+  resetShowcaseState(): void {
+    this.showcaseStateService.clear();
+  }
 
   setSelectionValue(control: string, value: string): void {
     this.loginError = false;

@@ -1,55 +1,98 @@
-<div class="product-card" (click)="handleClick()" role="button" tabindex="0">
+<div
+  class="product-card"
+  role="button"
+  tabindex="0"
+  (click)="handleClick()"
+  (keydown.enter)="handleClick()"
+  (keydown.space)="handleClick()"
+  [attr.aria-label]="
+    (roba.proizvodjac?.naziv || '') + ' ' + (roba.naziv || 'Artikal')
+  "
+  [attr.aria-disabled]="isTecDocOnly ? 'true' : null"
+>
+  <!-- Badge: popust (gore desno) -->
+  <div class="discount-badge" *ngIf="hasDiscount">-{{ roba.rabat }}%</div>
+
+  <!-- Ikonica: u korpi (gore levo) -->
+  <div
+    class="in-cart-indicator"
+    *ngIf="isInCart"
+    aria-label="Artikal je u korpi"
+  >
+    <autom-icon
+      [color]="colorEnum.GREEN_700"
+      [source]="iconEnum.SHOPPING_BAG"
+      [tooltip]="{ tooltipText: 'Artikal je u korpi' }"
+    ></autom-icon>
+  </div>
+
   <!-- Slika -->
   <div class="product-image">
     <img
       [src]="roba.slika?.slikeUrl || '/assets/images/fallback.jpg'"
-      [alt]="roba.naziv || 'Artikal'"
+      [alt]="(roba.proizvodjac?.naziv || '') + ' ' + (roba.naziv || 'Artikal')"
       loading="lazy"
     />
   </div>
 
-  <!-- Naziv -->
+  <!-- Detalji -->
   <div class="product-details">
     <h3 class="product-title">
       {{ roba.proizvodjac?.naziv }} {{ roba.naziv }}
     </h3>
-    <p class="product-katbr">Kat. broj: {{ roba.katbr }}</p>
+
+    <p class="product-katbr" *ngIf="roba.katbr">Kat. broj: {{ roba.katbr }}</p>
+
+    <!-- Kompatibilnost (TecDoc) -->
+    <p class="compat" *ngIf="compatibilityCount">
+      Kompatibilno sa {{ compatibilityCount }} vozila
+    </p>
   </div>
 
-  <!-- Cena -->
-  <div class="product-price">
-    <p *ngIf="hasDiscount" class="old-price">{{ oldPrice | rsdCurrency }}</p>
-    <p *ngIf="hasDiscount" class="discount">-{{ roba.rabat }}%</p>
-    <p class="final-price">{{ roba.cena! | rsdCurrency }}</p>
+  <!-- Cene -->
+  <div class="product-price" aria-label="Cene">
+    <!-- Stara cena (diskretna, siva, precrtana) -->
+    <p *ngIf="hasDiscount && oldPrice" class="old-price">
+      {{ oldPrice | rsdCurrency }}
+    </p>
+
+    <!-- Finalna cena (primarna) -->
+    <p class="final-price">
+      {{ roba.cena! | rsdCurrency }}
+    </p>
+
+    <!-- Ušteda (opciono, diskretno) -->
+    <p *ngIf="hasDiscount && savings" class="saving">
+      Ušteda {{ savings | rsdCurrency }}
+    </p>
   </div>
+
+  <!-- Cena po jedinici (npr. /L) -->
+  <p *ngIf="unitPrice" class="unit-price">
+    ~ {{ unitPrice | rsdCurrency }} / L
+  </p>
 
   <!-- Stanje -->
   <div
     class="product-stock"
     [ngClass]="{ green: !isOutOfStock, red: isOutOfStock }"
   >
-    {{
-      isTecDocOnly
-        ? "TecDoc artikal"
-        : isOutOfStock
-        ? "Nema na stanju"
-        : "Na stanju"
-    }}
+    {{ stockLabel }}
   </div>
 
-  <!-- Količina i korpa -->
+  <!-- Količina i korpa (sakriveno za TecDoc-only) -->
   <div class="product-actions" *ngIf="!isTecDocOnly">
     <autom-input-fields
       [clearBtn]="false"
       [disableInput]="isOutOfStock"
       [customClass]="'quantity-size'"
-      [max]="roba.stanje"
+      [max]="roba.stanje || 1"
       [min]="1"
       [roundOff]="true"
       [size]="sizeEnum.MEDIUM"
       [type]="inputTypeEnum.QUANTITY"
       [validators]="[
-        { name: 'max', value: roba.stanje },
+        { name: 'max', value: roba.stanje || 1 },
         { name: 'min', value: 1 }
       ]"
       [step]="1"
@@ -66,14 +109,5 @@
       [iconColor]="colorEnum.INFO_25_FILL"
       (clickEvent)="handleAddToCart()"
     ></autom-button>
-  </div>
-
-  <!-- Ikonica da je u korpi -->
-  <div class="in-cart-indicator" *ngIf="isInCart">
-    <autom-icon
-      [color]="colorEnum.GREEN_700"
-      [source]="iconEnum.SHOPPING_BAG"
-      [tooltip]="{ tooltipText: 'Artikal je u korpi' }"
-    ></autom-icon>
   </div>
 </div>
