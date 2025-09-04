@@ -1,19 +1,21 @@
+/* ---------- Helper (TecDoc info box) ---------- */
 .helper-article {
-  background-color: #f8f9fa; // Svetlo siva pozadina za bolju vidljivost
-  border-radius: 5px; // Zaobljeni uglovi
-  border: 1px solid #ddd; // Blaga ivica da se istakne
-  color: #333; // Tamnija boja za bolju čitljivost
-  font-size: 14px; // Prijatna veličina fonta
-  font-weight: 500; // Nešto deblji font za naglašavanje
-  margin: 10px auto; // Centriranje na stranici
-  max-width: 300px; // Neće se širiti previše
-  padding: 10px 15px; // Unutrašnji razmak za preglednost
-  text-align: center; // Centriran tekst
+  background-color: var(--figma-neutral-25);
+  border-radius: 6px;
+  border: 1px solid var(--figma-grey-100);
+  color: var(--figma-grey-700);
+  font-size: 14px;
+  font-weight: 500;
+  margin: 10px auto;
+  max-width: 320px;
+  padding: 10px 14px;
+  text-align: center;
 }
 
+/* ---------- States / utility ---------- */
 .disabled {
-  color: var(--figma-grey-500); /* Greyish color */
-  pointer-events: none; /* Makes it non-clickable */
+  color: var(--figma-grey-500);
+  pointer-events: none;
   text-decoration: none;
   cursor: default;
 }
@@ -29,26 +31,53 @@
   margin-top: 10px;
 }
 
+/* ---------- ROW CONTAINER (desktop) ---------- */
 .row-container {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 16px;
+  gap: 0px;
 
+  /* --- Image --- */
   .image-container {
+    position: relative;
     align-items: center;
     display: flex;
     height: 180px;
     justify-content: center;
-    overflow: hidden; /* Ovo osigurava da ništa ne prelazi granice */
+    overflow: hidden;
     width: 200px;
+    border-radius: 8px;
+    background: var(--figma-grey-25);
+
+    /* Popust badge (kao na product cardu) */
+    .discount-badge {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background: var(--figma-error-600);
+      color: var(--figma-base-white);
+      font-size: 0.9rem;
+      font-weight: 700;
+      min-width: 2.2rem;
+      min-height: 2.2rem;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      z-index: 1;
+    }
 
     .clickable-image {
       cursor: zoom-in;
       transition: transform 0.2s ease;
     }
-    .clickable-image:hover {
-      transform: scale(1.03);
+    @media (hover: hover) and (pointer: fine) {
+      .clickable-image:hover {
+        transform: scale(1.03);
+      }
     }
   }
 
@@ -59,9 +88,10 @@
   .image-container img {
     max-height: 100%;
     max-width: 100%;
-    object-fit: contain; /* Zadržava razmeru slike unutar zadanih granica */
+    object-fit: contain;
   }
 
+  /* --- Details --- */
   .details-container {
     flex: 2;
     padding: 0 16px;
@@ -69,46 +99,52 @@
     h3 {
       font-size: 18px;
       margin: 0 0 8px;
+      color: var(--figma-grey-800);
+      transition: color 0.15s ease, text-decoration-color 0.15s ease;
     }
-
-    h3:hover {
-      text-decoration: underline;
-      cursor: pointer;
-      color: var(--figma-grey-600);
+    @media (hover: hover) and (pointer: fine) {
+      h3:hover {
+        text-decoration: underline;
+        cursor: pointer;
+        color: var(--figma-grey-600);
+      }
     }
 
     p {
       font-size: 14px;
-      color: #555;
+      color: var(--figma-grey-600);
       margin: 0 0 16px;
     }
 
     .specifications {
       width: 500px;
       font-size: 14px;
-      color: #666;
+      color: var(--figma-grey-600);
       margin-top: 15px;
 
       td {
         padding: 2px 8px;
+        word-break: break-word;
       }
-
       td:first-child {
-        font-weight: bold;
+        font-weight: 600;
+        color: var(--figma-grey-700);
       }
     }
   }
 
+  /* --- Pricing / CTA --- */
   .pricing-container {
     text-align: left;
 
     .sub-price {
       font-size: 16px;
-      margin-bottom: 0px;
+      margin-bottom: 0;
       text-align: right;
+      color: var(--figma-grey-700);
     }
-
-    .line-through {
+    .old-price {
+      color: var(--figma-grey-500);
       text-decoration: line-through;
     }
 
@@ -117,23 +153,36 @@
       font-style: italic;
       position: relative;
       bottom: 5px;
+      color: var(--figma-grey-600);
     }
 
     .price {
       font-size: 20px;
-      font-weight: bold;
-      margin-bottom: 0px;
+      font-weight: 700;
+      margin-bottom: 0;
       text-align: right;
+      color: var(--figma-grey-800);
     }
 
+    /* diskretno istaknuta ušteda */
+    .saving {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--figma-success-700);
+      text-align: right;
+      margin-top: 2px;
+      margin-bottom: 6px;
+    }
+
+    /* Status sa tačkicom */
     .item-status {
       font-size: 12px;
       padding-left: 20px;
-      position: relative; /* Ensure ::before is positioned relative to this element */
+      position: relative;
       text-align: right;
       width: 250px;
+      color: var(--figma-grey-700);
     }
-
     .item-status::before {
       border-radius: 50%;
       content: "";
@@ -143,17 +192,14 @@
       top: 2px;
       width: 18px;
     }
-
     .item-status.green::before {
-      background: #00ba9c; /* Green for available */
+      background: var(--figma-success-600);
     }
-
     .item-status.red::before {
-      background: #ff4d4d; /* Red for not available */
+      background: var(--figma-error-600);
     }
-
     .item-status.yellow::before {
-      background: var(--figma-accent-yellow-500); /* Red for not available */
+      background: var(--figma-accent-yellow-500);
     }
 
     button {
@@ -162,13 +208,14 @@
   }
 }
 
+/* ---------- Responsive (≤ 991px) ---------- */
 @media (max-width: 991px) {
   .row-container {
     flex-direction: column;
     align-items: center;
     gap: 20px;
     padding: 16px 0;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--figma-grey-100);
 
     .remove-icon {
       order: -1;
@@ -191,6 +238,15 @@
     img {
       max-width: 100% !important;
       height: auto;
+    }
+
+    /* malo manji badge na mobilnom */
+    .discount-badge {
+      min-width: 2rem;
+      min-height: 2rem;
+      font-size: 0.85rem;
+      top: 0.4rem;
+      right: 0.4rem;
     }
   }
 
@@ -217,11 +273,9 @@
         padding: 4px 8px;
         word-break: break-word;
       }
-
       td:first-child {
         text-align: left;
       }
-
       td:last-child {
         text-align: right;
       }
@@ -248,7 +302,8 @@
 
     .price,
     .sub-price,
-    .small-explanation {
+    .small-explanation,
+    .saving {
       text-align: center !important;
     }
 
@@ -277,12 +332,12 @@
   .mobile-row {
     text-align: center !important;
   }
-
   .mobile-quantity-cart {
     flex-direction: row !important;
   }
 }
 
+/* ---------- Image Zoom Overlay ---------- */
 .image-zoom-overlay {
   position: fixed;
   top: 0;
@@ -300,6 +355,11 @@
 .zoomed-image {
   max-width: 90%;
   max-height: 90%;
-  box-shadow: 0 0 20px #000;
+  box-shadow: 0 0 20px var(--figma-figma-base-black);
   cursor: auto;
 }
+
+/* ---------- Small a11y / robustness ---------- */
+.row-container > * {
+  min-width: 0;
+} /* spreči overflow teksta */

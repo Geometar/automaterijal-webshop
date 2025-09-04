@@ -1,17 +1,18 @@
-/* ====== Variables ====== */
-:root {
-  --cp-bg: #fff;
-  --cp-fg: #111;
-  --cp-muted: #6b7280; /* gray-500 */
-  --cp-border: #e5e7eb; /* gray-200 */
-  --cp-accent: #0ea5e9; /* sky-500 */
-  --cp-accent-weak: #e0f2fe; /* sky-100 */
+/* ========= Tokens mapped na tvoju paletu ========= */
+.categories-popup {
+  /* lokalni CSS varovi, ali vezani za tvoju paletu */
+  --cp-bg: var(--figma-base-white);
+  --cp-fg: var(--figma-grey-800);
+  --cp-muted: var(--figma-grey-600);
+  --cp-border: var(--figma-grey-100);
+  --cp-accent: var(--figma-primary-600);
+  --cp-accent-weak: var(--figma-primary-50);
   --cp-radius: 16px;
   --cp-gap: 12px;
   --cp-gap-lg: 20px;
 }
 
-/* ====== WRAPPER ====== */
+/* ========= WRAPPER ========= */
 .categories-popup {
   display: flex;
   flex-direction: column;
@@ -19,9 +20,15 @@
   background: var(--cp-bg);
   color: var(--cp-fg);
   font-family: system-ui, sans-serif;
+
+  /* da se vidi radius (popup kao karta) */
+  border: 1px solid var(--cp-border);
+  border-radius: var(--cp-radius);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
 }
 
-/* ====== HEADER ====== */
+/* ========= HEADER ========= */
 .cp-header {
   position: sticky;
   top: 0;
@@ -33,6 +40,7 @@
   &--main {
     display: flex;
     justify-content: space-between;
+    align-items: flex-start;
   }
 
   .cp-hero {
@@ -44,6 +52,7 @@
       margin: 0;
       font-size: 1.25rem;
       font-weight: 600;
+      color: var(--figma-grey-800);
     }
 
     .cp-subtitle {
@@ -67,18 +76,16 @@
         gap: 6px;
         padding: 6px 12px;
         background: var(--cp-accent);
-        color: white;
+        color: var(--figma-base-white);
         border-radius: var(--cp-radius);
         border: none;
         cursor: pointer;
         font-weight: 500;
         transition: background 0.2s;
 
-        &:hover {
-          background: color-mix(in srgb, var(--cp-accent) 90%, black);
-
-          @supports not (background: color-mix(in srgb, red 90%, black)) {
-            filter: brightness(0.92);
+        @media (hover: hover) and (pointer: fine) {
+          &:hover {
+            background: var(--figma-primary-700);
           }
         }
       }
@@ -91,14 +98,17 @@
     font-size: 1.5rem;
     cursor: pointer;
     color: var(--cp-muted);
+    line-height: 1;
 
-    &:hover {
-      color: var(--cp-fg);
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        color: var(--cp-fg);
+      }
     }
   }
 }
 
-/* ====== BODY LAYOUT ====== */
+/* ========= BODY LAYOUT ========= */
 /* spolja skroluje */
 .mobile-filters .page-details__body {
   max-height: calc(100dvh - 100px);
@@ -111,18 +121,20 @@
   overflow: visible;
   max-height: none;
 }
+
 .cp-body {
   flex: 1;
   display: grid;
-  grid-template-columns: 280px 1fr;
+  grid-template-columns: 320px 1fr;
   min-height: 0; /* important for flex/grid scroll */
 }
 
-/* ====== LEFT PANEL ====== */
+/* ========= LEFT PANEL ========= */
 .cp-left {
   border-right: 1px solid var(--cp-border);
   overflow-y: auto;
   padding: var(--cp-gap-lg);
+  background: var(--figma-base-white);
 
   .bucket {
     margin-bottom: var(--cp-gap-lg);
@@ -135,9 +147,10 @@
     }
 
     .bucket__title {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--cp-muted);
+      font-size: 0.85rem !important;
+      color: var(--figma-accent-pink-700);
+      font-weight: 600 !important;
+      letter-spacing: 0.5px;
       text-transform: uppercase;
     }
 
@@ -161,13 +174,19 @@
         padding: 6px 10px;
         transition: background 0.2s;
 
-        &:hover {
-          background: var(--cp-accent-weak);
+        @media (hover: hover) and (pointer: fine) {
+          &:hover {
+            background: var(--cp-accent-weak);
+          }
         }
 
         &.is-active {
           background: var(--cp-accent);
-          color: white;
+          color: var(--figma-base-white);
+
+          .group-item__chev {
+            color: var(--figma-base-white);
+          }
         }
 
         .group-item__inner {
@@ -176,14 +195,42 @@
           align-items: center;
         }
       }
+
+      .group-item__title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-transform: none;
+        letter-spacing: normal;
+      }
+
+      .group-item__name {
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: var(--cp-fg);
+        text-transform: none; /* resetuje potencijalni uppercase */
+        letter-spacing: normal;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        display: inline-block;
+      }
+
+      .group-item__chev {
+        color: var(--cp-muted);
+        font-size: 1.1rem;
+        margin-left: 8px;
+      }
     }
   }
 }
 
-/* ====== RIGHT PANEL ====== */
+/* ========= RIGHT PANEL ========= */
 .cp-right {
   overflow-y: auto;
   padding: var(--cp-gap-lg);
+  background: var(--figma-grey-50); /* blaga razlika od leve kolone */
 
   .group-head {
     display: flex;
@@ -194,6 +241,8 @@
     .group-title {
       font-size: 1.1rem;
       font-weight: 600;
+      color: var(--figma-grey-800);
+      margin: 0;
     }
 
     .btn-back {
@@ -203,6 +252,7 @@
       cursor: pointer;
       color: var(--bittersweet);
       margin-right: var(--cp-gap);
+      line-height: 1;
     }
 
     .btn-outline {
@@ -213,9 +263,12 @@
       padding: 4px 10px;
       cursor: pointer;
       font-size: 0.85rem;
+      transition: background 0.2s;
 
-      &:hover {
-        background: var(--cp-accent-weak);
+      @media (hover: hover) and (pointer: fine) {
+        &:hover {
+          background: var(--cp-accent-weak);
+        }
       }
     }
   }
@@ -230,20 +283,30 @@
       justify-content: space-between;
       align-items: center;
       padding: 10px;
-      background: #f9fafb;
+      background: var(--figma-base-white);
       border: 1px solid var(--cp-border);
       border-radius: var(--cp-radius);
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background 0.2s, border-color 0.2s;
 
-      &:hover {
-        background: var(--cp-accent-weak);
+      @media (hover: hover) and (pointer: fine) {
+        &:hover {
+          background: var(--cp-accent-weak);
+          border-color: var(--cp-accent);
+        }
       }
+    }
+  }
+
+  .empty-subgroups {
+    color: var(--cp-muted);
+    .btn-outline {
+      margin-top: 8px;
     }
   }
 }
 
-/* ====== ANIMATIONS ====== */
+/* ========= ANIMATIONS ========= */
 .fade-in {
   animation: fadeIn 0.2s ease-in;
 }
@@ -270,16 +333,22 @@
   }
 }
 
-/* ====== RESPONSIVE ====== */
+/* ========= A11y / fokus ========= */
+.categories-popup :focus-visible {
+  outline: 3px solid var(--figma-primary-300);
+  outline-offset: 2px;
+}
+
+/* ========= RESPONSIVE ========= */
 @media (max-width: 991px) {
   .cp-body {
-    grid-template-columns: 1fr; /* collapse to 1 column */
+    grid-template-columns: 1fr;
   }
 
   .cp-left {
     border-right: none;
     border-bottom: 1px solid var(--cp-border);
-    max-height: 60vh; /* limit left panel height */
+    max-height: 60vh;
   }
 
   .cp-right {

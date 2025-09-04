@@ -1,9 +1,14 @@
 <div class="row-container">
   <!-- Image Section -->
   <div class="image-container" [class.image-smaller]="showPriceOnly">
+    <!-- Popust badge -->
+    <div class="discount-badge" *ngIf="data.podGrupa !== 1000000 && data.rabat">
+      -{{ data.rabat }}%
+    </div>
+
     <img
       class="clickable-image"
-      [alt]="data.proizvodjac?.naziv + ' ' + data.naziv"
+      [alt]="(data.proizvodjac?.naziv || '') + ' ' + (data.naziv || '')"
       [src]="data!.slika!.slikeUrl"
       decoding="async"
       height="180"
@@ -24,24 +29,29 @@
       }}</span>
       {{ nameWithoutManufacturer }}
     </h3>
+
     <p class="autom-margin__none">
       Kataloški broj:
-      <span class="color--figma-primary-800 display--inline font-medium">{{
-        data!.katbr
-      }}</span>
+      <span class="color--figma-primary-800 display--inline font-medium">
+        {{ data!.katbr }}
+      </span>
     </p>
+
     <p class="autom-margin__none">
       Kategorija:
-      <span class="color--figma-primary-800 display--inline font-medium">{{
-        data!.podGrupaNaziv
-      }}</span>
+      <span class="color--figma-primary-800 display--inline font-medium">
+        {{ data!.podGrupaNaziv }}
+      </span>
     </p>
+
     <p *ngIf="isEmployee">
       Stanje:
-      <span class="color--figma-primary-800 display--inline font-medium">{{
-        data!.stanje
-      }}</span>
+      <span class="color--figma-primary-800 display--inline font-medium">
+        {{ data!.stanje }}
+      </span>
     </p>
+
+    <!-- Specifikacije -->
     <table
       *ngIf="!showPriceOnly"
       class="specifications"
@@ -49,7 +59,7 @@
       aria-label="Specifikacije artikla"
     >
       <tbody>
-        <!-- Mandatory tdLinkageCriteria (show all) -->
+        <!-- tdLinkageCriteria -->
         <tr *ngFor="let spec of displayedLinkageCriteria">
           <td [class.color--figma-highlight-orange]="spec.type === 'A'">
             {{ spec.oznaka }}
@@ -65,7 +75,7 @@
           </td>
         </tr>
 
-        <!-- Tehnicki Opis (trimmed initially, expands on click) -->
+        <!-- Tehnički opis -->
         <tr *ngFor="let spec of displayedTehnickiOpis">
           <td [class.color--figma-highlight-orange]="spec.type === 'A'">
             {{ spec.oznaka }}
@@ -81,7 +91,7 @@
           </td>
         </tr>
 
-        <!-- No specifications available -->
+        <!-- No specifications -->
         <tr
           *ngIf="!data.tehnickiOpis?.length && !data.tdLinkageCriteria?.length"
         >
@@ -105,6 +115,7 @@
 
   <!-- Add to basket Section -->
   <div class="pricing-container" *ngIf="showAddToBasket">
+    <!-- Status -->
     <div
       [ngClass]="{
         'item-status': true,
@@ -113,32 +124,44 @@
         yellow: data.podGrupa === 1000000
       }"
     >
-      {{ data.stanje! > 0 ? "Ima na stanju" : "Nema na stanju" }}
+      {{
+        data.podGrupa === 1000000
+          ? "TecDoc artikal"
+          : data.stanje! > 0
+          ? "Ima na stanju"
+          : "Nema na stanju"
+      }}
     </div>
+
+    <!-- Stara cena -->
     <p
       *ngIf="data.podGrupa !== 1000000 && data.rabat"
-      class="sub-price line-through"
+      class="sub-price old-price"
     >
       {{ data.cena! / (1 - data.rabat / 100) | rsdCurrency }}
     </p>
-    <p
-      *ngIf="data.podGrupa !== 1000000 && data.rabat"
-      class="sub-price color--bittersweet"
-    >
-      -{{ data.rabat }}%
-    </p>
+
+    <!-- Finalna cena -->
     <p *ngIf="data.podGrupa !== 1000000" class="price">
       {{ data.cena ? (data.cena! | rsdCurrency) : (0 | rsdCurrency) }}
     </p>
+
     <p *ngIf="data.podGrupa !== 1000000" class="mobile-row autom-align__right">
       Cena sa PDV-om
     </p>
+
+    <!-- Ušteda -->
+    <p *ngIf="data.podGrupa !== 1000000 && data.rabat" class="saving">
+      Ušteda
+      {{ data.cena! / (1 - data.rabat / 100) - data.cena! | rsdCurrency }}
+    </p>
+
     <div class="mobile-quantity-cart util__flex--center">
       <div *ngIf="data.podGrupa === 1000000" class="helper-article">
-        <span>Ovaj artikal se nalazi u TecDoc katalogu.</span>
-        <br />
+        <span>Ovaj artikal se nalazi u TecDoc katalogu.</span><br />
         <span>Za dostupnost, molimo vas da nas kontaktirate.</span>
       </div>
+
       <autom-input-fields
         *ngIf="data.podGrupa !== 1000000"
         [clearBtn]="false"
@@ -158,6 +181,7 @@
         (emitSelected)="modifyQuantity($event)"
         ngDefaultControl
       ></autom-input-fields>
+
       <autom-button
         *ngIf="data.podGrupa !== 1000000"
         mat-raised-button
@@ -170,6 +194,7 @@
         (clickEvent)="addToShoppingCart(data)"
       />
     </div>
+
     <div
       *ngIf="isInCart(data.robaid ?? 0)"
       class="util__flex--center"
@@ -186,18 +211,23 @@
     </div>
   </div>
 
-  <!-- Pricing Section -->
+  <!-- Pricing-only Section -->
   <div class="pricing-container" *ngIf="showPriceOnly">
-    <p *ngIf="data.rabat" class="sub-price line-through">
+    <p *ngIf="data.rabat" class="sub-price old-price">
       {{ data.cena! / (1 - data.rabat / 100) | rsdCurrency }}
     </p>
-    <p *ngIf="data.rabat" class="sub-price color--bittersweet">
-      -{{ data.rabat }}%
-    </p>
-    <p class="sub-price">
+
+    <p class="sub-price final-price">
       {{ data.cena ? (data.cena! | rsdCurrency) : (0 | rsdCurrency) }}
     </p>
+
+    <p *ngIf="data.rabat" class="small-explanation saving">
+      Ušteda
+      {{ data.cena! / (1 - data.rabat / 100) - data.cena! | rsdCurrency }}
+    </p>
+
     <p class="autom-align__right small-explanation">Cena po komadu</p>
+
     <div class="util__flex--center">
       <autom-input-fields
         [clearBtn]="false"
@@ -220,7 +250,7 @@
 
       <div>
         <p class="price">
-          {{ data.cena! * data.kolicina! | rsdCurrency }}
+          {{ (data.cena || 0) * (data.kolicina || 0) | rsdCurrency }}
         </p>
         <p class="autom-align__right autom-margin__none">Ukupno sa pdv-om</p>
       </div>
@@ -237,6 +267,7 @@
   </div>
 </div>
 
+<!-- Overlay za zoom -->
 <div
   class="image-zoom-overlay"
   *ngIf="zoomedImageUrl"
