@@ -1,4 +1,10 @@
-import { Component, EventEmitter, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  OnInit,
+  Output,
+  ViewEncapsulation,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { take } from 'rxjs/operators';
 
@@ -21,7 +27,7 @@ import { VehicleSelectionPopupComponent } from '../../../shared/components/ui/ve
   imports: [CommonModule, ShowcaseComponent, VehicleSelectionPopupComponent],
   templateUrl: './webshop-empty.component.html',
   styleUrl: './webshop-empty.component.scss',
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
 })
 export class WebshopEmptyComponent implements OnInit {
   @Output() selectedVehicleDetailsEmit = new EventEmitter<TDVehicleDetails>();
@@ -38,9 +44,12 @@ export class WebshopEmptyComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.configService.getConfig().pipe(take(1)).subscribe(config => {
-      this.brands = config.brands.filter(brand => brand.visible !== false);
-    });
+    this.configService
+      .getConfig()
+      .pipe(take(1))
+      .subscribe((config) => {
+        this.brands = config.brands.filter((brand) => brand.visible !== false);
+      });
   }
 
   filterByBrand(id: string): void {
@@ -57,5 +66,9 @@ export class WebshopEmptyComponent implements OnInit {
       return;
     }
     this.selectedVehicleDetailsEmit.emit(vehicleDetails);
+  }
+
+  scrollTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 }

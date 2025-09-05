@@ -2,9 +2,6 @@
   class="product-card"
   role="button"
   tabindex="0"
-  (click)="handleClick()"
-  (keydown.enter)="handleClick()"
-  (keydown.space)="handleClick()"
   [attr.aria-label]="
     (roba.proizvodjac?.naziv || '') + ' ' + (roba.naziv || 'Artikal')
   "
@@ -27,9 +24,13 @@
   </div>
 
   <!-- Slika -->
-  <div class="product-image">
+  <div class="product-image" (click)="handleClick()">
     <img
-      [src]="roba.slika?.slikeUrl || '/assets/images/fallback.jpg'"
+      [src]="
+        roba.slika?.slikeByte
+          ? 'data:image/jpeg;base64,' + roba.slika!.slikeByte!
+          : roba.slika?.slikeUrl || '/assets/images/fallback.jpg'
+      "
       [alt]="(roba.proizvodjac?.naziv || '') + ' ' + (roba.naziv || 'Artikal')"
       loading="lazy"
     />
@@ -37,16 +38,11 @@
 
   <!-- Detalji -->
   <div class="product-details">
-    <h3 class="product-title">
+    <h3 class="product-title" (click)="handleClick()">
       {{ roba.proizvodjac?.naziv }} {{ roba.naziv }}
     </h3>
 
     <p class="product-katbr" *ngIf="roba.katbr">Kat. broj: {{ roba.katbr }}</p>
-
-    <!-- Kompatibilnost (TecDoc) -->
-    <p class="compat" *ngIf="compatibilityCount">
-      Kompatibilno sa {{ compatibilityCount }} vozila
-    </p>
   </div>
 
   <!-- Cene -->
@@ -109,7 +105,7 @@
       [iconPrefix]="true"
       [disabled]="isOutOfStock"
       [iconColor]="colorEnum.INFO_25_FILL"
-      (clickEvent)="handleAddToCart()"
+      (clickEvent)="handleAddToCart($event)"
     ></autom-button>
   </div>
 </div>

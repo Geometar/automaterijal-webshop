@@ -3,18 +3,18 @@
   border-radius: 1rem;
   border: 1px solid var(--figma-grey-100);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  cursor: default;
   display: flex;
   flex-direction: column;
   height: 100%;
   max-width: 250px;
   padding: 1.2rem;
   position: relative;
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
-  cursor: pointer;
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
 
   &:hover {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-    transform: translateY(-2px);
+    border-color: var(--figma-primary-300); /* highlight border */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06); /* malo dublja senka */
   }
 
   /* --- Discount badge --- */
@@ -65,6 +65,11 @@
       max-height: 100%;
       object-fit: contain;
     }
+
+    &:hover img {
+      cursor: pointer;
+      transform: scale(1.02); /* blagi zoom */
+    }
   }
 
   /* --- Details --- */
@@ -82,6 +87,12 @@
       -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
+    }
+
+    .product-title:hover {
+      color: var(--figma-primary-700);
+      cursor: pointer;
+      text-decoration: underline;
     }
 
     .product-katbr {
@@ -199,6 +210,7 @@
 @media (max-width: 480px) {
   .product-card {
     padding: 1rem;
+    max-width: 100%;
 
     .product-title {
       font-size: 0.95rem;

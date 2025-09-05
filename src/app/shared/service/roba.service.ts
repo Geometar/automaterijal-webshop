@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Sort } from '@angular/material/sort';
-import { Filter, Magacin, Roba } from '../data-models/model/roba';
+import { Filter, Magacin, Roba, ShowcaseResponse } from '../data-models/model/roba';
 import { catchError, Observable, throwError } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environment/environment';
@@ -112,5 +112,13 @@ export class RobaService {
     return this.http.post<void>(url, text, {
       headers: { 'Content-Type': 'application/json' },
     });
+  }
+
+  /** Fetch showcase (backend already caches & prepares) */
+  public fetchShowcase(): Observable<ShowcaseResponse> {
+    const url = `${DOMAIN_URL}${ROBA_URL}/showcase`;
+    return this.http.get<ShowcaseResponse>(url).pipe(
+      catchError((error: any) => throwError(() => error))
+    );
   }
 }

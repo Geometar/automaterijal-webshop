@@ -1,6 +1,7 @@
-import { Component, Input, Output, EventEmitter, ViewEncapsulation, OnInit } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
+import { Component, Input, Output, EventEmitter, ViewEncapsulation, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 // Automaterijal imports
 import { AutomIconComponent } from '../autom-icon/autom-icon.component';
@@ -15,6 +16,10 @@ import { ColorEnum, IconsEnum, InputTypeEnum, SizeEnum } from '../../data-models
 
 // Pipes
 import { RsdCurrencyPipe } from '../../pipe/rsd-currency.pipe';
+
+// Services
+import { CartStateService } from '../../service/state/cart-state.service';
+import { SnackbarService } from '../../service/utils/snackbar.service';
 
 @Component({
   selector: 'autom-product-card',
@@ -47,6 +52,8 @@ export class AutomProductCardComponent implements OnInit {
   // Quantity state
   quantity = 1;
 
+  constructor(private cartStateService: CartStateService, private snackbarService: SnackbarService, private router: Router) { }
+
   /* ---------------------------- Lifecycle ---------------------------- */
 
   ngOnInit(): void {
@@ -59,15 +66,17 @@ export class AutomProductCardComponent implements OnInit {
 
   /* ----------------------------- Actions ----------------------------- */
 
-  handleClick(): void {
+  handleClick(event?: MouseEvent): void {
     if (this.roba?.robaid != null) {
-      this.onClick.emit(this.roba.robaid);
+      this.router.navigate(['/webshop', this.roba.robaid]);
     }
   }
 
-  handleAddToCart(): void {
+  handleAddToCart(event?: Event): void {
+    event?.stopPropagation();
     if (this.roba && this.quantity > 0) {
-      this.addToCart.emit({ roba: this.roba, quantity: this.quantity });
+      this.cartStateService.addToCart(this.roba, this.quantity);
+      this.snackbarService.showSuccess('Artikal je dodat u korpu');
     }
   }
 
@@ -93,7 +102,8 @@ export class AutomProductCardComponent implements OnInit {
 
   // Is in cart indicator
   get isInCart(): boolean {
-    return !!this.roba?.uKorpi;
+    return this.cartStateService.isInCart(this.roba?.robaid!);
+
   }
 
   // Stock logic

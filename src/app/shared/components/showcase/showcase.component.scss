@@ -30,14 +30,14 @@
 
   .products-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 1.5rem;
     max-width: 1320px; // npr. 6 kartica * 220px + 5 * 24px gap
     width: 100%;
 
     autom-product-card {
       transition: transform 0.2s ease, box-shadow 0.2s ease;
-
+      width: fit-content;
       &:hover {
         transform: translateY(-4px);
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);

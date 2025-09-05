@@ -8,13 +8,13 @@ import { throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 
 // Services
-import { AccountStateService } from '../../service/state/account-state.service';
 import { AccountService } from '../service/account.service';
+import { AccountStateService } from '../../service/state/account-state.service';
 
 export const authInterceptor: HttpInterceptorFn = (request, next) => {
-  const localStorageService = inject(LocalStorageService);
-  const accountStateService = inject(AccountStateService);
   const accountService = inject(AccountService);
+  const accountStateService = inject(AccountStateService);
+  const localStorageService = inject(LocalStorageService);
   const router = inject(Router);
 
   if (

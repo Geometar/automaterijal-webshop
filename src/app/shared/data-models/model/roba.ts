@@ -56,6 +56,13 @@ export class Magacin {
   robaDto?: PaginatedResponse<Roba>;
 }
 
+export interface ShowcaseResponse {
+  prioritetne: Roba[];
+  maziva: Roba[];
+  alati: Roba[];
+  pribor: Roba[];
+}
+
 export class Roba {
   aplikacije?: Map<string, RobaAplikacija[]>;
   asociraniArtikli: Roba[] = [];

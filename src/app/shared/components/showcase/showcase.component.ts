@@ -1,10 +1,8 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { map, filter as rxfilter } from 'rxjs/operators';
-import { forkJoin } from 'rxjs';
 
-// Data models
-import { Filter, Roba } from '../../../shared/data-models/model/roba';
+// Models
+import { Roba, ShowcaseResponse } from '../../../shared/data-models/model/roba';
 
 // Enums
 import { IconsEnum } from '../../../shared/data-models/enums';
@@ -12,100 +10,65 @@ import { IconsEnum } from '../../../shared/data-models/enums';
 // Services
 import { UrlHelperService } from '../../../shared/service/utils/url-helper.service';
 import { RobaService } from '../../service/roba.service';
-import { CategoriesStateService } from '../../service/state/categories-state.service';
-import { ShowcaseStateService } from '../../service/state/showcase-state.service';
 
 // Components
 import { AutomProductCardComponent } from '../../../shared/components/product-card/product-card.component';
+import { SpinnerComponent } from '../spinner/spinner.component';
 
 @Component({
   selector: 'autom-showcase',
   standalone: true,
-  imports: [CommonModule, AutomProductCardComponent],
+  imports: [CommonModule, AutomProductCardComponent, SpinnerComponent],
   templateUrl: './showcase.component.html',
   styleUrl: './showcase.component.scss',
   encapsulation: ViewEncapsulation.None,
 })
 export class ShowcaseComponent implements OnInit {
   iconEnum = IconsEnum;
+
+  loading = false;
+  error: string | null = null;
+
+  // Struktura koju tvoj HTML očekuje
   showcase: { podgrupa: string; artikli: Roba[] }[] = [];
 
   constructor(
     private urlHelperService: UrlHelperService,
-    private robaService: RobaService,
-    private categoriesStateService: CategoriesStateService,
-    private showcaseStateService: ShowcaseStateService
+    private robaService: RobaService
   ) { }
 
   ngOnInit(): void {
-    const expired = this.showcaseStateService.isExpired();
-    const cached = this.showcaseStateService.get();
-    console.log('CACHE EXPIRED?', expired);
-    console.log('CACHED LENGTH:', cached.length);
-    console.log('CACHED STRUCTURE:', cached);
-
-    if (!this.showcaseStateService.isExpired()) {
-      const cached = this.showcaseStateService.get();
-      if (cached.length > 0) {
-        this.showcase = cached;
-        return;
-      }
-    }
-
-    this.loadFreshShowcase();
+    this.loadShowcase();
   }
 
-  private loadFreshShowcase(): void {
-    const PRIORITETNE_CODES = ['ADO', 'PRI', 'ALATI'];
-    const MAZIVA_CODES = ['MPU', 'MTR', 'MIZ', 'MOM', 'MOS'];
+  private loadShowcase(): void {
+    this.loading = true;
+    this.error = null;
 
-    this.categoriesStateService.getCategories$().subscribe((categories) => {
-      const podgrupePrioritetne = categories
-        .filter((group) => PRIORITETNE_CODES.includes(group.groupId!))
-        .flatMap((group) => group.articleSubGroups || []);
+    this.robaService.fetchShowcase().subscribe({
+      next: (resp: ShowcaseResponse) => {
+        // spoji sve sekcije u jedan niz i mapiraj u Roba
+        const allItems: Roba[] = [
+          ...(resp.prioritetne ?? []),
+          ...(resp.maziva ?? []),
+          ...(resp.alati ?? []),
+          ...(resp.pribor ?? []),
+        ];
 
-      const podgrupeMaziva = categories
-        .filter((group) => MAZIVA_CODES.includes(group.groupId!))
-        .flatMap((group) => group.articleSubGroups || []);
-
-      const izabranePodgrupe = [
-        ...this.getRandomSubset(podgrupePrioritetne, 3),
-        ...this.getRandomSubset(podgrupeMaziva, 2),
-      ];
-
-      const requests = izabranePodgrupe.map((podgrupa) => {
-        const filter = new Filter();
-        filter.podgrupe = [podgrupa!.subGroupId!.toString()];
-        filter.naStanju = true;
-
-        return this.robaService.pronadjiSvuRobu(null, 50, 0, '', filter).pipe(
-          map((res) =>
-            res.robaDto!.content.filter((r) => r.slika?.slikeUrl)// && !r.slika!.slikeUrl!.includes('no-image'))
-          ),
-          map((artikli) => this.getRandomSubset(artikli, 5)),
-          rxfilter((artikli) => artikli.length > 1),
-          map((artikli) => ({
-            podgrupa: podgrupa.name!,
-            artikli,
-          }))
-        );
-      });
-
-      forkJoin(requests).subscribe((results) => {
-        this.showcase = results.filter((r) => r.artikli.length > 0);
-        this.showcaseStateService.set(this.showcase);
-      });
+        // grupiši po podgrupi (podGrupaNaziv)
+        this.showcase = this.groupBySubgroup(allItems);
+      },
+      error: (err) => {
+        console.error('Showcase error:', err);
+        this.error = 'Nije moguće učitati showcase u ovom trenutku.';
+      },
+      complete: () => {
+        this.loading = false;
+      },
     });
   }
 
-  goToProduct(id: number): void {
-    this.urlHelperService.navigateTo(`/webshop/${id}`);
-  }
-
-  private getRandomSubset<T>(array: T[], size: number): T[] {
-    return [...array].sort(() => 0.5 - Math.random()).slice(0, size);
-  }
-
+  // Grupisanje po nazivu podgrupe
   private groupBySubgroup(data: Roba[]): { podgrupa: string; artikli: Roba[] }[] {
     const grouped: Record<string, Roba[]> = {};
 
@@ -115,6 +78,14 @@ export class ShowcaseComponent implements OnInit {
       grouped[key].push(item);
     }
 
-    return Object.entries(grouped).map(([podgrupa, artikli]) => ({ podgrupa, artikli }));
+    // pretvori u niz sekcija i izbaci prazne
+    return Object.entries(grouped)
+      .map(([podgrupa, artikli]) => ({ podgrupa, artikli }))
+      .filter(s => s.artikli.length > 0);
+  }
+
+
+  goToProduct(id: number): void {
+    this.urlHelperService.navigateTo(`/webshop/${id}`);
   }
 }

@@ -10,45 +10,36 @@
         Odaberi vozilo
       </button>
     </div>
-
-    <div class="hero-bg-image">
-      <img
-        src="/images/backgrounds/car-with-parts.png"
-        alt="Ilustracija vozila"
-      />
-    </div>
   </section>
 
-  <section class="webshop-empty-recommendation">
-    <h2>Izdvajamo iz ponude</h2>
-  </section>
-  <autom-showcase></autom-showcase>
+  <div class="wave-separator">
+    <svg
+      viewBox="0 0 1440 150"
+      xmlns="http://www.w3.org/2000/svg"
+      preserveAspectRatio="none"
+    >
+      <defs>
+        <!-- Zlatna -> plava -->
+        <linearGradient id="goldToBlue" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="var(--figma-highlight-gold)" />
+          <stop offset="100%" stop-color="var(--figma-primary-100)" />
+        </linearGradient>
+      </defs>
 
-  <!-- BRANDS -->
-  <section class="brands-section fade-in" *ngIf="brands.length > 0">
-    <h2>Izdvojeni proizvođači</h2>
-    <ul class="card-grid" role="list">
-      <li
-        *ngFor="let brand of brands"
-        (click)="filterByBrand(brand.id)"
-        tabindex="0"
-        role="button"
-        [attr.aria-label]="'Filtriraj po brendu: ' + brand.label"
-        (keydown.enter)="filterByBrand(brand.id)"
-        (keydown.space)="filterByBrand(brand.id)"
-      >
-        <img [src]="brand.src" [alt]="brand.alt" loading="lazy" />
-        <p>{{ brand.label }}</p>
-      </li>
-    </ul>
-  </section>
-
+      <path
+        d="M0,120 C240,180 480,60 720,120 C960,180 1200,60 1440,120 L1440,0 L0,0 Z"
+        fill="url(#goldToBlue)"
+      ></path>
+    </svg>
+  </div>
   <section class="oil-advisors-section">
-    <h2>Pronađite odgovarajuće ulje za vaše vozilo</h2>
+    <h2>
+      Pronađite idealno ulje za svoje vozilo – uz pomoć zvaničnih alata
+      proizvođača
+    </h2>
     <p class="subtitle">
-      Iskoristite pomoć zvaničnih alata proizvođača da pronađete odgovarajuće
-      ulje,<br />
-      a zatim ga lako potražite kod nas.
+      Koristite zvanične alate proizvođača da brzo i jednostavno pronađete
+      odgovarajuće ulje, a zatim ga lako naručite kod nas.
     </p>
 
     <div class="advisors-grid">
@@ -61,7 +52,8 @@
         <div class="advisor-image">
           <img src="/images/brands/shell.png" alt="Shell LubeMatch" />
         </div>
-        <p>Shell LubeMatch</p>
+        <p class="advisor-title">Shell LubeMatch</p>
+        <p class="advisor-desc">Zvaničan Shell alat za pronalazak ulja</p>
       </a>
 
       <a
@@ -73,10 +65,63 @@
         <div class="advisor-image">
           <img src="/images/brands/lukoil.png" alt="Lukoil Lubricant Advisor" />
         </div>
-        <p>Lukoil Lubricant Advisor</p>
+        <p class="advisor-title">Lukoil Lubricant Advisor</p>
+        <p class="advisor-desc">Preporučeno ulje za vaš model vozila</p>
       </a>
     </div>
+
+    <div class="advisor-cta">
+      <p>
+        Nakon što pronađete preporučeno ulje, unesite kataloški broj u našu
+        <a (click)="scrollTop()">pretragu</a> i poručite odmah.
+      </p>
+    </div>
   </section>
+</section>
+
+<section class="webshop-empty-recommendation">
+  <h2>Izdvajamo iz ponude</h2>
+</section>
+<autom-showcase></autom-showcase>
+
+<div class="wave-separator">
+  <svg
+    viewBox="0 0 1440 150"
+    xmlns="http://www.w3.org/2000/svg"
+    preserveAspectRatio="none"
+  >
+    <defs>
+      <!-- Zlatna -> plava -->
+      <linearGradient id="goldToBlue" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="var(--figma-highlight-gold)" />
+        <stop offset="100%" stop-color="var(--figma-primary-100)" />
+      </linearGradient>
+    </defs>
+
+    <path
+      d="M0,120 C240,180 480,60 720,120 C960,180 1200,60 1440,120 L1440,0 L0,0 Z"
+      fill="url(#goldToBlue)"
+    ></path>
+  </svg>
+</div>
+
+<!-- BRANDS -->
+<section class="brands-section fade-in" *ngIf="brands.length > 0">
+  <h2>Izdvojeni proizvođači</h2>
+  <ul class="card-grid" role="list">
+    <li
+      *ngFor="let brand of brands"
+      (click)="filterByBrand(brand.id)"
+      tabindex="0"
+      role="button"
+      [attr.aria-label]="'Filtriraj po brendu: ' + brand.label"
+      (keydown.enter)="filterByBrand(brand.id)"
+      (keydown.space)="filterByBrand(brand.id)"
+    >
+      <img [src]="brand.src" [alt]="brand.alt" loading="lazy" />
+      <p>{{ brand.label }}</p>
+    </li>
+  </ul>
 </section>
 
 <vehicle-selection-popup
