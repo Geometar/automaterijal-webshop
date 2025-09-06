@@ -1,20 +1,20 @@
+// shared/service/seo.service.ts
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
-import { DOCUMENT } from '@angular/common';
+import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 
 export interface UpdateSeoArgs {
   title: string;
   description: string;
-  url: string;
-  image?: string;
-  type?: string;           // og:type
+  url: string;                // also used for og:url
+  image?: string;             // absolute URL
+  type?: string;              // og:type (website | article | product ...)
   keywords?: string;
-  robots?: string;
-  siteName?: string;       // og:site_name
-  locale?: string;         // og:locale (npr. 'sr_RS')
-  imageAlt?: string;       // og:image:alt i twitter:image:alt
-  twitterCard?: 'summary' | 'summary_large_image';
-  canonical?: string;      // canonical href (podrazumevano = url)
+  robots?: string;            // e.g. "index, follow" | "noindex, follow"
+  siteName?: string;          // og:site_name
+  locale?: string;            // og:locale (e.g. 'sr_RS')
+  imageAlt?: string;          // og:image:alt and twitter:image:alt
+  canonical?: string;         // canonical href (defaults to url)
 }
 
 @Injectable({ providedIn: 'root' })
@@ -26,6 +26,15 @@ export class SeoService {
     @Inject(PLATFORM_ID) private platformId: Object
   ) { }
 
+  // ===== High-level entry point =====
+
+  /**
+   * Update all essential SEO tags at once:
+   * - Title, description, keywords, robots
+   * - Open Graph tags (og:title, og:description, og:image...)
+   * - Twitter tags
+   * - Canonical link
+   */
   updateSeoTags({
     title,
     description,
@@ -37,7 +46,6 @@ export class SeoService {
     siteName = 'Automaterijal',
     locale = 'sr_RS',
     imageAlt,
-    twitterCard = 'summary_large_image',
     canonical
   }: UpdateSeoArgs): void {
     // Title
@@ -58,22 +66,55 @@ export class SeoService {
     this.upsertProp('og:locale', locale);
     if (imageAlt) this.upsertProp('og:image:alt', imageAlt);
 
-    // Twitter
-    this.upsertName('twitter:card', twitterCard);
-    this.upsertName('twitter:title', title);
-    this.upsertName('twitter:description', description);
-    this.upsertName('twitter:image', image);
-    if (imageAlt) this.upsertName('twitter:image:alt', imageAlt);
-
     // Canonical
-    this.setCanonical(canonical || url);
-  }
-  clearJsonLd(id: string = 'seo-jsonld'): void {
-    const el = this.doc.getElementById(id);
-    if (el) el.remove();
+    this.ensureCanonical(canonical || url);
   }
 
-  /** JSON-LD (schema.org) – npr. Product, BreadcrumbList, Organization... */
+  /** Quickly update only the robots directive */
+  setRobots(value: string) {
+    this.upsertName('robots', value);
+  }
+
+  // ===== Canonical and link relations =====
+
+  /** Force set canonical (creates <link rel="canonical"> if missing) */
+  setCanonicalUrl(href: string) {
+    let link = this.doc.querySelector<HTMLLinkElement>("link[rel='canonical']");
+    if (!link) {
+      link = this.doc.createElement('link');
+      link.setAttribute('rel', 'canonical');
+      this.doc.head.appendChild(link);
+    }
+    link.setAttribute('href', href);
+  }
+
+  /** Update canonical only if different (avoids reflow) */
+  ensureCanonical(href: string) {
+    const current = this.doc.querySelector<HTMLLinkElement>("link[rel='canonical']")?.href;
+    if (current !== href) this.setCanonicalUrl(href);
+  }
+
+  /** Remove canonical (rarely needed) */
+  clearCanonical() {
+    this.doc.querySelector("link[rel='canonical']")?.remove();
+  }
+
+  /** Add <link rel="prev/next"> for pagination */
+  setLinkRel(rel: 'prev' | 'next', href: string | null) {
+    const sel = `link[rel='${rel}']`;
+    let link = this.doc.querySelector<HTMLLinkElement>(sel);
+    if (!href) { if (link) link.remove(); return; }
+    if (!link) {
+      link = this.doc.createElement('link');
+      link.setAttribute('rel', rel);
+      this.doc.head.appendChild(link);
+    }
+    link.setAttribute('href', href);
+  }
+
+  // ===== JSON-LD (schema.org) =====
+
+  /** Insert/replace JSON-LD script by ID (default = 'seo-jsonld') */
   setJsonLd(json: unknown, id: string = 'seo-jsonld'): void {
     let script = this.doc.getElementById(id) as HTMLScriptElement | null;
     if (!script) {
@@ -85,40 +126,58 @@ export class SeoService {
     script.text = JSON.stringify(json);
   }
 
-  /** Alias za kompatibilnost sa starim pozivom */
+  /** Alias for backward compatibility */
   updateJsonLd(json: unknown, id: string = 'seo-jsonld'): void {
     this.setJsonLd(json, id);
   }
 
-  /** Helperi: pouzdano upsert meta tagova bez duplikata */
+  /** Remove JSON-LD script by ID */
+  clearJsonLd(id: string = 'seo-jsonld'): void {
+    this.doc.getElementById(id)?.remove();
+  }
+
+  // ===== Hreflang =====
+
+  /**
+   * Set alternate hreflang links for multi-language sites
+   * Example: { 'sr-RS': 'https://.../sr', 'en': 'https://.../en' }
+   */
+  setHreflang(alternates: Record<string, string>) {
+    this.doc.querySelectorAll("link[rel='alternate'][hreflang]").forEach(el => el.remove());
+    Object.entries(alternates).forEach(([lang, href]) => {
+      const link = this.doc.createElement('link');
+      link.setAttribute('rel', 'alternate');
+      link.setAttribute('hreflang', lang);
+      link.setAttribute('href', href);
+      this.doc.head.appendChild(link);
+    });
+  }
+
+  // ===== Performance helpers =====
+
+  /** Preload main image (improves LCP for product pages) */
+  preloadImage(src?: string) {
+    if (!src || !isPlatformBrowser(this.platformId)) return;
+    const exists = Array.from(this.doc.head.querySelectorAll('link[rel="preload"]'))
+      .some(l => (l as HTMLLinkElement).href === src);
+    if (exists) return;
+
+    const link = this.doc.createElement('link');
+    link.setAttribute('rel', 'preload');
+    link.setAttribute('as', 'image');
+    link.setAttribute('href', src);
+    this.doc.head.appendChild(link);
+  }
+
+  // ===== Low-level helpers =====
+
+  /** Upsert meta tag by "name" attribute */
   private upsertName(name: string, content: string) {
     this.meta.updateTag({ name, content }, `name='${name}'`);
   }
+
+  /** Upsert meta tag by "property" attribute */
   private upsertProp(property: string, content: string) {
     this.meta.updateTag({ property, content }, `property='${property}'`);
-  }
-
-  // u SeoService
-  setLinkRel(rel: 'prev' | 'next', href: string | null) {
-    const sel = `link[rel='${rel}']`;
-    let link = this.doc.querySelector(sel) as HTMLLinkElement | null;
-    if (!href) { if (link) link.remove(); return; }
-    if (!link) {
-      link = this.doc.createElement('link');
-      link.setAttribute('rel', rel);
-      this.doc.head.appendChild(link);
-    }
-    link.setAttribute('href', href);
-  }
-
-  /** Canonical link */
-  private setCanonical(href: string) {
-    let link: HTMLLinkElement | null = this.doc.querySelector("link[rel='canonical']");
-    if (!link) {
-      link = this.doc.createElement('link');
-      link.setAttribute('rel', 'canonical');
-      this.doc.head.appendChild(link);
-    }
-    link.setAttribute('href', href);
   }
 }

@@ -1,106 +1,228 @@
+/* ─────────────────────────────────────────────────────────
+   Panel header
+   ───────────────────────────────────────────────────────── */
 .expansion-panel {
   height: 80px !important;
-  background-color: white;
+  background: #fff;
   border-bottom: 3px solid var(--figma-accent-yellow-700);
-  &--header {
+
+  .mat-expansion-panel-header {
+    padding: 8px 16px;
   }
 
-  .mat-expansion-indicator svg {
-    width: 45px;
-    height: 45px;
+  .mat-expansion-indicator {
+    transform: scale(1.2);
+    transition: transform 160ms ease;
+
+    svg {
+      width: 36px;
+      height: 36px;
+    }
+  }
+
+  .mat-expansion-panel-header:hover {
+    background: #fafafa;
+  }
+
+  .mat-expansion-panel-header.mat-focus-indicator:focus-visible {
+    outline: 2px solid #1a73e8;
+    outline-offset: 2px;
+  }
+
+  &--header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    img,
+    .vehicle-placeholder {
+      width: 120px;
+      height: 60px;
+      object-fit: contain;
+      aspect-ratio: 2 / 1;
+      border-radius: 6px;
+      background: #f6f6f6;
+      border: 1px solid #eee;
+    }
   }
 }
 
+.vehicle-placeholder {
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+}
+.vehicle-placeholder::after {
+  /* šrafura za “no image” */
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(45deg, #f0f0f0 25%, transparent 25%),
+    linear-gradient(-45deg, #f0f0f0 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #f0f0f0 75%),
+    linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+  opacity: .6;
+}
+
+/* “subtitle” u headeru */
+mat-panel-description {
+  font-size: 14px;
+  line-height: 1.4;
+  white-space: normal;
+  word-break: break-word;
+  text-align: left;
+  color: #333;
+
+  @media (max-width: 991px) {
+    font-size: 13px;
+    line-height: 1.35;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────
+   Tech data (grid + kartice sekcija)
+   ───────────────────────────────────────────────────────── */
 .tech-data-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 40px;
-  padding: 15px;
+  display: grid;
+  gap: 24px;
+  padding: 16px;
+
+  /* 3 kolone na širokom, 2 na tablet, 1 na mobilnom */
+  grid-template-columns: repeat(3, minmax(240px, 1fr));
+
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+  }
+  @media (max-width: 700px) {
+    grid-template-columns: 1fr;
+    padding: 12px;
+    gap: 18px;
+  }
 }
 
 .tech-section {
-  flex: 1;
-  min-width: 250px;
-}
+  background: #fff;
+  border: 1px solid #ececec;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 0 rgba(0,0,0,.02);
 
-.tech-section h3 {
-  font-size: 16px;
-  margin-bottom: 10px;
-  border-bottom: 2px solid #ddd;
-  padding-bottom: 5px;
+  h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0;
+    padding: 12px 14px;
+    border-bottom: 1px solid #eee;
+    background: #fafafa;
+  }
 }
 
 .tech-items {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
 }
 
 .tech-item {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 14px;
+  border-bottom: 1px dashed #efefef;
   font-size: 14px;
-  border-bottom: 1px solid #eee;
-  padding: 5px 0;
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  @media (max-width: 700px) {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    align-items: start;
+  }
 }
 
 .tech-key {
-  font-weight: bold;
+  font-weight: 600;
+  color: #222;
+  min-width: 0;           /* spreči overflow */
+  word-break: break-word;
 }
 
 .tech-value {
   color: #555;
-}
-
-mat-panel-description {
-  font-size: 14px;
-  line-height: 1.4;
-  white-space: normal; 
+  min-width: 0;
   word-break: break-word;
-  text-align: left;
+  justify-self: end;
 
-  @media (max-width: 991px) {
-    font-size: 13px; 
-    line-height: 1.3;
+  @media (max-width: 700px) {
+    justify-self: start;
   }
 }
 
-@media (max-width: 991px) {
-  .tech-data-container {
-    flex-direction: column;
-    gap: 20px; 
-    padding: 10px; 
+/* suptilni hover na stavke */
+.tech-item:hover {
+  background: #fcfcfc;
+}
+
+/* ─────────────────────────────────────────────────────────
+   Fine-tuning mat-expansion (spacing, border, anim)
+   ───────────────────────────────────────────────────────── */
+::ng-deep .mat-expansion-panel-body {
+  padding: 0; /* već imamo padding u .tech-data-container */
+}
+
+::ng-deep .mat-expansion-panel {
+  border-radius: 12px;
+  border: 1px solid #eee;
+  overflow: hidden;
+}
+
+/* ─────────────────────────────────────────────────────────
+   Dark-ish mode nudging (ako imaš tamni UI, zadrži)
+   ───────────────────────────────────────────────────────── */
+/*
+@media (prefers-color-scheme: dark) {
+  .expansion-panel {
+    background: #1b1b1b;
+    border-bottom-color: #f8c400;
+
+    .mat-expansion-panel-header:hover {
+      background: #202020;
+    }
+
+    &--header img,
+    &--header .vehicle-placeholder {
+      background: #222;
+      border-color: #2a2a2a;
+    }
   }
 
   .tech-section {
-    min-width: auto; 
-    width: 100%; 
-  }
+    background: #181818;
+    border-color: #2a2a2a;
 
-  .tech-items {
-    gap: 8px; 
+    h3 {
+      background: #1f1f1f;
+      border-bottom-color: #2a2a2a;
+      color: #e9e9e9;
+    }
   }
 
   .tech-item {
-    display: flex;
-    flex-direction: column; 
-    align-items: flex-start;
-    width: 100%;
-    padding: 8px 0;
-    word-break: break-word;
+    border-bottom-color: #2a2a2a;
+    color: #ddd;
+
+    .tech-key { color: #f0f0f0; }
+    .tech-value { color: #cfcfcf; }
   }
 
-.tech-key {
-    font-size: 14px;
-    font-weight: bold;
-    margin-bottom: 4px;
-    word-break: break-word; 
-  }
-
-
-  .tech-value {
-    font-size: 14px;
-    color: #555;
-    word-break: break-word;
+  mat-panel-description {
+    color: #e6e6e6;
   }
 }
+*/

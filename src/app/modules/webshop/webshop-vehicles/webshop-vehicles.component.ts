@@ -10,11 +10,12 @@ import {
 import { finalize, Subject, takeUntil } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 
-// Component imported
+// Autom imported
 import { AssemblyGroupsComponent } from './assembly-groups/assembly-groups.component';
 import { CommonModule } from '@angular/common';
 import { SpinnerComponent } from '../../../shared/components/spinner/spinner.component';
-import { VehicleDetailsAcordionComponent } from './vehicle-details-acordion/vehicle-details-acordion.component';
+import { VehicleDetailsAccordionComponent } from './vehicle-details-acordion/vehicle-details-acordion.component';
+
 
 // Data models
 import {
@@ -35,7 +36,7 @@ import { UrlHelperService } from '../../../shared/service/utils/url-helper.servi
     AssemblyGroupsComponent,
     CommonModule,
     SpinnerComponent,
-    VehicleDetailsAcordionComponent,
+    VehicleDetailsAccordionComponent,
   ],
   templateUrl: './webshop-vehicles.component.html',
   styleUrl: './webshop-vehicles.component.scss',

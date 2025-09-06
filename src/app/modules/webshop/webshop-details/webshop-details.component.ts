@@ -1,4 +1,10 @@
-import { Component, HostListener, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  OnDestroy,
+  OnInit,
+  ViewEncapsulation,
+} from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { finalize, Subject, takeUntil } from 'rxjs';
@@ -27,7 +33,7 @@ import {
 } from '../../../shared/data-models/model/roba';
 import { TooltipModel } from '../../../shared/data-models/interface';
 
-// Components imports
+// Components
 import { AddAttributesComponent } from './add-atributes/add-atributes.component';
 import { AutomIconComponent } from '../../../shared/components/autom-icon/autom-icon.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
@@ -46,7 +52,7 @@ import { PictureService } from '../../../shared/service/utils/picture.service';
 import { RobaService } from '../../../shared/service/roba.service';
 import { SeoService } from '../../../shared/service/seo.service';
 import { SnackbarService } from '../../../shared/service/utils/snackbar.service';
-import { TecdocService } from '../../../shared/service/tecdoc.service'
+import { TecdocService } from '../../../shared/service/tecdoc.service';
 
 @Component({
   selector: 'app-webshop-details',
@@ -66,7 +72,7 @@ import { TecdocService } from '../../../shared/service/tecdoc.service'
   ],
   providers: [CurrencyPipe],
   templateUrl: './webshop-details.component.html',
-  styleUrl: './webshop-details.component.scss',
+  styleUrls: ['./webshop-details.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
 export class WebshopDetailsComponent implements OnInit, OnDestroy {
@@ -85,7 +91,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   // Misc
   editingText = false;
   isAdmin = false;
-  loading = false;
+  loading = true;
   quantity: number = 1;
   sanitizedText: SafeHtml = '';
   showAddAttributes = false;
@@ -93,21 +99,22 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   showImageDeleteWarningPopup = false;
 
   // Tooltip
-  pdfToolTip = {
+  pdfToolTip: TooltipModel = {
     position: TooltipPositionEnum.TOP,
     subPosition: TooltipSubPositionsEnum.SUB_CENTER,
     theme: TooltipThemeEnum.DARK,
     tooltipText: 'PDF Document',
     type: TooltipTypesEnum.TEXT,
-  } as TooltipModel;
+  };
 
   // Data
   documentKeys: string[] = [];
   oeNumbers: Map<string, string[]> = new Map();
+  private youTubeIds: string[] = [];
 
   private destroy$ = new Subject<void>();
 
-  @HostListener('document:keydown.escape', ['$event'])
+  @HostListener('document:keydown.escape')
   onEscape() {
     this.showDeleteWarningPopup = false;
     this.showImageDeleteWarningPopup = false;
@@ -121,19 +128,22 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private sanitizer: DomSanitizer,
     private seoService: SeoService,
-    private snackBar: SnackbarService,
     private snackbarService: SnackbarService,
-    private tecDocService: TecdocService,
+    private tecDocService: TecdocService
   ) { }
 
-  /** Start of: Angular lifecycle hooks */
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Lifecycle
+  // ─────────────────────────────────────────────────────────────────────────────
 
   ngOnInit(): void {
-    this.id = +this.route.snapshot.paramMap.get('id')!;
+    const raw = this.route.snapshot.paramMap.get('id');
+    this.id = this.parseId(raw);
     if (this.id) {
       this.fetchData(this.id);
+    } else {
+      console.warn('Nevažeći ID u ruti:', raw);
     }
-
     this.isAdmin = this.accountStateService.isAdmin();
   }
 
@@ -142,9 +152,9 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  /** End of: Angular lifecycle hooks */
-
-  /** Start of: API event */
+  // ─────────────────────────────────────────────────────────────────────────────
+  // API
+  // ─────────────────────────────────────────────────────────────────────────────
 
   fetchData(id: number): void {
     this.loading = true;
@@ -156,18 +166,36 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (response: Roba) => {
+          // ensure image bytes are converted to data URL for display
           this.pictureService.convertByteToImage(response);
+
           this.data = response;
           this.fillDocumentation();
           this.fillOeNumbers();
           this.setSanitizedText();
-          this.updateSeoTags(response);
+
+          // set canonical path with slug (id-brand-name-sku)
+          const { idParam, url } = this.buildCanonical(this.data);
+          const current = this.route.snapshot.paramMap.get('id');
+          if (current && current !== idParam) {
+            history.replaceState({}, '', `/webshop/${idParam}`);
+          }
+          // If your SeoService has ensureCanonical, use it; else updateSeoTags below sets it.
+          if (typeof (this.seoService as any).ensureCanonical === 'function') {
+            (this.seoService as any).ensureCanonical(url);
+          }
+
+          this.updateSeoTags(this.data);
         },
         error: (err: HttpErrorResponse) => {
-          const error = err.error.details || err.error;
+          console.error('fetchDetails error', err.error?.details || err.error);
         },
       });
   }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // UI actions
+  // ─────────────────────────────────────────────────────────────────────────────
 
   openPdf(doc: TecDocDokumentacija) {
     this.tecDocService
@@ -177,22 +205,20 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
         if (res) {
           const blob = new Blob([res], { type: 'application/pdf' });
           const url = URL.createObjectURL(blob);
-          window.open(url); // Open in a new tab
+          window.open(url);
         }
       });
   }
 
   openLink(doc: TecDocDokumentacija) {
-    window.open(doc.docUrl, '_blank');
+    window.open(doc.docUrl!, '_blank');
   }
-
 
   onImageSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (!input.files?.length || !this.id) return;
 
     const file = input.files[0];
-
     this.loading = true;
     this.robaService
       .uploadImage(this.id, file)
@@ -203,7 +229,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.snackbarService.showSuccess('Image uploaded successfully');
-          this.fetchData(this.id!); // refresh details to get new image
+          this.fetchData(this.id!);
         },
         error: () => {
           this.snackbarService.showError('Image upload failed');
@@ -211,102 +237,99 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       });
   }
 
-
   removeAttributes(): void {
-    this.robaService.removeTecDocAttributes(this.data.robaid!).pipe(takeUntil(this.destroy$)).subscribe({
-      next: () => {
-        this.snackBar.showSuccess('Atributi uspešno izbrisani');
-        this.showDeleteWarningPopup = false;
-        this.refreshDetails();
-      },
-      error: () => {
-        this.snackBar.showSuccess('Greška pri brisanju atributa');
-        this.showDeleteWarningPopup = false;
-      }
-    });
+    this.robaService
+      .removeTecDocAttributes(this.data.robaid!)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.snackbarService.showSuccess('Atributi uspešno izbrisani');
+          this.showDeleteWarningPopup = false;
+          this.refreshDetails();
+        },
+        error: () => {
+          this.snackbarService.showError('Greška pri brisanju atributa');
+          this.showDeleteWarningPopup = false;
+        },
+      });
   }
-
 
   removeImage(): void {
-    this.robaService.removeImage(this.data.robaid!).pipe(takeUntil(this.destroy$)).subscribe({
-      next: () => {
-        this.snackBar.showSuccess('Atributi uspešno izbrisani');
-        this.showDeleteWarningPopup = false;
-        this.refreshDetails();
-      },
-      error: () => {
-        this.snackBar.showSuccess('Greška pri brisanju atributa');
-        this.showDeleteWarningPopup = false;
-      }
-    });
+    this.robaService
+      .removeImage(this.data.robaid!)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.snackbarService.showSuccess('Slika uspešno izbrisana');
+          this.showImageDeleteWarningPopup = false;
+          this.refreshDetails();
+        },
+        error: () => {
+          this.snackbarService.showError('Greška pri brisanju slike');
+          this.showImageDeleteWarningPopup = false;
+        },
+      });
   }
-
 
   saveTextDescription(): void {
-    this.robaService.saveText(this.data.robaid!, this.data.tekst!).pipe(takeUntil(this.destroy$)).subscribe({
-      next: () => {
-        this.snackBar.showSuccess('Opis uspešno sačuvan');
-        this.editingText = false;
-        this.refreshDetails();
-      },
-      error: () => {
-        this.snackBar.showError('Greška pri čuvanju opisa');
-        this.editingText = false;
-      },
-    });
+    this.robaService
+      .saveText(this.data.robaid!, this.data.tekst!)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.snackbarService.showSuccess('Opis uspešno sačuvan');
+          this.editingText = false;
+          this.refreshDetails();
+        },
+        error: () => {
+          this.snackbarService.showError('Greška pri čuvanju opisa');
+          this.editingText = false;
+        },
+      });
   }
 
-  /** End of: API event */
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Mappers
+  // ─────────────────────────────────────────────────────────────────────────────
 
   fillDocumentation() {
-    if (!this.data.dokumentacija) {
-      return;
-    }
+    this.documentKeys = [];
+    this.youTubeIds = [];
 
-    for (const data of Object.entries(this.data.dokumentacija!)) {
-      (data[1] as TecDocDokumentacija[]).forEach(
-        (value: TecDocDokumentacija) => {
-          if (
-            value.docFileTypeName!.toUpperCase().indexOf('URL') > -1 &&
-            value.docUrl
-          ) {
-            // Updated regex to handle youtube-nocookie.com and standard YouTube URLs
-            const videoIdMatch = value.docUrl.match(
-              /(?:youtube(-nocookie)?\.com\/embed\/|youtube\.com\/watch\?v=|youtu\.be\/)([^&?]+)/
-            );
+    if (!this.data.dokumentacija) return;
 
-            if (videoIdMatch && videoIdMatch[2]) {
-              value.saniraniUrl = videoIdMatch[2]; // Extract and store only the video ID
-            }
-          }
-          if (
-            value.docFileTypeName!.toUpperCase().indexOf('JPEG') > -1 &&
-            value.dokument
-          ) {
-            value.dokument = this.pictureService.convertByteToImageByte(
-              value.dokument
-            );
-          }
+    for (const [key, docs] of Object.entries(this.data.dokumentacija)) {
+      this.documentKeys.push(key);
+      (docs as TecDocDokumentacija[]).forEach((value) => {
+        // capture YouTube IDs for VideoObject
+        if (
+          value.docFileTypeName?.toUpperCase().includes('URL') &&
+          value.docUrl
+        ) {
+          const m = value.docUrl.match(
+            /(?:youtube(?:-nocookie)?\.com\/embed\/|youtube\.com\/watch\?v=|youtu\.be\/)([^&?]+)/
+          );
+          if (m && m[1]) this.youTubeIds.push(m[1]);
         }
-      );
-    }
-
-    if (this.data.dokumentacija != null) {
-      for (const key of Object.keys(this.data.dokumentacija)) {
-        this.documentKeys.push(key);
-      }
+        // convert JPEG bytes for inline display
+        if (
+          value.docFileTypeName?.toUpperCase().includes('JPEG') &&
+          value.dokument
+        ) {
+          value.dokument = this.pictureService.toDataUrl(value.dokument, 'image/jpeg') ?? undefined;
+        }
+      });
     }
   }
 
   fillOeNumbers(): void {
-    if (!this.data.tdBrojevi || this.data.tdBrojevi.length === 0) {
-      return;
-    }
+    this.oeNumbers.clear();
+    if (!this.data.tdBrojevi?.length) return;
 
-    this.data.tdBrojevi.forEach((value: RobaBrojevi) => {
-      const manufactures: string[] = this.oeNumbers.get(value.fabrBroj!) ?? [];
-      manufactures.push(value.proizvodjac!);
-      this.oeNumbers.set(value.fabrBroj!, manufactures);
+    this.data.tdBrojevi.forEach((v: RobaBrojevi) => {
+      const list = this.oeNumbers.get(v.fabrBroj!) ?? [];
+      list.push(v.proizvodjac!);
+      this.oeNumbers.set(v.fabrBroj!, list);
     });
   }
 
@@ -314,6 +337,8 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     if (this.data?.tekst) {
       const textWithBreaks = this.data.tekst.replace(/\n/g, '<br>');
       this.sanitizedText = this.sanitizer.bypassSecurityTrustHtml(textWithBreaks);
+    } else {
+      this.sanitizedText = '';
     }
   }
 
@@ -322,22 +347,22 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   }
 
   fetchDocument(key: string): TecDocDokumentacija[] {
-    for (const data of Object.entries(this.data.dokumentacija!)) {
-      if (data[0] === key) {
-        return data[1] as TecDocDokumentacija[];
-      }
+    if (!this.data.dokumentacija) return [];
+    for (const [k, list] of Object.entries(this.data.dokumentacija)) {
+      if (k === key) return list as TecDocDokumentacija[];
     }
     return [];
   }
 
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Cart / quantity
+  // ─────────────────────────────────────────────────────────────────────────────
+
   modifyQuantity(quantity: number): void {
-    if (quantity < 1) {
-      this.quantity = 1;
-    } else if (quantity > this.data.stanje!) {
-      this.quantity = this.data.stanje!;
-    } else {
-      this.quantity = quantity;
-    }
+    if (quantity < 1) this.quantity = 1;
+    else if (this.data.stanje && quantity > this.data.stanje)
+      this.quantity = this.data.stanje;
+    else this.quantity = quantity;
   }
 
   addToShopingCart(): void {
@@ -345,118 +370,291 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     this.snackbarService.showSuccess('Artikal je dodat u korpu');
   }
 
-  /**
-   * Admin tools: Start
-   */
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Admin actions
+  // ─────────────────────────────────────────────────────────────────────────────
 
   triggerImageUpload(): void {
     const input = document.getElementById('imageUpload') as HTMLInputElement;
-    if (input) {
-      input.click();
-    }
+    if (input) input.click();
   }
-
   editAttributes(): void {
     this.showAddAttributes = true;
   }
-
   editDescription(): void {
     this.editingText = !this.editingText;
   }
-
   refreshDetails(): void {
-    if (this.showAddAttributes) {
-      this.showAddAttributes = false;
-    }
-
-    if (this.showDeleteWarningPopup) {
-      this.showDeleteWarningPopup = false;
-    }
-
-    if (this.showImageDeleteWarningPopup) {
-      this.showImageDeleteWarningPopup = false;
-    }
-
-    this.fetchData(this.id!);
+    this.showAddAttributes = false;
+    this.showDeleteWarningPopup = false;
+    this.showImageDeleteWarningPopup = false;
+    if (this.id) this.fetchData(this.id);
   }
-
   toggleTextEdit(): void {
     this.editingText = !this.editingText;
   }
-
   textChanged(event: string): void {
     this.data.tekst = event;
   }
-
   cancelTextEdit(): void {
     this.editingText = false;
   }
 
-  /**
-   * Admin tools: End
-   */
+  // ─────────────────────────────────────────────────────────────────────────────
+  // SEO helpers
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  private normalizeWhitespace(v: string | undefined | null): string {
+    return (v ?? '').replace(/\s+/g, ' ').trim();
+  }
+
+  private slugifySerbian(v: string): string {
+    // remove diacritics, keep numbers/letters, hyphenate
+    const noDiacritics = v
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+    return noDiacritics
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+  }
+
+  private buildCanonical(roba: Roba): { idParam: string; url: string } {
+    const brand = this.normalizeWhitespace(roba.proizvodjac?.naziv);
+    const name = this.normalizeWhitespace(roba.naziv);
+    const sku = this.normalizeWhitespace(roba.katbr);
+    const id = roba.robaid ?? '';
+    const slug = this.slugifySerbian([brand, name, sku].filter(Boolean).join(' '));
+    const idParam = slug ? `${id}-${slug}` : String(id);
+    const url = `https://www.automaterijal.com/webshop/${idParam}`;
+    return { idParam, url };
+  }
+
+  private isThin(roba: Roba): boolean {
+    const hasImg = !!(roba.slika?.slikeUrl || roba.slika?.slikeByte || roba.proizvodjacLogo);
+    const hasPrice = typeof roba.cena === 'number' && roba.cena > 0;
+    const hasSpecs = !!roba.tehnickiOpis?.length;
+    const hasText = !!(roba.tekst && roba.tekst.trim().length > 0);
+    return !(hasImg || hasPrice || hasSpecs || hasText);
+  }
+
+  private absoluteImage(candidate?: string | null): string {
+    const logoFallback = 'https://www.automaterijal.com/images/logo/logo.svg';
+    if (!candidate) return logoFallback;
+    if (candidate.startsWith('http')) return candidate;
+    // data:image... is allowed in <img>, ali za og:image je bolje absolutni URL;
+    // ako je data URL ili relativno prazno → vrati fallback logo:
+    if (candidate.startsWith('data:') || candidate === '') return logoFallback;
+    return `https://www.automaterijal.com/${candidate.replace(/^\/?/, '')}`;
+  }
+
+  private buildAdditionalProperties(roba: Roba): any[] {
+    const props: any[] = [];
+    // Tehničke specifikacije
+    if (roba.tehnickiOpis?.length) {
+      for (const item of roba.tehnickiOpis) {
+        const name = this.normalizeWhitespace(item.oznaka);
+        const value = this.normalizeWhitespace(item.vrednost);
+        if (!name && !value) continue;
+        props.push({
+          '@type': 'PropertyValue',
+          name: [name, item.jedinica ? `[${item.jedinica}]` : ''].filter(Boolean).join(' ').trim(),
+          value: value || '—',
+        });
+      }
+    }
+    // OE brojevi kao jedan property (ili više, ali ovde grupujemo)
+    if (this.oeNumbers.size > 0) {
+      const joined = Array.from(this.oeNumbers.entries())
+        .map(([oe, prozv]) => `${oe} (${prozv.join(', ')})`)
+        .join(' | ');
+      props.push({
+        '@type': 'PropertyValue',
+        name: 'OE / OEM brojevi',
+        value: joined.slice(0, 5000), // safety cutoff
+      });
+    }
+    return props;
+  }
+
+  private buildVideoObjects(): any[] | undefined {
+    if (!this.youTubeIds.length) return undefined;
+    return this.youTubeIds.slice(0, 3).map((id) => ({
+      '@type': 'VideoObject',
+      name: 'Servisna informacija',
+      embedUrl: `https://www.youtube.com/embed/${id}`,
+      potentialAction: {
+        '@type': 'WatchAction',
+        target: `https://www.youtube.com/watch?v=${id}`,
+      },
+    }));
+  }
+
+  private buildRelatedProducts(roba: Roba): any[] | undefined {
+    if (!roba.asociraniArtikli?.length) return undefined;
+    const related = roba.asociraniArtikli.slice(0, 10).map((r) => {
+      const brand = this.normalizeWhitespace(r.proizvodjac?.naziv);
+      const name = this.normalizeWhitespace(r.naziv);
+      const sku = this.normalizeWhitespace(r.katbr);
+      const id = r.robaid ?? '';
+      const slug = this.slugifySerbian([brand, name, sku].filter(Boolean).join(' '));
+      const url = `https://www.automaterijal.com/webshop/${id}${slug ? '-' + slug : ''}`;
+      const img = this.absoluteImage(r.slika?.slikeUrl);
+      return {
+        '@type': 'Product',
+        name: [brand, name].filter(Boolean).join(' ') || name || brand || 'Proizvod',
+        sku: sku || String(id),
+        url,
+        ...(img ? { image: img } : {}),
+        ...(brand ? { brand: { '@type': 'Brand', name: brand } } : {}),
+      };
+    });
+    return related.length ? related : undefined;
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // SEO main
+  // ─────────────────────────────────────────────────────────────────────────────
 
   private updateSeoTags(roba: Roba): void {
-    const brand = roba.proizvodjac?.naziv?.trim() ?? '';
-    const name = roba.naziv?.trim() ?? '';
-    const sku = roba.katbr?.trim() ?? '';
+    const brand = this.normalizeWhitespace(roba.proizvodjac?.naziv);
+    const name = this.normalizeWhitespace(roba.naziv);
+    const sku = this.normalizeWhitespace(roba.katbr);       // merchant SKU
+    const mpn = this.normalizeWhitespace(roba.katbrpro);    // manufacturer part number
     const id = roba.robaid ?? '';
-    const price = roba.cena ?? undefined;         // broj (RSD)
+    const price = roba.cena ?? undefined;
     const inStock = (roba.stanje ?? 0) > 0;
-    const productImg = roba.slika?.slikeUrl || ''; // bolje od logotipa
-    const logoFallback = 'https://www.automaterijal.com/images/logo/logo.svg';
+    const group = this.normalizeWhitespace(roba.grupaNaziv);
+    const subgroup = this.normalizeWhitespace(roba.podGrupaNaziv);
 
-    // Title (≤ 60–65 znakova kad može)
+    // Title
     const baseTitle = [brand, name].filter(Boolean).join(' ');
-    const title = sku ? `${baseTitle} (${sku}) | Automaterijal`
-      : `${baseTitle} | Automaterijal`;
+    const title = sku ? `${baseTitle} (${sku}) | Automaterijal` : `${baseTitle} | Automaterijal`;
 
-    // Meta description (≤ ~155–160c)
-    const descBase = sku
-      ? `Kupite ${brand} ${name} (${sku}) online. Proverena dostupnost, brza dostava, dokumentacija i OE brojevi.`
-      : `Kupite ${brand} ${name} online. Proverena dostupnost, brza dostava, dokumentacija i OE brojevi.`;
-    const description = descBase.slice(0, 158);
+    // Description — robust fallback kad nema teksta
+    const specsSnippet = (roba.tehnickiOpis || [])
+      .slice(0, 4)
+      .map((s) => [s.oznaka, s.vrednost, s.jedinica ? `(${s.jedinica})` : ''].filter(Boolean).join(' '))
+      .join(' · ');
+    const groupLine = [group, subgroup].filter(Boolean).join(' › ');
+    const descCandidates = [
+      roba.tekst?.trim(),
+      `Kupite ${brand} ${name}${sku ? ` (${sku})` : ''} online. Dostupnost: ${inStock ? 'Na stanju' : 'Nema na stanju'}, brza dostava.${groupLine ? ' Kategorija: ' + groupLine + '.' : ''}`,
+      specsSnippet,
+      `${brand} ${name} — rezervni deo. Brza isporuka i podrška.`,
+    ].filter(Boolean) as string[];
+    const description = (descCandidates[0] || '').slice(0, 158);
 
-    const url = `https://www.automaterijal.com/webshop/${id}`;
+    const { url } = this.buildCanonical(roba);
 
-    // JSON-LD Product
-    const productJsonLd: any = {
-      '@context': 'https://schema.org',
-      '@type': 'Product',
-      name: baseTitle || name || brand || 'Proizvod',
-      sku: sku || String(id),
-      brand: brand ? { '@type': 'Brand', name: brand } : undefined,
-      image: productImg || logoFallback,
-      url,
-      offers: {
-        '@type': 'Offer',
-        priceCurrency: 'RSD',
-        availability: inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-        url,
-        ...(price ? { price: String(price) } : {})
-      }
-    };
+    // Images: prefer product image; fallback brand logo; finally site logo
+    const mainImgCandidateRaw =
+      roba.slika?.slikeUrl ??
+      roba.slika?.slikeByte ??
+      roba.proizvodjacLogo;
 
-    // Og image alt (pristupačnost + bolji preview)
-    const ogImageAlt = baseTitle || (brand && name ? `${brand} ${name}` : 'Automaterijal proizvod');
+    const mainImgDataUrl = this.pictureService.toDataUrl(mainImgCandidateRaw, 'image/jpeg');
+    const ogImage = this.absoluteImage(mainImgDataUrl);
 
-    // Ako tvoj seoService prima “extras”, prosledi ih; u suprotnom proširi servis
+    const ogImageAlt =
+      baseTitle ||
+      (brand && name ? `${brand} ${name}` : 'Automaterijal proizvod');
+
+    // Robots (index thin=off)
+    const robots = this.isThin(roba) ? 'noindex, follow' : 'index, follow';
+
+    // Update metas & canonical
     this.seoService.updateSeoTags({
       title,
       description,
       url,
       type: 'product',
-      image: productImg || logoFallback,
-      // dodatne OG/Twitter stvari
+      image: ogImage,
       siteName: 'Automaterijal',
       locale: 'sr_RS',
       imageAlt: ogImageAlt,
-      twitterCard: 'summary_large_image',
-      // canonical preporuka
-      canonical: url
+      robots,
+      canonical: url,
     });
 
-    // JSON-LD (ako imaš metodu u servisu)
-    this.seoService.updateJsonLd(productJsonLd);
+    // Optionally preload the main image if service supports it
+    if (typeof (this.seoService as any).preloadImage === 'function') {
+      (this.seoService as any).preloadImage(ogImage);
+    }
+
+    // Build JSON-LD Product
+    const additionalProps = this.buildAdditionalProperties(roba);
+    const videoObjects = this.buildVideoObjects();
+    const related = this.buildRelatedProducts(roba);
+
+    const productJsonLd: any = {
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: baseTitle || name || brand || 'Proizvod',
+      sku: sku || String(id),
+      ...(mpn ? { mpn } : {}),
+      ...(brand ? { brand: { '@type': 'Brand', name: brand } } : {}),
+      image: ogImage,
+      url,
+      description: description || `${brand} ${name}`,
+      ...(additionalProps.length ? { additionalProperty: additionalProps } : {}),
+      ...(videoObjects ? { hasVideo: videoObjects } : {}),
+      ...(related ? { isRelatedTo: related } : {}),
+      offers: {
+        '@type': 'Offer',
+        priceCurrency: 'RSD',
+        url,
+        availability: inStock
+          ? 'https://schema.org/InStock'
+          : 'https://schema.org/OutOfStock',
+        ...(typeof price === 'number' ? { price: String(price) } : {}),
+        itemCondition: 'https://schema.org/NewCondition',
+        seller: { '@type': 'Organization', name: 'Automaterijal' },
+      },
+    };
+    this.seoService.updateJsonLd(productJsonLd, 'jsonld-product');
+
+    // Build JSON-LD Breadcrumbs (Webshop → Grupa → Podgrupa → Proizvod)
+    const base = 'https://www.automaterijal.com';
+    const items: any[] = [
+      { '@type': 'ListItem', position: 1, name: 'Webshop', item: `${base}/webshop` },
+    ];
+    if (group) {
+      items.push({
+        '@type': 'ListItem',
+        position: items.length + 1,
+        name: group,
+        item: `${base}/webshop?grupa=${encodeURIComponent(group)}`,
+      });
+    }
+    if (subgroup) {
+      items.push({
+        '@type': 'ListItem',
+        position: items.length + 1,
+        name: subgroup,
+        item: `${base}/webshop?grupa=${encodeURIComponent(group || '')}&podgrupa=${encodeURIComponent(subgroup)}`,
+      });
+    }
+    items.push({
+      '@type': 'ListItem',
+      position: items.length + 1,
+      name: baseTitle || name || 'Proizvod',
+      item: url,
+    });
+
+    const breadcrumbsJsonLd = {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: items,
+    };
+    this.seoService.updateJsonLd(breadcrumbsJsonLd, 'jsonld-breadcrumbs');
+  }
+
+  private parseId(raw: string | null): number | null {
+    if (!raw) return null;
+    const m = raw.match(/^\d+/);     // uzmi početne cifre pre prvog '-'
+    return m ? Number(m[0]) : null;
   }
 }

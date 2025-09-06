@@ -183,17 +183,34 @@
     </ul>
   </div>
 
-  <div
-    *ngIf="data.tekst && !editingText"
-    class="product-container documentation"
-  >
-    <h3 class="oe-title">Informacije o proizvodu</h3>
+  <div *ngIf="!editingText" class="product-container documentation">
+    <h3 class="oe-title" *ngIf="data.tekst || !data.tehnickiOpis?.length">
+      Informacije o proizvodu
+    </h3>
+
+    <!-- Ako postoji tekst -->
     <div
-      *ngIf="data.tekst"
+      *ngIf="data.tekst; else checkSpecs"
       class="product-rich-text"
       [innerHTML]="sanitizedText"
       aria-label="Detaljan opis proizvoda"
     ></div>
+
+    <!-- Ako nema tekst, proveri specifikacije -->
+    <ng-template #checkSpecs>
+      <!-- Ako postoje specifikacije, ne prikazujemo ništa -->
+      <ng-container
+        *ngIf="data.tehnickiOpis?.length; else noDescription"
+      ></ng-container>
+    </ng-template>
+
+    <!-- Ako nema ni tekst ni specifikacije -->
+    <ng-template #noDescription>
+      <p class="product-fallback">
+        Detaljan opis trenutno nije dostupan za ovaj proizvod. Kontaktirajte nas
+        za dodatne informacije ili tehničke detalje.
+      </p>
+    </ng-template>
   </div>
 
   <div *ngIf="editingText" class="product-container documentation">

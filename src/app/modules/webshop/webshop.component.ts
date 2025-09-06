@@ -2,7 +2,8 @@ import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { finalize, Subject, takeUntil } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Params } from '@angular/router';
+import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 
 // Components imports
 import { WebshopEmptyComponent } from './webshop-empty/webshop-empty.component';
@@ -105,19 +106,36 @@ export class WebshopComponent implements OnDestroy, OnInit {
 
     let init = true;
     this.filter = new Filter();
-    // Subscribe to queryParams observable
+
+    // Stabilniji subscribe na queryParams (map + distinct + debounce)
     this.activatedRoute.queryParams
       .pipe(
+        map((p: Params) => ({
+          ...p,
+          searchTerm: (p['searchTerm'] || '').trim(),
+          grupe: (p['grupe'] || '').toString(),
+          proizvodjaci: (p['proizvodjaci'] || '').toString(),
+          assembleGroupId: (p['assembleGroupId'] || '').toString(),
+          assemblyGroupName: (p['assemblyGroupName'] || '').toString(),
+          tecdocType: (p['tecdocType'] || '').toString(),
+          tecdocId: p['tecdocId'] ? String(p['tecdocId']) : ''
+        }) as QueryParams), // 👈 ovde fiks: kastujemo u QueryParams
+        distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
+        debounceTime(30),
         takeUntil(this.destroy$),
         finalize(() => (this.loading = false))
       )
-      .subscribe((params) => {
+      .subscribe((params: QueryParams) => {   // 👈 sad je QueryParams
         this.handleQueryParams(params, init);
         init = false;
       });
   }
 
   ngOnDestroy(): void {
+    // očisti rel prev/next da ne curi u druge rute
+    this.seoService.setLinkRel('prev', null);
+    this.seoService.setLinkRel('next', null);
+
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -156,7 +174,8 @@ export class WebshopComponent implements OnDestroy, OnInit {
           this.updateSeoTagsForState();
         },
         error: (err: HttpErrorResponse) => {
-          const error = err.error.details || err.error;
+          const error = err.error?.details || err.error;
+          console.error('pronadjiSvuRobu error', error);
         },
       });
   }
@@ -169,7 +188,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
   ): void {
     this.loading = !internalLoading;
     this.internalLoading = internalLoading;
-    this.activeRequests++; // Increase active requests count
+    this.activeRequests++;
 
     this.tecdocService
       .getAssociatedArticles(
@@ -182,7 +201,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
       )
       .pipe(
         takeUntil(this.destroy$),
-        finalize(() => this.finalizeLoading()) // Use shared finalize method
+        finalize(() => this.finalizeLoading())
       )
       .subscribe({
         next: (response: Magacin) => {
@@ -192,26 +211,29 @@ export class WebshopComponent implements OnDestroy, OnInit {
           this.magacinData = response;
         },
         error: (err: HttpErrorResponse) => {
-          const error = err.error.details || err.error;
+          const error = err.error?.details || err.error;
+          console.error('getAssociatedArticles error', error);
         },
       });
   }
 
   getTDVehicleDetails(tecdocId: number, tecdocType: string): void {
     this.loading = true;
-    this.activeRequests++; // Increase active requests count
+    this.activeRequests++;
     this.tecdocService
       .getLinkageTargets(tecdocId, tecdocType)
       .pipe(
         takeUntil(this.destroy$),
-        finalize(() => this.finalizeLoading()) // Use shared finalize method
+        finalize(() => this.finalizeLoading())
       )
       .subscribe({
         next: (vehicleDetails: TDVehicleDetails[]) => {
-          this.selectedVehicleDetails = vehicleDetails[0];
+          this.selectedVehicleDetails = vehicleDetails?.[0] || null;
+          this.updateSeoTagsForState(); // osveži SEO kad znamo vozilo
         },
         error: (err: HttpErrorResponse) => {
-          const error = err.error.details || err.error;
+          const error = err.error?.details || err.error;
+          console.error('getLinkageTargets error', error);
         },
       });
   }
@@ -224,6 +246,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
     this.searchTerm = searchTerm;
     this.getRoba();
   }
+
   setRobaPageData(tableEvent: TablePage): void {
     this.pageIndex = tableEvent.pageIndex;
     this.rowsPerPage = tableEvent.pageSize;
@@ -249,7 +272,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
    * Handles finalize logic, only setting loading = false when all requests complete.
    */
   private finalizeLoading(): void {
-    this.activeRequests--; // Decrease active requests count
+    this.activeRequests = Math.max(0, this.activeRequests - 1);
     if (this.activeRequests === 0) {
       this.loading = false;
       this.internalLoading = false;
@@ -286,6 +309,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
       this.filter = newFilter;
       this.selectedVehicleDetails = null;
       this.updateState(WebShopState.SHOW_EMPTY_CONTAINER, this.searchTerm);
+      this.updateSeoTagsForState();
       return;
     }
 
@@ -358,6 +382,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
     switch (this.currentState) {
       case WebShopState.SHOW_VEHICLE_DETAILS:
         // Vehicle details are already fetched in updateVehicleIfNeeded
+        this.updateSeoTagsForState();
         break;
       case WebShopState.SHOW_ARTICLES_WITH_VEHICLE_DETAILS:
         if (this.tecdocId) {
@@ -374,6 +399,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
         break;
     }
   }
+
   private updateSeoTagsForState(): void {
     const baseUrl = 'https://www.automaterijal.com/webshop';
     const page = this.pageIndex ?? 0;
@@ -392,57 +418,88 @@ export class WebshopComponent implements OnDestroy, OnInit {
     const searchTerm = (this.searchTerm || '').trim();
     const resultCount = this.magacinData?.robaDto?.totalElements ?? 0;
 
-    // title/desc
+    // Varijante konteksta
+    const isVehicle = !!this.tecdocId && !!this.tecdocType;
+    const isGroup = !!this.assembleGroupId && !!this.assemblyGroupName;
+    const hasSearch = !!searchTerm;
+
+    // title/desc default
     let title = 'Webshop | Automaterijal - Auto delovi, filteri i maziva';
     let description =
       'Kupite auto delove, filtere i maziva online putem našeg Webshopa. Pretraga po vozilu, brendu ili kategoriji. Brza isporuka širom Srbije.';
 
+    // vozilo (kada je selektovano)
+    if (isVehicle && this.selectedVehicleDetails) {
+      const v = this.selectedVehicleDetails;
+      const vehicleLabel = [
+        v.mfrName,
+        v.hmdMfrModelName,
+        v.description,
+        v.engineType,
+      ].filter(Boolean).join(' ');
+      title = `Delovi za ${vehicleLabel}${page ? ` (str. ${page + 1})` : ''} - Automaterijal`;
+      description = `Ponuda delova za ${vehicleLabel}${v.beginYearMonth ? ` (${v.beginYearMonth} - ${v.endYearMonth || 'trenutno'})` : ''}. Pretraga po kategoriji, brendu i OE broju.`;
+    }
+
+    // assemble group listing
+    if (isGroup && this.assemblyGroupName) {
+      title = `Kategorija: ${this.assemblyGroupName}${page ? ` (str. ${page + 1})` : ''} - Automaterijal`;
+      description = `Istražite ${this.assemblyGroupName}. Delovi i oprema, brza isporuka.`;
+    }
+
+    // brend / kategorije (fallback)
     if (this.filter.mandatoryProid && brandName) {
       title = `Webshop | ${brandName} delovi - Automaterijal`;
       description = `Kupite ${brandName} auto delove putem našeg webshopa. Brza dostava i proveren kvalitet.`;
     }
 
-    if (this.filter.grupe?.length && groupLabels.length) {
+    if (this.filter.grupe?.length && groupLabels.length && !isGroup) {
       const allGroups = groupLabels.join(', ');
       title = `Webshop | ${allGroups} - Automaterijal`;
       description = `Istražite ponudu za kategorije: ${allGroups}. Delovi, filteri i maziva za sve potrebe.`;
     }
 
-    if (searchTerm && resultCount > 0) {
+    // search kontekst
+    if (hasSearch && resultCount > 0) {
       title = `Webshop pretraga: "${searchTerm}"${page ? ` (str. ${page + 1})` : ''} - Automaterijal`;
       description = `Pronađeno ${resultCount} rezultata za "${searchTerm}". Pogledajte delove, filtere i maziva dostupne za online porudžbinu.`;
-    } else if (searchTerm) {
+    } else if (hasSearch) {
       title = `Webshop pretraga: "${searchTerm}" - Automaterijal`;
       description = `Nažalost, nema rezultata za "${searchTerm}". Pokušajte sa drugim nazivom ili kataloškim brojem.`;
-    } else if (page > 0) {
-      // bez searchTerm-a, ali na višoj strani
+    } else if (page > 0 && !isVehicle && !isGroup) {
+      // bez searchTerm-a i bez spec. konteksta, ali na višoj strani
       title += ` (str. ${page + 1})`;
     }
 
-    // canonical + prev/next
+    // canonical + prev/next (uključujemo relevantne parametre)
     const canonical = this.buildCanonicalUrl(baseUrl, {
       searchTerm,
       grupe: this.filter.grupe?.join(',') || '',
       proizvodjaci: this.filter.proizvodjaci?.join(',') || '',
+      assembleGroupId: this.assembleGroupId || '',
+      assemblyGroupName: this.assemblyGroupName || '',
+      tecdocId: this.tecdocId ? String(this.tecdocId) : '',
+      tecdocType: this.tecdocType || '',
       page: page > 0 ? String(page + 1) : '', // 1-based u URL-u, ali prazno za 1. stranu
       size: perPage !== 10 ? String(perPage) : '', // ne upisuj default
     });
 
+    const robots =
+      hasSearch && resultCount === 0 ? 'noindex,follow' : undefined;
+
     this.seoService.updateSeoTags({
       title,
       description,
-      url: canonical,           // koristi canonical i kao og:url
+      url: canonical, // koristi canonical i kao og:url
       type: 'website',
       siteName: 'Automaterijal',
       locale: 'sr_RS',
-      // kad je 0 rezultata – signalizuj crawleru
-      robots: searchTerm && resultCount === 0 ? 'noindex,follow' : undefined,
-      // po želji: image (može hero iz webshopa)
+      robots,
       image: 'https://www.automaterijal.com/images/logo/logo.svg',
       imageAlt: 'Automaterijal'
     });
 
-    // rel=prev/next (ako si dodao helper u SeoService – vidi niže)
+    // rel=prev/next
     this.setPaginationLinks(canonical, page, perPage, resultCount);
 
     // (opciono) JSON-LD za listing
@@ -451,7 +508,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
       "@type": "CollectionPage",
       "name": title.replace(' - Automaterijal', ''),
       "isPartOf": { "@type": "WebSite", "name": "Automaterijal", "url": "https://www.automaterijal.com/" },
-      "about": searchTerm ? `Rezultati pretrage za: ${searchTerm}` : 'Lista artikala',
+      "about": hasSearch ? `Rezultati pretrage za: ${searchTerm}` : (isVehicle ? 'Lista artikala za vozilo' : (isGroup ? `Kategorija: ${this.assemblyGroupName}` : 'Lista artikala')),
       "url": canonical,
       "numberOfItems": resultCount
     }, 'seo-jsonld-webshop');
@@ -465,7 +522,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
     return qp ? `${base}?${qp}` : base;
   }
 
-  /** rel=prev/next – zahteva male izmene u SeoService (vidi ispod) */
+  /** rel=prev/next – zahteva male izmene u SeoService (već koristiš setLinkRel) */
   private setPaginationLinks(canonical: string, page: number, size: number, total: number) {
     const totalPages = Math.ceil((total || 0) / (size || 10));
     if (!totalPages || totalPages <= 1) {
@@ -473,7 +530,6 @@ export class WebshopComponent implements OnDestroy, OnInit {
       this.seoService.setLinkRel('next', null);
       return;
     }
-    // canonical je već sa ?page=N (1-based) ako > 1
     const url = new URL(canonical);
     // prev
     if (page > 0) {

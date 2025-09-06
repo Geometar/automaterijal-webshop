@@ -46,7 +46,7 @@ export interface TecDocDokumentacija {
   docTypeId?: number;
   docTypeName?: string;
   docUrl?: string;
-  dokument?: string;
+  dokument?: string | null;
   saniraniUrl?: string;
 }
 
@@ -69,6 +69,8 @@ export class Roba {
   cena?: number;
   dokumentacija?: Object;
   dozvoljenoZaAnonimusa?: boolean;
+  group?: number;
+  grupaNaziv?: string;
   katbr?: string;
   katbrpro?: string;
   kolicina?: number;
