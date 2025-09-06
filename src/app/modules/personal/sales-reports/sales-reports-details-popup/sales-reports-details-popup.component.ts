@@ -130,7 +130,7 @@ export class SalesReportsDetailsPopupComponent implements OnInit, OnDestroy {
     this.form = this.fb.group({
       address: ['', [Validators.required, Validators.minLength(3)]],
       assortment: ['', [Validators.required, Validators.minLength(3)]],
-      city: ['', [Validators.required, Validators.minLength(3)]],
+      city: ['', [Validators.required, Validators.minLength(2)]],
       comment: ['', [Validators.required, Validators.minLength(3)]],
       companyId: [''],
       competitors: ['', [Validators.required, Validators.minLength(3)]],
