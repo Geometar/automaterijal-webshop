@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRoute, NavigationExtras, Params, Router } from '@angular/router';
 
+// Utils
+import { StringUtils } from '../../utils/string-utils';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -138,11 +141,17 @@ export class UrlHelperService {
   }
 
   /** QoL helper: set category selection (group + optional subgroup). */
-  setCategorySelection(groupId?: string, subGroupId?: number): void {
-    this.addOrUpdateQueryParams({
-      grupe: groupId ?? null,
-      podgrupe: subGroupId ?? null
-    });
+  setCategorySelection(groupName?: string, subGroupName?: string | null): void {
+    const parts = ['/webshop'];
+
+    if (groupName) {
+      parts.push('category', StringUtils.slugify(groupName));
+      if (subGroupName) {
+        parts.push(StringUtils.slugify(subGroupName));
+      }
+    }
+
+    this.navigateTo(parts);
   }
 
   /** Navigate to absolute path (utility method) */
@@ -165,6 +174,8 @@ export class UrlHelperService {
     const currentPath = this.getCurrentPath();
 
     if (currentPath.includes('/webshop/manufactures')) {
+      this.navigateTo(['/webshop']);
+    } else if (currentPath.includes('/webshop/category')) {
       this.navigateTo(['/webshop']);
     } else {
       this.clearQueryParams();

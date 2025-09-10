@@ -5,8 +5,11 @@ import { catchError, finalize, shareReplay, tap } from 'rxjs/operators';
 // Data Models
 import { ArticleCategories, SubCategories } from '../../data-models/model/article-categories';
 
-//Services
+// Services
 import { ArticleGroupService } from '../article-group.service';
+
+// Utils
+import { StringUtils } from '../../utils/string-utils';
 
 @Injectable({ providedIn: 'root' })
 export class CategoriesStateService {
@@ -76,5 +79,18 @@ export class CategoriesStateService {
       .map((c) => c.articleSubGroups)
       .flat()
       .find((s) => s.subGroupId?.toString() === id);
+  }
+
+  getCategoryBySlug(slug: string): ArticleCategories | undefined {
+    return this.categoryCache.find((c) => StringUtils.slugify(c.name!) === slug);
+  }
+
+  getSubCategoryBySlug(groupId: string, subSlug: string): SubCategories | undefined {
+    const group = this.categoryCache.find((c) => c.groupId === groupId);
+    if (!group) return undefined;
+
+    return group.articleSubGroups?.find(
+      (s) => StringUtils.slugify(s.name!) === subSlug
+    );
   }
 }

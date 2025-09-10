@@ -54,6 +54,9 @@ import { SeoService } from '../../../shared/service/seo.service';
 import { SnackbarService } from '../../../shared/service/utils/snackbar.service';
 import { TecdocService } from '../../../shared/service/tecdoc.service';
 
+// Utils
+import { StringUtils } from '../../../shared/utils/string-utils';
+
 @Component({
   selector: 'app-webshop-details',
   standalone: true,
@@ -408,25 +411,12 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     return (v ?? '').replace(/\s+/g, ' ').trim();
   }
 
-  private slugifySerbian(v: string): string {
-    // remove diacritics, keep numbers/letters, hyphenate
-    const noDiacritics = v
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '');
-    return noDiacritics
-      .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '');
-  }
-
   private buildCanonical(roba: Roba): { idParam: string; url: string } {
     const brand = this.normalizeWhitespace(roba.proizvodjac?.naziv);
     const name = this.normalizeWhitespace(roba.naziv);
     const sku = this.normalizeWhitespace(roba.katbr);
     const id = roba.robaid ?? '';
-    const slug = this.slugifySerbian([brand, name, sku].filter(Boolean).join(' '));
+    const slug = StringUtils.slugify([brand, name, sku].filter(Boolean).join(' '));
     const idParam = slug ? `${id}-${slug}` : String(id);
     const url = `https://www.automaterijal.com/webshop/${idParam}`;
     return { idParam, url };
@@ -499,7 +489,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       const name = this.normalizeWhitespace(r.naziv);
       const sku = this.normalizeWhitespace(r.katbr);
       const id = r.robaid ?? '';
-      const slug = this.slugifySerbian([brand, name, sku].filter(Boolean).join(' '));
+      const slug = StringUtils.slugify([brand, name, sku].filter(Boolean).join(' '));
       const url = `https://www.automaterijal.com/webshop/${id}${slug ? '-' + slug : ''}`;
       const img = this.absoluteImage(r.slika?.slikeUrl);
       return {

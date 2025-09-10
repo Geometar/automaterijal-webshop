@@ -8,13 +8,14 @@ import { InputFieldsComponent } from '../../input-fields/input-fields.component'
 import { PopupComponent } from '../../popup/popup.component';
 
 // Data models
-import { Bucket, BucketGroup, CategoryPick } from '../../../data-models/model';
+import { Bucket, BucketGroup } from '../../../data-models/model';
 
 // Enums
 import { InputTypeEnum, PositionEnum, SizeEnum } from '../../../data-models/enums';
 
 // Services
 import { CategoriesBucketsService } from '../../../service/utils/categories-buckets.service';
+import { UrlHelperService } from '../../../service/utils/url-helper.service';
 
 @Component({
   selector: 'autom-categories-popup',
@@ -31,7 +32,6 @@ import { CategoriesBucketsService } from '../../../service/utils/categories-buck
 })
 export class CategoriesPopupComponent {
   @Output() close = new EventEmitter<void>();
-  @Output() selected = new EventEmitter<CategoryPick>();
 
   // Enums
   readonly inputTypeEnum = InputTypeEnum;
@@ -57,7 +57,7 @@ export class CategoriesPopupComponent {
     }
   }
 
-  constructor(private bucketsService: CategoriesBucketsService) {
+  constructor(private bucketsService: CategoriesBucketsService, private urlHelper: UrlHelperService) {
     // Init buckets stream
     this.buckets$ = this.bucketsService.getBuckets$();
 
@@ -112,21 +112,11 @@ export class CategoriesPopupComponent {
   }
 
   pickGroup(group: BucketGroup): void {
-    this.selected.emit({
-      kind: 'group',
-      groupId: group.code,
-      groupName: group.name
-    });
+    this.urlHelper.setCategorySelection(group.name, null);
   }
 
   pickSubgroup(group: BucketGroup, sub: { id: number; name: string }): void {
-    this.selected.emit({
-      kind: 'subgroup',
-      groupId: group.code,
-      groupName: group.name,
-      subGroupId: sub.id,
-      subGroupName: sub.name
-    });
+    this.urlHelper.setCategorySelection(group.name, sub.name);
   }
 
   // --- Helpers -------------------------------------------------------------

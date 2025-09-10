@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { combineLatest, finalize, Subject, takeUntil } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Params } from '@angular/router';
-import { debounceTime } from 'rxjs/operators';
+import { debounceTime, take } from 'rxjs/operators';
 
 // Components imports
 import { WebshopEmptyComponent } from './webshop-empty/webshop-empty.component';
@@ -18,6 +18,7 @@ import { TDVehicleDetails } from '../../shared/data-models/model/tecdoc';
 
 // Services
 import { CartStateService } from '../../shared/service/state/cart-state.service';
+import { CategoriesStateService } from '../../shared/service/state/categories-state.service';
 import { ConfigService } from '../../shared/service/config.service';
 import { ManufactureService } from '../../shared/service/manufacture.service';
 import { PictureService } from '../../shared/service/utils/picture.service';
@@ -25,6 +26,7 @@ import { RobaService } from '../../shared/service/roba.service';
 import { SeoService } from '../../shared/service/seo.service';
 import { SpinnerComponent } from '../../shared/components/spinner/spinner.component';
 import { TecdocService } from '../../shared/service/tecdoc.service';
+import { UrlHelperService } from '../../shared/service/utils/url-helper.service';
 import { WebshopConfig } from '../../shared/data-models/interface';
 import { WebshopLogicService } from '../../shared/service/utils/webshop-logic.service';
 import { WebshopStateService } from '../../shared/service/state/webshop-state.service';
@@ -92,45 +94,55 @@ export class WebshopComponent implements OnDestroy, OnInit {
 
   private selectedBrandName: string | null = null;
   private config: WebshopConfig | null = null;
+  private currentCategoryName: string | null = null;
+  private currentSubcategoryName: string | null = null;
 
   constructor(
     private activatedRoute: ActivatedRoute,
     private cartStateService: CartStateService,
+    private categoriesState: CategoriesStateService,
+    private configService: ConfigService,
     private logicService: WebshopLogicService,
     private manufactureService: ManufactureService,
     private pictureService: PictureService,
     private robaService: RobaService,
+    private seoService: SeoService,
     private stateService: WebshopStateService,
     private tecdocService: TecdocService,
-    private seoService: SeoService,
-    private configService: ConfigService
+    private urlHelperService: UrlHelperService
   ) { }
 
   /** Angular lifecycle hooks start */
 
   ngOnInit(): void {
-    this.updateSeoTagsForState();
     this.filter = new Filter();
 
-    this.configService.getConfig().pipe(takeUntil(this.destroy$)).subscribe(cfg => {
-      this.config = cfg;
-    });
+    this.configService
+      .getConfig()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((cfg) => {
+        this.config = cfg;
+      });
 
     combineLatest([
       this.activatedRoute.paramMap,
       this.activatedRoute.queryParams,
     ])
-      .pipe(
-        takeUntil(this.destroy$),
-        debounceTime(30),
-        finalize(() => (this.loading = false))
-      )
+      .pipe(takeUntil(this.destroy$), debounceTime(30))
       .subscribe(([paramMap, p]) => {
         const currentPath = this.activatedRoute.routeConfig?.path;
         const slug = paramMap.get('name');
 
         if (currentPath === 'webshop/manufactures/:name' && slug) {
           this.handleManufactureSlug(slug, p);
+        } else if (currentPath === 'webshop/category/:name' && slug) {
+          this.handleCategorySlug(slug, null, p);
+        } else if (
+          currentPath === 'webshop/category/:name/:subcategory' &&
+          slug
+        ) {
+          const subSlug = paramMap.get('subcategory');
+          this.handleCategorySlug(slug, subSlug, p);
         } else {
           this.handleWebshopParams(p);
         }
@@ -317,6 +329,46 @@ export class WebshopComponent implements OnDestroy, OnInit {
     });
   }
 
+  private handleCategorySlug(
+    categorySlug: string,
+    subSlug: string | null,
+    p: Params
+  ): void {
+    this.categoriesState
+      .getCategories$()
+      .pipe(take(1), takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          const group = this.categoriesState.getCategoryBySlug(categorySlug);
+          if (!group) {
+            this.currentState = this.state.SHOW_EMPTY_CONTAINER;
+            this.updateSeoTagsForState();
+            return;
+          }
+
+          let subGroupId = '';
+          let subName: string | null = null;
+          if (subSlug) {
+            const sub = this.categoriesState.getSubCategoryBySlug(group.groupId!, subSlug);
+            if (sub) {
+              subGroupId = sub.subGroupId?.toString() || '';
+              subName = sub.name || null;
+            }
+          }
+
+          this.currentCategoryName = group.name || '';
+          this.currentSubcategoryName = subName;
+
+          const params: QueryParams = {
+            ...p,
+            grupe: group.groupId,
+            podgrupe: subGroupId,
+          };
+          this.handleQueryParams(params);
+        },
+      });
+  }
+
   private finalizeLoading(): void {
     this.activeRequests = Math.max(0, this.activeRequests - 1);
     if (this.activeRequests === 0) {
@@ -477,7 +529,12 @@ export class WebshopComponent implements OnDestroy, OnInit {
     });
 
     // 🔹 Pagination links
-    this.setPaginationLinks(canonical, context.page, context.perPage, context.resultCount);
+    this.setPaginationLinks(
+      canonical,
+      context.page,
+      context.perPage,
+      context.resultCount
+    );
 
     // 🔹 JSON-LD
     this.seoService.setJsonLd(jsonLd, 'seo-jsonld-webshop');
@@ -487,8 +544,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
     const page = this.pageIndex ?? 0;
     const perPage = this.rowsPerPage ?? 10;
 
-    const brandName =
-      this.selectedBrandName
+    const brandName = this.selectedBrandName;
 
     const groupLabels = this.magacinData?.categories
       ? Object.keys(this.magacinData.categories)
@@ -501,6 +557,19 @@ export class WebshopComponent implements OnDestroy, OnInit {
     const isGroup = !!this.assembleGroupId && !!this.assemblyGroupName;
     const hasSearch = !!searchTerm;
 
+    const isCategoryPage = this.urlHelperService
+      .getCurrentPath()
+      .startsWith('/webshop/category');
+    const currentCategorySlug = isCategoryPage
+      ? this.urlHelperService.getCurrentPath()
+      : null;
+    const isManufacturePage = this.urlHelperService
+      .getCurrentPath()
+      .startsWith('/webshop/manufactures');
+    const currentManufactureSlug = isManufacturePage
+      ? this.urlHelperService.getCurrentPath()
+      : null;
+
     let title = 'Webshop | Automaterijal - Auto delovi, filteri i maziva';
     let description =
       'Kupite auto delove, filtere i maziva online putem našeg Webshopa. Pretraga po vozilu, brendu ili kategoriji. Brza isporuka širom Srbije.';
@@ -509,17 +578,26 @@ export class WebshopComponent implements OnDestroy, OnInit {
     // Vozilo
     if (isVehicle && this.selectedVehicleDetails) {
       const v = this.selectedVehicleDetails;
-      const vehicleLabel = [v.mfrName, v.hmdMfrModelName, v.description, v.engineType]
+      const vehicleLabel = [
+        v.mfrName,
+        v.hmdMfrModelName,
+        v.description,
+        v.engineType,
+      ]
         .filter(Boolean)
         .join(' ');
-      title = `Delovi za ${vehicleLabel}${page ? ` (str. ${page + 1})` : ''} - Automaterijal`;
-      description = `Ponuda delova za ${vehicleLabel}${v.beginYearMonth ? ` (${v.beginYearMonth} - ${v.endYearMonth || 'trenutno'})` : ''
+      title = `Delovi za ${vehicleLabel}${page ? ` (str. ${page + 1})` : ''
+        } - Automaterijal`;
+      description = `Ponuda delova za ${vehicleLabel}${v.beginYearMonth
+        ? ` (${v.beginYearMonth} - ${v.endYearMonth || 'trenutno'})`
+        : ''
         }. Pretraga po kategoriji, brendu i OE broju.`;
     }
 
     // Kategorija
     if (isGroup && this.assemblyGroupName) {
-      title = `Kategorija: ${this.assemblyGroupName}${page ? ` (str. ${page + 1})` : ''} - Automaterijal`;
+      title = `Kategorija: ${this.assemblyGroupName}${page ? ` (str. ${page + 1})` : ''
+        } - Automaterijal`;
       description = `Istražite ${this.assemblyGroupName}. Delovi i oprema, brza isporuka.`;
     }
 
@@ -538,7 +616,8 @@ export class WebshopComponent implements OnDestroy, OnInit {
 
     // Search
     if (hasSearch && resultCount > 0) {
-      title = `Webshop pretraga: "${searchTerm}"${page ? ` (str. ${page + 1})` : ''} - Automaterijal`;
+      title = `Webshop pretraga: "${searchTerm}"${page ? ` (str. ${page + 1})` : ''
+        } - Automaterijal`;
       description = `Pronađeno ${resultCount} rezultata za "${searchTerm}". Pogledajte delove, filtere i maziva dostupne za online porudžbinu.`;
     } else if (hasSearch) {
       title = `Webshop pretraga: "${searchTerm}" - Automaterijal`;
@@ -548,25 +627,49 @@ export class WebshopComponent implements OnDestroy, OnInit {
       title += ` (str. ${page + 1})`;
     }
 
-    return { title, description, robots, brandName, page, perPage, searchTerm, resultCount, isVehicle, isGroup };
+    if (isCategoryPage && (this.currentCategoryName || this.currentSubcategoryName)) {
+      const cat = this.currentCategoryName || '';
+      const sub = this.currentSubcategoryName ? ` / ${this.currentSubcategoryName}` : '';
+      title = `Kategorija: ${cat}${sub}${page ? ` (str. ${page + 1})` : ''} - Automaterijal`;
+      description = `Istražite ponudu: ${cat}${sub}. Delovi i oprema, brza isporuka.`;
+    }
+
+    return {
+      title,
+      description,
+      robots,
+      brandName,
+      page,
+      perPage,
+      searchTerm,
+      resultCount,
+      isVehicle,
+      isGroup,
+      isCategoryPage,
+      currentCategorySlug,
+      isManufacturePage,
+      currentManufactureSlug,
+    };
   }
 
   private buildCanonicalUrlForContext(ctx: any): string {
-    if (ctx.brandName) {
-      const slug = ctx.brandName
-        .toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^\w-]+/g, '');
-      return `https://www.automaterijal.com/webshop/manufactures/${slug}`;
+    // 1) Brand page
+    if (ctx.isManufacturePage) {
+      return `https://www.automaterijal.com${ctx.currentManufactureSlug}`;
     }
 
+    // 2) Category page
+    if (ctx.isCategoryPage) {
+      return `https://www.automaterijal.com${ctx.currentCategorySlug}`;
+    }
+
+    // 3) Generic search/filter webshop
     const baseUrl = 'https://www.automaterijal.com/webshop';
     return this.buildCanonicalUrl(baseUrl, {
-      searchTerm: ctx.searchTerm,
+      search: ctx.searchTerm,
       grupe: this.filter.grupe?.join(',') || '',
+      podgrupe: this.filter.podgrupe?.join(',') || '',
       proizvodjaci: this.filter.proizvodjaci?.join(',') || '',
-      assembleGroupId: this.assembleGroupId || '',
-      assemblyGroupName: this.assemblyGroupName || '',
       tecdocId: this.tecdocId ? String(this.tecdocId) : '',
       tecdocType: this.tecdocType || '',
       page: ctx.page > 0 ? String(ctx.page + 1) : '',
@@ -575,12 +678,28 @@ export class WebshopComponent implements OnDestroy, OnInit {
   }
 
   private buildJsonLdForContext(ctx: any, canonical: string): any {
-    if (ctx.brandName) {
+    if (ctx.isManufacturePage && ctx.brandName) {
       return {
-        "@context": "https://schema.org",
-        "@type": "Brand",
-        "name": ctx.brandName,
-        "url": canonical
+        '@context': 'https://schema.org',
+        '@type': 'Brand',
+        name: ctx.brandName,
+        url: canonical,
+      };
+    }
+
+    const isCategoryPage = ctx.isCategoryPage;
+    if (isCategoryPage && (this.currentCategoryName || this.currentSubcategoryName)) {
+      const label = this.currentSubcategoryName
+        ? `Kategorija: ${this.currentCategoryName} / ${this.currentSubcategoryName}`
+        : `Kategorija: ${this.currentCategoryName}`;
+      return {
+        '@context': 'https://schema.org',
+        '@type': 'CollectionPage',
+        name: ctx.title.replace(' - Automaterijal', ''),
+        isPartOf: { '@type': 'WebSite', name: 'Automaterijal', url: 'https://www.automaterijal.com/' },
+        about: label,
+        url: canonical,
+        numberOfItems: ctx.resultCount,
       };
     }
 

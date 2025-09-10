@@ -2,13 +2,25 @@ import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { finalize, Subject, takeUntil } from 'rxjs';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { SelectModel } from '../../shared/data-models/interface';
+import { Router, RouterLink } from '@angular/router';
+import {
+  FormsModule,
+  ReactiveFormsModule,
+  UntypedFormBuilder,
+  UntypedFormGroup,
+  Validators,
+} from '@angular/forms';
 
-// Components imports
+// Autom imports
+import { AutomIconComponent } from '../../shared/components/autom-icon/autom-icon.component';
 import { ButtonComponent } from '../../shared/components/button/button.component';
 import { InputFieldsComponent } from '../../shared/components/input-fields/input-fields.component';
 import { RowComponent } from '../../shared/components/table/row/row.component';
 import { SelectComponent } from '../../shared/components/select/select.component';
 import { TextAreaComponent } from '../../shared/components/text-area/text-area.component';
+
+// Constants
+import { EMAIL_ADDRESS } from '../../shared/data-models/constants/input.constants';
 
 // Data models
 import {
@@ -36,18 +48,9 @@ import { RsdCurrencyPipe } from '../../shared/pipe/rsd-currency.pipe';
 import { AccountStateService } from '../../shared/service/state/account-state.service';
 import { CartService } from '../../shared/service/cart.service';
 import { CartStateService } from '../../shared/service/state/cart-state.service';
-import {
-  FormsModule,
-  ReactiveFormsModule,
-  UntypedFormBuilder,
-  UntypedFormGroup,
-  Validators,
-} from '@angular/forms';
-import { EMAIL_ADDRESS } from '../../shared/data-models/constants/input.constants';
+import { PictureService } from '../../shared/service/utils/picture.service';
 import { InvoiceService } from '../../shared/service/invoice.service';
 import { SnackbarPosition, SnackbarService } from '../../shared/service/utils/snackbar.service';
-import { Router, RouterLink } from '@angular/router';
-import { AutomIconComponent } from '../../shared/components/autom-icon/autom-icon.component';
 
 
 @Component({
@@ -114,6 +117,7 @@ export class CartComponent implements OnInit, OnDestroy {
     private fb: UntypedFormBuilder,
     private invoiceService: InvoiceService,
     private router: Router,
+    private pictureService: PictureService,
     private snackbarService: SnackbarService,
   ) {
     this.cartForm = this.fb.group({
@@ -188,6 +192,7 @@ export class CartComponent implements OnInit, OnDestroy {
   syncOnCartItemSize(): void {
     this.cartStateService.roba$.pipe(takeUntil(this.destroy$)).subscribe({
       next: (roba: Roba[]) => {
+        this.pictureService.convertByteToImageArray(roba);
         this.roba = roba;
         this.sumTotal();
       },

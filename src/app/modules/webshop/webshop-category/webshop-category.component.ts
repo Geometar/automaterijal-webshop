@@ -107,7 +107,17 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
     return false; // fallback za server-side render
   }
 
+  get isCategoryPage(): boolean {
+    return this.urlHelperService.getCurrentPath().startsWith('/webshop/category');
+  }
+
   /** Start of: Angular lifecycle hooks */
+  ngOnInit(): void {
+    const saved = localStorage.getItem(this.collapseKey);
+    if (saved) {
+      try { this.collapseState = { ...this.collapseState, ...JSON.parse(saved) }; } catch { }
+    }
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['manufactures'] || changes['filter']) {
@@ -160,12 +170,6 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
   };
 
   // Restore persisted collapse on init
-  ngOnInit(): void {
-    const saved = localStorage.getItem(this.collapseKey);
-    if (saved) {
-      try { this.collapseState = { ...this.collapseState, ...JSON.parse(saved) }; } catch { }
-    }
-  }
 
   // Toggle helpers
   toggleSection(name: 'availability' | 'categories' | 'manufacturers') {

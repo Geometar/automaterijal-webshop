@@ -30,6 +30,8 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./modules/login/login.component').then((m) => m.LoginComponent)
   },
+
+  // --- Webshop routes ---
   {
     path: 'webshop',
     loadComponent: () =>
@@ -41,10 +43,22 @@ export const routes: Routes = [
       import('./modules/webshop/webshop.component').then((m) => m.WebshopComponent)
   },
   {
+    path: 'webshop/category/:name',
+    loadComponent: () =>
+      import('./modules/webshop/webshop.component').then((m) => m.WebshopComponent)
+  },
+  {
+    path: 'webshop/category/:name/:subcategory',
+    loadComponent: () =>
+      import('./modules/webshop/webshop.component').then((m) => m.WebshopComponent)
+  },
+  {
     path: 'webshop/:id',
     loadComponent: () =>
       import('./modules/webshop/webshop-details/webshop-details.component').then((m) => m.WebshopDetailsComponent)
   },
+
+  // --- Cart & personal ---
   {
     path: 'cart',
     loadComponent: () =>
@@ -74,6 +88,8 @@ export const routes: Routes = [
       import('./modules/personal/logs/logs.component').then((m) => m.LogsComponent),
     canActivate: [salesGuard]
   },
+
+  // --- Catch all ---
   {
     path: '**',
     loadComponent: () =>

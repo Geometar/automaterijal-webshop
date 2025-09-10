@@ -45,7 +45,7 @@
     <!-- Categories -->
     <div
       class="filter-card"
-      *ngIf="categories"
+      *ngIf="categories && !isCategoryPage"
       [class.collapsed]="isCollapsed('categories')"
     >
       <button

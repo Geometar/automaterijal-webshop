@@ -174,6 +174,16 @@ export class TableComponent implements OnChanges {
   removeFilter(chip: Chip): void {
     const currentPath = this.urlHelperService.getCurrentPath();
 
+    // Ako smo na /webshop/category/... i brišemo grupu ili podgrupu
+    if (
+      currentPath.includes('/webshop/category') &&
+      (chip.label === 'Grupe' || chip.label === 'Podgrupe')
+    ) {
+      this.urlHelperService.navigateTo(['/webshop']);
+      return;
+    }
+
+    // Ako se uklanja proizvođač i trenutno smo na /webshop/manufactures
     if (
       chip.label === 'Proizvodjaci' &&
       currentPath.includes('/webshop/manufactures')
@@ -182,15 +192,16 @@ export class TableComponent implements OnChanges {
       return;
     }
 
+    // Ako se uklanja proizvođač, ali postoji mandatoryproid → obriši sve
     if (
-      chip.label === 'Grupe' ||
-      (chip.label === 'Proizvodjaci' &&
-        this.urlHelperService.hasQueryParam('mandatoryproid'))
+      chip.label === 'Proizvodjaci' &&
+      this.urlHelperService.hasQueryParam('mandatoryproid')
     ) {
       this.urlHelperService.clearQueryParams();
       return;
     }
 
+    // Standardno ponašanje za ostale chipove (generički query param)
     if (chip.label === 'Proizvodjaci') {
       this.urlHelperService.removeQueryParam('proizvodjaci');
       this.urlHelperService.removeQueryParam('mandatoryproid');
