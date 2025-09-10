@@ -5,6 +5,7 @@
       "alt": "Shell",
       "label": "Shell",
       "id": "SHELL",
+      "slug": "shell",
       "visible": true,
       "section": "MOTOR_OIL"
     },
@@ -13,6 +14,7 @@
       "alt": "Lukoil",
       "label": "Lukoil",
       "id": "LKOIL",
+      "slug": "lukoil",
       "visible": true,
       "section": "MOTOR_OIL"
     },
@@ -21,6 +23,7 @@
       "alt": "Fuchs",
       "label": "Fuchs",
       "id": "FUCHS",
+      "slug": "fuchs",
       "visible": true,
       "section": "MOTOR_OIL"
     },
@@ -29,14 +32,16 @@
       "alt": "Febi",
       "label": "Febi",
       "id": "FEBI",
+      "slug": "febi",
       "visible": true,
       "section": "PARTS"
     },
     {
       "src": "/images/brands/bilstain.png",
-      "alt": "Bilstain",
-      "label": "Bilstain",
+      "alt": "Bilstein",
+      "label": "Bilstein",
       "id": "BIL",
+      "slug": "bilstein",
       "visible": true,
       "section": "PARTS"
     },
@@ -45,14 +50,16 @@
       "alt": "Blue Print",
       "label": "Blue Print",
       "id": "BLUE",
+      "slug": "blue-print",
       "visible": true,
       "section": "PARTS"
     },
     {
       "src": "/images/brands/hiq.png",
       "alt": "HiQ",
-      "label": "HiQ",
+      "label": "HI-Q",
       "id": "HIQ",
+      "slug": "hi-q",
       "visible": true,
       "section": "PARTS"
     },
@@ -61,6 +68,7 @@
       "alt": "Mahle",
       "label": "Mahle",
       "id": "MAHL",
+      "slug": "mahle",
       "visible": true,
       "section": "FILTERS"
     },
@@ -69,6 +77,7 @@
       "alt": "Fleetguard",
       "label": "Fleetguard",
       "id": "FTG",
+      "slug": "fleetguard",
       "visible": true,
       "section": "FILTERS"
     },
@@ -77,6 +86,7 @@
       "alt": "Victor Reinz",
       "label": "Victor Reinz",
       "id": "VR",
+      "slug": "victor-reinz",
       "visible": true,
       "section": "PARTS"
     },
@@ -85,6 +95,7 @@
       "alt": "Pierburg",
       "label": "Pierburg",
       "id": "PIERB",
+      "slug": "pierburg",
       "visible": true,
       "section": "PARTS"
     },
@@ -93,6 +104,7 @@
       "alt": "Kolbenschmidt",
       "label": "Kolbenschmidt",
       "id": "KS",
+      "slug": "kolbenschmidt",
       "visible": true,
       "section": "PARTS"
     },
@@ -101,6 +113,7 @@
       "alt": "Magneti Marelli",
       "label": "Magneti Marelli",
       "id": "MAGNM",
+      "slug": "magneti-marelli",
       "visible": true,
       "section": "PARTS"
     },
@@ -109,6 +122,7 @@
       "alt": "Bottari",
       "label": "Bottari",
       "id": "BOTT",
+      "slug": "bottari",
       "visible": true,
       "section": "ACCESSORIES"
     },
@@ -117,8 +131,29 @@
       "alt": "Energizer",
       "label": "Energizer",
       "id": "ENERG",
+      "slug": "energizer",
       "visible": true,
       "section": "BATTERIES"
+    }
+  ],
+  "youtubeLinks": [
+    {
+      "videoId": "8ZMLhKbxsqU",
+      "title": "Značaj redovne zamene motornog ulja i posledice nepridržavanja optimalnih intervala zamene",
+      "publishedAt": "25. maj 2024.",
+      "visible": true
+    },
+    {
+      "videoId": "RwFQ05brbV0",
+      "title": "Najvažnije tečnosti u automobiliu i značaj njihove zamene",
+      "publishedAt": "2. septembar 2024.",
+      "visible": true
+    },
+    {
+      "videoId": "vtYvyGAUhxc",
+      "title": "Novo u ponudi! Hi-Q kočioni sistem",
+      "publishedAt": "31. oktobar 2024.",
+      "visible": true
     }
   ],
   "categories": [
@@ -198,26 +233,6 @@
       "label": "Filteri Teretni Program",
       "id": "FILTTE",
       "visible": false
-    }
-  ],
-  "youtubeLinks": [
-    {
-      "videoId": "8ZMLhKbxsqU",
-      "title": "Značaj redovne zamene motornog ulja i posledice nepridržavanja optimalnih intervala zamene",
-      "publishedAt": "25. maj 2024.",
-      "visible": true
-    },
-    {
-      "videoId": "RwFQ05brbV0",
-      "title": "Najvažnije tečnosti u automobiliu i značaj njihove zamene",
-      "publishedAt": "2. septembar 2024.",
-      "visible": true
-    },
-    {
-      "videoId": "vtYvyGAUhxc",
-      "title": "Novo u ponudi! Hi-Q kočioni sistem",
-      "publishedAt": "31. oktobar 2024.",
-      "visible": true
     }
   ]
 }

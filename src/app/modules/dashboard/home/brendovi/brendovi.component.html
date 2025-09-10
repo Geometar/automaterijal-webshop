@@ -9,8 +9,7 @@
         <div
           class="product--card"
           *ngFor="let brand of brands"
-          [routerLink]="['/webshop']"
-          [queryParams]="{ mandatoryproid: brand.id }"
+          [routerLink]="['/webshop/manufactures', brand.slug]"
         >
           <img [src]="brand.src" [alt]="brand.alt" loading="lazy" />
         </div>

@@ -111,12 +111,12 @@
   <ul class="card-grid" role="list">
     <li
       *ngFor="let brand of brands"
-      (click)="filterByBrand(brand.id)"
+      (click)="filterByBrand(brand.id, brand.label)"
       tabindex="0"
       role="button"
       [attr.aria-label]="'Filtriraj po brendu: ' + brand.label"
-      (keydown.enter)="filterByBrand(brand.id)"
-      (keydown.space)="filterByBrand(brand.id)"
+      (keydown.enter)="filterByBrand(brand.id, brand.label)"
+      (keydown.space)="filterByBrand(brand.id, brand.label)"
     >
       <img [src]="brand.src" [alt]="brand.alt" loading="lazy" />
       <p>{{ brand.label }}</p>

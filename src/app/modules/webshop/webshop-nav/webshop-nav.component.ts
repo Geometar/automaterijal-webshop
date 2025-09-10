@@ -178,7 +178,7 @@ export class WebshopNavComponent implements OnChanges {
   }
 
   goToMainPage(): void {
-    this.urlHelperService.clearQueryParams();
+    this.urlHelperService.clearWebshopFilters();
   }
 
   goToSecondPage(): void {

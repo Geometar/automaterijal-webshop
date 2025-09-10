@@ -5,6 +5,7 @@ export interface Brand {
   id: string;
   label: string;
   section?: keyof typeof BrandSectionEnum;
+  slug?: string;
   src: string;
   visible: boolean;
 }

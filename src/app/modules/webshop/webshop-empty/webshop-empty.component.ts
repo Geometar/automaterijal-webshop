@@ -52,8 +52,15 @@ export class WebshopEmptyComponent implements OnInit {
       });
   }
 
-  filterByBrand(id: string): void {
-    this.urlHelperService.addOrUpdateQueryParams({ mandatoryproid: id });
+  filterByBrand(id: string, label: string): void {
+    const brandName = label
+      .toLowerCase()
+      .replace(/\s+/g, '-')   // zameni razmake crticom
+      .replace(/[^\w-]+/g, ''); // ukloni specijalne znakove
+
+    this.urlHelperService.navigateTo(['/webshop/manufactures', brandName], {
+      queryParams: { mandatoryproid: id }
+    });
   }
 
   handleSelectedVehicle(vehicleDetails: TDVehicleDetails): void {

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, NavigationExtras, Params, Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -146,11 +146,28 @@ export class UrlHelperService {
   }
 
   /** Navigate to absolute path (utility method) */
-  navigateTo(path: string | any[]): void {
+  navigateTo(path: string | any[], extras: NavigationExtras = {}): void {
     if (typeof path === 'string') {
-      this.router.navigate([path]);
+      this.router.navigate([path], extras);
     } else {
-      this.router.navigate(path);
+      this.router.navigate(path, extras);
+    }
+  }
+
+  /** Returns the current path (without query params or fragment). */
+  getCurrentPath(): string {
+    const urlTree = this.router.parseUrl(this.router.url);
+    return '/' + urlTree.root.children['primary']?.segments.map(it => it.path).join('/') || '';
+  }
+
+  /** Clears webshop filters and navigates correctly */
+  clearWebshopFilters(): void {
+    const currentPath = this.getCurrentPath();
+
+    if (currentPath.includes('/webshop/manufactures')) {
+      this.navigateTo(['/webshop']);
+    } else {
+      this.clearQueryParams();
     }
   }
 }

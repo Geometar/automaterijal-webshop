@@ -46,13 +46,12 @@ export class ChipsComponent {
   }
 
   removeAll(): void {
-    this.urlHelperService.clearQueryParams();
+    this.urlHelperService.clearWebshopFilters();
   }
 
   getChipText(chip: { label: string; values: string[] }): string {
     if (!chip?.values?.length) return '';
     if (chip.values.length === 1) return chip.values[0];
-    // pokaži broj za čistoću UI-ja
     return `${chip.values.length} izabrano`;
   }
 

@@ -172,7 +172,16 @@ export class TableComponent implements OnChanges {
   }
 
   removeFilter(chip: Chip): void {
-    // If Grupe or Mandatory Proid is removed, cleare all filters
+    const currentPath = this.urlHelperService.getCurrentPath();
+
+    if (
+      chip.label === 'Proizvodjaci' &&
+      currentPath.includes('/webshop/manufactures')
+    ) {
+      this.urlHelperService.navigateTo(['/webshop']);
+      return;
+    }
+
     if (
       chip.label === 'Grupe' ||
       (chip.label === 'Proizvodjaci' &&
