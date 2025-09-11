@@ -52,27 +52,57 @@
 
       <!-- Breadcrumbs -->
       <nav
-        *ngIf="secondNavigation"
         class="nav-breadcrumbs"
-        aria-label="breadcrumb"
+        aria-label="Breadcrumb"
+        itemscope
+        itemtype="https://schema.org/BreadcrumbList"
+        *ngIf="secondNavigation"
       >
         <ol class="crumbs">
-          <li class="crumb" [class.is-active]="!thirdNavigation">
-            <a (click)="goToMainPage()">Početna</a>
-          </li>
-          <li class="crumb" [class.is-active]="!thirdNavigation">
-            <a
-              *ngIf="thirdNavigation; else activeSecond"
-              (click)="goToSecondPage()"
-            >
-              {{ secondNavigation }}
+          <li
+            class="crumb"
+            itemprop="itemListElement"
+            itemscope
+            itemtype="https://schema.org/ListItem"
+            [class.is-active]="!secondNavigation && !thirdNavigation"
+          >
+            <a itemprop="item" [routerLink]="['/webshop']">
+              <span itemprop="name">Početna</span>
             </a>
-            <ng-template #activeSecond>
-              <span>{{ secondNavigation }}</span>
-            </ng-template>
+            <meta itemprop="position" content="1" />
           </li>
-          <li class="crumb is-active" *ngIf="thirdNavigation">
-            <span>{{ thirdNavigation }}</span>
+
+          <li
+            class="crumb"
+            itemprop="itemListElement"
+            itemscope
+            itemtype="https://schema.org/ListItem"
+            [class.is-active]="!thirdNavigation"
+          >
+            <a
+              *ngIf="thirdNavigation; else secondActive"
+              itemprop="item"
+              (click)="goToSecondPage()"
+              role="link"
+              tabindex="0"
+            >
+              <span itemprop="name">{{ secondNavigation }}</span>
+            </a>
+            <ng-template #secondActive>
+              <span itemprop="name">{{ secondNavigation }}</span>
+            </ng-template>
+            <meta itemprop="position" content="2" />
+          </li>
+
+          <li
+            class="crumb is-active"
+            *ngIf="thirdNavigation"
+            itemprop="itemListElement"
+            itemscope
+            itemtype="https://schema.org/ListItem"
+          >
+            <span itemprop="name">{{ thirdNavigation }}</span>
+            <meta itemprop="position" content="3" />
           </li>
         </ol>
       </nav>

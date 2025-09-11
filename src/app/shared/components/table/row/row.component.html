@@ -1,4 +1,4 @@
-<div class="row-container">
+<article class="row-container">
   <!-- Image Section -->
   <div class="image-container" [class.image-smaller]="showPriceOnly">
     <!-- Popust badge -->
@@ -22,19 +22,28 @@
   <div class="details-container">
     <h3 [class.disabled]="data.podGrupa === 1000000">
       <a [routerLink]="['/webshop', data.robaid]">
-        <span class="color--figma-primary-800">{{
-          data.proizvodjac?.naziv
-        }}</span>
+        <span
+          class="color--figma-primary-800"
+          itemscope
+          itemtype="https://schema.org/Brand"
+        >
+          <meta itemprop="name" [content]="data.proizvodjac?.naziv || ''" />
+          {{ data.proizvodjac?.naziv }}</span
+        >
         {{ nameWithoutManufacturer }}
       </a>
     </h3>
 
     <p class="autom-margin__none">
       Kataloški broj:
-      <span class="color--figma-primary-800 display--inline font-medium">
-        {{ data!.katbr }}
+      <span
+        class="color--figma-primary-800 display--inline font-medium"
+        itemprop="sku"
+      >
+        {{ data.katbr }}
       </span>
     </p>
+    <meta itemprop="mpn" [content]="data.katbr!" />
 
     <p class="autom-margin__none">
       Kategorija:
@@ -131,6 +140,17 @@
           : "Nema na stanju"
       }}
     </div>
+    <link
+      itemprop="availability"
+      [attr.href]="
+        data.podGrupa !== 1000000 && (data.stanje || 0) > 0
+          ? 'https://schema.org/InStock'
+          : 'https://schema.org/OutOfStock'
+      "
+    />
+
+    <!-- Currency -->
+    <meta itemprop="priceCurrency" content="RSD" />
 
     <!-- Stara cena -->
     <p
@@ -193,6 +213,7 @@
         (clickEvent)="addToShoppingCart(data)"
       />
     </div>
+    <meta itemprop="seller" content="Automaterijal" />
 
     <div
       *ngIf="isInCart(data.robaid ?? 0)"
@@ -264,7 +285,7 @@
       (click)="removeEvent.emit(data.robaid)"
     ></autom-icon>
   </div>
-</div>
+</article>
 
 <!-- Overlay za zoom -->
 <div

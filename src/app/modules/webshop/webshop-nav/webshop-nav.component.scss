@@ -228,7 +228,7 @@
 
     &.is-active span {
       background: rgba(255, 255, 255, 0.12);
-      color: #ffcc00;
+      color: var(--figma-accent-yellow-300) !important;
       font-weight: 700;
     }
 
@@ -380,7 +380,7 @@
 
   &.is-active span {
     background: rgba(255, 255, 255, 0.12);
-    color: #ffcc00;
+    color: var(--figma-accent-yellow-300) !important;
     font-weight: 700;
   }
 

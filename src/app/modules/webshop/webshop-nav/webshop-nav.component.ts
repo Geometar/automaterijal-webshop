@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HostListener } from '@angular/core';
+import { RouterModule } from '@angular/router';
 
 // Component Imports
 import { ButtonComponent } from '../../../shared/components/button/button.component';
@@ -48,7 +49,8 @@ export class NavTitles {
     CommonModule,
     InputFieldsComponent,
     VehicleSelectionPopupComponent,
-    CategoriesPopupComponent
+    CategoriesPopupComponent,
+    RouterModule
   ],
   templateUrl: './webshop-nav.component.html',
   styleUrl: './webshop-nav.component.scss',
