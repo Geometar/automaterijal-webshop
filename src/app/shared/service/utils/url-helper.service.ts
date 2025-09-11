@@ -154,6 +154,20 @@ export class UrlHelperService {
     this.navigateTo(parts);
   }
 
+
+  buildCategoryUrl(groupName?: string, subGroupName?: string | null): string {
+    const parts = ['/webshop'];
+
+    if (groupName) {
+      parts.push('category', StringUtils.slugify(groupName));
+      if (subGroupName) {
+        parts.push(StringUtils.slugify(subGroupName));
+      }
+    }
+
+    return parts.join('/');
+  }
+
   /** Navigate to absolute path (utility method) */
   navigateTo(path: string | any[], extras: NavigationExtras = {}): void {
     if (typeof path === 'string') {

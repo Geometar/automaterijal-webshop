@@ -60,12 +60,17 @@
   }
 
   .card-title {
+    font-size: var(--text-sm);
+    font-style: normal;
+    font-weight: var(--font-weight-regular);
+    height: 50px;
+    line-height: var(--font-1-line-height);
     margin-block: 20px 10px;
     transition: var(--transition-1);
-    height: 50px;
 
     &:is(:hover, :focus) {
       color: var(--tan-crayola);
+      text-decoration: underline;
     }
   }
 

@@ -33,11 +33,12 @@ import {
 } from '../../../shared/data-models/model/roba';
 import { TooltipModel } from '../../../shared/data-models/interface';
 
-// Components
+// Autom Components
 import { AddAttributesComponent } from './add-atributes/add-atributes.component';
 import { AutomIconComponent } from '../../../shared/components/autom-icon/autom-icon.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { CommonModule, CurrencyPipe } from '@angular/common';
+import { DividerComponent } from '../../../shared/components/divider/divider.component';
 import { InputFieldsComponent } from '../../../shared/components/input-fields/input-fields.component';
 import { PopupComponent } from '../../../shared/components/popup/popup.component';
 import { RsdCurrencyPipe } from '../../../shared/pipe/rsd-currency.pipe';
@@ -72,6 +73,7 @@ import { StringUtils } from '../../../shared/utils/string-utils';
     SpinnerComponent,
     TextAreaComponent,
     YouTubePlayer,
+    DividerComponent
   ],
   providers: [CurrencyPipe],
   templateUrl: './webshop-details.component.html',

@@ -12,26 +12,8 @@
     </div>
   </section>
 
-  <div class="wave-separator">
-    <svg
-      viewBox="0 0 1440 150"
-      xmlns="http://www.w3.org/2000/svg"
-      preserveAspectRatio="none"
-    >
-      <defs>
-        <!-- Zlatna -> plava -->
-        <linearGradient id="goldToBlue" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="var(--figma-highlight-gold)" />
-          <stop offset="100%" stop-color="var(--figma-primary-100)" />
-        </linearGradient>
-      </defs>
+  <autom-divider></autom-divider>
 
-      <path
-        d="M0,120 C240,180 480,60 720,120 C960,180 1200,60 1440,120 L1440,0 L0,0 Z"
-        fill="url(#goldToBlue)"
-      ></path>
-    </svg>
-  </div>
   <section class="oil-advisors-section">
     <h2>
       Pronađite idealno ulje za svoje vozilo – uz pomoć zvaničnih alata
@@ -82,44 +64,33 @@
 <section class="webshop-empty-recommendation">
   <h2>Izdvajamo iz ponude</h2>
 </section>
+
 <autom-showcase></autom-showcase>
 
-<div class="wave-separator">
-  <svg
-    viewBox="0 0 1440 150"
-    xmlns="http://www.w3.org/2000/svg"
-    preserveAspectRatio="none"
-  >
-    <defs>
-      <!-- Zlatna -> plava -->
-      <linearGradient id="goldToBlue" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="var(--figma-highlight-gold)" />
-        <stop offset="100%" stop-color="var(--figma-primary-100)" />
-      </linearGradient>
-    </defs>
-
-    <path
-      d="M0,120 C240,180 480,60 720,120 C960,180 1200,60 1440,120 L1440,0 L0,0 Z"
-      fill="url(#goldToBlue)"
-    ></path>
-  </svg>
-</div>
+<autom-divider></autom-divider>
 
 <!-- BRANDS -->
 <section class="brands-section fade-in" *ngIf="brands.length > 0">
   <h2>Izdvojeni proizvođači</h2>
-  <ul class="card-grid" role="list">
-    <li
-      *ngFor="let brand of brands"
-      (click)="filterByBrand(brand.id, brand.label)"
-      tabindex="0"
-      role="button"
-      [attr.aria-label]="'Filtriraj po brendu: ' + brand.label"
-      (keydown.enter)="filterByBrand(brand.id, brand.label)"
-      (keydown.space)="filterByBrand(brand.id, brand.label)"
-    >
-      <img [src]="brand.src" [alt]="brand.alt" loading="lazy" />
-      <p>{{ brand.label }}</p>
+
+  <ul class="card-grid">
+    <li *ngFor="let brand of brands">
+      <a
+        class="brand-card"
+        [routerLink]="['/webshop/manufactures', brand.slug]"
+        [queryParams]="{ mandatoryproid: brand.id }"
+        [title]="'Proizvođač: ' + brand.label"
+        [attr.aria-label]="'Proizvođač: ' + brand.label"
+      >
+        <img
+          [src]="brand.src"
+          [alt]="brand.alt || 'Logo brenda ' + brand.label"
+          loading="lazy"
+          width="160"
+          height="80"
+        />
+        <p>{{ brand.label }}</p>
+      </a>
     </li>
   </ul>
 </section>

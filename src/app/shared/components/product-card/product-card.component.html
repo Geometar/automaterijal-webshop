@@ -39,7 +39,9 @@
   <!-- Detalji -->
   <div class="product-details">
     <h3 class="product-title" (click)="handleClick()">
-      {{ roba.proizvodjac?.naziv }} {{ roba.naziv }}
+      <a [routerLink]="['/webshop', roba.robaid]">
+        {{ roba.proizvodjac?.naziv }} {{ roba.naziv }}
+      </a>
     </h3>
 
     <p class="product-katbr" *ngIf="roba.katbr">Kat. broj: {{ roba.katbr }}</p>

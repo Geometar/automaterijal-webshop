@@ -7,7 +7,12 @@
     *ngFor="let section of showcase; let i = index"
     [ngClass]="'theme-' + (i % 3)"
   >
-    <h2 class="section-title">{{ section.podgrupa }}</h2>
+    <h2 class="section-title">
+      <a [routerLink]="section.titleUrl" class="section-link">
+        {{ section.title }}
+        <span class="arrow-icon">→</span>
+      </a>
+    </h2>
 
     <div class="grid-wrapper">
       <div class="products-grid" role="list">

@@ -1,7 +1,7 @@
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { Component, Input, Output, EventEmitter, ViewEncapsulation, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 // Automaterijal imports
 import { AutomIconComponent } from '../autom-icon/autom-icon.component';
@@ -31,7 +31,8 @@ import { SnackbarService } from '../../service/utils/snackbar.service';
     InputFieldsComponent,
     FormsModule,
     ReactiveFormsModule,
-    RsdCurrencyPipe
+    RsdCurrencyPipe,
+    RouterModule
   ],
   providers: [CurrencyPipe],
   templateUrl: './product-card.component.html',

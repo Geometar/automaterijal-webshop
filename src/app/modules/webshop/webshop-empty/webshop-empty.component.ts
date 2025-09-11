@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { take } from 'rxjs/operators';
+import { RouterModule } from '@angular/router';
 
 // Models & Enums
 import { TDVehicleDetails } from '../../../shared/data-models/model';
@@ -18,13 +19,14 @@ import { UrlHelperService } from '../../../shared/service/utils/url-helper.servi
 import { ConfigService } from '../../../shared/service/config.service';
 
 // Autom Imports
+import { DividerComponent } from '../../../shared/components/divider/divider.component';
 import { ShowcaseComponent } from '../../../shared/components/showcase/showcase.component';
 import { VehicleSelectionPopupComponent } from '../../../shared/components/ui/vehicle-selection-popup/vehicle-selection-popup.component';
 
 @Component({
   selector: 'webshop-empty',
   standalone: true,
-  imports: [CommonModule, ShowcaseComponent, VehicleSelectionPopupComponent],
+  imports: [CommonModule, ShowcaseComponent, VehicleSelectionPopupComponent, DividerComponent, RouterModule],
   templateUrl: './webshop-empty.component.html',
   styleUrl: './webshop-empty.component.scss',
   encapsulation: ViewEncapsulation.None,

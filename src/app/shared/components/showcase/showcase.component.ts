@@ -14,13 +14,14 @@ import { RobaService } from '../../service/roba.service';
 // Components
 import { AutomProductCardComponent } from '../../../shared/components/product-card/product-card.component';
 import { SpinnerComponent } from '../spinner/spinner.component';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'autom-showcase',
   standalone: true,
-  imports: [CommonModule, AutomProductCardComponent, SpinnerComponent],
+  imports: [CommonModule, AutomProductCardComponent, SpinnerComponent, RouterModule],
   templateUrl: './showcase.component.html',
-  styleUrl: './showcase.component.scss',
+  styleUrls: ['./showcase.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
 export class ShowcaseComponent implements OnInit {
@@ -30,7 +31,7 @@ export class ShowcaseComponent implements OnInit {
   error: string | null = null;
 
   // Struktura koju tvoj HTML očekuje
-  showcase: { podgrupa: string; artikli: Roba[] }[] = [];
+  showcase: { title: string; titleUrl: string, artikli: Roba[] }[] = [];
 
   constructor(
     private urlHelperService: UrlHelperService,
@@ -69,7 +70,7 @@ export class ShowcaseComponent implements OnInit {
   }
 
   // Grupisanje po nazivu podgrupe
-  private groupBySubgroup(data: Roba[]): { podgrupa: string; artikli: Roba[] }[] {
+  private groupBySubgroup(data: Roba[]): { title: string; titleUrl: string, artikli: Roba[] }[] {
     const grouped: Record<string, Roba[]> = {};
 
     for (const item of data) {
@@ -80,12 +81,13 @@ export class ShowcaseComponent implements OnInit {
 
     // pretvori u niz sekcija i izbaci prazne
     return Object.entries(grouped)
-      .map(([podgrupa, artikli]) => ({ podgrupa, artikli }))
+      .map(([subgroup, artikli]) => {
+        let category = 'Ostalo';
+        if (artikli.length > 0) {
+          category = artikli[0].grupaNaziv || 'Ostalo';
+        }
+        return { title: (category + ' - ' + subgroup), titleUrl: this.urlHelperService.buildCategoryUrl(category, subgroup), artikli };
+      })
       .filter(s => s.artikli.length > 0);
-  }
-
-
-  goToProduct(id: number): void {
-    this.urlHelperService.navigateTo(`/webshop/${id}`);
   }
 }

@@ -97,36 +97,6 @@
   }
 }
 
-.wave-separator {
-  position: relative;
-  width: 100%;
-  height: 60px;
-  overflow: hidden;
-  line-height: 0;
-}
-.wave-separator svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-.wave-separator svg path {
-  animation: waveFloat 6s ease-in-out infinite;
-  transform-origin: center;
-}
-
-/* obavezno: keyframes */
-@keyframes waveFloat {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(8px); }
-}
-
-/* accessibility: poštuj users koji ne vole animacije */
-@media (prefers-reduced-motion: reduce) {
-  .wave-separator svg path {
-    animation: none;
-  }
-}
-
 .section-separator.wave svg path {
   fill: var(--figma-highlight-gold);
 }

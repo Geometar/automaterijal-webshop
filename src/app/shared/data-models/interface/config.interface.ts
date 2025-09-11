@@ -5,15 +5,16 @@ export interface Brand {
   id: string;
   label: string;
   section?: keyof typeof BrandSectionEnum;
-  slug?: string;
+  slug: string;
   src: string;
   visible: boolean;
 }
 
 export interface Category {
+  alt: string;
   id: string;
   label: string;
-  alt: string;
+  slug: string;
   src: string;
   visible: boolean;
 }
