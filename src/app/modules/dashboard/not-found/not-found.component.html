@@ -4,11 +4,13 @@
   <p>Žao nam je, ali stranica koju tražite ne postoji.</p>
   <p>Molimo vas da proverite URL ili se vratite na</p>
 
-  <autom-button
-    (clickEvent)="home()"
-    [type]="buttonTypes.PRIMARY"
-    [theme]="buttonThemes.DARK_RED"
-    [label]="'Početna strana'"
-    >početnu stranu</autom-button
-  >
+  <a [routerLink]="['/home']" class="link-reset">
+    <autom-button
+      [routerLink]="['/home']"
+      [type]="buttonTypes.PRIMARY"
+      [theme]="buttonThemes.DARK_RED"
+      [label]="'Početna strana'"
+    >
+    </autom-button>
+  </a>
 </section>

@@ -20,14 +20,13 @@
 
   <!-- Details Section -->
   <div class="details-container">
-    <h3
-      [class.disabled]="data.podGrupa === 1000000"
-      [routerLink]="['/webshop', data.robaid]"
-    >
-      <span class="color--figma-primary-800">{{
-        data.proizvodjac?.naziv
-      }}</span>
-      {{ nameWithoutManufacturer }}
+    <h3 [class.disabled]="data.podGrupa === 1000000">
+      <a [routerLink]="['/webshop', data.robaid]">
+        <span class="color--figma-primary-800">{{
+          data.proizvodjac?.naziv
+        }}</span>
+        {{ nameWithoutManufacturer }}
+      </a>
     </h3>
 
     <p class="autom-margin__none">

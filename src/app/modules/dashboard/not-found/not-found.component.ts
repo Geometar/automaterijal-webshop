@@ -1,31 +1,52 @@
 // page-not-found.component.ts
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
 
 // Automaterd imports
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 
 // Enums
 import { ButtonThemes, ButtonTypes } from '../../../shared/data-models/enums';
+import { SeoService } from '../../../shared/service/seo.service';
 
 @Component({
   selector: 'not-found',
   templateUrl: './not-found.component.html',
-  imports: [CommonModule, ButtonComponent],
+  imports: [CommonModule, ButtonComponent, RouterModule],
   styleUrls: ['./not-found.component.scss'],
   standalone: true
 })
-export class PageNotFoundComponent {
+export class PageNotFoundComponent implements OnInit {
   searchQuery: string = '';
 
   //Enums
   buttonThemes = ButtonThemes;
   buttonTypes = ButtonTypes;
 
-  constructor(private router: Router) { }
+  constructor(private seo: SeoService) { }
 
-  home(): void {
-    this.router.navigate(['/home']);
+  ngOnInit(): void {
+    this.seo.updateSeoTags({
+      title: '404 – Stranica nije pronađena | Automaterijal',
+      description: 'Žao nam je, ali stranica koju tražite ne postoji. Vratite se na početnu ili nastavite pretragu delova.',
+      url: 'https://www.automaterijal.com/404',
+      type: 'website',
+      robots: 'noindex, follow',
+      image: 'https://www.automaterijal.com/images/logo/logo.svg',
+      imageAlt: 'Automaterijal logo',
+      siteName: 'Automaterijal',
+      locale: 'sr_RS',
+      canonical: 'https://www.automaterijal.com/404'
+    });
+
+    // Po želji: JSON-LD za 404 (nije obavezno)
+    this.seo.setJsonLd({
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      name: '404 – Stranica nije pronađena',
+      url: 'https://www.automaterijal.com/404',
+      isPartOf: { '@type': 'WebSite', name: 'Automaterijal' }
+    });
   }
 }
