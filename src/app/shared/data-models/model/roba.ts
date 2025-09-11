@@ -69,7 +69,7 @@ export class Roba {
   cena?: number;
   dokumentacija?: Object;
   dozvoljenoZaAnonimusa?: boolean;
-  group?: number;
+  grupa?: string;
   grupaNaziv?: string;
   katbr?: string;
   katbrpro?: string;

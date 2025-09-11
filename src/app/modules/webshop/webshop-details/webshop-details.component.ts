@@ -27,11 +27,13 @@ import {
 
 // Data Models
 import {
+  Filter,
   Roba,
   RobaBrojevi,
   TecDocDokumentacija,
 } from '../../../shared/data-models/model/roba';
 import { TooltipModel } from '../../../shared/data-models/interface';
+import { ShowcaseComponent, ShowcaseSection } from '../../../shared/components/showcase/showcase.component';
 
 // Autom Components
 import { AddAttributesComponent } from './add-atributes/add-atributes.component';
@@ -54,6 +56,7 @@ import { RobaService } from '../../../shared/service/roba.service';
 import { SeoService } from '../../../shared/service/seo.service';
 import { SnackbarService } from '../../../shared/service/utils/snackbar.service';
 import { TecdocService } from '../../../shared/service/tecdoc.service';
+import { UrlHelperService } from '../../../shared/service/utils/url-helper.service';
 
 // Utils
 import { StringUtils } from '../../../shared/utils/string-utils';
@@ -73,7 +76,8 @@ import { StringUtils } from '../../../shared/utils/string-utils';
     SpinnerComponent,
     TextAreaComponent,
     YouTubePlayer,
-    DividerComponent
+    DividerComponent,
+    ShowcaseComponent
   ],
   providers: [CurrencyPipe],
   templateUrl: './webshop-details.component.html',
@@ -115,7 +119,8 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   // Data
   documentKeys: string[] = [];
   oeNumbers: Map<string, string[]> = new Map();
-  private youTubeIds: string[] = [];
+  showcaseData: ShowcaseSection[] = [];
+  youTubeIds: string[] = [];
 
   private destroy$ = new Subject<void>();
 
@@ -134,7 +139,8 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     private sanitizer: DomSanitizer,
     private seoService: SeoService,
     private snackbarService: SnackbarService,
-    private tecDocService: TecdocService
+    private tecDocService: TecdocService,
+    private urlHelperService: UrlHelperService
   ) { }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -142,13 +148,18 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   // ─────────────────────────────────────────────────────────────────────────────
 
   ngOnInit(): void {
-    const raw = this.route.snapshot.paramMap.get('id');
-    this.id = this.parseId(raw);
-    if (this.id) {
-      this.fetchData(this.id);
-    } else {
-      console.warn('Nevažeći ID u ruti:', raw);
-    }
+    this.route.paramMap
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((params) => {
+        const raw = params.get('id');
+        this.id = this.parseId(raw);
+        if (this.id) {
+          this.fetchData(this.id);
+        } else {
+          console.warn('Nevažeći ID u ruti:', raw);
+        }
+      });
+
     this.isAdmin = this.accountStateService.isAdmin();
   }
 
@@ -191,9 +202,54 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
           }
 
           this.updateSeoTags(this.data);
+          this.loadShowcase(this.data);
         },
         error: (err: HttpErrorResponse) => {
           console.error('fetchDetails error', err.error?.details || err.error);
+        },
+      });
+  }
+
+  private loadShowcase(roba: Roba): void {
+    if (!roba.grupa || !roba.podGrupa) {
+      this.showcaseData = [];
+      return;
+    }
+
+    const filter = new Filter();
+    filter.grupe = [roba.grupa];
+    filter.podgrupe = [roba.podGrupa.toString()];
+    filter.naStanju = true;
+
+    this.robaService
+      .pronadjiSvuRobu(null, 20, 0, '', filter) // uzmi malo više pa filtriraj
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (magacin) => {
+          const artikli = magacin.robaDto?.content ?? [];
+
+          const filtered = artikli
+            // izbaci trenutni artikal
+            .filter((a) => a.robaid !== roba.robaid)
+            // uzmi samo one sa slikom
+            .filter((a) => !!a.slika?.slikeByte)
+            // uzmi max 5
+            .slice(0, 5);
+
+          const titleUrl = this.urlHelperService.buildCategoryUrl(roba.grupaNaziv, roba.podGrupaNaziv);
+
+          this.showcaseData = filtered.length
+            ? [
+              {
+                title: `Još iz kategorije: ${roba.podGrupaNaziv ?? roba.grupaNaziv}`,
+                titleUrl: titleUrl,
+                artikli: filtered,
+              },
+            ]
+            : [];
+        },
+        error: () => {
+          this.showcaseData = [];
         },
       });
   }

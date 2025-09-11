@@ -1,5 +1,23 @@
 <section *ngIf="!loading" class="section">
-  <div class="product-container">
+  <div
+    class="product-container"
+    itemscope
+    itemtype="https://schema.org/Product"
+  >
+    <meta
+      itemprop="name"
+      [content]="(data.proizvodjac?.naziv || '') + ' ' + (data.naziv || '')"
+    />
+    <meta itemprop="sku" [content]="data.katbr || data.robaid + ''" />
+    <span itemprop="brand" itemscope itemtype="https://schema.org/Brand">
+      <meta itemprop="name" [content]="data.proizvodjac?.naziv || 'Brand'" />
+    </span>
+    <link
+      itemprop="url"
+      [attr.href]="
+        'https://www.automaterijal.com/webshop/' + (data.robaid || '')
+      "
+    />
     <div class="product-header">
       <h1 class="product-title" aria-label="Naziv proizvoda">
         {{ data.proizvodjac?.naziv }} {{ data.naziv }}
@@ -7,68 +25,108 @@
       <p class="product-article">Kat br: {{ data.katbr }}</p>
     </div>
 
-    <div class="product-details">
-      <div class="product-image">
-        <img
-          *ngIf="data?.proizvodjacLogo"
-          class="product-logo"
-          [src]="data!.proizvodjacLogo"
-          [alt]="'Logo ' + (data.proizvodjac!.naziv || '')"
-        />
-        <img
-          class="product-img"
-          [alt]="data.proizvodjac?.naziv + ' ' + data.naziv"
-          [src]="data.slika!.slikeUrl"
-          decoding="async"
-          height="350"
-          loading="lazy"
-          width="350"
-        />
-      </div>
-      <div *ngIf="data.tehnickiOpis?.length" class="product-description">
-        <h3>Description</h3>
-        <ul class="description-list" aria-label="Tehnički opis proizvoda">
-          <li *ngFor="let data of data.tehnickiOpis">
-            <span class="label"
-              >{{ data.oznaka
-              }}<span *ngIf="data.jedinica" class="label display--inline"
-                >[{{ data.jedinica }}]:</span
-              ></span
-            >
-            <span class="value">{{ data.vrednost }}</span>
-          </li>
-        </ul>
-      </div>
-      <div
-        *ngIf="!data.tehnickiOpis?.length"
-        class="product-description placeholder"
-      >
-        <h3>Opis</h3>
-        <p>Tehnički podaci trenutno nisu dostupni za ovaj proizvod.</p>
-      </div>
-      <div class="product-stock-price">
-        <p
-          class="stock-status"
-          role="status"
-          aria-live="polite"
-          *ngIf="data.stanje > 0"
+    <article class="product-details">
+      <div class="product-hero">
+        <!-- Slika / gallery -->
+        <figure class="product-media">
+          <img
+            class="product-img"
+            [src]="
+              data.slika?.slikeByte
+                ? 'data:image/jpeg;base64,' + data.slika!.slikeByte!
+                : data.slika?.slikeUrl || '/assets/images/fallback.jpg'
+            "
+            [alt]="
+              (data.proizvodjac?.naziv || '') + ' ' + (data.naziv || 'Artikal')
+            "
+            loading="lazy"
+            decoding="async"
+          />
+          <figcaption *ngIf="data.proizvodjac?.naziv" class="media-caption">
+            <img
+              *ngIf="data?.proizvodjacLogo"
+              class="brand-logo"
+              [src]="data!.proizvodjacLogo"
+              [alt]="'Logo ' + (data.proizvodjac!.naziv || '')"
+            />
+            <span>{{ data.proizvodjac?.naziv }}</span>
+          </figcaption>
+        </figure>
+
+        <!-- Highlights -->
+        <aside *ngIf="data.tehnickiOpis?.length" class="product-description">
+          <h3>Description</h3>
+          <ul class="description-list" aria-label="Tehnički opis proizvoda">
+            <li *ngFor="let data of data.tehnickiOpis">
+              <span class="label"
+                >{{ data.oznaka
+                }}<span *ngIf="data.jedinica" class="label display--inline"
+                  >[{{ data.jedinica }}]:</span
+                ></span
+              >
+              <span class="value">{{ data.vrednost }}</span>
+            </li>
+          </ul>
+        </aside>
+        <aside
+          *ngIf="!data.tehnickiOpis?.length"
+          class="product-highlights card"
         >
-          <span class="status-indicator"></span> Na stanju
-        </p>
-        <p class="stock-status" *ngIf="data.stanje === 0">
-          <span class="status-indicator-not"></span> Nema na stanju
-        </p>
-        <div class="price-info">
-          <p class="discount" *ngIf="data.rabat > 0">{{ data.rabat }}</p>
-          <p class="price">{{ data.cena! | rsdCurrency }}</p>
-          <p class="vat-info">cena sa PDV-pm</p>
-        </div>
-        <div class="product-actions">
-          <div class="quantity-control">
+          <ul class="bullets">
+            <li *ngIf="data.proizvodjac?.naziv">
+              <i class="dot"></i
+              ><strong>{{ data.proizvodjac?.naziv }}</strong> — pouzdan brend
+            </li>
+            <li *ngIf="data.grupaNaziv">
+              <i class="dot"></i>{{ data.grupaNaziv }}
+              <span *ngIf="data.podGrupaNaziv">› {{ data.podGrupaNaziv }}</span>
+            </li>
+            <li *ngIf="data.stanje > 0">
+              <i class="dot"></i>Na stanju — spremno za brzu isporuku
+            </li>
+            <li *ngIf="data.katbr">
+              <i class="dot"></i>Kat. broj: {{ data.katbr }}
+            </li>
+          </ul>
+        </aside>
+
+        <!-- Kupovna kartica (sticky) -->
+        <aside class="buy-card card">
+          <meta itemprop="priceCurrency" content="RSD" />
+          <meta itemprop="price" [content]="data.cena || 0" />
+          <link
+            itemprop="availability"
+            [attr.href]="
+              (data.stanje || 0) > 0
+                ? 'https://schema.org/InStock'
+                : 'https://schema.org/OutOfStock'
+            "
+          />
+          <meta
+            itemprop="url"
+            [content]="
+              'https://www.automaterijal.com/webshop/' + (data.robaid || '')
+            "
+          />
+          <div
+            class="stock"
+            [class.ok]="data.stanje > 0"
+            [class.nope]="!data.stanje"
+          >
+            <span class="led"></span
+            >{{ data.stanje > 0 ? "Na stanju" : "Nema na stanju" }}
+          </div>
+
+          <div class="price-wrap">
+            <div class="price">{{ data.cena! | rsdCurrency }}</div>
+            <div class="note">cena sa PDV-om</div>
+          </div>
+
+          <div class="actions">
             <autom-input-fields
-              aria-label="Količina za porudžbinu"
               [clearBtn]="false"
-              [customClass]="'quantity-size'"
+              [disableInput]="!data.stanje"
+              [customClass]="'qty'"
               [max]="data!.stanje!"
               [min]="1"
               [roundOff]="true"
@@ -79,24 +137,28 @@
                 { name: 'min', value: 1 }
               ]"
               [step]="1"
-              [value]="1"
+              [value]="quantity"
               (emitSelected)="modifyQuantity($event)"
               ngDefaultControl
             ></autom-input-fields>
+
+            <autom-button
+              [disabled]="!data.stanje"
+              [iconPrefix]="true"
+              [iconSource]="iconEnum.SHOPPING_CART"
+              [iconColor]="colorEnum.INFO_25_FILL"
+              [label]="'Dodaj u korpu'"
+              (clickEvent)="addToShopingCart()"
+            ></autom-button>
           </div>
-          <autom-button
-            [disabled]="!data.stanje"
-            [iconColor]="colorEnum.INFO_25"
-            [iconPrefix]="true"
-            [iconSource]="iconEnum.SHOPPING_CART"
-            [label]="'Dodaj u korpu'"
-            mat-raised-button
-            color="primary"
-            (clickEvent)="addToShopingCart()"
-          />
-        </div>
+
+          <ul class="trust">
+            <li><i class="shield"></i> Sigurno plaćanje</li>
+            <li><i class="truck"></i> Brza isporuka</li>
+          </ul>
+        </aside>
       </div>
-    </div>
+    </article>
   </div>
   <div
     *ngIf="documentKeys && documentKeys.length !== 0"
@@ -193,6 +255,7 @@
     <div
       *ngIf="data.tekst; else checkSpecs"
       class="product-rich-text"
+      itemprop="description"
       [innerHTML]="sanitizedText"
       aria-label="Detaljan opis proizvoda"
     ></div>
@@ -213,6 +276,14 @@
       </p>
     </ng-template>
   </div>
+
+  <autom-divider *ngIf="showcaseData.length"></autom-divider>
+
+  <autom-showcase
+    *ngIf="showcaseData.length"
+    [showcase]="showcaseData"
+    [loading]="loading"
+  ></autom-showcase>
 
   <div *ngIf="editingText" class="product-container documentation">
     <h3 class="oe-title">Informacije o proizvodu</h3>
