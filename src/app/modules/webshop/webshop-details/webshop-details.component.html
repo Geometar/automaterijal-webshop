@@ -13,6 +13,7 @@
           *ngIf="data?.proizvodjacLogo"
           class="product-logo"
           [src]="data!.proizvodjacLogo"
+          [alt]="'Logo ' + (data.proizvodjac!.naziv || '')"
         />
         <img
           class="product-img"

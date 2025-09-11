@@ -65,7 +65,10 @@
   <h2>Izdvajamo iz ponude</h2>
 </section>
 
-<autom-showcase></autom-showcase>
+<autom-showcase
+  [loading]="showcaseLoading"
+  [showcase]="showcase"
+></autom-showcase>
 
 <autom-divider></autom-divider>
 
@@ -74,14 +77,15 @@
   <h2>Izdvojeni proizvođači</h2>
 
   <ul class="card-grid">
-    <li *ngFor="let brand of brands">
-      <a
-        class="brand-card"
-        [routerLink]="['/webshop/manufactures', brand.slug]"
-        [queryParams]="{ mandatoryproid: brand.id }"
-        [title]="'Proizvođač: ' + brand.label"
-        [attr.aria-label]="'Proizvođač: ' + brand.label"
-      >
+    <a
+      *ngFor="let brand of brands"
+      class="brand-card"
+      [routerLink]="['/webshop/manufactures', brand.slug]"
+      [queryParams]="{ mandatoryproid: brand.id }"
+      [title]="'Proizvođač: ' + brand.label"
+      [attr.aria-label]="'Proizvođač: ' + brand.label"
+    >
+      <li>
         <img
           [src]="brand.src"
           [alt]="brand.alt || 'Logo brenda ' + brand.label"
@@ -90,8 +94,8 @@
           height="80"
         />
         <p>{{ brand.label }}</p>
-      </a>
-    </li>
+      </li>
+    </a>
   </ul>
 </section>
 
