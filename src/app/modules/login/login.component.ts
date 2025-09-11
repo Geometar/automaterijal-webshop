@@ -263,12 +263,19 @@ export class LoginComponent implements OnDestroy, OnInit {
   }
 
   private updateSeoTags(): void {
+    const url = 'https://www.automaterijal.com/login';
+
     this.seoService.updateSeoTags({
       title: 'Prijava | Automaterijal',
       description: 'Ulogujte se na svoj nalog na Automaterijal webshopu.',
-      url: 'https://www.automaterijal.com/login',
-      image: 'https://www.automaterijal.com/images/logo/logo.svg', // 👈 promenjeno
+      url,
+      canonical: url,
+      image: 'https://www.automaterijal.com/images/logo/logo.svg',
       robots: 'noindex, nofollow',
+      siteName: 'Automaterijal',
+      locale: 'sr_RS',
+      type: 'website'
     });
+
   }
 }

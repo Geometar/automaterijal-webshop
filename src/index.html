@@ -1,54 +1,71 @@
 <!DOCTYPE html>
-<html lang="sr">
+<html lang="sr-RS">
   <head>
-    <!-- Charset and mobile viewport -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="content-language" content="sr-RS" />
 
-    <!-- Title (fallback, dynamic per route should be set in Angular) -->
-    <title>Automaterijal | Auto delovi, filteri, maziva</title>
-
-    <!-- Base href (important for Angular routing) -->
-    <base href="/" />
-
-    <!-- Primary meta tags -->
+    <title>
+      Automaterijal – Auto delovi, filteri i maziva | Šabac & Srbija
+    </title>
     <meta
       name="description"
-      content="Automaterijal - prodaja auto delova, filtera i maziva za sve vrste vozila. Širok asortiman, kvalitetne marke. Brza dostava."
-    />
-    <meta
-      name="keywords"
-      content="auto delovi, filteri, maziva, Automaterijal, rezervni delovi, Srbija"
+      content="Auto delovi, filteri, ulja i maziva za putnička, teretna i građevinska vozila. Brza isporuka širom Srbije. Posetite naš Web Shop."
     />
     <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://www.automaterijal.com/" />
+    <base href="/" />
+    <meta name="theme-color" content="#18181B" />
+    <link rel="icon" type="image/png" href="/images/favicon/fav.png" />
+    <link rel="apple-touch-icon" href="/images/favicon/fav.png" />
 
-    <!-- Open Graph / Facebook meta tags -->
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Automaterijal" />
+    <meta property="og:locale" content="sr_RS" />
     <meta
       property="og:title"
-      content="Automaterijal | Auto delovi, filteri i maziva"
+      content="Automaterijal – Auto delovi, filteri i maziva"
     />
     <meta
       property="og:description"
-      content="Prodaja kvalitetnih auto delova uz brzu dostavu. Pogledajte ponudu!"
+      content="Sve za vaše vozilo na jednom mestu. Delovi, filteri, ulja i maziva."
     />
     <meta property="og:url" content="https://www.automaterijal.com/" />
-    <meta property="og:type" content="website" />
+    <meta
+      property="og:image"
+      content="https://www.automaterijal.com/images/logo/logo.svg"
+    />
+    <meta property="og:image:alt" content="Automaterijal logo" />
 
-    <!-- Canonical link -->
-    <link rel="canonical" href="https://www.automaterijal.com/" />
+    <!-- Preload hero (ako koristiš webp/avif) -->
+    <link
+      rel="preload"
+      as="image"
+      href="/images/navigation/hero-banner.webp"
+      fetchpriority="high"
+    />
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="images/favicon/fav.png" />
-
-    <!-- Fonts and icons -->
+    <!-- Fontovi -->
     <link
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
       rel="stylesheet"
     />
-    <link
-      href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet"
-    />
+
+    <!-- Consent Mode default -->
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("consent", "default", {
+        ad_storage: "denied",
+        analytics_storage: "granted",
+        functionality_storage: "granted",
+        security_storage: "granted",
+        wait_for_update: 500,
+      });
+    </script>
 
     <!-- Google Tag Manager -->
     <script>
@@ -63,10 +80,73 @@
         f.parentNode.insertBefore(j, f);
       })(window, document, "script", "dataLayer", "GTM-WTFZ8CL3");
     </script>
-    <!-- End Google Tag Manager -->
+    <!-- END GTM -->
+
+    <!-- JSON-LD -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "name": "Automaterijal d.o.o.",
+            "url": "https://www.automaterijal.com/",
+            "logo": "https://www.automaterijal.com/images/logo/logo.svg",
+            "sameAs": [
+              "https://www.facebook.com/automaterijal",
+              "https://www.instagram.com/automaterijal"
+            ]
+          },
+          {
+            "@type": "AutoPartsStore",
+            "name": "Automaterijal d.o.o.",
+            "image": "https://www.automaterijal.com/images/navigation/hero-banner.webp",
+            "url": "https://www.automaterijal.com/",
+            "telephone": "+38115319000",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "Kralja Milutina 159",
+              "addressLocality": "Šabac",
+              "postalCode": "15000",
+              "addressCountry": "RS"
+            },
+            "openingHoursSpecification": [
+              {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": [
+                  "Monday",
+                  "Tuesday",
+                  "Wednesday",
+                  "Thursday",
+                  "Friday"
+                ],
+                "opens": "08:00",
+                "closes": "17:00"
+              },
+              {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": "Saturday",
+                "opens": "08:00",
+                "closes": "14:00"
+              }
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "url": "https://www.automaterijal.com/",
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": "https://www.automaterijal.com/webshop?search={query}",
+              "query-input": "required name=query"
+            }
+          }
+        ]
+      }
+    </script>
   </head>
+
   <body class="mat-typography">
-    <!-- Google Tag Manager (noscript) -->
+    <!-- GTM noscript ostaje na vrhu body-a -->
     <noscript>
       <iframe
         src="https://www.googletagmanager.com/ns.html?id=GTM-WTFZ8CL3"
@@ -75,21 +155,12 @@
         style="display: none; visibility: hidden"
       ></iframe>
     </noscript>
-    <!-- End Google Tag Manager (noscript) -->
 
     <autom-root></autom-root>
 
-    <!-- Google Analytics (through GTM) -->
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-
-      gtag("js", new Date());
-      gtag("config", "G-BLYKCVFFEV", {
-        debug_mode: true,
-      });
-    </script>
+    <!-- VAŽNO: ne dodaj ručno polyfills/main; Angular (sa Vite) ih sam ubacuje -->
+    <!-- Ako baš treba za dev, onda koristi (obično nije potrebno):
+    <script type="module" src="/src/main.ts"></script>
+    -->
   </body>
 </html>

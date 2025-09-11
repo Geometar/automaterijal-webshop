@@ -1,7 +1,7 @@
 // page-not-found.component.ts
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { RouterModule } from '@angular/router';
 
 // Automaterd imports
 import { ButtonComponent } from '../../../shared/components/button/button.component';
@@ -17,7 +17,7 @@ import { SeoService } from '../../../shared/service/seo.service';
   styleUrls: ['./not-found.component.scss'],
   standalone: true
 })
-export class PageNotFoundComponent implements OnInit {
+export class PageNotFoundComponent implements OnInit, OnDestroy {
   searchQuery: string = '';
 
   //Enums
@@ -48,5 +48,9 @@ export class PageNotFoundComponent implements OnInit {
       url: 'https://www.automaterijal.com/404',
       isPartOf: { '@type': 'WebSite', name: 'Automaterijal' }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.seo.clearJsonLd('seo-jsonld');
   }
 }

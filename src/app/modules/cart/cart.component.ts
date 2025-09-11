@@ -48,8 +48,9 @@ import { RsdCurrencyPipe } from '../../shared/pipe/rsd-currency.pipe';
 import { AccountStateService } from '../../shared/service/state/account-state.service';
 import { CartService } from '../../shared/service/cart.service';
 import { CartStateService } from '../../shared/service/state/cart-state.service';
-import { PictureService } from '../../shared/service/utils/picture.service';
 import { InvoiceService } from '../../shared/service/invoice.service';
+import { PictureService } from '../../shared/service/utils/picture.service';
+import { SeoService } from '../../shared/service/seo.service';
 import { SnackbarPosition, SnackbarService } from '../../shared/service/utils/snackbar.service';
 
 
@@ -119,6 +120,7 @@ export class CartComponent implements OnInit, OnDestroy {
     private router: Router,
     private pictureService: PictureService,
     private snackbarService: SnackbarService,
+    private seo: SeoService
   ) {
     this.cartForm = this.fb.group({
       address: ['', Validators.required],
@@ -148,9 +150,13 @@ export class CartComponent implements OnInit, OnDestroy {
     this.syncOnCartItemSize();
     this.account = this.accountStateService.get();
     this.loggedIn = this.accountStateService.isUserLoggedIn();
+    this.setUpdateSeoTags();
   }
 
   ngOnDestroy(): void {
+    this.seo.clearJsonLd('seo-jsonld-cart');
+    this.seo.setLinkRel('prev', null);
+    this.seo.setLinkRel('next', null);
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -370,4 +376,45 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   /** Basket send: end */
+
+  /** Start of: seo */
+
+  private setUpdateSeoTags(): void {
+    const url = 'https://www.automaterijal.com/webshop/cart';
+
+    this.seo.updateSeoTags({
+      title: 'Korpa | Automaterijal',
+      description: 'Pregled proizvoda u korpi i priprema porudžbine.',
+      url,
+      canonical: url,
+      type: 'website',
+      robots: 'noindex, nofollow',
+      siteName: 'Automaterijal',
+      locale: 'sr_RS',
+      image: 'https://www.automaterijal.com/images/logo/logo.svg',
+      imageAlt: 'Automaterijal logo',
+    });
+
+    // (opciono) JSON-LD: WebPage + Breadcrumbs
+    this.seo.setJsonLd({
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebPage",
+          "name": "Korpa",
+          "url": url,
+          "isPartOf": { "@type": "WebSite", "name": "Automaterijal", "url": "https://www.automaterijal.com/" }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Početna", "item": "https://www.automaterijal.com/" },
+            { "@type": "ListItem", "position": 2, "name": "Webshop", "item": "https://www.automaterijal.com/webshop" },
+            { "@type": "ListItem", "position": 3, "name": "Korpa", "item": url }
+          ]
+        }
+      ]
+    }, 'seo-jsonld-cart');
+  }
+  /** End of: seo */
 }

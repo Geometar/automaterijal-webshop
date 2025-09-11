@@ -33,12 +33,16 @@ export class ONamaComponent implements OnInit {
 
   private updateSeoTags(): void {
     this.seoService.updateSeoTags({
-      title: 'O nama | Automaterijal - Istorija, partneri i razvoj',
+      title: 'O nama | Automaterijal – Istorija, partneri i razvoj',
       description:
         'Saznajte više o kompaniji Automaterijal. Naša istorija, partneri i razvojni put od 1990. do danas.',
       url: 'https://www.automaterijal.com/onama',
-      keywords:
-        'O nama, Automaterijal, istorija, auto delovi, partneri, Šabac, Pierburg, Reinz, Mahle, Shell, Lukoil, Fuchs'
+      canonical: 'https://www.automaterijal.com/onama',
+      robots: 'index, follow',
+      siteName: 'Automaterijal',
+      locale: 'sr_RS',
+      image: 'https://www.automaterijal.com/images/navigation/onama-hero.webp',
+      imageAlt: 'Automaterijal – istorija i partneri'
     });
   }
 }

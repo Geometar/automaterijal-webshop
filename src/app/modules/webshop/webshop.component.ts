@@ -154,6 +154,8 @@ export class WebshopComponent implements OnDestroy, OnInit {
     this.seoService.setLinkRel('prev', null);
     this.seoService.setLinkRel('next', null);
 
+    this.seoService.clearJsonLd('seo-jsonld-webshop');
+
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -632,6 +634,10 @@ export class WebshopComponent implements OnDestroy, OnInit {
       const sub = this.currentSubcategoryName ? ` / ${this.currentSubcategoryName}` : '';
       title = `Kategorija: ${cat}${sub}${page ? ` (str. ${page + 1})` : ''} - Automaterijal`;
       description = `Istražite ponudu: ${cat}${sub}. Delovi i oprema, brza isporuka.`;
+    }
+
+    if (!robots) {
+      robots = 'index, follow';
     }
 
     return {

@@ -26,6 +26,31 @@ export class SeoService {
     @Inject(PLATFORM_ID) private platformId: Object
   ) { }
 
+  setHtmlLang(lang: string) {
+    const html = this.doc.documentElement;
+    if (html && html.lang !== lang) html.lang = lang;
+  }
+
+  // ===== NEW: OG image meta (sa dimenzijama) =====
+  setOgImageMeta(opts: {
+    url: string;
+    alt?: string;
+    type?: string;      // image/png, image/webp...
+    width?: number;     // u px
+    height?: number;    // u px
+  }) {
+    this.upsertProp('og:image', opts.url);
+    if (opts.alt) this.upsertProp('og:image:alt', opts.alt);
+    if (opts.type) this.upsertProp('og:image:type', opts.type);
+    if (opts.width) this.upsertProp('og:image:width', String(opts.width));
+    if (opts.height) this.upsertProp('og:image:height', String(opts.height));
+  }
+
+  // (opciono) očisti meta po potrebi na specifičnim rutama
+  clearMetaBySelector(selector: string) {
+    Array.from(this.doc.head.querySelectorAll(`meta[${selector}]`)).forEach(m => m.remove());
+  }
+
   // ===== High-level entry point =====
 
   /**
@@ -66,6 +91,7 @@ export class SeoService {
     this.upsertProp('og:locale', locale);
     if (imageAlt) this.upsertProp('og:image:alt', imageAlt);
 
+    this.setHtmlLang('sr-RS');
     // Canonical
     this.ensureCanonical(canonical || url);
   }

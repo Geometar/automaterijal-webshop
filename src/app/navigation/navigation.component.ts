@@ -114,7 +114,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // Subscribe to the state
-    this.accountService.authenticationState.subscribe(
+    this.accountService.authenticationState.pipe(takeUntil(this.destroy$)).subscribe(
       (account: Account | null) => {
         if (account) {
           this.account = Object.assign(new Account(), account);
@@ -132,7 +132,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
     this.syncOnCartItemSize();
 
     if (isPlatformBrowser(this.platformId)) {
-      this.router.events.subscribe((event) => {
+      this.router.events.pipe(takeUntil(this.destroy$)).subscribe((event) => {
         if (event instanceof NavigationEnd) {
           const parsedUrl = new URL(
             event.urlAfterRedirects,

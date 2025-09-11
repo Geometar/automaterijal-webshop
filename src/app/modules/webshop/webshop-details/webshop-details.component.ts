@@ -164,6 +164,8 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.seoService.clearJsonLd('jsonld-product');
+    this.seoService.clearJsonLd('jsonld-breadcrumbs');
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -330,6 +332,12 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
           this.showImageDeleteWarningPopup = false;
         },
       });
+  }
+
+  private pickMainImage(roba: Roba): string {
+    if (roba.slika?.slikeUrl) return this.absoluteImage(roba.slika.slikeUrl);
+    if (roba.proizvodjacLogo) return this.absoluteImage(roba.proizvodjacLogo as string);
+    return this.absoluteImage(null);
   }
 
   saveTextDescription(): void {
@@ -604,7 +612,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       roba.proizvodjacLogo;
 
     const mainImgDataUrl = this.pictureService.toDataUrl(mainImgCandidateRaw, 'image/jpeg');
-    const ogImage = this.absoluteImage(mainImgDataUrl);
+    const ogImage = this.pickMainImage(roba);
 
     const ogImageAlt =
       baseTitle ||
