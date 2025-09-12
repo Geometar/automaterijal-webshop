@@ -16,7 +16,7 @@
       matTooltipPosition="above"
     >
       <span class="chip__label">{{ chip.label }}</span>
-      <a
+      <span
         class="chip__value"
         (click)="$event.stopPropagation()"
         (keydown)="$event.stopPropagation()"
@@ -26,7 +26,7 @@
             ? chip.values[0]
             : chip.values.length + " izabrano"
         }}
-      </a>
+      </span>
       <autom-icon class="chip__x" [source]="iconSource.X"></autom-icon>
     </button>
     }

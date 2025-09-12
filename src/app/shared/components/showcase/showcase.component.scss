@@ -34,8 +34,6 @@
       align-items: center;
       gap: 0.5rem;
       transition: color 0.2s ease, transform 0.2s ease;
-      white-space: nowrap;
-      overflow-wrap: anywhere;
 
       &:hover {
         color: var(--figma-primary-600);

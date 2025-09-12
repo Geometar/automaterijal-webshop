@@ -139,5 +139,49 @@
         </button>
       </div>
     </section>
+
+    <section
+      class="cp-right-slide"
+      *ngIf="activeGroup as g"
+      [class.is-open]="!!activeGroup"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Podgrupe"
+    >
+      <header class="group-head">
+        <button
+          class="btn-icon"
+          type="button"
+          (click)="closeSubpanel()"
+          aria-label="Zatvori"
+        >
+          ✕
+        </button>
+        <h4 class="group-title">{{ g.name }}</h4>
+        <button class="btn-outline" type="button" (click)="pickGroup(g)">
+          Prikaži sve
+        </button>
+      </header>
+
+      <div class="subgrid">
+        <button
+          class="subcard"
+          *ngFor="let sub of g.subgroups; trackBy: trackSub"
+          type="button"
+          (click)="pickSubgroup(g, sub)"
+          [attr.aria-label]="sub.name"
+        >
+          <span class="subcard__name">{{ sub.name }}</span>
+          <span class="subcard__chev">›</span>
+        </button>
+      </div>
+
+      <div class="empty-subgroups" *ngIf="!g.subgroups?.length">
+        <p>Ova grupa trenutno nema podgrupe.</p>
+        <button class="btn-outline" type="button" (click)="pickGroup(g)">
+          Otvori celu grupu
+        </button>
+      </div>
+    </section>
   </div>
 </autom-popup>

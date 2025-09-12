@@ -12,9 +12,9 @@
     <span itemprop="brand" itemscope itemtype="https://schema.org/Brand">
       <meta itemprop="name" [content]="data.proizvodjac?.naziv || 'Brand'" />
     </span>
-    <link
+    <meta
       itemprop="url"
-      [attr.href]="
+      [attr.content]="
         'https://www.automaterijal.com/webshop/' + (data.robaid || '')
       "
     />
@@ -94,10 +94,10 @@
         <aside class="buy-card card">
           <meta itemprop="priceCurrency" content="RSD" />
           <meta itemprop="price" [content]="data.cena || 0" />
-          <link
+          <meta
             itemprop="availability"
-            [attr.href]="
-              (data.stanje || 0) > 0
+            [attr.content]="
+              data.podGrupa !== 1000000 && (data.stanje || 0) > 0
                 ? 'https://schema.org/InStock'
                 : 'https://schema.org/OutOfStock'
             "
@@ -277,11 +277,17 @@
     </ng-template>
   </div>
 
-  <autom-divider *ngIf="showcaseData.length"></autom-divider>
+  <autom-divider *ngIf="showcaseDataCategories.length"></autom-divider>
 
   <autom-showcase
-    *ngIf="showcaseData.length"
-    [showcase]="showcaseData"
+    *ngIf="showcaseDataCategories.length"
+    [showcase]="showcaseDataCategories"
+    [loading]="loading"
+  ></autom-showcase>
+
+  <autom-showcase
+    *ngIf="showcaseDataManufactures.length"
+    [showcase]="showcaseDataManufactures"
     [loading]="loading"
   ></autom-showcase>
 

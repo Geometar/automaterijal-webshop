@@ -57,6 +57,15 @@ export class CategoriesPopupComponent {
     }
   }
 
+  @HostListener('document:keydown.escape')
+  onEscape() {
+    this.closeSubpanel();
+  }
+
+  closeSubpanel(): void {
+    this.activeGroup = null;
+  }
+
   constructor(private bucketsService: CategoriesBucketsService, private urlHelper: UrlHelperService) {
     // Init buckets stream
     this.buckets$ = this.bucketsService.getBuckets$();

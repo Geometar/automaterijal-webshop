@@ -200,20 +200,32 @@
 
       <div class="arrows">
         <!-- Arrow Up -->
-        <a [class.disabled]="value >= max" (click)="increaseQuantity()">
+        <button
+          type="button"
+          class="arrow-btn"
+          [disabled]="value >= max"
+          aria-label="Povećaj količinu"
+          (click)="increaseQuantity()"
+        >
           <autom-icon
             class="quantity-arrow"
             [source]="iconEnum.ARROW_UP"
           ></autom-icon>
-        </a>
+        </button>
 
         <!-- Arrow Down -->
-        <a [class.disabled]="value <= 1" (click)="decreaseQuantity()">
+        <button
+          type="button"
+          class="arrow-btn"
+          [disabled]="value <= 1"
+          aria-label="Smanji količinu"
+          (click)="decreaseQuantity()"
+        >
           <autom-icon
             class="quantity-arrow"
             [source]="iconEnum.ARROW_DOWN"
           ></autom-icon>
-        </a>
+        </button>
       </div>
     </div>
   </ng-container>

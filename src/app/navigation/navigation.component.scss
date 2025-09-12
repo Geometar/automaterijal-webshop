@@ -146,6 +146,28 @@ $breakpoint-sm: 768px;
     padding: 5px 0;
     box-shadow: 0 0 10px hsla(0, 0%, 0%, 0.25);
     z-index: 1001;
+
+    .action-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      text-decoration: none;
+      background: transparent;
+      border: 0;
+      padding: 6px 8px;
+    }
+
+    .action-label {
+      font-size: 11px;
+      line-height: 1;
+      color: var(--figma-text-default);
+    }
+
+    .icon-active ~ .action-label {
+      color: var(--figma-highlight-orange);
+    }
   }
 
   .overlay-mobile {
@@ -288,6 +310,7 @@ $breakpoint-sm: 768px;
   align-items: center;
   justify-content: center;
 }
+
 .menu-section {
   display: flex;
   flex-direction: column;

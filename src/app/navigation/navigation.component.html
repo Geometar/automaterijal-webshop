@@ -196,9 +196,16 @@
   </div>
 </nav>
 
-<div class="mobile-bottom-navigation">
+<div
+  class="mobile-bottom-navigation"
+  role="navigation"
+  aria-label="Brza navigacija na mobilnom"
+>
+  <!-- Meni -->
   <button
     class="action-btn"
+    type="button"
+    aria-label="Otvori meni"
     data-mobile-menu-open-btn
     (click)="mobileSidebarOpen = !mobileSidebarOpen"
   >
@@ -206,28 +213,48 @@
       [color]="colorEnum.RICH_BLACK"
       [source]="iconEnum.ALIGN_JUSTIFY"
     ></autom-icon>
+    <span class="action-label">Meni</span>
   </button>
 
-  <a class="action-btn" routerLink="/home">
+  <!-- Početna -->
+  <a
+    class="action-btn"
+    routerLink="/home"
+    aria-label="Početna"
+    [attr.aria-current]="currentUrl.includes('/home') ? 'page' : null"
+  >
     <autom-icon
       [ngClass]="currentUrl.includes('/home') ? 'icon-active' : null"
       [color]="colorEnum.RICH_BLACK"
       [source]="iconEnum.HOME"
     ></autom-icon>
+    <span class="action-label">Početna</span>
   </a>
 
-  <button
+  <!-- Webshop -->
+  <a
     class="action-btn"
     routerLink="/webshop"
-    [ngClass]="currentUrl.includes('/webshop') ? 'icon-active' : null"
+    aria-label="Webshop"
+    [attr.aria-current]="currentUrl.includes('/webshop') ? 'page' : null"
   >
     <autom-icon
+      [ngClass]="currentUrl.includes('/webshop') ? 'icon-active' : null"
       [color]="colorEnum.RICH_BLACK"
       [source]="iconEnum.TOOLS"
     ></autom-icon>
-  </button>
+    <span class="action-label">Webshop</span>
+  </a>
 
-  <button class="action-btn" routerLink="/cart">
+  <!-- Korpa -->
+  <a
+    class="action-btn"
+    routerLink="/cart"
+    [attr.aria-label]="
+      'Korpa' + (cartSize ? ', ' + cartSize + ' artikala' : '')
+    "
+    [attr.aria-current]="currentUrl.includes('/cart') ? 'page' : null"
+  >
     <autom-icon
       [ngClass]="currentUrl.includes('/cart') ? 'icon-active' : null"
       [badge]="cartSize"
@@ -235,23 +262,39 @@
       [enableBadge]="true"
       [source]="iconEnum.SHOPPING_CART"
     ></autom-icon>
-  </button>
+    <span class="action-label">Korpa</span>
+  </a>
 
-  <button *ngIf="loggedIn" class="action-btn" routerLink="/invoices">
+  <!-- Porudžbenice / Login -->
+  <a
+    *ngIf="loggedIn"
+    class="action-btn"
+    routerLink="/invoices"
+    aria-label="Porudžbenice"
+    [attr.aria-current]="currentUrl.includes('/invoices') ? 'page' : null"
+  >
     <autom-icon
       [ngClass]="currentUrl.includes('/invoices') ? 'icon-active' : null"
       [color]="colorEnum.RICH_BLACK"
       [source]="iconEnum.BOOK"
     ></autom-icon>
-  </button>
+    <span class="action-label">Porudžbenice</span>
+  </a>
 
-  <button *ngIf="!loggedIn" class="action-btn" routerLink="/login">
+  <a
+    *ngIf="!loggedIn"
+    class="action-btn"
+    routerLink="/login"
+    aria-label="Prijava"
+    [attr.aria-current]="currentUrl.includes('/login') ? 'page' : null"
+  >
     <autom-icon
       [ngClass]="currentUrl.includes('/login') ? 'icon-active' : null"
       [color]="colorEnum.RICH_BLACK"
       [source]="iconEnum.LOG_IN"
     ></autom-icon>
-  </button>
+    <span class="action-label">Prijava</span>
+  </a>
 </div>
 
 <nav

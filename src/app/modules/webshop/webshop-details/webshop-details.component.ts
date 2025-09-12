@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
-import { finalize, Subject, takeUntil } from 'rxjs';
+import { catchError, finalize, forkJoin, Observable, of, Subject, takeUntil } from 'rxjs';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 // Enums
@@ -28,6 +28,7 @@ import {
 // Data Models
 import {
   Filter,
+  Magacin,
   Roba,
   RobaBrojevi,
   TecDocDokumentacija,
@@ -119,8 +120,10 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   // Data
   documentKeys: string[] = [];
   oeNumbers: Map<string, string[]> = new Map();
-  showcaseData: ShowcaseSection[] = [];
+  showcaseDataCategories: ShowcaseSection[] = [];
+  showcaseDataManufactures: ShowcaseSection[] = [];
   youTubeIds: string[] = [];
+  private showcaseTakenIds = new Set<number>();
 
   private destroy$ = new Subject<void>();
 
@@ -213,46 +216,82 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   }
 
   private loadShowcase(roba: Roba): void {
-    if (!roba.grupa || !roba.podGrupa) {
-      this.showcaseData = [];
-      return;
+    this.showcaseDataCategories = [];
+    this.showcaseDataManufactures = [];
+
+    const hasImage = (a: Roba) => !!(a?.slika?.slikeUrl || a?.slika?.slikeByte || a?.proizvodjacLogo);
+    const uniqById = (list: Roba[]) => {
+      const seen = new Set<number>();
+      return list.filter(x => {
+        const id = Number(x.robaid);
+        if (seen.has(id)) return false;
+        seen.add(id);
+        return true;
+      });
+    };
+    const pick = (list: Roba[], max = 5) =>
+      uniqById(list)
+        .filter(a => a.robaid !== roba.robaid)
+        .filter(hasImage)
+        .filter(a => !this.showcaseTakenIds.has(Number(a.robaid)))
+        .slice(0, max);
+
+    // --- pripremi observables
+    let cat$: Observable<Magacin | null> = of<Magacin | null>(null);
+    if (roba.grupa && roba.podGrupa) {
+      const f = new Filter();
+      f.naStanju = true;
+      f.grupe = [roba.grupa];
+      f.podgrupe = [String(roba.podGrupa)];
+      cat$ = this.robaService.pronadjiSvuRobu(null, 40, 0, '', f).pipe(catchError(() => of(null)));
     }
 
-    const filter = new Filter();
-    filter.grupe = [roba.grupa];
-    filter.podgrupe = [roba.podGrupa.toString()];
-    filter.naStanju = true;
 
-    this.robaService
-      .pronadjiSvuRobu(null, 20, 0, '', filter) // uzmi malo više pa filtriraj
+    let brand$: Observable<Magacin | null> = of<Magacin | null>(null);
+    if (roba?.proizvodjac?.proid || roba?.proizvodjac?.naziv) {
+      const f = new Filter();
+      // koristi ono što tvoj API očekuje:
+      if (roba.proizvodjac?.proid) f.proizvodjaci = [roba.proizvodjac.proid];
+      else f.proizvodjaci = [roba.proizvodjac!.naziv!];
+      f.naStanju = true;
+      brand$ = this.robaService.pronadjiSvuRobu(null, 60, 0, '', f);
+    }
+
+    // --- paralelno povuci, pa deterministički obradi (kategorija -> brend)
+    forkJoin({ cat: cat$, brand: brand$ })
       .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (magacin) => {
-          const artikli = magacin.robaDto?.content ?? [];
+      .subscribe(({ cat, brand }) => {
+        // 1) KATEGORIJA
+        if (cat?.robaDto?.content?.length) {
+          const candidates = cat?.robaDto?.content as Roba[];
+          const picked = pick(candidates, 5);
+          picked.forEach(p => this.showcaseTakenIds.add(Number(p.robaid)));
 
-          const filtered = artikli
-            // izbaci trenutni artikal
-            .filter((a) => a.robaid !== roba.robaid)
-            // uzmi samo one sa slikom
-            .filter((a) => !!a.slika?.slikeByte)
-            // uzmi max 5
-            .slice(0, 5);
+          if (picked.length) {
+            const titleUrl = this.urlHelperService.buildCategoryUrl(roba.grupaNaziv, roba.podGrupaNaziv);
+            this.showcaseDataCategories = [{
+              title: `Još iz kategorije: ${roba.podGrupaNaziv ?? roba.grupaNaziv}`,
+              titleUrl,
+              artikli: picked
+            }];
+          }
+        }
 
-          const titleUrl = this.urlHelperService.buildCategoryUrl(roba.grupaNaziv, roba.podGrupaNaziv);
+        // 2) PROIZVOĐAČ
+        if (brand?.robaDto?.content?.length) {
+          const candidates = brand.robaDto.content as Roba[];
+          const picked = pick(candidates, 5);
+          picked.forEach(p => this.showcaseTakenIds.add(Number(p.robaid)));
 
-          this.showcaseData = filtered.length
-            ? [
-              {
-                title: `Još iz kategorije: ${roba.podGrupaNaziv ?? roba.grupaNaziv}`,
-                titleUrl: titleUrl,
-                artikli: filtered,
-              },
-            ]
-            : [];
-        },
-        error: () => {
-          this.showcaseData = [];
-        },
+          if (picked.length) {
+            const titleUrl = `/webshop/manufactures/${StringUtils.slugify(roba.proizvodjac!.naziv! ?? '')}`;
+            this.showcaseDataManufactures = [{
+              title: `Još od proizvođača: ${roba.proizvodjac?.naziv}`,
+              titleUrl,
+              artikli: picked
+            }];
+          }
+        }
       });
   }
 

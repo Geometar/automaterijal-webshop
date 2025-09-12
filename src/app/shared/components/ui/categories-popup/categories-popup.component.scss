@@ -30,12 +30,14 @@
 
 /* ========= HEADER ========= */
 .cp-header {
+  border-radius: calc(var(--space-xxs) * 2.5);
+  background: var(--cp-bg);
+  border-bottom: 1px solid var(--cp-border);
+  border-top: 5px solid var(--bittersweet);
+  padding: var(--cp-gap-lg);
   position: sticky;
   top: 0;
   z-index: 10;
-  background: var(--cp-bg);
-  border-bottom: 1px solid var(--cp-border);
-  padding: var(--cp-gap-lg);
 
   &--main {
     display: flex;
@@ -356,3 +358,124 @@
     min-height: 35vh;
   }
 }
+
+/* ---------- Mobile slide-over ---------- */
+.cp-overlay {
+  display: none;
+}
+
+.cp-right-slide {
+  display: none;
+}
+
+/* samo za mobilni/tablet */
+@media (max-width: 991px) {
+  /* desktop right se sakriva na mobilnom */
+  .cp-right--desktop {
+    display: none !important;
+  }
+
+  .cp-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 1002;
+  }
+
+  .cp-right-slide {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: calc(100vh - 64px);
+    width: min(92vw, 420px);
+    background: var(--cp-bg, #fff);
+    border-left: 1px solid var(--cp-border, #eee);
+    box-shadow: -8px 0 24px rgba(0, 0, 0, 0.12);
+    transform: translateX(100%);
+    transition: transform 0.28s ease;
+    z-index: 1003;
+    overflow: hidden; /* da header bude sticky */
+
+    &.is-open {
+      transform: translateX(0);
+    }
+
+    .group-head {
+      align-items: center;
+      background: var(--cp-bg, #fff);
+      border-bottom: 1px solid var(--cp-border, #eee);
+      border-top: 5px solid var(--bittersweet);
+      display: grid;
+      gap: 8px;
+      grid-template-columns: auto 1fr auto;
+      padding: 12px 14px;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+
+      .btn-icon {
+        border: 0;
+        background: transparent;
+        font-size: 20px;
+        line-height: 1;
+        padding: 6px;
+        color: var(--cp-fg, #222);
+      }
+
+      .group-title {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--cp-fg, #222);
+        text-align: left;
+        padding-inline: 4px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .btn-outline {
+        border: 1px solid var(--cp-accent, #0a66c2);
+        background: transparent;
+        color: var(--cp-accent, #0a66c2);
+        border-radius: 10px;
+        padding: 6px 10px;
+        font-size: 0.85rem;
+      }
+    }
+
+    .subgrid {
+      padding: 12px 14px 24px;
+      overflow-y: auto; /* sadržaj skroluje */
+      -webkit-overflow-scrolling: touch;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+
+      .subcard {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 12px;
+        background: var(--figma-base-white, #fff);
+        border: 1px solid var(--cp-border, #eee);
+        border-radius: 12px;
+        font-size: 0.95rem;
+      }
+
+      .subcard__chev {
+        color: var(--cp-muted, #6b7280);
+      }
+    }
+
+    .empty-subgroups {
+      padding: 14px;
+      color: var(--cp-muted, #6b7280);
+    }
+  }
+}
+
+/* desktop ostaje tvoj postojeći .cp-right stil */

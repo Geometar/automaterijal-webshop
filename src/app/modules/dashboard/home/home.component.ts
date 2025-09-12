@@ -23,7 +23,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     const url = 'https://www.automaterijal.com/';
-    const hero = 'https://www.automaterijal.com/images/navigation/hero-banner.webp';
+    const hero = 'https://automaterijal.com/images/navigation/hero-banner.png';
 
     // Preload hero (jednom, webp)
     this.seo.preloadImage(hero);

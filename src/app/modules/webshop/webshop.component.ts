@@ -505,19 +505,8 @@ export class WebshopComponent implements OnDestroy, OnInit {
     const canonical = this.buildCanonicalUrlForContext(context);
     const jsonLd = this.buildJsonLdForContext(context, canonical);
 
-    // 🔹 Update meta + canonical
     this.seoService.setCanonicalUrl(canonical);
-    console.log('SEO TAGS:', {
-      title: context.title,
-      description: context.description,
-      url: canonical,
-      type: 'website',
-      siteName: 'Automaterijal',
-      locale: 'sr_RS',
-      robots: context.robots,
-      image: 'https://www.automaterijal.com/images/logo/logo.svg',
-      imageAlt: 'Automaterijal',
-    });
+
     this.seoService.updateSeoTags({
       title: context.title,
       description: context.description,

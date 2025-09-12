@@ -140,9 +140,9 @@
           : "Nema na stanju"
       }}
     </div>
-    <link
+    <meta
       itemprop="availability"
-      [attr.href]="
+      [attr.content]="
         data.podGrupa !== 1000000 && (data.stanje || 0) > 0
           ? 'https://schema.org/InStock'
           : 'https://schema.org/OutOfStock'

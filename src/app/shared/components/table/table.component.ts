@@ -98,6 +98,7 @@ export class TableComponent implements OnChanges {
   }
 
   processFilter(): void {
+    this.filterChips = [];
     if (this.filter.mandatoryProid?.length) {
       this.filterChips.push({
         label: 'Proizvodjaci',
