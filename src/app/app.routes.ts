@@ -38,7 +38,7 @@ export const routes: Routes = [
       import('./modules/webshop/webshop.component').then((m) => m.WebshopComponent)
   },
   {
-    path: 'webshop/manufactures/:name',
+    path: 'webshop/manufacturers/:name',
     loadComponent: () =>
       import('./modules/webshop/webshop.component').then((m) => m.WebshopComponent)
   },

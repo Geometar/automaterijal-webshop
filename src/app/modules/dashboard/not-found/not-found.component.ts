@@ -30,14 +30,14 @@ export class PageNotFoundComponent implements OnInit, OnDestroy {
     this.seo.updateSeoTags({
       title: '404 – Stranica nije pronađena | Automaterijal',
       description: 'Žao nam je, ali stranica koju tražite ne postoji. Vratite se na početnu ili nastavite pretragu delova.',
-      url: 'https://www.automaterijal.com/404',
+      url: 'https://automaterijal.com/404',
       type: 'website',
       robots: 'noindex, follow',
-      image: 'https://www.automaterijal.com/images/logo/logo.svg',
+      image: 'https://automaterijal.com/images/logo/logo.svg',
       imageAlt: 'Automaterijal logo',
       siteName: 'Automaterijal',
       locale: 'sr_RS',
-      canonical: 'https://www.automaterijal.com/404'
+      canonical: 'https://automaterijal.com/404'
     });
 
     // Po želji: JSON-LD za 404 (nije obavezno)
@@ -45,7 +45,7 @@ export class PageNotFoundComponent implements OnInit, OnDestroy {
       '@context': 'https://schema.org',
       '@type': 'WebPage',
       name: '404 – Stranica nije pronađena',
-      url: 'https://www.automaterijal.com/404',
+      url: 'https://automaterijal.com/404',
       isPartOf: { '@type': 'WebSite', name: 'Automaterijal' }
     });
   }

@@ -380,7 +380,7 @@ export class CartComponent implements OnInit, OnDestroy {
   /** Start of: seo */
 
   private setUpdateSeoTags(): void {
-    const url = 'https://www.automaterijal.com/webshop/cart';
+    const url = 'https://automaterijal.com/webshop/cart';
 
     this.seo.updateSeoTags({
       title: 'Korpa | Automaterijal',
@@ -391,7 +391,7 @@ export class CartComponent implements OnInit, OnDestroy {
       robots: 'noindex, nofollow',
       siteName: 'Automaterijal',
       locale: 'sr_RS',
-      image: 'https://www.automaterijal.com/images/logo/logo.svg',
+      image: 'https://automaterijal.com/images/logo/logo.svg',
       imageAlt: 'Automaterijal logo',
     });
 
@@ -403,13 +403,13 @@ export class CartComponent implements OnInit, OnDestroy {
           "@type": "WebPage",
           "name": "Korpa",
           "url": url,
-          "isPartOf": { "@type": "WebSite", "name": "Automaterijal", "url": "https://www.automaterijal.com/" }
+          "isPartOf": { "@type": "WebSite", "name": "Automaterijal", "url": "https://automaterijal.com/" }
         },
         {
           "@type": "BreadcrumbList",
           "itemListElement": [
-            { "@type": "ListItem", "position": 1, "name": "Početna", "item": "https://www.automaterijal.com/" },
-            { "@type": "ListItem", "position": 2, "name": "Webshop", "item": "https://www.automaterijal.com/webshop" },
+            { "@type": "ListItem", "position": 1, "name": "Početna", "item": "https://automaterijal.com/" },
+            { "@type": "ListItem", "position": 2, "name": "Webshop", "item": "https://automaterijal.com/webshop" },
             { "@type": "ListItem", "position": 3, "name": "Korpa", "item": url }
           ]
         }

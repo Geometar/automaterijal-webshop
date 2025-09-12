@@ -36,12 +36,12 @@ export class ONamaComponent implements OnInit {
       title: 'O nama | Automaterijal – Istorija, partneri i razvoj',
       description:
         'Saznajte više o kompaniji Automaterijal. Naša istorija, partneri i razvojni put od 1990. do danas.',
-      url: 'https://www.automaterijal.com/onama',
-      canonical: 'https://www.automaterijal.com/onama',
+      url: 'https://automaterijal.com/onama',
+      canonical: 'https://automaterijal.com/onama',
       robots: 'index, follow',
       siteName: 'Automaterijal',
       locale: 'sr_RS',
-      image: 'https://www.automaterijal.com/images/navigation/onama-hero.webp',
+      image: 'https://automaterijal.com/images/navigation/onama-hero.webp',
       imageAlt: 'Automaterijal – istorija i partneri'
     });
   }

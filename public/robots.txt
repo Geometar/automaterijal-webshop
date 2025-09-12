@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.automaterijal.com/sitemap.xml
+Sitemap: https://automaterijal.com/sitemap.xml

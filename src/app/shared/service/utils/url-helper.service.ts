@@ -187,7 +187,7 @@ export class UrlHelperService {
   clearWebshopFilters(): void {
     const currentPath = this.getCurrentPath();
 
-    if (currentPath.includes('/webshop/manufactures')) {
+    if (currentPath.includes('/webshop/manufacturers')) {
       this.navigateTo(['/webshop']);
     } else if (currentPath.includes('/webshop/category')) {
       this.navigateTo(['/webshop']);

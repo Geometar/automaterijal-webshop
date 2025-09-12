@@ -28,7 +28,7 @@ export class TecdocService {
   }
 
   public getManufactures(type: string = 'PO'): Observable<TDManufacture[]> {
-    const fullUrl = DOMAIN_URL + '/manufactures';
+    const fullUrl = DOMAIN_URL + '/manufacturers';
 
     const parameterObject = {} as any;
     parameterObject['type'] = type;
@@ -40,7 +40,7 @@ export class TecdocService {
   }
 
   public getModels(manufactureId: number, type: string = 'PO'): Observable<TDModels[]> {
-    const fullUrl = DOMAIN_URL + '/manufactures/' + manufactureId;
+    const fullUrl = DOMAIN_URL + '/manufacturers/' + manufactureId;
 
     const parameterObject = {} as any;
     parameterObject['type'] = type;
@@ -52,7 +52,7 @@ export class TecdocService {
   }
 
   public getTypeOfModel(manufactureId: number, modelId: number, type: string = 'PO'): Observable<TDVehicleDetails[]> {
-    const fullUrl = DOMAIN_URL + '/manufactures/' + manufactureId + '/' + modelId;
+    const fullUrl = DOMAIN_URL + '/manufacturers/' + manufactureId + '/' + modelId;
 
     const parameterObject = {} as any;
     parameterObject['type'] = type;

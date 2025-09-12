@@ -219,7 +219,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     this.showcaseDataCategories = [];
     this.showcaseDataManufactures = [];
 
-    const hasImage = (a: Roba) => !!(a?.slika?.slikeUrl || a?.slika?.slikeByte || a?.proizvodjacLogo);
+    const hasImage = (a: Roba) => !!(a?.slika?.slikeByte);
     const uniqById = (list: Roba[]) => {
       const seen = new Set<number>();
       return list.filter(x => {
@@ -284,7 +284,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
           picked.forEach(p => this.showcaseTakenIds.add(Number(p.robaid)));
 
           if (picked.length) {
-            const titleUrl = `/webshop/manufactures/${StringUtils.slugify(roba.proizvodjac!.naziv! ?? '')}`;
+            const titleUrl = `/webshop/manufacturers/${StringUtils.slugify(roba.proizvodjac!.naziv! ?? '')}`;
             this.showcaseDataManufactures = [{
               title: `Još od proizvođača: ${roba.proizvodjac?.naziv}`,
               titleUrl,
@@ -417,7 +417,10 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
           const m = value.docUrl.match(
             /(?:youtube(?:-nocookie)?\.com\/embed\/|youtube\.com\/watch\?v=|youtu\.be\/)([^&?]+)/
           );
-          if (m && m[1]) this.youTubeIds.push(m[1]);
+          if (m && m[1]) {
+            this.youTubeIds.push(m[1]);
+            value.saniraniUrl = m[1];
+          };
         }
         // convert JPEG bytes for inline display
         if (
@@ -523,7 +526,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     const id = roba.robaid ?? '';
     const slug = StringUtils.slugify([brand, name, sku].filter(Boolean).join(' '));
     const idParam = slug ? `${id}-${slug}` : String(id);
-    const url = `https://www.automaterijal.com/webshop/${idParam}`;
+    const url = `https://automaterijal.com/webshop/${idParam}`;
     return { idParam, url };
   }
 
@@ -536,13 +539,13 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   }
 
   private absoluteImage(candidate?: string | null): string {
-    const logoFallback = 'https://www.automaterijal.com/images/logo/logo.svg';
+    const logoFallback = 'https://automaterijal.com/images/logo/logo.svg';
     if (!candidate) return logoFallback;
     if (candidate.startsWith('http')) return candidate;
     // data:image... is allowed in <img>, ali za og:image je bolje absolutni URL;
     // ako je data URL ili relativno prazno → vrati fallback logo:
     if (candidate.startsWith('data:') || candidate === '') return logoFallback;
-    return `https://www.automaterijal.com/${candidate.replace(/^\/?/, '')}`;
+    return `https://automaterijal.com/${candidate.replace(/^\/?/, '')}`;
   }
 
   private buildAdditionalProperties(roba: Roba): any[] {
@@ -595,7 +598,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       const sku = this.normalizeWhitespace(r.katbr);
       const id = r.robaid ?? '';
       const slug = StringUtils.slugify([brand, name, sku].filter(Boolean).join(' '));
-      const url = `https://www.automaterijal.com/webshop/${id}${slug ? '-' + slug : ''}`;
+      const url = `https://automaterijal.com/webshop/${id}${slug ? '-' + slug : ''}`;
       const img = this.absoluteImage(r.slika?.slikeUrl);
       return {
         '@type': 'Product',
@@ -712,7 +715,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     this.seoService.updateJsonLd(productJsonLd, 'jsonld-product');
 
     // Build JSON-LD Breadcrumbs (Webshop → Grupa → Podgrupa → Proizvod)
-    const base = 'https://www.automaterijal.com';
+    const base = 'https://automaterijal.com';
     const items: any[] = [
       { '@type': 'ListItem', position: 1, name: 'Webshop', item: `${base}/webshop` },
     ];

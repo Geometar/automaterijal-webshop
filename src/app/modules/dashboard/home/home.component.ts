@@ -22,7 +22,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   constructor(private seo: SeoService) { }
 
   ngOnInit(): void {
-    const url = 'https://www.automaterijal.com/';
+    const url = 'https://automaterijal.com/';
     const hero = 'https://automaterijal.com/images/navigation/hero-banner.png';
 
     // Preload hero (jednom, webp)
@@ -53,7 +53,7 @@ export class HomeComponent implements OnInit, OnDestroy {
           "@type": "Organization",
           "name": "Automaterijal d.o.o.",
           "url": url,
-          "logo": "https://www.automaterijal.com/images/logo/logo.svg",
+          "logo": "https://automaterijal.com/images/logo/logo.svg",
           "sameAs": [
             "https://www.facebook.com/automaterijal",
             "https://www.instagram.com/automaterijal"
@@ -82,7 +82,7 @@ export class HomeComponent implements OnInit, OnDestroy {
           "url": url,
           "potentialAction": {
             "@type": "SearchAction",
-            "target": "https://www.automaterijal.com/webshop?searchTerm={query}",
+            "target": "https://automaterijal.com/webshop?searchTerm={query}",
             "query-input": "required name=query"
           }
         }

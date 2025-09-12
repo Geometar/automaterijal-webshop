@@ -7,7 +7,7 @@ import { Manufacture } from '../data-models/model';
 // Env
 import { environment } from '../../../environment/environment';
 
-const DOMAIN_URL = environment.apiUrl + '/api/manufactures';
+const DOMAIN_URL = environment.apiUrl + '/api/manufacturers';
 
 @Injectable({
   providedIn: 'root'

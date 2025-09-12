@@ -80,7 +80,7 @@
     <a
       *ngFor="let brand of brands"
       class="brand-card"
-      [routerLink]="['/webshop/manufactures', brand.slug]"
+      [routerLink]="['/webshop/manufacturers', brand.slug]"
       [queryParams]="{ mandatoryproid: brand.id }"
       [title]="'Proizvođač: ' + brand.label"
       [attr.aria-label]="'Proizvođač: ' + brand.label"

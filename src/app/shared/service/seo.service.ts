@@ -64,7 +64,7 @@ export class SeoService {
     title,
     description,
     url,
-    image = 'https://www.automaterijal.com/images/logo/logo.svg',
+    image = 'https://automaterijal.com/images/logo/logo.svg',
     type = 'website',
     keywords,
     robots,

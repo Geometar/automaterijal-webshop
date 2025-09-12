@@ -124,7 +124,7 @@ export class KontaktComponent implements OnDestroy, OnInit {
   }
 
   private updateSeoTags(): void {
-    const url = 'https://www.automaterijal.com/kontakt';
+    const url = 'https://automaterijal.com/kontakt';
 
     this.seoService.updateSeoTags({
       title: 'Kontakt | Automaterijal – Auto delovi Šabac',
@@ -134,7 +134,7 @@ export class KontaktComponent implements OnDestroy, OnInit {
       robots: 'index, follow',
       siteName: 'Automaterijal',
       locale: 'sr_RS',
-      image: 'https://www.automaterijal.com/images/logo/logo.svg',
+      image: 'https://automaterijal.com/images/logo/logo.svg',
       imageAlt: 'Automaterijal logo',
       type: 'website'
     });
@@ -151,8 +151,8 @@ export class KontaktComponent implements OnDestroy, OnInit {
         {
           "@type": "LocalBusiness",
           "name": "Automaterijal d.o.o.",
-          "url": "https://www.automaterijal.com/",
-          "logo": "https://www.automaterijal.com/images/logo/logo.svg",
+          "url": "https://automaterijal.com/",
+          "logo": "https://automaterijal.com/images/logo/logo.svg",
           "email": "office@automaterijal.com",
           "telephone": "+38115319000",
           "address": {
@@ -179,7 +179,7 @@ export class KontaktComponent implements OnDestroy, OnInit {
         {
           "@type": "BreadcrumbList",
           "itemListElement": [
-            { "@type": "ListItem", "position": 1, "name": "Početna", "item": "https://www.automaterijal.com/" },
+            { "@type": "ListItem", "position": 1, "name": "Početna", "item": "https://automaterijal.com/" },
             { "@type": "ListItem", "position": 2, "name": "Kontakt", "item": url }
           ]
         }

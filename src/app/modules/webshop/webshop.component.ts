@@ -133,7 +133,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
         const currentPath = this.activatedRoute.routeConfig?.path;
         const slug = paramMap.get('name');
 
-        if (currentPath === 'webshop/manufactures/:name' && slug) {
+        if (currentPath === 'webshop/manufacturers/:name' && slug) {
           this.handleManufactureSlug(slug, p);
         } else if (currentPath === 'webshop/category/:name' && slug) {
           this.handleCategorySlug(slug, null, p);
@@ -515,7 +515,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
       siteName: 'Automaterijal',
       locale: 'sr_RS',
       robots: context.robots,
-      image: 'https://www.automaterijal.com/images/logo/logo.svg',
+      image: 'https://automaterijal.com/images/logo/logo.svg',
       imageAlt: 'Automaterijal',
     });
 
@@ -556,7 +556,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
       : null;
     const isManufacturePage = this.urlHelperService
       .getCurrentPath()
-      .startsWith('/webshop/manufactures');
+      .startsWith('/webshop/manufacturers');
     const currentManufactureSlug = isManufacturePage
       ? this.urlHelperService.getCurrentPath()
       : null;
@@ -650,16 +650,16 @@ export class WebshopComponent implements OnDestroy, OnInit {
   private buildCanonicalUrlForContext(ctx: any): string {
     // 1) Brand page
     if (ctx.isManufacturePage) {
-      return `https://www.automaterijal.com${ctx.currentManufactureSlug}`;
+      return `https://automaterijal.com${ctx.currentManufactureSlug}`;
     }
 
     // 2) Category page
     if (ctx.isCategoryPage) {
-      return `https://www.automaterijal.com${ctx.currentCategorySlug}`;
+      return `https://automaterijal.com${ctx.currentCategorySlug}`;
     }
 
     // 3) Generic search/filter webshop
-    const baseUrl = 'https://www.automaterijal.com/webshop';
+    const baseUrl = 'https://automaterijal.com/webshop';
     return this.buildCanonicalUrl(baseUrl, {
       search: ctx.searchTerm,
       grupe: this.filter.grupe?.join(',') || '',
@@ -691,7 +691,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
         '@context': 'https://schema.org',
         '@type': 'CollectionPage',
         name: ctx.title.replace(' - Automaterijal', ''),
-        isPartOf: { '@type': 'WebSite', name: 'Automaterijal', url: 'https://www.automaterijal.com/' },
+        isPartOf: { '@type': 'WebSite', name: 'Automaterijal', url: 'https://automaterijal.com/' },
         about: label,
         url: canonical,
         numberOfItems: ctx.resultCount,
@@ -705,7 +705,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
       isPartOf: {
         '@type': 'WebSite',
         name: 'Automaterijal',
-        url: 'https://www.automaterijal.com/',
+        url: 'https://automaterijal.com/',
       },
       about: ctx.searchTerm
         ? `Rezultati pretrage za: ${ctx.searchTerm}`

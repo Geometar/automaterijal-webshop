@@ -184,10 +184,10 @@ export class TableComponent implements OnChanges {
       return;
     }
 
-    // Ako se uklanja proizvođač i trenutno smo na /webshop/manufactures
+    // Ako se uklanja proizvođač i trenutno smo na /webshop/manufacturers
     if (
       chip.label === 'Proizvodjaci' &&
-      currentPath.includes('/webshop/manufactures')
+      currentPath.includes('/webshop/manufacturers')
     ) {
       this.urlHelperService.navigateTo(['/webshop']);
       return;
