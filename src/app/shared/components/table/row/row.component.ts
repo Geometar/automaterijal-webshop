@@ -28,6 +28,7 @@ import { RsdCurrencyPipe } from '../../../pipe/rsd-currency.pipe';
 import { AccountStateService } from '../../../service/state/account-state.service';
 import { CartStateService } from '../../../service/state/cart-state.service';
 import { SnackbarService } from '../../../service/utils/snackbar.service';
+import { StringUtils } from '../../../utils/string-utils';
 
 @Component({
   selector: 'row',
@@ -73,6 +74,8 @@ export class RowComponent implements OnInit {
   hasMoreThanFiveSpecs = false;
   isEmployee = false;
   showAllSpecs = false;
+
+  stringUtils = StringUtils;
 
   get specTableId(): string {
     return `spec-${this.data?.robaid ?? 'row'}`;
@@ -160,5 +163,10 @@ export class RowComponent implements OnInit {
 
   openImageZoom(url: string) {
     this.zoomedImageUrl = url;
+  }
+
+  getProductSlug(data: any): string {
+    const parts = [data.proizvodjac?.naziv, data.naziv, data.katbr].filter((x) => !!x);
+    return StringUtils.slugify(parts.join(' '));
   }
 }

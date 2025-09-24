@@ -22,7 +22,10 @@
   <!-- Details Section -->
   <div class="details-container">
     <h3 [class.disabled]="data.podGrupa === 1000000">
-      <a [routerLink]="['/webshop', data.robaid]" itemprop="name url">
+      <a
+        [routerLink]="['/webshop', data.robaid + '-' + getProductSlug(data)]"
+        itemprop="name url"
+      >
         <span
           class="color--figma-primary-800"
           itemprop="brand"
@@ -92,7 +95,10 @@
 
       <ng-template #noSpecsTemplate>
         <p class="no-specs" aria-label="Specifikacije nisu dostupne">
-          <autom-icon [source]="iconEnum.INFO" class="specs-info-icon"></autom-icon>
+          <autom-icon
+            [source]="iconEnum.INFO"
+            class="specs-info-icon"
+          ></autom-icon>
           <span>Specifikacije nisu dostupne za ovaj artikal.</span>
         </p>
       </ng-template>

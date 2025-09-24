@@ -39,7 +39,7 @@
   <!-- Detalji -->
   <div class="product-details">
     <h3 class="product-title" (click)="handleClick()">
-      <a [routerLink]="['/webshop', roba.robaid]">
+      <a [routerLink]="['/webshop', roba.robaid + '-' + getProductSlug(roba)]">
         {{ roba.proizvodjac?.naziv }} {{ roba.naziv }}
       </a>
     </h3>

@@ -20,6 +20,7 @@ import { RsdCurrencyPipe } from '../../pipe/rsd-currency.pipe';
 // Services
 import { CartStateService } from '../../service/state/cart-state.service';
 import { SnackbarService } from '../../service/utils/snackbar.service';
+import { StringUtils } from '../../utils/string-utils';
 
 @Component({
   selector: 'autom-product-card',
@@ -69,7 +70,7 @@ export class AutomProductCardComponent implements OnInit {
 
   handleClick(event?: MouseEvent): void {
     if (this.roba?.robaid != null) {
-      this.router.navigate(['/webshop', this.roba.robaid]);
+      this.router.navigate(['/webshop', this.roba.robaid + '-' + this.getProductSlug(this.roba)]);
     }
   }
 
@@ -183,5 +184,11 @@ export class AutomProductCardComponent implements OnInit {
     }
 
     return total > 0 ? total : null;
+  }
+
+  getProductSlug(data: any): string {
+    const parts = [data.proizvodjac?.naziv, data.naziv, data.katbr].filter((x) => !!x);
+    console.log(StringUtils.slugify(parts.join(' ')))
+    return StringUtils.slugify(parts.join(' '));
   }
 }
