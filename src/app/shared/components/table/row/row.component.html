@@ -1,4 +1,4 @@
-<article class="row-container">
+<article class="row-container" itemscope itemtype="https://schema.org/Product">
   <!-- Image Section -->
   <div class="image-container" [class.image-smaller]="showPriceOnly">
     <!-- Popust badge -->
@@ -10,6 +10,7 @@
       class="clickable-image"
       [alt]="(data.proizvodjac?.naziv || '') + ' ' + (data.naziv || '')"
       [src]="data!.slika!.slikeUrl"
+      itemprop="image"
       decoding="async"
       height="180"
       loading="lazy"
@@ -21,16 +22,17 @@
   <!-- Details Section -->
   <div class="details-container">
     <h3 [class.disabled]="data.podGrupa === 1000000">
-      <a [routerLink]="['/webshop', data.robaid]">
+      <a [routerLink]="['/webshop', data.robaid]" itemprop="name url">
         <span
           class="color--figma-primary-800"
+          itemprop="brand"
           itemscope
           itemtype="https://schema.org/Brand"
         >
           <meta itemprop="name" [content]="data.proizvodjac?.naziv || ''" />
           {{ data.proizvodjac?.naziv }}</span
         >
-        {{ nameWithoutManufacturer }}
+        <span class="product-name-fragment">{{ nameWithoutManufacturer }}</span>
       </a>
     </h3>
 
@@ -47,7 +49,10 @@
 
     <p class="autom-margin__none">
       Kategorija:
-      <span class="color--figma-primary-800 display--inline font-medium">
+      <span
+        class="color--figma-primary-800 display--inline font-medium"
+        itemprop="category"
+      >
         {{ data!.podGrupaNaziv }}
       </span>
     </p>
@@ -60,53 +65,38 @@
     </p>
 
     <!-- Specifikacije -->
-    <table
-      *ngIf="!showPriceOnly"
-      class="specifications"
-      id="specTable"
-      aria-label="Specifikacije artikla"
-    >
-      <tbody>
-        <!-- tdLinkageCriteria -->
-        <tr *ngFor="let spec of displayedLinkageCriteria">
-          <td [class.color--figma-highlight-orange]="spec.type === 'A'">
-            {{ spec.oznaka }}
-            <span *ngIf="spec.jedinica" class="display--inline">[</span>
-            {{ spec.jedinica }}
-            <span *ngIf="spec.jedinica" class="display--inline">]</span>
-          </td>
-          <td
-            class="autom-align__right"
-            [class.color--figma-highlight-orange]="spec.type === 'A'"
-          >
-            {{ spec.vrednost }}
-          </td>
-        </tr>
+    <section *ngIf="!showPriceOnly" class="specifications-wrapper">
+      <table
+        *ngIf="displayedSpecs.length; else noSpecsTemplate"
+        class="specifications"
+        [attr.id]="specTableId"
+        aria-label="Specifikacije artikla"
+      >
+        <tbody>
+          <tr *ngFor="let spec of displayedSpecs">
+            <td [class.color--figma-highlight-orange]="spec.type === 'A'">
+              {{ spec.oznaka }}
+              <span *ngIf="spec.jedinica" class="display--inline">[</span>
+              {{ spec.jedinica }}
+              <span *ngIf="spec.jedinica" class="display--inline">]</span>
+            </td>
+            <td
+              class="autom-align__right"
+              [class.color--figma-highlight-orange]="spec.type === 'A'"
+            >
+              {{ spec.vrednost }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-        <!-- Tehnički opis -->
-        <tr *ngFor="let spec of displayedTehnickiOpis">
-          <td [class.color--figma-highlight-orange]="spec.type === 'A'">
-            {{ spec.oznaka }}
-            <span *ngIf="spec.jedinica" class="display--inline">[</span>
-            {{ spec.jedinica }}
-            <span *ngIf="spec.jedinica" class="display--inline">]</span>
-          </td>
-          <td
-            class="autom-align__right"
-            [class.color--figma-highlight-orange]="spec.type === 'A'"
-          >
-            {{ spec.vrednost }}
-          </td>
-        </tr>
-
-        <!-- No specifications -->
-        <tr
-          *ngIf="!data.tehnickiOpis?.length && !data.tdLinkageCriteria?.length"
-        >
-          <td colspan="2">No specifications available</td>
-        </tr>
-      </tbody>
-    </table>
+      <ng-template #noSpecsTemplate>
+        <p class="no-specs" aria-label="Specifikacije nisu dostupne">
+          <autom-icon [source]="iconEnum.INFO" class="specs-info-icon"></autom-icon>
+          <span>Specifikacije nisu dostupne za ovaj artikal.</span>
+        </p>
+      </ng-template>
+    </section>
 
     <!-- Expand/Collapse Button -->
     <div class="spec-toggle-btn" *ngIf="hasMoreThanFiveSpecs">
@@ -114,7 +104,7 @@
         [type]="buttonType.TERNARY"
         [label]="showAllSpecs ? 'Prikaži manje' : 'Prikaži više'"
         [attr.aria-expanded]="showAllSpecs"
-        [attr.aria-controls]="'specTable'"
+        [attr.aria-controls]="specTableId"
         (click)="toggleSpecifications()"
       >
       </autom-button>
@@ -122,7 +112,13 @@
   </div>
 
   <!-- Add to basket Section -->
-  <div class="pricing-container" *ngIf="showAddToBasket">
+  <div
+    class="pricing-container"
+    *ngIf="showAddToBasket"
+    itemprop="offers"
+    itemscope
+    itemtype="https://schema.org/Offer"
+  >
     <!-- Status -->
     <div
       [ngClass]="{
@@ -151,6 +147,7 @@
 
     <!-- Currency -->
     <meta itemprop="priceCurrency" content="RSD" />
+    <meta itemprop="price" [attr.content]="data.cena || 0" />
 
     <!-- Stara cena -->
     <p
@@ -196,7 +193,7 @@
           { name: 'min', value: 1 }
         ]"
         [step]="1"
-        [value]="1"
+        [value]="quantity"
         (emitSelected)="modifyQuantity($event)"
         ngDefaultControl
       ></autom-input-fields>
@@ -232,7 +229,25 @@
   </div>
 
   <!-- Pricing-only Section -->
-  <div class="pricing-container" *ngIf="showPriceOnly">
+  <div
+    class="pricing-container"
+    *ngIf="showPriceOnly"
+    itemprop="offers"
+    itemscope
+    itemtype="https://schema.org/Offer"
+  >
+    <meta itemprop="priceCurrency" content="RSD" />
+    <meta itemprop="price" [attr.content]="data.cena || 0" />
+    <meta
+      itemprop="availability"
+      [attr.content]="
+        data.podGrupa !== 1000000 && (data.stanje || 0) > 0
+          ? 'https://schema.org/InStock'
+          : 'https://schema.org/OutOfStock'
+      "
+    />
+    <meta itemprop="seller" content="Automaterijal" />
+
     <p *ngIf="data.rabat" class="sub-price old-price">
       {{ data.cena! / (1 - data.rabat / 100) | rsdCurrency }}
     </p>

@@ -66,12 +66,17 @@ export class RowComponent implements OnInit {
   // Data
   displayedLinkageCriteria: any[] = [];
   displayedTehnickiOpis: any[] = [];
+  displayedSpecs: any[] = [];
   zoomedImageUrl: string | null = null;
 
   // Misc
   hasMoreThanFiveSpecs = false;
   isEmployee = false;
   showAllSpecs = false;
+
+  get specTableId(): string {
+    return `spec-${this.data?.robaid ?? 'row'}`;
+  }
 
   get nameWithoutManufacturer(): string {
     const manufacturer = this.data.proizvodjac?.naziv?.trim();
@@ -96,39 +101,36 @@ export class RowComponent implements OnInit {
 
   ngOnInit() {
     this.isEmployee = this.accountStateService.isEmployee();
+    this.quantity = this.data.kolicina ?? this.quantity;
     this.updateDisplayedSpecs();
   }
 
   updateDisplayedSpecs() {
-    this.displayedLinkageCriteria = this.data.tdLinkageCriteria || [];
+    const linkage = this.data.tdLinkageCriteria ?? [];
+    const tehnickiOpis = this.data.tehnickiOpis ?? [];
 
-    const totalDisplayedCount = this.displayedLinkageCriteria.length;
+    this.displayedLinkageCriteria = linkage;
 
-    // Only trim tehnickiOpis if total items exceed 5
-    if (totalDisplayedCount >= 5) {
-      this.displayedTehnickiOpis = []; // No space for tehnickiOpis
-    } else {
-      const remainingSlots = 5 - totalDisplayedCount;
-      this.displayedTehnickiOpis = this.data.tehnickiOpis
-        ? this.data.tehnickiOpis.slice(0, remainingSlots)
-        : [];
+    const totalSpecs = linkage.length + tehnickiOpis.length;
+    this.hasMoreThanFiveSpecs = totalSpecs > 5;
+
+    if (!this.hasMoreThanFiveSpecs) {
+      this.showAllSpecs = false;
     }
 
-    // Check if there are more than 5 rows in total
-    this.hasMoreThanFiveSpecs =
-      this.displayedLinkageCriteria.length +
-      (this.data.tehnickiOpis?.length || 0) >
-      5;
+    if (this.showAllSpecs || !this.hasMoreThanFiveSpecs) {
+      this.displayedTehnickiOpis = tehnickiOpis;
+    } else {
+      const remainingSlots = Math.max(0, 5 - linkage.length);
+      this.displayedTehnickiOpis = tehnickiOpis.slice(0, remainingSlots);
+    }
+
+    this.displayedSpecs = [...this.displayedLinkageCriteria, ...this.displayedTehnickiOpis];
   }
 
   toggleSpecifications() {
     this.showAllSpecs = !this.showAllSpecs;
-    this.displayedTehnickiOpis = this.showAllSpecs
-      ? this.data.tehnickiOpis ?? []
-      : this.data.tehnickiOpis!.slice(
-        0,
-        Math.max(0, 5 - this.displayedLinkageCriteria.length)
-      );
+    this.updateDisplayedSpecs();
   }
 
   modifyQuantity(quantity: number): void {

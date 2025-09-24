@@ -1,3 +1,17 @@
+/* ---------- No specifications row ---------- */
+.no-specs {
+  align-items: center;
+  color: var(--figma-grey-500);
+  display: inline-flex;
+  font-style: italic;
+  gap: 6px;
+  justify-content: center;
+  text-align: center;
+  padding: 12px 0;
+  .specs-info-icon {
+    vertical-align: middle;
+  }
+}
 /* ---------- Helper (TecDoc info box) ---------- */
 .helper-article {
   background-color: var(--figma-neutral-25);
@@ -101,6 +115,10 @@
       margin: 0 0 8px;
       color: var(--figma-grey-800);
       transition: color 0.15s ease, text-decoration-color 0.15s ease;
+
+      .product-name-fragment {
+        margin-left: 4px;
+      }
     }
     @media (hover: hover) and (pointer: fine) {
       h3:hover {
@@ -129,6 +147,15 @@
       td:first-child {
         font-weight: 600;
         color: var(--figma-grey-700);
+      }
+    }
+    .specifications-wrapper {
+      margin-top: 15px;
+      display: inline-block;
+      width: 100%;
+
+      .no-specs {
+        width: 100%;
       }
     }
   }
@@ -279,6 +306,9 @@
       td:last-child {
         text-align: right;
       }
+    }
+    .specifications-wrapper {
+      margin-top: 12px;
     }
   }
 
