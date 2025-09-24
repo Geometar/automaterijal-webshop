@@ -9,6 +9,8 @@
       [content]="(data.proizvodjac?.naziv || '') + ' ' + (data.naziv || '')"
     />
     <meta itemprop="sku" [content]="data.katbr || data.robaid + ''" />
+    <meta *ngIf="data.katbr" itemprop="mpn" [content]="data.katbr" />
+    <meta *ngIf="categoryLabel" itemprop="category" [content]="categoryLabel" />
     <span itemprop="brand" itemscope itemtype="https://schema.org/Brand">
       <meta itemprop="name" [content]="data.proizvodjac?.naziv || 'Brand'" />
     </span>
@@ -39,6 +41,7 @@
             [alt]="
               (data.proizvodjac?.naziv || '') + ' ' + (data.naziv || 'Artikal')
             "
+            itemprop="image"
             loading="lazy"
             decoding="async"
           />
@@ -53,42 +56,73 @@
           </figcaption>
         </figure>
 
-        <!-- Highlights -->
-        <aside *ngIf="data.tehnickiOpis?.length" class="product-description">
-          <h3>Description</h3>
-          <ul class="description-list" aria-label="Tehnički opis proizvoda">
-            <li *ngFor="let data of data.tehnickiOpis">
-              <span class="label"
-                >{{ data.oznaka
-                }}<span *ngIf="data.jedinica" class="label display--inline"
-                  >[{{ data.jedinica }}]:</span
-                ></span
-              >
-              <span class="value">{{ data.vrednost }}</span>
-            </li>
-          </ul>
-        </aside>
+        <!-- Specifikacije -->
         <aside
-          *ngIf="!data.tehnickiOpis?.length"
-          class="product-highlights card"
+          *ngIf="hasSpecs; else fallbackHighlights"
+          class="product-specs card"
+          [attr.aria-labelledby]="specTitleId"
         >
-          <ul class="bullets">
-            <li *ngIf="data.proizvodjac?.naziv">
-              <i class="dot"></i
-              ><strong>{{ data.proizvodjac?.naziv }}</strong> — pouzdan brend
-            </li>
-            <li *ngIf="data.grupaNaziv">
-              <i class="dot"></i>{{ data.grupaNaziv }}
-              <span *ngIf="data.podGrupaNaziv">› {{ data.podGrupaNaziv }}</span>
-            </li>
-            <li *ngIf="data.stanje > 0">
-              <i class="dot"></i>Na stanju — spremno za brzu isporuku
-            </li>
-            <li *ngIf="data.katbr">
-              <i class="dot"></i>Kat. broj: {{ data.katbr }}
-            </li>
-          </ul>
+          <header class="specs-header">
+            <h2 class="specs-title" [id]="specTitleId">Specifikacije</h2>
+            <span *ngIf="specOverflow && !showAllSpecs" class="specs-count"
+              >+{{ specOverflow }} dodatnih stavki</span
+            >
+          </header>
+
+          <table class="specs-table">
+            <caption class="sr-only">Specifikacije proizvoda</caption>
+            <tbody>
+              <tr
+                *ngFor="let spec of displayedSpecs; trackBy: trackSpec"
+                itemprop="additionalProperty"
+                itemscope
+                itemtype="https://schema.org/PropertyValue"
+                [class.spec-highlight]="spec.highlight"
+              >
+                <th scope="row">
+                  <span itemprop="name">{{ spec.oznaka }}</span>
+                  <span *ngIf="spec.jedinica" class="spec-unit">[{{ spec.jedinica }}]</span>
+                </th>
+                <td class="spec-value">
+                  <span itemprop="value">{{ spec.vrednost }}</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="spec-toggle" *ngIf="specOverflow > 0">
+            <autom-button
+              [label]="showAllSpecs ? 'Prikaži manje' : 'Prikaži sve specifikacije'"
+              [type]="buttonType.TERNARY"
+              (clickEvent)="toggleSpecs()"
+            ></autom-button>
+          </div>
         </aside>
+
+        <ng-template #fallbackHighlights>
+          <aside class="product-highlights card" aria-label="Istaknute informacije">
+            <p class="specs-fallback">
+              <autom-icon [source]="iconEnum.INFO" class="specs-info-icon"></autom-icon>
+              Specifikacije nisu dostupne za ovaj artikal.
+            </p>
+            <ul class="bullets">
+              <li *ngIf="data.proizvodjac?.naziv">
+                <i class="dot"></i
+                ><strong>{{ data.proizvodjac?.naziv }}</strong> — pouzdan brend
+              </li>
+              <li *ngIf="data.grupaNaziv">
+                <i class="dot"></i>{{ data.grupaNaziv }}
+                <span *ngIf="data.podGrupaNaziv">› {{ data.podGrupaNaziv }}</span>
+              </li>
+              <li *ngIf="data.stanje > 0">
+                <i class="dot"></i>Na stanju — spremno za brzu isporuku
+              </li>
+              <li *ngIf="data.katbr">
+                <i class="dot"></i>Kat. broj: {{ data.katbr }}
+              </li>
+            </ul>
+          </aside>
+        </ng-template>
 
         <!-- Kupovna kartica (sticky) -->
         <aside class="buy-card card">

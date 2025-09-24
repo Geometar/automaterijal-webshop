@@ -62,6 +62,14 @@ import { UrlHelperService } from '../../../shared/service/utils/url-helper.servi
 // Utils
 import { StringUtils } from '../../../shared/utils/string-utils';
 
+interface SpecEntry {
+  id: string;
+  oznaka: string;
+  vrednost: string;
+  jedinica?: string;
+  highlight: boolean;
+}
+
 @Component({
   selector: 'app-webshop-details',
   standalone: true,
@@ -125,7 +133,27 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   youTubeIds: string[] = [];
   private showcaseTakenIds = new Set<number>();
 
+  // Specs
+  displayedSpecs: SpecEntry[] = [];
+  private allSpecs: SpecEntry[] = [];
+  hasSpecs = false;
+  showAllSpecs = false;
+  specOverflow = 0;
+  private readonly specDisplayLimit = 10;
+
   private destroy$ = new Subject<void>();
+
+  get specTitleId(): string {
+    return `specs-${this.data?.robaid ?? 'product'}`;
+  }
+
+  get categoryLabel(): string {
+    const parts = [
+      this.normalizeWhitespace(this.data?.grupaNaziv),
+      this.normalizeWhitespace(this.data?.podGrupaNaziv),
+    ].filter(Boolean);
+    return parts.join(' › ');
+  }
 
   @HostListener('document:keydown.escape')
   onEscape() {
@@ -193,6 +221,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
           this.data = response;
           this.fillDocumentation();
           this.fillOeNumbers();
+          this.prepareSpecs(this.data);
           this.setSanitizedText();
 
           // set canonical path with slug (id-brand-name-sku)
@@ -444,6 +473,17 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
+  prepareSpecs(roba: Roba): void {
+    const linkage = this.mapSpecs(roba.tdLinkageCriteria, 'linkage');
+    const tehnicki = this.mapSpecs(roba.tehnickiOpis, 'tehnicki');
+
+    this.allSpecs = [...linkage, ...tehnicki];
+    this.hasSpecs = this.allSpecs.length > 0;
+    this.specOverflow = Math.max(this.allSpecs.length - this.specDisplayLimit, 0);
+    this.showAllSpecs = this.specOverflow === 0;
+    this.syncDisplayedSpecs();
+  }
+
   setSanitizedText(): void {
     if (this.data?.tekst) {
       const textWithBreaks = this.data.tekst.replace(/\n/g, '<br>');
@@ -463,6 +503,15 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       if (k === key) return list as TecDocDokumentacija[];
     }
     return [];
+  }
+
+  toggleSpecs(): void {
+    this.showAllSpecs = !this.showAllSpecs;
+    this.syncDisplayedSpecs();
+  }
+
+  trackSpec(_: number, spec: SpecEntry): string {
+    return spec.id;
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -517,6 +566,58 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
 
   private normalizeWhitespace(v: string | undefined | null): string {
     return (v ?? '').replace(/\s+/g, ' ').trim();
+  }
+
+  private syncDisplayedSpecs(): void {
+    this.displayedSpecs = this.showAllSpecs
+      ? this.allSpecs
+      : this.allSpecs.slice(0, this.specDisplayLimit);
+  }
+
+  private mapSpecs(list: unknown, source: string): SpecEntry[] {
+    if (!Array.isArray(list)) {
+      return [];
+    }
+
+    const seen = new Set<string>();
+    const specs: SpecEntry[] = [];
+
+    list.forEach((item: any, index: number) => {
+      const rawName = item?.oznaka ?? item?.naziv ?? item?.label;
+      const rawValue = item?.vrednost ?? item?.value ?? item?.opis ?? item?.text;
+      const rawUnit = item?.jedinica ?? item?.unit;
+      const type = String(item?.type ?? item?.oznakaTip ?? '').toUpperCase();
+
+      const name = this.normalizeWhitespace(
+        typeof rawName === 'number' ? String(rawName) : rawName
+      );
+      const value = this.normalizeWhitespace(
+        typeof rawValue === 'number' ? String(rawValue) : rawValue
+      );
+      const unit = this.normalizeWhitespace(
+        typeof rawUnit === 'number' ? String(rawUnit) : rawUnit
+      );
+
+      if (!name && !value) {
+        return;
+      }
+
+      const key = `${name}|${value}|${unit}`.toLowerCase();
+      if (seen.has(key)) {
+        return;
+      }
+      seen.add(key);
+
+      specs.push({
+        id: `${source}-${index}-${key || 'spec'}`,
+        oznaka: name || 'Specifikacija',
+        vrednost: value || (unit ? unit : '—'),
+        ...(unit ? { jedinica: unit } : {}),
+        highlight: type === 'A',
+      });
+    });
+
+    return specs;
   }
 
   private buildCanonical(roba: Roba): { idParam: string; url: string } {

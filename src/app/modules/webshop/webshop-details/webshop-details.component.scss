@@ -32,6 +32,18 @@
 *::before,
 *::after { box-sizing: border-box; }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .spinner {
   display: flex; align-items: center; justify-content: center;
   width: 100%; height: calc(100vh - 220px);
@@ -137,34 +149,87 @@
   }
 }
 
-/* Tehnički opis (kada postoji) */
-.product-description {
-  padding: 15px; color: var(--text-700);
+/* Specifikacije (primarni prikaz) */
+.product-specs {
+  padding: 18px;
+  background: var(--surface);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-md);
+  color: var(--text-700);
 
-  h3 {
-    color: var(--text-900);
-    font-size: 18px; margin: 0 0 15px 0;
-    border-bottom: 1px solid var(--stroke);
-    padding-bottom: 6px;
+  .specs-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+
+    .specs-title {
+      margin: 0;
+      font-size: 18px;
+      color: var(--text-900);
+    }
+
+    .specs-count {
+      font-size: 12px;
+      color: var(--text-500);
+      background: var(--bg-soft);
+      border-radius: 999px;
+      padding: 4px 10px;
+    }
   }
 
-  .description-list {
-    list-style: none; padding: 0; margin: 0;
+  .specs-table {
+    width: 100%;
+    border-collapse: collapse;
 
-    li {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 10px; padding: 10px 0;
-      border-bottom: 1px solid #eee;
-
-      &:last-child { border-bottom: 0; }
-
-      .label, .value {
-        color: var(--text-700);
-        font-size: 13px; font-weight: 500;
-      }
-      .label { text-align: left; }
-      .value { text-align: right; }
+    th,
+    td {
+      padding: 10px 0;
+      font-size: 13px;
+      border-bottom: 1px solid var(--stroke);
     }
+
+    th {
+      text-align: left;
+      color: var(--text-700);
+      font-weight: 600;
+
+      .spec-unit {
+        margin-left: 4px;
+        color: var(--text-500);
+        font-weight: 500;
+      }
+    }
+
+    td {
+      text-align: right;
+      color: var(--text-900);
+      font-weight: 600;
+    }
+
+    .spec-highlight th,
+    .spec-highlight td {
+      color: var(--accent);
+    }
+  }
+
+  .spec-toggle {
+    margin-top: 14px;
+    text-align: center;
+  }
+}
+
+.specs-fallback {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-500);
+  margin-bottom: 12px;
+
+  .specs-info-icon {
+    font-size: 18px;
   }
 }
 
@@ -301,7 +366,7 @@
   border-radius: var(--radius-sm); resize: vertical;
 }
 
-.product-description.placeholder {
+.product-specs.placeholder {
   color: var(--text-500); font-style: italic;
   background-color: var(--bg-soft);
   padding: 15px; border: 1px dashed var(--accent);
@@ -320,6 +385,18 @@
   .product-header { text-align: center;
     .product-title { font-size: 18px !important; }
     .product-article { font-size: 13px; }
+  }
+
+  .product-specs {
+    padding: 16px;
+
+    .specs-table {
+      th,
+      td {
+        font-size: 12px;
+        padding: 8px 0;
+      }
+    }
   }
 
   .product-media { padding: 12px;
