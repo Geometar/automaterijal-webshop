@@ -6,10 +6,10 @@
   "parents": [
     {
       "key": "PRIORITETNE",
-      "label": "Pribor & Dodaci",
+      "label": "Alati, pribor, hemija i oprema",
       "order": 10,
       "icon": "Toolbox",
-      "include": ["ADO", "PRI", "ALATI"],
+      "include": ["ADO", "PRI", "ALATI", "MOS", "KNV", "RAG", "SIR"],
       "exclude": [],
       "show": true
     },
@@ -18,7 +18,7 @@
       "label": "Maziva & Hemija",
       "order": 20,
       "icon": "Oil",
-      "include": ["MPU", "MTR", "MIZ", "MOM", "MOS"],
+      "include": ["MPU", "MTR", "MIZ", "MOM"],
       "exclude": [],
       "show": true
     },
@@ -37,7 +37,18 @@
       "order": 40,
       "icon": "Car",
       "include": "*",
-      "exclude": ["ADO","PRI","ALATI","MPU","MTR","MIZ","MOM","MOS","FILPUT","FILTTE"],
+      "exclude": [
+        "ADO",
+        "PRI",
+        "ALATI",
+        "MPU",
+        "MTR",
+        "MIZ",
+        "MOM",
+        "MOS",
+        "FILPUT",
+        "FILTTE"
+      ],
       "show": true
     }
   ],

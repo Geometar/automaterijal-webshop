@@ -11,7 +11,7 @@ import { PopupComponent } from '../../popup/popup.component';
 import { Bucket, BucketGroup } from '../../../data-models/model';
 
 // Enums
-import { InputTypeEnum, PositionEnum, SizeEnum } from '../../../data-models/enums';
+import { IconsEnum, InputTypeEnum, PositionEnum, SizeEnum } from '../../../data-models/enums';
 
 // Services
 import { CategoriesBucketsService } from '../../../service/utils/categories-buckets.service';
@@ -32,16 +32,19 @@ import { UrlHelperService } from '../../../service/utils/url-helper.service';
 })
 export class CategoriesPopupComponent {
   @Output() close = new EventEmitter<void>();
+  @Output() requestVehicleSearch = new EventEmitter<void>();
 
   // Enums
   readonly inputTypeEnum = InputTypeEnum;
   readonly positionEnum = PositionEnum;
   readonly sizeEnum = SizeEnum;
   readonly subPosition = PositionEnum;
+  readonly iconsEnum = IconsEnum;
 
   // Observables
   readonly buckets$: Observable<Bucket[]>;
   readonly vm$: Observable<Bucket[]>;
+  readonly stats$: Observable<{ groups: number; subgroups: number }>;
 
   // Search query state
   private readonly query$ = new BehaviorSubject<string>('');
@@ -67,10 +70,8 @@ export class CategoriesPopupComponent {
   }
 
   constructor(private bucketsService: CategoriesBucketsService, private urlHelper: UrlHelperService) {
-    // Init buckets stream
     this.buckets$ = this.bucketsService.getBuckets$();
 
-    // Derive filtered buckets stream
     this.vm$ = combineLatest([this.buckets$, this.query$]).pipe(
       map(([buckets, q]) => {
         const term = q.trim().toLowerCase();
@@ -102,9 +103,28 @@ export class CategoriesPopupComponent {
         });
       })
     );
+
+    this.stats$ = this.buckets$.pipe(
+      map((buckets) => {
+        const groups = buckets.reduce((acc, bucket) => acc + (bucket.groups?.length ?? 0), 0);
+        const subgroups = buckets.reduce(
+          (acc, bucket) =>
+            acc +
+            (bucket.groups?.reduce((groupAcc, group) => groupAcc + (group.subgroups?.length ?? 0), 0) ?? 0),
+          0
+        );
+
+        return { groups, subgroups };
+      })
+    );
   }
 
   // --- Handlers -------------------------------------------------------------
+
+  openVehicleSearch(): void {
+    this.close.emit();
+    this.requestVehicleSearch.emit();
+  }
 
   onSearch(e: string | { value?: string } | null): void {
     const term = typeof e === 'string' ? e : (e?.value ?? '');
@@ -122,10 +142,12 @@ export class CategoriesPopupComponent {
 
   pickGroup(group: BucketGroup): void {
     this.urlHelper.setCategorySelection(group.name, null);
+    this.close.emit();
   }
 
   pickSubgroup(group: BucketGroup, sub: { id: number; name: string }): void {
     this.urlHelper.setCategorySelection(group.name, sub.name);
+    this.close.emit();
   }
 
   // --- Helpers -------------------------------------------------------------

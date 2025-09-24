@@ -7,9 +7,14 @@
   --cp-border: var(--figma-grey-100);
   --cp-accent: var(--figma-primary-600);
   --cp-accent-weak: var(--figma-primary-50);
-  --cp-radius: 16px;
-  --cp-gap: 12px;
-  --cp-gap-lg: 20px;
+  --cp-radius: 14px;
+  --cp-gap: 10px;
+  --cp-gap-lg: 18px;
+  --cp-hero-gradient: linear-gradient(
+    135deg,
+    var(--figma-primary-50) 0%,
+    var(--figma-base-white) 65%
+  );
 }
 
 /* ========= WRAPPER ========= */
@@ -24,90 +29,192 @@
   /* da se vidi radius (popup kao karta) */
   border: 1px solid var(--cp-border);
   border-radius: var(--cp-radius);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 32px
+    color-mix(in srgb, var(--figma-grey-800) 12%, transparent);
   overflow: hidden;
 }
 
 /* ========= HEADER ========= */
 .cp-header {
   border-radius: calc(var(--space-xxs) * 2.5);
-  background: var(--cp-bg);
+  background: var(--cp-hero-gradient);
   border-bottom: 1px solid var(--cp-border);
-  border-top: 5px solid var(--bittersweet);
-  padding: var(--cp-gap-lg);
+  border-top: 5px solid var(--figma-primary-500);
+  padding: clamp(16px, 2vw, 22px) var(--cp-gap-lg) var(--cp-gap-lg);
   position: sticky;
   top: 0;
   z-index: 10;
+}
 
-  &--main {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-  }
+.cp-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--cp-gap);
+}
 
-  .cp-hero {
-    display: flex;
-    flex-direction: column;
-    gap: var(--cp-gap);
+.cp-topbar__lead {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 560px;
+}
 
-    .cp-title {
-      margin: 0;
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--figma-grey-800);
-    }
+.cp-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--figma-primary-700);
+  background: color-mix(in srgb, var(--figma-primary-100) 70%, transparent);
+  border-radius: 999px;
+  width: fit-content;
+}
 
-    .cp-subtitle {
-      margin: 0;
-      font-size: 0.875rem;
-      color: var(--cp-muted);
-    }
+.cp-badge__icon .autom-icon {
+  font-size: 1rem;
+  color: var(--figma-primary-600);
+}
 
-    .cp-hero__actions {
-      display: flex;
-      align-items: center;
-      gap: var(--cp-gap);
+.cp-title {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--figma-grey-900);
+}
 
-      .cp-search {
-        flex: 1;
-      }
+.cp-subtitle {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--cp-muted);
+  line-height: 1.4;
+}
 
-      .btn-cta {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        padding: 6px 12px;
-        background: var(--cp-accent);
-        color: var(--figma-base-white);
-        border-radius: var(--cp-radius);
-        border: none;
-        cursor: pointer;
-        font-weight: 500;
-        transition: background 0.2s;
+.cp-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--cp-muted);
+  line-height: 1;
 
-        @media (hover: hover) and (pointer: fine) {
-          &:hover {
-            background: var(--figma-primary-700);
-          }
-        }
-      }
-    }
-  }
-
-  .cp-close {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: var(--cp-muted);
-    line-height: 1;
-
-    @media (hover: hover) and (pointer: fine) {
-      &:hover {
-        color: var(--cp-fg);
-      }
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      color: var(--cp-fg);
     }
   }
+}
+
+.cp-tools {
+  display: flex;
+  align-items: center;
+  gap: var(--cp-gap);
+  flex-wrap: wrap;
+  margin-top: clamp(10px, 1.4vw, 16px);
+  margin-bottom: var(--cp-gap);
+
+  .cp-search {
+    flex: 1 1 240px;
+    min-width: 0;
+  }
+}
+
+.cp-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--figma-primary-200);
+  background: var(--figma-primary-50);
+  color: var(--figma-primary-700);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.2s ease, background 0.2s ease;
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background: var(--figma-primary-100);
+      border-color: var(--figma-primary-300);
+      box-shadow: 0 8px 18px
+        color-mix(in srgb, var(--figma-primary-600) 22%, transparent);
+      transform: translateY(-1px);
+    }
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--figma-primary-300);
+    outline-offset: 2px;
+  }
+
+  span {
+    white-space: nowrap;
+  }
+}
+
+.cp-cta__icon .autom-icon {
+  font-size: 1.1rem;
+  color: var(--figma-primary-600);
+}
+
+.cp-hero__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+  gap: var(--cp-gap);
+  margin-top: var(--cp-gap);
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 16px;
+  background: var(--figma-base-white);
+  border-radius: calc(var(--cp-radius) - 4px);
+  border: 1px solid var(--figma-primary-50);
+  box-shadow: 0 12px 28px
+    color-mix(in srgb, var(--figma-primary-600) 17%, transparent);
+}
+
+.stat-card__value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--figma-grey-900);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stat-card__eyebrow {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--figma-primary-700);
+}
+
+.stat-card--tip {
+  border-style: dashed;
+  background: var(--figma-primary-50);
+}
+
+.stat-card__tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--cp-muted);
+}
+
+.stat-card__tip autom-icon .autom-icon {
+  font-size: 1rem;
+  color: var(--figma-primary-600);
 }
 
 /* ========= BODY LAYOUT ========= */
@@ -150,7 +257,7 @@
 
     .bucket__title {
       font-size: 0.85rem !important;
-      color: var(--figma-accent-pink-700);
+      color: var(--figma-primary-700);
       font-weight: 600 !important;
       letter-spacing: 0.5px;
       text-transform: uppercase;
@@ -252,7 +359,7 @@
       border: none;
       font-size: 1.75rem;
       cursor: pointer;
-      color: var(--bittersweet);
+      color: var(--figma-primary-500);
       margin-right: var(--cp-gap);
       line-height: 1;
     }
@@ -345,17 +452,18 @@
 @media (max-width: 991px) {
   .cp-body {
     grid-template-columns: 1fr;
+    gap: var(--cp-gap);
   }
 
   .cp-left {
     border-right: none;
     border-bottom: 1px solid var(--cp-border);
-    max-height: 60vh;
+    max-height: 55vh;
   }
 
   .cp-right {
-    max-height: 60vh;
-    min-height: 35vh;
+    max-height: 55vh;
+    min-height: 32vh;
   }
 }
 
@@ -407,7 +515,7 @@
       align-items: center;
       background: var(--cp-bg, #fff);
       border-bottom: 1px solid var(--cp-border, #eee);
-      border-top: 5px solid var(--bittersweet);
+      border-top: 5px solid var(--figma-primary-500);
       display: grid;
       gap: 8px;
       grid-template-columns: auto 1fr auto;
@@ -479,3 +587,66 @@
 }
 
 /* desktop ostaje tvoj postojeći .cp-right stil */
+
+@media (max-width: 640px) {
+  .categories-popup {
+    border-radius: 24px 24px 0 0;
+  }
+
+  .cp-header {
+    background: var(--figma-base-white);
+    border-top-color: var(--figma-primary-400);
+    padding: 18px 16px 14px;
+  }
+
+  .cp-badge,
+  .cp-subtitle,
+  .cp-hero__stats {
+    display: none;
+  }
+
+  .cp-title {
+    font-size: 1.12rem;
+  }
+
+  .cp-tools {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-top: 12px;
+    margin-bottom: 6px;
+
+    .cp-search {
+      flex: 1 1 20px;
+      min-width: 0;
+    }
+
+    .cp-cta {
+      justify-content: center;
+      width: 100%;
+    }
+  }
+
+  .cp-body {
+    display: block;
+    padding: 0 16px 18px;
+    overflow-y: auto;
+    max-height: calc(100dvh - 170px);
+    margin-top: 0;
+  }
+
+  .cp-left {
+    border-right: none;
+    padding: 8px 0 16px;
+    overflow: visible;
+  }
+
+  .cp-right {
+    display: none;
+  }
+
+  .cp-right-slide {
+    width: 100vw;
+    max-width: 420px;
+  }
+}

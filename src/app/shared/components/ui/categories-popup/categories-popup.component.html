@@ -8,39 +8,64 @@
 >
   <!-- ========== HEADER / HERO ========== -->
   <div custom-header class="cp-header">
-    <div class="cp-hero">
-      <div class="cp-hero__title cp-header--main">
-        <div>
-          <h3 class="cp-title">Kategorije</h3>
-          <p class="cp-subtitle">
-            Brzo pronađi maziva, pribor, alate ili filtere. Za autodelove
-            koristi pretragu po vozilu.
-          </p>
+    <div class="cp-topbar">
+      <div class="cp-topbar__lead">
+        <span class="cp-badge">
+          <autom-icon class="cp-badge__icon" [source]="iconsEnum.FILTER"></autom-icon>
+          Pametna kategorizacija
+        </span>
+        <h3 class="cp-title">Kategorije</h3>
+        <p class="cp-subtitle">
+          Brzo pronađi maziva, pribor, alate ili filtere. Za autodelove koristi pretragu po vozilu.
+        </p>
+      </div>
+
+      <button
+        class="cp-close"
+        type="button"
+        (click)="close.emit()"
+        aria-label="Zatvori"
+      >
+        ✕
+      </button>
+    </div>
+
+    <div class="cp-tools">
+      <autom-input-fields
+        class="cp-search"
+        [type]="inputTypeEnum.SEARCH"
+        placeholder="Pretraži grupe…"
+        (emitSelected)="onSearch($event)"
+        aria-label="Pretraga kategorija"
+      ></autom-input-fields>
+
+      <button
+        class="cp-cta"
+        type="button"
+        (click)="openVehicleSearch()"
+        aria-label="Pretraži kategorije po vozilu"
+      >
+        <autom-icon class="cp-cta__icon" [source]="iconsEnum.CAR"></autom-icon>
+        <span>Pretraži po vozilu</span>
+      </button>
+    </div>
+
+    <div class="cp-hero__stats" *ngIf="stats$ | async as stats">
+      <article class="stat-card" aria-label="Ukupan broj grupa">
+        <span class="stat-card__eyebrow">Grupe</span>
+        <strong class="stat-card__value">{{ stats.groups }}</strong>
+      </article>
+      <article class="stat-card" aria-label="Ukupan broj podgrupa">
+        <span class="stat-card__eyebrow">Podgrupe</span>
+        <strong class="stat-card__value">{{ stats.subgroups }}</strong>
+      </article>
+      <article class="stat-card stat-card--tip" aria-label="Saveti za pretragu">
+        <span class="stat-card__eyebrow">Saveti</span>
+        <div class="stat-card__tip">
+          <autom-icon [source]="iconsEnum.SEARCH"></autom-icon>
+          <span>Kombinuj pretragu i filtere za brži dolazak do artikla.</span>
         </div>
-
-        <button
-          class="cp-close"
-          type="button"
-          (click)="close.emit()"
-          aria-label="Zatvori"
-        >
-          ✕
-        </button>
-      </div>
-
-      <div class="cp-hero__actions">
-        <!-- Search -->
-        <autom-input-fields
-          class="cp-search"
-          [type]="inputTypeEnum.SEARCH"
-          placeholder="Pretraži grupe…"
-          (emitSelected)="onSearch($event)"
-          aria-label="Pretraga kategorija"
-        ></autom-input-fields>
-
-        <!-- TecDoc CTA -->
-        <button class="btn-cta" type="button">Pretraži po vozilu</button>
-      </div>
+      </article>
     </div>
   </div>
 
