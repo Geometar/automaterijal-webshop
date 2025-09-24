@@ -1,7 +1,6 @@
 <div class="mf-card">
   <div class="mf-header">
     <div class="mf-title">
-      Proizvođači
       <span class="mf-count" *ngIf="selectedCount()">{{
         selectedCount()
       }}</span>
@@ -51,9 +50,24 @@
   >
   </autom-checkbox>
 
-  <div class="mf-actions" *ngIf="!isMobile && hasMore()">
-    <button type="button" class="mf-more" (click)="showMore()">
+  <div
+    class="mf-actions"
+    *ngIf="!isMobile && (hasMore() || visibleLimit() > basePage)"
+  >
+    <button
+      type="button"
+      class="mf-more"
+      *ngIf="hasMore()"
+      (click)="showMore()"
+    >
+      <autom-icon
+        class="mf-more__icon"
+        [source]="iconsEnum.CHEVRON_DOWN"
+      ></autom-icon>
       Prikaži još
+      <span class="mf-more__count" *ngIf="remainingCount()">{{
+        remainingCount()
+      }}</span>
     </button>
     <button
       type="button"
@@ -61,7 +75,11 @@
       *ngIf="visibleLimit() > basePage"
       (click)="showLess()"
     >
-      Manje
+      <autom-icon
+        class="mf-less__icon"
+        [source]="iconsEnum.CHEVRON_UP"
+      ></autom-icon>
+      Sakrij višak
     </button>
   </div>
 </div>

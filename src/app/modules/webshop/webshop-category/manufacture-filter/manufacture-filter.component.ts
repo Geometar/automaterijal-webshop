@@ -18,17 +18,18 @@ import {
 // Automaterijal imports
 import { CheckboxComponent } from '../../../../shared/components/checkbox/checkbox.component';
 import { SelectComponent } from '../../../../shared/components/select/select.component';
+import { AutomIconComponent } from '../../../../shared/components/autom-icon/autom-icon.component';
 
 // Data models
 import { CheckboxModel, SelectModel } from '../../../../shared/data-models/interface';
 
 // Enums
-import { OrientationEnum, SizeEnum } from '../../../../shared/data-models/enums';
+import { IconsEnum, OrientationEnum, SizeEnum } from '../../../../shared/data-models/enums';
 
 @Component({
   selector: 'manufacture-filter',
   standalone: true,
-  imports: [CommonModule, CheckboxComponent, SelectComponent],
+  imports: [CommonModule, CheckboxComponent, SelectComponent, AutomIconComponent],
   templateUrl: './manufacture-filter.component.html',
   styleUrl: './manufacture-filter.component.scss'
 })
@@ -44,6 +45,7 @@ export class ManufactureFilterComponent implements OnInit, OnChanges {
   // Enums
   readonly sizeEnum = SizeEnum;
   readonly orientationEnum = OrientationEnum;
+  readonly iconsEnum = IconsEnum;
 
   // Misc
   isMobile = false;
@@ -109,6 +111,13 @@ export class ManufactureFilterComponent implements OnInit, OnChanges {
       ? this.filteredManufactures().length
       : this.state().length;
     return this._visibleLimit() < total;
+  }
+
+  remainingCount(): number {
+    const total = this._filterTerm().trim()
+      ? this.filteredManufactures().length
+      : this.state().length;
+    return Math.max(total - this._visibleLimit(), 0);
   }
 
   showMore(): void {

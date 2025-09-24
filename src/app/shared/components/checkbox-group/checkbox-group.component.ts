@@ -45,22 +45,33 @@ export interface Task {
 export class CheckboxGroupComponent {
   @Input() items: Task[] = [];
   @Input() label = '';
+  @Input() scrollThreshold = 7;
+  @Input() scrollBodyMaxHeight = 220;
+  @Input() pinActiveGroups = true;
   @Output() clickEvent = new EventEmitter<Task[]>();
 
   // Enums
   iconsEnum = IconsEnum;
 
   readonly tasks = signal<Task[]>([]); // Signal for internal task management
+  readonly maxChipDisplay = 8;
+  readonly selectedChips = computed(() => {
+    return this.collectSelectedEntries(this.tasks()).slice(0, this.maxChipDisplay);
+  });
+  readonly chipOverflow = computed(() => {
+    const count = this.collectSelectedEntries(this.tasks()).length;
+    return Math.max(count - this.maxChipDisplay, 0);
+  });
 
   ngOnChanges() {
     const currentExpandedMap = new Map(this.tasks().map((task) => [task.id, task.expanded]));
 
-    this.tasks.set(
-      this.items.map((item) => ({
-        ...item,
-        expanded: currentExpandedMap.get(item.id) ?? true, // preserve if exists
-      }))
-    );
+    const next = this.items.map((item) => ({
+      ...item,
+      expanded: currentExpandedMap.get(item.id) ?? true,
+    }));
+
+    this.tasks.set(this.sortTasks(next));
   }
 
   readonly partiallyComplete = computed(() => {
@@ -73,7 +84,8 @@ export class CheckboxGroupComponent {
 
   update(completed: boolean, taskIndex: number, subtaskIndex?: number): void {
     this.tasks.update((tasks) => {
-      const task = tasks[taskIndex];
+      const draft = [...tasks];
+      const task = draft[taskIndex];
       if (subtaskIndex === undefined) {
         task.completed = completed;
         task.subtasks?.forEach((t) => (t.completed = completed));
@@ -82,16 +94,20 @@ export class CheckboxGroupComponent {
         task.completed = task.subtasks?.every((t) => t.completed) ?? true;
       }
 
-      // Emit the updated list of subtasks
-      this.clickEvent.emit(tasks);
-      return [...tasks];
+      const sorted = this.sortTasks(draft);
+      this.clickEvent.emit(sorted);
+      return sorted;
     });
   }
 
   toggleExpand(taskIndex: number): void {
     this.tasks.update((tasks) => {
-      tasks[taskIndex].expanded = !tasks[taskIndex].expanded;
-      return [...tasks];
+      const draft = [...tasks];
+      draft[taskIndex] = {
+        ...draft[taskIndex],
+        expanded: !draft[taskIndex].expanded,
+      };
+      return draft;
     });
   }
 
@@ -103,5 +119,65 @@ export class CheckboxGroupComponent {
   // Ukupan broj podstavki u grupi
   countTotal(task: Task): number {
     return task.subtasks?.length ?? 0;
+  }
+
+  hasActiveChildren(task: Task): boolean {
+    return this.countSelected(task) > 0;
+  }
+
+  shouldScroll(task: Task): boolean {
+    return (task.subtasks?.length ?? 0) > this.scrollThreshold;
+  }
+
+  clearChip(taskId: Task['id'], subId: Task['id']): void {
+    const tasks = this.tasks();
+    const groupIndex = tasks.findIndex((t) => t.id === taskId);
+    if (groupIndex === -1) { return; }
+
+    const subIndex = tasks[groupIndex].subtasks?.findIndex((s) => s.id === subId) ?? -1;
+    if (subIndex === -1) { return; }
+
+    this.update(false, groupIndex, subIndex);
+  }
+
+  clearAll(): void {
+    const cleared = this.tasks().map((task) => ({
+      ...task,
+      completed: false,
+      subtasks: task.subtasks?.map((sub) => ({ ...sub, completed: false })),
+    }));
+
+    const sorted = this.sortTasks(cleared);
+    this.tasks.set(sorted);
+    this.clickEvent.emit(sorted);
+  }
+
+  private sortTasks(tasks: Task[]): Task[] {
+    if (!this.pinActiveGroups) {
+      return tasks;
+    }
+
+    const active: Task[] = [];
+    const inactive: Task[] = [];
+
+    tasks.forEach((task) => {
+      (task.subtasks?.some((s) => s.completed) ? active : inactive).push(task);
+    });
+
+    return [...active, ...inactive];
+  }
+
+  private collectSelectedEntries(tasks: Task[]): Array<{ taskId: Task['id']; subId: Task['id']; label: string }> {
+    const entries: Array<{ taskId: Task['id']; subId: Task['id']; label: string }> = [];
+
+    tasks.forEach((task) => {
+      task.subtasks?.forEach((sub) => {
+        if (sub.completed) {
+          entries.push({ taskId: task.id, subId: sub.id, label: sub.name });
+        }
+      });
+    });
+
+    return entries;
   }
 }

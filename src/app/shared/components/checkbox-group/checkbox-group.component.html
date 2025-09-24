@@ -1,11 +1,32 @@
 <autom-label *ngIf="label" [label]="label" class="gc-title"></autom-label>
 
+<div class="gc-summary" *ngIf="selectedChips().length">
+  <span class="gc-summary__label">Aktivni filteri</span>
+  <div class="gc-summary__chips">
+    <button
+      type="button"
+      class="gc-chip"
+      *ngFor="let chip of selectedChips()"
+      (click)="clearChip(chip.taskId, chip.subId)"
+    >
+      {{ chip.label }} <span class="gc-chip__close">×</span>
+    </button>
+    <span class="gc-chip gc-chip--overflow" *ngIf="chipOverflow() > 0">
+      +{{ chipOverflow() }}
+    </span>
+  </div>
+  <button type="button" class="gc-summary__clear" (click)="clearAll()">
+    Resetuj sve
+  </button>
+</div>
+
 <section class="gc gc--sidebar gc--dense" role="tree">
   <ng-container *ngFor="let task of tasks(); let i = index">
     <article
       class="gc-group"
       role="treeitem"
       [attr.aria-expanded]="task.expanded"
+      [class.gc-group--active]="hasActiveChildren(task)"
     >
       <!-- HEADER: group master -->
       <div class="gc-h">
@@ -44,12 +65,18 @@
       </div>
 
       <!-- BODY: children -->
-      <div class="gc-b" *ngIf="task.expanded">
+      <div
+        class="gc-b"
+        *ngIf="task.expanded"
+        [class.gc-b--scroll]="shouldScroll(task)"
+        [style.maxHeight.px]="shouldScroll(task) ? scrollBodyMaxHeight : null"
+      >
         <ul class="gc-list" role="group">
           <li
             *ngFor="let sub of task.subtasks; let j = index"
             class="gc-row"
             role="treeitem"
+            [class.is-checked]="sub.completed"
           >
             <mat-checkbox
               class="gc-row__cb"

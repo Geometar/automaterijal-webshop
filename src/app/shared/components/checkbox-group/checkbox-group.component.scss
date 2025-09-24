@@ -25,6 +25,76 @@
   color: #0f172a;
 }
 
+.gc-summary {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--figma-primary-50) 40%, #fff);
+  border: 1px solid color-mix(in srgb, var(--figma-primary-200) 50%, #fff);
+}
+
+.gc-summary__label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--figma-primary-700);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.gc-summary__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.gc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: #fff;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #0f172a;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+
+  &:hover {
+    background: color-mix(in srgb, var(--figma-primary-50) 70%, #fff);
+  }
+}
+
+.gc-chip--overflow {
+  cursor: default;
+  color: var(--figma-grey-600);
+  box-shadow: none;
+  background: color-mix(in srgb, var(--figma-primary-50) 50%, #fff);
+}
+
+.gc-chip__close {
+  font-size: 14px;
+  line-height: 1;
+  color: var(--figma-primary-600);
+}
+
+.gc-summary__clear {
+  justify-self: start;
+  border: none;
+  background: none;
+  color: var(--figma-grey-600);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--figma-primary-700);
+  }
+}
+
 /* Root container for 320px sidebar */
 .gc.gc--sidebar {
   display: grid;
@@ -37,6 +107,7 @@
 .gc-group {
   border-bottom: 1px solid var(--g-sep);
   background: #fff;
+  transition: background 0.2s ease;
 }
 
 /* Group header: label + tools (badge + chevron) */
@@ -197,6 +268,21 @@
   }
 }
 
+.gc-group--active .gc-h {
+  background: color-mix(in srgb, var(--figma-primary-50) 55%, #fff);
+}
+.gc-group--active .gc-h::before {
+  background: var(--figma-primary-600);
+}
+.gc-group--active .gc-h__label {
+  color: var(--figma-primary-700);
+}
+.gc-group--active .gc-badge {
+  color: #fff;
+  background: var(--figma-primary-600);
+  border-color: var(--figma-primary-600);
+}
+
 /* Optional fallback (if želiš 100% bez :has):
    dodaj klasu .has-selected na .gc-group iz TS-a kad countSelected(task)>0
 .gc-group.has-selected .gc-h::before { background: var(--figma-primary-600); }
@@ -205,3 +291,43 @@
 /* Smaller ripples (subtle) */
 ::ng-deep .mat-mdc-checkbox .mat-mdc-focus-indicator,
 ::ng-deep .mdc-checkbox__ripple { transform: scale(.86); }
+
+.gc-b--scroll {
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(15, 23, 42, 0.25) transparent;
+}
+
+.gc-b--scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.gc-b--scroll::-webkit-scrollbar-thumb {
+  background: rgba(15, 23, 42, 0.25);
+  border-radius: 999px;
+}
+
+.gc-row {
+  position: relative;
+}
+
+.gc-row.is-checked::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--figma-primary-400);
+}
+.gc-row.is-checked .gc-row__cb {
+  background: color-mix(in srgb, var(--figma-primary-50) 55%, #fff);
+  border-color: color-mix(in srgb, var(--figma-primary-300) 60%, transparent);
+  font-weight: 600;
+  color: #0f172a;
+}
+.gc-row.is-checked .gc-row__cb .gc-row__label {
+  color: var(--figma-primary-700);
+}
