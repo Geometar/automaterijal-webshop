@@ -42,9 +42,11 @@ interface QueryParams {
   assemblyGroupName?: string;
   grupe?: string;
   mandatoryproid?: string;
+  pageIndex?: string;
   naStanju?: string;
   podgrupe?: string;
   proizvodjaci?: string;
+  rowsPerPage?: string;
   searchTerm?: string;
   tecdocId?: string;
   tecdocType?: string;
@@ -96,6 +98,9 @@ export class WebshopComponent implements OnDestroy, OnInit {
   private config: WebshopConfig | null = null;
   private currentCategoryName: string | null = null;
   private currentSubcategoryName: string | null = null;
+  private lastRoutePageIndex = 0;
+  private lastRouteRowsPerPage = 10;
+  private hasProcessedRoute = false;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -268,15 +273,16 @@ export class WebshopComponent implements OnDestroy, OnInit {
   }
 
   setRobaPageData(tableEvent: TablePage): void {
+    const pageChanged = this.pageIndex !== tableEvent.pageIndex;
+    const sizeChanged = this.rowsPerPage !== tableEvent.pageSize;
+
+    if (!pageChanged && !sizeChanged) {
+      return;
+    }
+
     this.pageIndex = tableEvent.pageIndex;
     this.rowsPerPage = tableEvent.pageSize;
-    this.currentState === this.state.SHOW_ARTICLES_WITH_VEHICLE_DETAILS
-      ? this.getArticlesByAssembleGroup(
-        this.tecdocId!,
-        this.tecdocType!,
-        this.assembleGroupId
-      )
-      : this.getRoba();
+    this.syncPaginationQueryParams();
   }
 
   selectVehicleDetailsEventHandle(selectedVehicle: TDVehicleDetails): void {
@@ -303,6 +309,9 @@ export class WebshopComponent implements OnDestroy, OnInit {
       assemblyGroupName: (p['assemblyGroupName'] || '').toString(),
       tecdocType: (p['tecdocType'] || '').toString(),
       tecdocId: p['tecdocId'] ? String(p['tecdocId']) : '',
+      pageIndex: p['pageIndex'] !== undefined ? String(p['pageIndex']) : '',
+      rowsPerPage:
+        p['rowsPerPage'] !== undefined ? String(p['rowsPerPage']) : '',
     } as QueryParams;
 
     this.handleQueryParams(params);
@@ -388,6 +397,9 @@ export class WebshopComponent implements OnDestroy, OnInit {
     params: QueryParams,
     isInitialLoad: boolean = false
   ): void {
+    const isFirstRoutePass = !this.hasProcessedRoute;
+    this.hasProcessedRoute = true;
+
     // 1. Extract and store basic parameters into the component's state
     const searchChanged = this.searchTerm !== params.searchTerm;
     this.extractBaseParams(params);
@@ -401,14 +413,30 @@ export class WebshopComponent implements OnDestroy, OnInit {
       newFilter
     );
 
+    const shouldResetPage = (filtersChanged || searchChanged) && !isFirstRoutePass;
+    let shouldSyncPagination = false;
+
     // 4. If filters have changed, reset to the first page
-    if (filtersChanged || searchChanged) this.pageIndex = 0;
+    if (shouldResetPage) {
+      if (this.pageIndex !== 0) {
+        this.pageIndex = 0;
+        shouldSyncPagination = true;
+      }
+    }
+
+    const paginationChanged =
+      this.lastRoutePageIndex !== this.pageIndex || this.lastRouteRowsPerPage !== this.rowsPerPage;
 
     // 5. If all params are effectively empty, show the empty container
     if (this.checkEmptyState(params)) {
       this.filter = newFilter;
       this.selectedVehicleDetails = null;
       this.updateState(WebShopState.SHOW_EMPTY_CONTAINER, this.searchTerm);
+      if (shouldSyncPagination) {
+        this.syncPaginationQueryParams();
+      }
+      this.lastRoutePageIndex = this.pageIndex;
+      this.lastRouteRowsPerPage = this.rowsPerPage;
       this.updateSeoTagsForState();
       return;
     }
@@ -426,8 +454,15 @@ export class WebshopComponent implements OnDestroy, OnInit {
     // 8. Set filter with the new one
     this.filter = newFilter;
 
+    if (shouldSyncPagination) {
+      this.syncPaginationQueryParams();
+    }
+
     // 9. Fetch data depending on current state (articles, vehicle, etc.)
-    this.fetchBasedOnState(filtersChanged, isInitialLoad);
+    this.fetchBasedOnState(filtersChanged, paginationChanged, isInitialLoad);
+
+    this.lastRoutePageIndex = this.pageIndex;
+    this.lastRouteRowsPerPage = this.rowsPerPage;
   }
 
   /**
@@ -444,6 +479,12 @@ export class WebshopComponent implements OnDestroy, OnInit {
     this.tecdocId = params.tecdocId ? +params.tecdocId : null;
     this.assembleGroupId = params.assembleGroupId || '';
     this.assemblyGroupName = params.assemblyGroupName || '';
+    this.pageIndex = this.parseNumberParam(params.pageIndex, this.pageIndex, 0);
+    this.rowsPerPage = this.parseNumberParam(
+      params.rowsPerPage,
+      this.rowsPerPage,
+      1
+    );
   }
 
   private checkEmptyState(params: QueryParams): boolean {
@@ -475,9 +516,10 @@ export class WebshopComponent implements OnDestroy, OnInit {
 
   private fetchBasedOnState(
     filtersChanged: boolean,
+    paginationChanged: boolean,
     isInitialLoad: boolean
   ): void {
-    const shouldRefresh = filtersChanged || isInitialLoad;
+    const shouldRefresh = filtersChanged || paginationChanged || isInitialLoad;
 
     switch (this.currentState) {
       case WebShopState.SHOW_VEHICLE_DETAILS:
@@ -730,6 +772,41 @@ export class WebshopComponent implements OnDestroy, OnInit {
     });
     const qp = sp.toString();
     return qp ? `${base}?${qp}` : base;
+  }
+
+  private syncPaginationQueryParams(): void {
+    const currentParams = this.activatedRoute.snapshot.queryParams;
+    const nextPage = String(this.pageIndex);
+    const nextRows = String(this.rowsPerPage);
+
+    const needsPageUpdate = currentParams['pageIndex'] !== nextPage;
+    const needsRowsUpdate = currentParams['rowsPerPage'] !== nextRows;
+
+    if (!needsPageUpdate && !needsRowsUpdate) {
+      return;
+    }
+
+    this.urlHelperService.addOrUpdateQueryParams({
+      pageIndex: this.pageIndex,
+      rowsPerPage: this.rowsPerPage,
+    });
+  }
+
+  private parseNumberParam(
+    value: string | undefined,
+    fallback: number,
+    min: number
+  ): number {
+    if (value === undefined || value === null || value === '') {
+      return fallback;
+    }
+
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed) || parsed < min) {
+      return fallback;
+    }
+
+    return Math.floor(parsed);
   }
 
   /** rel=prev/next – zahteva male izmene u SeoService (već koristiš setLinkRel) */

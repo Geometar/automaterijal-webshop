@@ -10,11 +10,11 @@ export class WebshopLogicService {
 
   createFilterFromParams(params: any): Filter {
     const filter = new Filter();
-    filter.grupe = this.splitParams(params['grupe']);
-    filter.mandatoryProid = this.splitParams(params['mandatoryproid']);
+    filter.grupe = this.parseArrayParam(params['grupe']);
+    filter.mandatoryProid = this.parseArrayParam(params['mandatoryproid']);
     filter.naStanju = params['naStanju'] === 'true';
-    filter.podgrupe = this.splitParams(params['podgrupe']);
-    filter.proizvodjaci = this.splitParams(params['proizvodjaci']);
+    filter.podgrupe = this.parseArrayParam(params['podgrupe']);
+    filter.proizvodjaci = this.parseArrayParam(params['proizvodjaci']);
     return filter;
   }
 
@@ -47,10 +47,24 @@ export class WebshopLogicService {
     return true;
   }
 
-  private splitParams(param: string): string[] {
+  private splitParams(param?: string): string[] {
     if (!param) {
       return [];
     }
     return param.includes(',') ? param.split(',') : [param];
+  }
+
+  private parseArrayParam(value: string | string[] | undefined): string[] | undefined {
+    if (Array.isArray(value)) {
+      const flattened = value
+        .map((v) => (v ?? '').trim())
+        .filter((v) => v.length > 0);
+      return flattened.length ? flattened : undefined;
+    }
+
+    const parts = this.splitParams(value as string)
+      .map((v) => v.trim())
+      .filter((v) => v.length > 0);
+    return parts.length ? parts : undefined;
   }
 }
