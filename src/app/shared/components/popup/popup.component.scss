@@ -14,8 +14,8 @@
   backdrop-filter: blur(var(--space-xs));
   position: fixed;
   inset: 0;
-  width: 100vw;
-  height: 100dvh; /* fix za mobilne address barove */
+  width: var(--autom-popup-vw, 100vw);
+  height: var(--autom-popup-vh, 100dvh); /* fix za mobilne address barove */
   z-index: 100;   /* overlay ispod prozora */
 }
 
@@ -25,7 +25,7 @@
   isolation: isolate;
   position: fixed;
   inset: auto;
-  max-width: 100vw;
+  max-width: var(--autom-popup-vw, 100vw);
   width: auto;
   padding: 0;
 
@@ -44,8 +44,8 @@
   &.popup-container__height--small  { height: var(--size-small); }
   &.popup-container__height--extra-small { height: var(--size-extra-small); }
   &.popup-container__height--extra-large { height: 85dvh; } /* ranije 85vh */
-  &.popup-container__height--full   { height: 100dvh; }     /* ranije 100% */
-  &.popup-container__height--full-vh{ height: 100dvh; }     /* ranije 100vh */
+  &.popup-container__height--full   { height: var(--autom-popup-vh, 100dvh); }     /* ranije 100% */
+  &.popup-container__height--full-vh{ height: var(--autom-popup-vh, 100dvh); }     /* ranije 100vh */
 
   /* širinski preset-i */
   &.popup-container__width--auto        { width: auto; }
@@ -55,7 +55,7 @@
   &.popup-container__width--large       { width: var(--size-large); }
   &.popup-container__width--extra-large { width: var(--size-extra-large); }
   &.popup-container__width--full        { width: 100%; }
-  &.popup-container__width--full-vw     { width: 100vw; }
+  &.popup-container__width--full-vw     { width: var(--autom-popup-vw, 100vw); }
 
   /* pozicije */
   &.popup-container__bottom--center {

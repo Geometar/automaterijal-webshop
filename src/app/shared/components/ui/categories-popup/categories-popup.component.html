@@ -4,10 +4,15 @@
   [position]="positionEnum.LEFT"
   [rounded]="true"
   [width]="sizeEnum.LARGE"
+  [preserveConfigOnMobile]="true"
   (close)="close.emit()"
 >
   <!-- ========== HEADER / HERO ========== -->
-  <div custom-header class="cp-header">
+  <div
+    custom-header
+    class="cp-header"
+    [class.mobile-hidden]="!!activeGroup"
+  >
     <div class="cp-topbar">
       <div class="cp-topbar__lead">
         <span class="cp-badge">
@@ -70,7 +75,12 @@
   </div>
 
   <!-- ========== BODY ========== -->
-  <div custom-body class="cp-body">
+  <div
+    custom-body
+    class="cp-body"
+    [class.mobile-no-header]="!!activeGroup"
+    [class.mobile-hide-left]="!!activeGroup"
+  >
     <!-- LEFT: Buckets & Groups -->
     <aside class="cp-left">
       <ng-container *ngIf="vm$ | async as buckets">

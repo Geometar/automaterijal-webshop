@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 
 import { DragDropModule } from '@angular/cdk/drag-drop';
 
@@ -46,7 +46,7 @@ import { PositionEnum, SizeEnum } from '../../data-models/enums';
   ],
   encapsulation: ViewEncapsulation.None
 })
-export class PopupComponent implements OnInit {
+export class PopupComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() allowDrag = false;
   @Input() customLeft = 0;
   @Input() customPosition = false;
@@ -61,6 +61,7 @@ export class PopupComponent implements OnInit {
   @Input() subPosition: PositionEnum = PositionEnum.TOP;
   @Input() visible = true;
   @Input() width: SizeEnum = SizeEnum.AUTO;
+  @Input() preserveConfigOnMobile = false;
   @Output() overlayEvent = new EventEmitter();
   @ViewChild('popupContainer') popupContainer?: ElementRef;
 
@@ -70,6 +71,10 @@ export class PopupComponent implements OnInit {
 
   // Misc
   fullVW = false;
+  private visualViewport: VisualViewport | null = null;
+  private readonly viewportChangeHandler = () => this.handleViewportChange();
+
+  constructor(private readonly hostRef: ElementRef<HTMLElement>) {}
 
   get popupClasses(): Array<string> {
     const container = 'popup-container__' + this.position.toString() + '--' + this.subPosition.toString();
@@ -81,21 +86,53 @@ export class PopupComponent implements OnInit {
     return Array.from([container, height, width]);
   }
 
-  @HostListener('window:resize', [])
+  @HostListener('window:resize')
   onResize(): void {
-    this.getPopupSize();
+    this.handleViewportChange();
+  }
+
+  @HostListener('window:orientationchange')
+  onOrientationChange(): void {
+    this.handleViewportChange();
   }
 
   ngOnInit(): void {
+    this.visualViewport = window.visualViewport ?? null;
+    this.updateViewportVars();
     this.getPopupSize();
 
+    if (this.visualViewport) {
+      this.visualViewport.addEventListener('resize', this.viewportChangeHandler);
+      this.visualViewport.addEventListener('scroll', this.viewportChangeHandler);
+    }
+  }
+
+  ngAfterViewInit(): void {
+    this.handleViewportChange();
+  }
+
+  ngOnDestroy(): void {
+    if (this.visualViewport) {
+      this.visualViewport.removeEventListener('resize', this.viewportChangeHandler);
+      this.visualViewport.removeEventListener('scroll', this.viewportChangeHandler);
+    }
+
+    const host = this.hostRef.nativeElement;
+    host.style.removeProperty('--autom-popup-vh');
+    host.style.removeProperty('--autom-popup-vw');
   }
 
   getPopupSize(): void {
-    const bodyWidth = window.innerWidth;
-    const isMobile = bodyWidth <= 768;
+    const viewportWidth = this.visualViewport?.width ?? window.innerWidth;
+    const isMobile = viewportWidth <= 768;
+    const popupWidth = this.popupContainer?.nativeElement.offsetWidth ?? 0;
 
     if (isMobile) {
+      if (this.preserveConfigOnMobile) {
+        this.fullVW = popupWidth >= viewportWidth;
+        return;
+      }
+
       this.position = PositionEnum.BOTTOM;
       this.subPosition = PositionEnum.CENTER;
       this.width = SizeEnum.FULL;
@@ -103,12 +140,26 @@ export class PopupComponent implements OnInit {
       this.customPosition = false;
       this.fullVW = true;
     } else {
-      this.fullVW = bodyWidth <= this.popupContainer?.nativeElement.offsetWidth;
+      this.fullVW = popupWidth >= viewportWidth;
     }
   }
 
   onOverlayClick(): void {
     this.overlayEvent.emit();
+  }
+
+  private handleViewportChange(): void {
+    this.updateViewportVars();
+    this.getPopupSize();
+  }
+
+  private updateViewportVars(): void {
+    const height = this.visualViewport?.height ?? window.innerHeight;
+    const width = this.visualViewport?.width ?? window.innerWidth;
+    const host = this.hostRef.nativeElement;
+
+    host.style.setProperty('--autom-popup-vh', `${height}px`);
+    host.style.setProperty('--autom-popup-vw', `${width}px`);
   }
 
 }
