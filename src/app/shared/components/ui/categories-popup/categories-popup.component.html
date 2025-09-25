@@ -148,30 +148,38 @@
           </button>
           <h4 class="group-title">{{ g.name }}</h4>
         </div>
-        <button class="btn-outline" type="button" (click)="pickGroup(g)">
+        <a
+          class="btn-outline"
+          [routerLink]="categoryUrl(g)"
+          (click)="pickGroup(g)"
+        >
           Prikaži sve iz grupe
-        </button>
+        </a>
       </header>
 
       <div class="subgrid">
-        <button
+        <a
           class="subcard fade-in"
           *ngFor="let sub of g.subgroups; trackBy: trackSub"
-          type="button"
+          [routerLink]="categoryUrl(g, sub)"
           (click)="pickSubgroup(g, sub)"
           [attr.aria-label]="sub.name"
         >
           <span class="subcard__name">{{ sub.name }}</span>
           <span class="subcard__chev">›</span>
-        </button>
+        </a>
       </div>
 
       <!-- fallback kad grupa nema podgrupe -->
       <div class="empty-subgroups fade-in" *ngIf="!g.subgroups?.length">
         <p>Ova grupa trenutno nema podgrupe.</p>
-        <button class="btn-outline" type="button" (click)="pickGroup(g)">
+        <a
+          class="btn-outline"
+          [routerLink]="categoryUrl(g)"
+          (click)="pickGroup(g)"
+        >
           Otvori celu grupu
-        </button>
+        </a>
       </div>
     </section>
 
@@ -193,29 +201,37 @@
           ✕
         </button>
         <h4 class="group-title">{{ g.name }}</h4>
-        <button class="btn-outline" type="button" (click)="pickGroup(g)">
+        <a
+          class="btn-outline"
+          [routerLink]="categoryUrl(g)"
+          (click)="pickGroup(g)"
+        >
           Prikaži sve
-        </button>
+        </a>
       </header>
 
       <div class="subgrid">
-        <button
+        <a
           class="subcard"
           *ngFor="let sub of g.subgroups; trackBy: trackSub"
-          type="button"
+          [routerLink]="categoryUrl(g, sub)"
           (click)="pickSubgroup(g, sub)"
           [attr.aria-label]="sub.name"
         >
           <span class="subcard__name">{{ sub.name }}</span>
           <span class="subcard__chev">›</span>
-        </button>
+        </a>
       </div>
 
       <div class="empty-subgroups" *ngIf="!g.subgroups?.length">
         <p>Ova grupa trenutno nema podgrupe.</p>
-        <button class="btn-outline" type="button" (click)="pickGroup(g)">
+        <a
+          class="btn-outline"
+          [routerLink]="categoryUrl(g)"
+          (click)="pickGroup(g)"
+        >
           Otvori celu grupu
-        </button>
+        </a>
       </div>
     </section>
   </div>

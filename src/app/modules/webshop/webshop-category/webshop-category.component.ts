@@ -107,8 +107,8 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
     return false; // fallback za server-side render
   }
 
-  get isCategoryPage(): boolean {
-    return this.urlHelperService.getCurrentPath().startsWith('/webshop/category');
+  get isManufPage(): boolean {
+    return this.urlHelperService.getCurrentPath().startsWith('/webshop/manufacturers');
   }
 
   /** Start of: Angular lifecycle hooks */

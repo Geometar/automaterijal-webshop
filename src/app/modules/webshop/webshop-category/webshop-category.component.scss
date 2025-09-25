@@ -1,9 +1,30 @@
 /* Sidebar shell */
 .sidebar {
   width: 320px;
-  position: sticky;
-  top: 88px; /* uskladi sa visinom headera */
+  position: relative;
+  top: 0;
   align-self: flex-start;
+  overflow: visible;
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.4) transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(148, 163, 184, 0.45), rgba(148, 163, 184, 0.25));
+    border-radius: 999px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, rgba(100, 116, 139, 0.55), rgba(100, 116, 139, 0.35));
+  }
 }
 
 /* Vertical rhythm */
@@ -71,9 +92,29 @@
 /* Section body (animated collapse) */
 .section-body {
   padding: 0px 4px;
-  max-height: 800px;
-  overflow: clip;
+  min-height: 150px;
+  max-height: 550px;
+  overflow-y: auto;
   transition: max-height 0.25s ease, padding 0.2s ease;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.35) transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.35);
+    border-radius: 999px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(100, 116, 139, 0.45);
+  }
 
   .filter-container {
     padding-top: 4px;
@@ -86,6 +127,7 @@
   padding-top: 0;
   padding-bottom: 0;
   max-height: 0;
+  overflow: hidden;
 }
 
 /* Prefilter spacing */

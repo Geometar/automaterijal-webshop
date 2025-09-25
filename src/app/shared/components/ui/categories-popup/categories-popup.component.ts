@@ -1,6 +1,7 @@
 import { Component, EventEmitter, HostListener, Output, ViewEncapsulation } from '@angular/core';
 import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 // Autom imports
 import { AutomIconComponent } from '../../autom-icon/autom-icon.component';
@@ -22,6 +23,7 @@ import { UrlHelperService } from '../../../service/utils/url-helper.service';
   standalone: true,
   imports: [
     CommonModule,
+    RouterModule,
     PopupComponent,
     InputFieldsComponent,
     AutomIconComponent
@@ -140,13 +142,20 @@ export class CategoriesPopupComponent {
     this.activeGroup = group;
   }
 
-  pickGroup(group: BucketGroup): void {
-    this.urlHelper.setCategorySelection(group.name, null);
-    this.close.emit();
+  pickGroup(_group: BucketGroup): void {
+    this.onCategoryNavigate();
   }
 
-  pickSubgroup(group: BucketGroup, sub: { id: number; name: string }): void {
-    this.urlHelper.setCategorySelection(group.name, sub.name);
+  pickSubgroup(_group: BucketGroup, _sub: { id: number; name: string }): void {
+    this.onCategoryNavigate();
+  }
+
+  categoryUrl(group: BucketGroup, sub?: { id: number; name: string } | null): string {
+    return this.urlHelper.buildCategoryUrl(group.name, sub?.name ?? null);
+  }
+
+  onCategoryNavigate(): void {
+    this.activeGroup = null;
     this.close.emit();
   }
 

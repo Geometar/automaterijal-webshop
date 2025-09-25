@@ -45,7 +45,7 @@
     <!-- Categories -->
     <div
       class="filter-card"
-      *ngIf="categories && !isCategoryPage"
+      *ngIf="categories"
       [class.collapsed]="isCollapsed('categories')"
     >
       <button
@@ -76,7 +76,7 @@
     <!-- Manufacturers -->
     <div
       class="filter-card"
-      *ngIf="manufactures?.length"
+      *ngIf="manufactures?.length && !isManufPage"
       [class.collapsed]="isCollapsed('manufacturers')"
     >
       <button

@@ -128,7 +128,7 @@
 /* Master checkbox + label (Material 18‑friendly) */
 .gc-h__cb {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   min-height: 32px;
   min-width: 0; /* enables ellipsis */
 
@@ -152,9 +152,10 @@
   font-size: var(--g-font-md);
   color: #111827;
   letter-spacing: .2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: initial;
+  line-height: 1.35;
   text-transform: none; /* keep diacritics safe */
 }
 
@@ -209,7 +210,7 @@
 
 .gc-row__cb {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   width: 100%;
   max-width: 100%;
   min-height: 32px;
@@ -233,9 +234,11 @@
 .gc-row__label {
   flex: 1;
   min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: initial;
+  line-height: 1.35;
+  word-break: break-word;
   text-transform: none;
 }
 

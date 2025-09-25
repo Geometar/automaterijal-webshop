@@ -8,7 +8,11 @@
     [ngClass]="'theme-' + (i % 3)"
   >
     <h2 class="section-title">
-      <a [routerLink]="section.titleUrl" class="section-link">
+      <a
+        [routerLink]="section.titleUrl"
+        [queryParams]="{ naStanju: true }"
+        class="section-link"
+      >
         {{ section.title }}
         <span class="arrow-icon">→</span>
       </a>

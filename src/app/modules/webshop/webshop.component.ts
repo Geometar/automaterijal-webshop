@@ -325,6 +325,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
           this.selectedBrandName = m.naziv!;
           const params = {
             ...p,
+            searchTerm: ((p['searchTerm'] || '') as string).trim(),
             mandatoryproid: m.proid,
           } as QueryParams;
           this.handleQueryParams(params);
@@ -372,7 +373,8 @@ export class WebshopComponent implements OnDestroy, OnInit {
 
           const params: QueryParams = {
             ...p,
-            grupe: group.groupId,
+            searchTerm: ((p['searchTerm'] || '') as string).trim(),
+            grupe: group.groupId?.toString(),
             podgrupe: subGroupId,
           };
           this.handleQueryParams(params);
