@@ -8,14 +8,15 @@
 
     <img
       class="clickable-image"
-      [alt]="(data.proizvodjac?.naziv || '') + ' ' + (data.naziv || '')"
-      [src]="data!.slika!.slikeUrl"
+      [alt]="getProductImageAlt()"
+      [title]="getProductImageTitle()"
+      [src]="getProductImageSrc()"
       itemprop="image"
       decoding="async"
       height="180"
       loading="lazy"
       width="200"
-      (click)="openImageZoom(data!.slika!.slikeUrl!)"
+      (click)="openImageZoom(getProductImageSrc())"
     />
   </div>
 
@@ -322,7 +323,8 @@
   <img
     class="zoomed-image"
     [src]="zoomedImageUrl"
-    alt="Uvećana slika proizvoda"
+    [alt]="getProductImageAlt()"
+    [title]="getProductImageTitle()"
     (click)="$event.stopPropagation()"
   />
 </div>

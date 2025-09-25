@@ -33,14 +33,9 @@
         <figure class="product-media">
           <img
             class="product-img"
-            [src]="
-              data.slika?.slikeByte
-                ? 'data:image/jpeg;base64,' + data.slika!.slikeByte!
-                : data.slika?.slikeUrl || '/assets/images/fallback.jpg'
-            "
-            [alt]="
-              (data.proizvodjac?.naziv || '') + ' ' + (data.naziv || 'Artikal')
-            "
+            [src]="getPrimaryImageSrc()"
+            [alt]="getPrimaryImageAlt()"
+            [title]="getPrimaryImageTitle()"
             itemprop="image"
             loading="lazy"
             decoding="async"

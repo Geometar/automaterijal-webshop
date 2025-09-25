@@ -29,6 +29,7 @@ import { AccountStateService } from '../../../service/state/account-state.servic
 import { CartStateService } from '../../../service/state/cart-state.service';
 import { SnackbarService } from '../../../service/utils/snackbar.service';
 import { StringUtils } from '../../../utils/string-utils';
+import { PictureService, ProductImageMeta } from '../../../service/utils/picture.service';
 
 @Component({
   selector: 'row',
@@ -99,7 +100,8 @@ export class RowComponent implements OnInit {
   constructor(
     private cartStateService: CartStateService,
     private snackbarService: SnackbarService,
-    private accountStateService: AccountStateService
+    private accountStateService: AccountStateService,
+    private pictureService: PictureService
   ) { }
 
   ngOnInit() {
@@ -168,5 +170,21 @@ export class RowComponent implements OnInit {
   getProductSlug(data: any): string {
     const parts = [data.proizvodjac?.naziv, data.naziv, data.katbr].filter((x) => !!x);
     return StringUtils.slugify(parts.join(' '));
+  }
+
+  get productImageMeta(): ProductImageMeta {
+    return this.pictureService.buildProductImageMeta(this.data);
+  }
+
+  getProductImageSrc(): string {
+    return this.productImageMeta.src;
+  }
+
+  getProductImageAlt(): string {
+    return this.productImageMeta.alt;
+  }
+
+  getProductImageTitle(): string {
+    return this.productImageMeta.title;
   }
 }

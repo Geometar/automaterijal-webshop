@@ -52,7 +52,7 @@ import { YouTubePlayer } from '@angular/youtube-player';
 // Services
 import { AccountStateService } from '../../../shared/service/state/account-state.service';
 import { CartStateService } from '../../../shared/service/state/cart-state.service';
-import { PictureService } from '../../../shared/service/utils/picture.service';
+import { PictureService, ProductImageMeta } from '../../../shared/service/utils/picture.service';
 import { RobaService } from '../../../shared/service/roba.service';
 import { SeoService } from '../../../shared/service/seo.service';
 import { SnackbarService } from '../../../shared/service/utils/snackbar.service';
@@ -248,7 +248,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     this.showcaseDataCategories = [];
     this.showcaseDataManufactures = [];
 
-    const hasImage = (a: Roba) => !!(a?.slika?.slikeByte);
+    const hasImage = (a: Roba) => this.pictureService.hasImage(a?.slika);
     const uniqById = (list: Roba[]) => {
       const seen = new Set<number>();
       return list.filter(x => {
@@ -263,6 +263,10 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
         .filter(a => a.robaid !== roba.robaid)
         .filter(hasImage)
         .filter(a => !this.showcaseTakenIds.has(Number(a.robaid)))
+        .map(item => {
+          this.pictureService.convertByteToImage(item);
+          return item;
+        })
         .slice(0, max);
 
     // --- pripremi observables
@@ -403,9 +407,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   }
 
   private pickMainImage(roba: Roba): string {
-    if (roba.slika?.slikeUrl) return this.absoluteImage(roba.slika.slikeUrl);
-    if (roba.proizvodjacLogo) return this.absoluteImage(roba.proizvodjacLogo as string);
-    return this.absoluteImage(null);
+    return this.collectProductImages(roba)[0] ?? this.absoluteImage(null);
   }
 
   saveTextDescription(): void {
@@ -625,14 +627,21 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     const name = this.normalizeWhitespace(roba.naziv);
     const sku = this.normalizeWhitespace(roba.katbr);
     const id = roba.robaid ?? '';
-    const slug = StringUtils.slugify([brand, name, sku].filter(Boolean).join(' '));
+    const slug = this.buildSlug(roba);
     const idParam = slug ? `${id}-${slug}` : String(id);
     const url = `https://automaterijal.com/webshop/${idParam}`;
     return { idParam, url };
   }
 
+  private buildSlug(roba: Roba): string {
+    const brand = this.normalizeWhitespace(roba.proizvodjac?.naziv);
+    const name = this.normalizeWhitespace(roba.naziv);
+    const sku = this.normalizeWhitespace(roba.katbr);
+    return StringUtils.slugify([brand, name, sku].filter(Boolean).join(' '));
+  }
+
   private isThin(roba: Roba): boolean {
-    const hasImg = !!(roba.slika?.slikeUrl || roba.slika?.slikeByte || roba.proizvodjacLogo);
+    const hasImg = this.pictureService.hasImage(roba.slika) || !!roba.proizvodjacLogo;
     const hasPrice = typeof roba.cena === 'number' && roba.cena > 0;
     const hasSpecs = !!roba.tehnickiOpis?.length;
     const hasText = !!(roba.tekst && roba.tekst.trim().length > 0);
@@ -647,6 +656,53 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     // ako je data URL ili relativno prazno → vrati fallback logo:
     if (candidate.startsWith('data:') || candidate === '') return logoFallback;
     return `https://automaterijal.com/${candidate.replace(/^\/?/, '')}`;
+  }
+
+  private collectProductImages(roba: Roba): string[] {
+    const urls = new Set<string>();
+
+    const addImage = (candidate?: string | null) => {
+      const normalised = this.normalizeStructuredImageUrl(candidate);
+      if (normalised && this.pictureService.hasImage({ slikeUrl: normalised, isUrl: true })) {
+        urls.add(normalised);
+      }
+    };
+
+    if (this.pictureService.hasImage(roba.slika)) {
+      addImage(roba.slika?.slikeUrl ?? null);
+    }
+
+    const gallery = (roba as any)?.slikeUrls;
+    if (Array.isArray(gallery)) {
+      gallery.forEach((url: unknown) => {
+        addImage(typeof url === 'string' ? url : null);
+      });
+    }
+
+    const slikaGallery = (roba.slika as any)?.galerija;
+    if (Array.isArray(slikaGallery)) {
+      slikaGallery.forEach((url: unknown) => {
+        addImage(typeof url === 'string' ? url : null);
+      });
+    }
+
+    const logoCandidate = typeof roba.proizvodjacLogo === 'string' ? roba.proizvodjacLogo : null;
+    if (logoCandidate) {
+      addImage(logoCandidate);
+    }
+
+    if (!urls.size) {
+      urls.add(this.absoluteImage(null));
+    }
+
+    return Array.from(urls);
+  }
+
+  private normalizeStructuredImageUrl(candidate?: string | null): string | null {
+    if (!candidate) return null;
+    const trimmed = candidate.trim();
+    if (!trimmed || trimmed.startsWith('data:')) return null;
+    return this.absoluteImage(trimmed);
   }
 
   private buildAdditionalProperties(roba: Roba): any[] {
@@ -694,11 +750,12 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   private buildRelatedProducts(roba: Roba): any[] | undefined {
     if (!roba.asociraniArtikli?.length) return undefined;
     const related = roba.asociraniArtikli.slice(0, 10).map((r) => {
+      this.pictureService.convertByteToImage(r);
       const brand = this.normalizeWhitespace(r.proizvodjac?.naziv);
       const name = this.normalizeWhitespace(r.naziv);
       const sku = this.normalizeWhitespace(r.katbr);
       const id = r.robaid ?? '';
-      const slug = StringUtils.slugify([brand, name, sku].filter(Boolean).join(' '));
+      const slug = this.buildSlug(r);
       const url = `https://automaterijal.com/webshop/${id}${slug ? '-' + slug : ''}`;
       const img = this.absoluteImage(r.slika?.slikeUrl);
       return {
@@ -748,14 +805,8 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
 
     const { url } = this.buildCanonical(roba);
 
-    // Images: prefer product image; fallback brand logo; finally site logo
-    const mainImgCandidateRaw =
-      roba.slika?.slikeUrl ??
-      roba.slika?.slikeByte ??
-      roba.proizvodjacLogo;
-
-    const mainImgDataUrl = this.pictureService.toDataUrl(mainImgCandidateRaw, 'image/jpeg');
-    const ogImage = this.pickMainImage(roba);
+    const images = this.collectProductImages(roba);
+    const ogImage = images[0];
 
     const ogImageAlt =
       baseTitle ||
@@ -795,7 +846,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       sku: sku || String(id),
       ...(mpn ? { mpn } : {}),
       ...(brand ? { brand: { '@type': 'Brand', name: brand } } : {}),
-      image: ogImage,
+      image: images,
       url,
       description: description || `${brand} ${name}`,
       ...(additionalProps.length ? { additionalProperty: additionalProps } : {}),
@@ -849,6 +900,22 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       itemListElement: items,
     };
     this.seoService.updateJsonLd(breadcrumbsJsonLd, 'jsonld-breadcrumbs');
+  }
+
+  get primaryImageMeta(): ProductImageMeta {
+    return this.pictureService.buildProductImageMeta(this.data ?? null);
+  }
+
+  getPrimaryImageSrc(): string {
+    return this.primaryImageMeta.src;
+  }
+
+  getPrimaryImageAlt(): string {
+    return this.primaryImageMeta.alt;
+  }
+
+  getPrimaryImageTitle(): string {
+    return this.primaryImageMeta.title;
   }
 
   private parseId(raw: string | null): number | null {

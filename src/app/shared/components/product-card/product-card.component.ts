@@ -21,6 +21,7 @@ import { RsdCurrencyPipe } from '../../pipe/rsd-currency.pipe';
 import { CartStateService } from '../../service/state/cart-state.service';
 import { SnackbarService } from '../../service/utils/snackbar.service';
 import { StringUtils } from '../../utils/string-utils';
+import { PictureService, ProductImageMeta } from '../../service/utils/picture.service';
 
 @Component({
   selector: 'autom-product-card',
@@ -54,7 +55,12 @@ export class AutomProductCardComponent implements OnInit {
   // Quantity state
   quantity = 1;
 
-  constructor(private cartStateService: CartStateService, private snackbarService: SnackbarService, private router: Router) { }
+  constructor(
+    private cartStateService: CartStateService,
+    private snackbarService: SnackbarService,
+    private router: Router,
+    private pictureService: PictureService
+  ) { }
 
   /* ---------------------------- Lifecycle ---------------------------- */
 
@@ -188,7 +194,22 @@ export class AutomProductCardComponent implements OnInit {
 
   getProductSlug(data: any): string {
     const parts = [data.proizvodjac?.naziv, data.naziv, data.katbr].filter((x) => !!x);
-    console.log(StringUtils.slugify(parts.join(' ')))
     return StringUtils.slugify(parts.join(' '));
+  }
+
+  get productImageMeta(): ProductImageMeta {
+    return this.pictureService.buildProductImageMeta(this.roba);
+  }
+
+  getProductImageSrc(): string {
+    return this.productImageMeta.src;
+  }
+
+  getProductImageAlt(): string {
+    return this.productImageMeta.alt;
+  }
+
+  getProductImageTitle(): string {
+    return this.productImageMeta.title;
   }
 }

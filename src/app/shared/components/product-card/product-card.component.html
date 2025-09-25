@@ -26,12 +26,9 @@
   <!-- Slika -->
   <div class="product-image" (click)="handleClick()">
     <img
-      [src]="
-        roba.slika?.slikeByte
-          ? 'data:image/jpeg;base64,' + roba.slika!.slikeByte!
-          : roba.slika?.slikeUrl || '/assets/images/fallback.jpg'
-      "
-      [alt]="(roba.proizvodjac?.naziv || '') + ' ' + (roba.naziv || 'Artikal')"
+      [src]="getProductImageSrc()"
+      [alt]="getProductImageAlt()"
+      [title]="getProductImageTitle()"
       loading="lazy"
     />
   </div>
