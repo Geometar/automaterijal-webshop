@@ -1,4 +1,4 @@
-<article class="row-container" itemscope itemtype="https://schema.org/Product">
+<article class="row-container">
   <!-- Image Section -->
   <div class="image-container" [class.image-smaller]="showPriceOnly">
     <!-- Popust badge -->
@@ -11,7 +11,6 @@
       [alt]="getProductImageAlt()"
       [title]="getProductImageTitle()"
       [src]="getProductImageSrc()"
-      itemprop="image"
       decoding="async"
       height="180"
       loading="lazy"
@@ -23,17 +22,8 @@
   <!-- Details Section -->
   <div class="details-container">
     <h3 [class.disabled]="data.podGrupa === 1000000">
-      <a
-        [routerLink]="['/webshop', data.robaid + '-' + getProductSlug(data)]"
-        itemprop="name url"
-      >
-        <span
-          class="color--figma-primary-800"
-          itemprop="brand"
-          itemscope
-          itemtype="https://schema.org/Brand"
-        >
-          <meta itemprop="name" [content]="data.proizvodjac?.naziv || ''" />
+      <a [routerLink]="['/webshop', data.robaid + '-' + getProductSlug(data)]">
+        <span class="color--figma-primary-800">
           {{ data.proizvodjac?.naziv }}</span
         >
         <span class="product-name-fragment">{{ nameWithoutManufacturer }}</span>
@@ -44,18 +34,15 @@
       Kataloški broj:
       <span
         class="color--figma-primary-800 display--inline font-medium"
-        itemprop="sku"
       >
         {{ data.katbr }}
       </span>
     </p>
-    <meta itemprop="mpn" [content]="data.katbr!" />
 
     <p class="autom-margin__none">
       Kategorija:
       <span
         class="color--figma-primary-800 display--inline font-medium"
-        itemprop="category"
       >
         {{ data!.podGrupaNaziv }}
       </span>
@@ -122,9 +109,6 @@
   <div
     class="pricing-container"
     *ngIf="showAddToBasket"
-    itemprop="offers"
-    itemscope
-    itemtype="https://schema.org/Offer"
   >
     <!-- Status -->
     <div
@@ -143,19 +127,6 @@
           : "Nema na stanju"
       }}
     </div>
-    <meta
-      itemprop="availability"
-      [attr.content]="
-        data.podGrupa !== 1000000 && (data.stanje || 0) > 0
-          ? 'https://schema.org/InStock'
-          : 'https://schema.org/OutOfStock'
-      "
-    />
-
-    <!-- Currency -->
-    <meta itemprop="priceCurrency" content="RSD" />
-    <meta itemprop="price" [attr.content]="data.cena || 0" />
-
     <!-- Stara cena -->
     <p
       *ngIf="data.podGrupa !== 1000000 && data.rabat"
@@ -217,8 +188,6 @@
         (clickEvent)="addToShoppingCart(data)"
       />
     </div>
-    <meta itemprop="seller" content="Automaterijal" />
-
     <div
       *ngIf="isInCart(data.robaid ?? 0)"
       class="util__flex--center"
@@ -239,21 +208,7 @@
   <div
     class="pricing-container"
     *ngIf="showPriceOnly"
-    itemprop="offers"
-    itemscope
-    itemtype="https://schema.org/Offer"
   >
-    <meta itemprop="priceCurrency" content="RSD" />
-    <meta itemprop="price" [attr.content]="data.cena || 0" />
-    <meta
-      itemprop="availability"
-      [attr.content]="
-        data.podGrupa !== 1000000 && (data.stanje || 0) > 0
-          ? 'https://schema.org/InStock'
-          : 'https://schema.org/OutOfStock'
-      "
-    />
-    <meta itemprop="seller" content="Automaterijal" />
 
     <p *ngIf="data.rabat" class="sub-price old-price">
       {{ data.cena! / (1 - data.rabat / 100) | rsdCurrency }}
