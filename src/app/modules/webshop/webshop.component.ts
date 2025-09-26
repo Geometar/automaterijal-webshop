@@ -24,7 +24,6 @@ import { ManufactureService } from '../../shared/service/manufacture.service';
 import { PictureService } from '../../shared/service/utils/picture.service';
 import { RobaService } from '../../shared/service/roba.service';
 import { SeoService } from '../../shared/service/seo.service';
-import { SpinnerComponent } from '../../shared/components/spinner/spinner.component';
 import { TecdocService } from '../../shared/service/tecdoc.service';
 import { UrlHelperService } from '../../shared/service/utils/url-helper.service';
 import { WebshopConfig } from '../../shared/data-models/interface';
@@ -57,7 +56,6 @@ interface QueryParams {
   standalone: true,
   imports: [
     CommonModule,
-    SpinnerComponent,
     WebshopEmptyComponent,
     WebshopNavComponent,
     WebshopRobaComponent,

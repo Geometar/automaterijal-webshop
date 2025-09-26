@@ -8,7 +8,6 @@ import { TDVehicleDetails } from '../../../shared/data-models/model/tecdoc';
 // Component imports
 import { ButtonComponent } from "../../../shared/components/button/button.component";
 import { CommonModule } from '@angular/common';
-import { SpinnerComponent } from '../../../shared/components/spinner/spinner.component';
 import { TableComponent } from '../../../shared/components/table/table.component';
 import { WebshopCategoryComponent } from '../webshop-category/webshop-category.component';
 
@@ -23,7 +22,7 @@ import { AutomIconComponent } from '../../../shared/components/autom-icon/autom-
 @Component({
   selector: 'webshop-roba',
   standalone: true,
-  imports: [AutomIconComponent, CommonModule, TableComponent, WebshopCategoryComponent, SpinnerComponent, ButtonComponent],
+  imports: [AutomIconComponent, CommonModule, TableComponent, WebshopCategoryComponent, ButtonComponent],
   templateUrl: './webshop-roba.component.html',
   styleUrl: './webshop-roba.component.scss',
 })
@@ -42,6 +41,7 @@ export class WebshopRobaComponent {
   buttonThemes = ButtonThemes;
   buttonTypes = ButtonTypes;
   iconEnum = IconsEnum;
+  readonly skeletonRows = Array.from({ length: 6 });
 
   constructor(private urlHelperService: UrlHelperService) { }
 

@@ -21,13 +21,12 @@
   ></webshop-empty>
   <webshop-roba
     *ngIf="
-      (currentState === state.SHOW_ARTICLES ||
-        currentState === state.SHOW_ARTICLES_WITH_VEHICLE_DETAILS) &&
-      !loading
+      currentState === state.SHOW_ARTICLES ||
+      currentState === state.SHOW_ARTICLES_WITH_VEHICLE_DETAILS
     "
     [assemblyGroupName]="assemblyGroupName"
     [filter]="filter"
-    [loading]="internalLoading"
+    [loading]="loading || internalLoading"
     [magacin]="magacinData"
     [pageIndex]="pageIndex"
     [pageSize]="rowsPerPage"
@@ -35,7 +34,4 @@
     [vehicleDetails]="selectedVehicleDetails"
     (emitTablePage)="setRobaPageData($event)"
   ></webshop-roba>
-  <div *ngIf="loading" class="spinner">
-    <spinner></spinner>
-  </div>
 </section>

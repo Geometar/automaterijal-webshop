@@ -16,6 +16,81 @@
   width: 1050px;
 }
 
+.table-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: min(1050px, 100%);
+}
+
+.table-skeleton__item {
+  display: grid;
+  grid-template-columns: 200px 1fr 200px;
+  gap: 24px;
+  padding: 18px;
+  background: #ffffff;
+  border: 1px solid #e6e8ef;
+  border-radius: 16px;
+  box-shadow: 0 6px 24px rgba(17, 24, 39, 0.06);
+}
+
+.table-skeleton__media,
+.table-skeleton__line {
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 37%, #f3f4f6 63%);
+  background-size: 400% 100%;
+  animation: table-skeleton-shimmer 1.6s ease infinite;
+  border-radius: 10px;
+}
+
+.table-skeleton__media {
+  aspect-ratio: 4 / 3;
+  width: 100%;
+}
+
+.table-skeleton__body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  justify-content: center;
+}
+
+.table-skeleton__aside {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  justify-content: center;
+}
+
+.table-skeleton__line {
+  height: 16px;
+  width: 100%;
+}
+
+.table-skeleton__line--title {
+  height: 24px;
+  max-width: 70%;
+}
+
+.table-skeleton__line--short {
+  max-width: 55%;
+}
+
+.table-skeleton__line--price {
+  height: 28px;
+  max-width: 140px;
+}
+
+.table-skeleton__line--button {
+  height: 44px;
+  max-width: 160px;
+  border-radius: 999px;
+}
+
+@keyframes table-skeleton-shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
 @media (max-width: 991px) {
   .webshop-container-roba {
     flex-direction: column;
@@ -32,6 +107,23 @@
   autom-table {
     width: 100% !important;
     order: 2;
+  }
+
+  .table-skeleton {
+    width: 100%;
+  }
+
+  .table-skeleton__item {
+    grid-template-columns: 120px 1fr;
+    grid-template-rows: auto auto;
+    gap: 16px;
+  }
+
+  .table-skeleton__aside {
+    grid-column: span 2;
+    flex-direction: row;
+    gap: 12px;
+    justify-content: flex-start;
   }
 
   .spinner {

@@ -1,9 +1,10 @@
-<section *ngIf="!loading" class="section">
-  <div
-    class="product-container"
-    itemscope
-    itemtype="https://schema.org/Product"
-  >
+<section class="section" [class.section--loading]="loading">
+  <ng-container *ngIf="!loading; else productSkeleton">
+    <div
+      class="product-container"
+      itemscope
+      itemtype="https://schema.org/Product"
+    >
     <meta
       itemprop="name"
       [content]="(data.proizvodjac?.naziv || '') + ' ' + (data.naziv || '')"
@@ -37,8 +38,8 @@
             [alt]="getPrimaryImageAlt()"
             [title]="getPrimaryImageTitle()"
             itemprop="image"
-            loading="lazy"
             decoding="async"
+            fetchpriority="high"
           />
           <figcaption *ngIf="data?.proizvodjacLogo" class="media-caption">
             <img
@@ -249,7 +250,13 @@
             class="documentation--section-padding"
             *ngIf="document.docFileTypeName!.toUpperCase().indexOf('JPEG') > -1"
           >
-            <img [src]="document.dokument" />
+            <img
+              class="document-image"
+              [src]="document.dokument"
+              [attr.alt]="document.docFileTypeName || 'Dokumentacija'"
+              decoding="async"
+              loading="lazy"
+            />
           </div>
         </ng-container>
       </div>
@@ -406,8 +413,48 @@
       (change)="onImageSelected($event)"
       hidden
     />
-  </div>
+    </div>
+  </ng-container>
 </section>
+
+<ng-template #productSkeleton>
+  <div class="product-container skeleton">
+    <div class="product-header">
+      <div class="skeleton-line skeleton-line--title"></div>
+      <div class="skeleton-line skeleton-line--muted"></div>
+    </div>
+
+    <div class="product-hero skeleton-hero-grid">
+      <figure class="product-media skeleton-media">
+        <div class="skeleton-block skeleton-block--image" aria-hidden="true"></div>
+      </figure>
+
+      <aside class="product-specs card skeleton-card" aria-hidden="true">
+        <div class="skeleton-line skeleton-line--heading"></div>
+        <div class="skeleton-table">
+          <div class="skeleton-row" *ngFor="let _ of skeletonRows">
+            <div class="skeleton-cell"></div>
+            <div class="skeleton-cell skeleton-cell--value"></div>
+          </div>
+        </div>
+        <div class="skeleton-line skeleton-line--button"></div>
+      </aside>
+
+      <aside class="buy-card card skeleton-card" aria-hidden="true">
+        <div class="skeleton-line skeleton-line--price"></div>
+        <div class="skeleton-line skeleton-line--text"></div>
+        <div class="skeleton-line skeleton-line--button"></div>
+        <div class="skeleton-line skeleton-line--button"></div>
+      </aside>
+    </div>
+
+    <div class="product-container documentation skeleton-stack" aria-hidden="true">
+      <div class="skeleton-line skeleton-line--heading"></div>
+      <div class="skeleton-line skeleton-line--text"></div>
+      <div class="skeleton-line skeleton-line--text"></div>
+    </div>
+  </div>
+</ng-template>
 
 <add-attributes
   *ngIf="showAddAttributes"
@@ -508,6 +555,3 @@
     </div>
   </div>
 </autom-popup>
-<div *ngIf="loading" class="spinner">
-  <spinner></spinner>
-</div>

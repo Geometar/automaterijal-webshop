@@ -115,6 +115,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   showAddAttributes = false;
   showDeleteWarningPopup = false;
   showImageDeleteWarningPopup = false;
+  readonly skeletonRows = Array.from({ length: 5 });
 
   // Tooltip
   pdfToolTip: TooltipModel = {

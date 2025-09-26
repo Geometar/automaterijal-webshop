@@ -10,14 +10,16 @@
     [filter]="filter"
     [manufactures]="magacin.proizvodjaci"
   ></webshop-category>
-  <autom-table
-    *ngIf="!loading && magacin?.robaDto?.content?.length"
-    [data]="magacin?.robaDto!"
-    [filter]="filter"
-    [pageIndex]="pageIndex"
-    [pageSize]="pageSize"
-    (emitTablePage)="handleTablePageEvent($event)"
-  ></autom-table>
+  <ng-container *ngIf="!loading; else tableSkeleton">
+    <autom-table
+      *ngIf="magacin?.robaDto?.content?.length"
+      [data]="magacin?.robaDto!"
+      [filter]="filter"
+      [pageIndex]="pageIndex"
+      [pageSize]="pageSize"
+      (emitTablePage)="handleTablePageEvent($event)"
+    ></autom-table>
+  </ng-container>
   <div
     *ngIf="!magacin?.robaDto?.content?.length && !loading"
     class="empty-state"
@@ -67,7 +69,22 @@
       </div>
     </div>
   </div>
-  <div *ngIf="loading" class="spinner">
-    <spinner></spinner>
-  </div>
 </div>
+
+<ng-template #tableSkeleton>
+  <div class="table-skeleton" aria-hidden="true">
+    <div class="table-skeleton__item" *ngFor="let _ of skeletonRows">
+      <div class="table-skeleton__media"></div>
+      <div class="table-skeleton__body">
+        <div class="table-skeleton__line table-skeleton__line--title"></div>
+        <div class="table-skeleton__line"></div>
+        <div class="table-skeleton__line table-skeleton__line--short"></div>
+        <div class="table-skeleton__line"></div>
+      </div>
+      <div class="table-skeleton__aside">
+        <div class="table-skeleton__line table-skeleton__line--price"></div>
+        <div class="table-skeleton__line table-skeleton__line--button"></div>
+      </div>
+    </div>
+  </div>
+</ng-template>
