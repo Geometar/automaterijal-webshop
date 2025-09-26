@@ -857,10 +857,10 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
         priceCurrency: 'RSD',
         url,
         availability: inStock
-          ? 'https://schema.org/InStock'
-          : 'https://schema.org/OutOfStock',
+          ? 'http://schema.org/InStock'
+          : 'http://schema.org/OutOfStock',
         ...(typeof price === 'number' ? { price: String(price) } : {}),
-        itemCondition: 'https://schema.org/NewCondition',
+        itemCondition: 'http://schema.org/NewCondition',
         seller: { '@type': 'Organization', name: 'Automaterijal' },
       },
     };
