@@ -73,7 +73,7 @@ export function app(): express.Express {
   });
 
   // Static assets
-  const hashedFilePattern = /\.[A-Za-z0-9]{8,}\.(?:js|css|woff2?|ttf)$/;
+  const hashedFilePattern = /(?:\.|-)[A-Za-z0-9]{8,}\.(?:js|css|woff2?|ttf)$/;
 
   server.use(
     '/assets',
