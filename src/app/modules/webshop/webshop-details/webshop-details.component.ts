@@ -275,9 +275,11 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     if (roba.grupa && roba.podGrupa) {
       const f = new Filter();
       f.naStanju = true;
+      f.paged = true;
+      f.showcase = true;
       f.grupe = [roba.grupa];
       f.podgrupe = [String(roba.podGrupa)];
-      cat$ = this.robaService.pronadjiSvuRobu(null, 40, 0, '', f).pipe(catchError(() => of(null)));
+      cat$ = this.robaService.pronadjiSvuRobu(null, 10, 0, '', f).pipe(catchError(() => of(null)));
     }
 
 
@@ -288,7 +290,9 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       if (roba.proizvodjac?.proid) f.proizvodjaci = [roba.proizvodjac.proid];
       else f.proizvodjaci = [roba.proizvodjac!.naziv!];
       f.naStanju = true;
-      brand$ = this.robaService.pronadjiSvuRobu(null, 60, 0, '', f);
+      f.paged = true;
+      f.showcase = true;
+      brand$ = this.robaService.pronadjiSvuRobu(null, 10, 0, '', f);
     }
 
     // --- paralelno povuci, pa deterministički obradi (kategorija -> brend)

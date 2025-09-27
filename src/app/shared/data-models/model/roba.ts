@@ -10,6 +10,8 @@ export class Filter {
   pretrazitiGrupe?: boolean;
   proizvodjaci?: string[];
   raspolozivost?: string = 'Svi artikli';
+  paged: boolean = false;
+  showcase: boolean = false;
 
   Filter() {
     this.naStanju = false;

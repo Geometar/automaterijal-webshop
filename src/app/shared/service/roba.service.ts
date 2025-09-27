@@ -61,6 +61,15 @@ export class RobaService {
     if (filter.pretrazitiGrupe) {
       parameterObject['pretrazitiGrupe'] = filter.pretrazitiGrupe;
     }
+
+    if (filter.paged) {
+      parameterObject['paged'] = true;
+    }
+
+    if (filter.showcase) {
+      parameterObject['showcase'] = true;
+    }
+
     const parametersString = this.helperService.formatQueryParameters(parameterObject);
 
     const realDataUrl = DOMAIN_URL + ROBA_URL + parametersString;
