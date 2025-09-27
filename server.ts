@@ -73,15 +73,34 @@ export function app(): express.Express {
   });
 
   // Static assets
+  const hashedFilePattern = /\.[A-Za-z0-9]{8,}\.(?:js|css|woff2?|ttf)$/;
+
   server.use(
     '/assets',
-    express.static(join(browserDistFolder, 'assets'), { maxAge: '1y', immutable: true })
+    express.static(join(browserDistFolder, 'assets'), {
+      index: false,
+      setHeaders: (res, filePath) => {
+        if (hashedFilePattern.test(filePath)) {
+          res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        } else {
+          res.setHeader('Cache-Control', 'public, max-age=2592000');
+        }
+      },
+    })
   );
 
   server.use(
     express.static(browserDistFolder, {
-      maxAge: '1h',
       index: false,
+      setHeaders: (res, filePath) => {
+        if (hashedFilePattern.test(filePath)) {
+          res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        } else if (filePath.endsWith('.html')) {
+          res.setHeader('Cache-Control', 'no-cache');
+        } else {
+          res.setHeader('Cache-Control', 'public, max-age=3600');
+        }
+      },
     })
   );
 
@@ -98,7 +117,7 @@ export function app(): express.Express {
         providers: [{ provide: APP_BASE_HREF, useValue: baseUrl }],
       })
       .then((html) => {
-        res.setHeader('cache-control', 'no-store');
+        res.setHeader('Cache-Control', 'no-cache');
         res.send(html);
       })
       .catch((err) => next(err));
