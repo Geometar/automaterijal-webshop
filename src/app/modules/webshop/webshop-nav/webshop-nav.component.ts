@@ -142,16 +142,34 @@ export class WebshopNavComponent implements OnChanges {
     }
   }
 
+  openVehicleSelection(): void {
+    this.chooseVehicleVisible = true;
+    this.chooseCategoryVisible = false;
+  }
+
+  openCategories(): void {
+    this.chooseCategoryVisible = true;
+    this.chooseVehicleVisible = false;
+  }
+
+  handleVehicleSearchRequest(): void {
+    this.chooseVehicleVisible = true;
+    this.chooseCategoryVisible = false;
+  }
+
   handleSelectedVehicle(vehicleDetails: TDVehicleDetails): void {
-    this.urlHelperService.setQueryParams({
-      tecdocType: vehicleDetails.linkageTargetType,
-      tecdocId: vehicleDetails.linkageTargetId,
+    this.urlHelperService.navigateTo(['/webshop'], {
+      queryParams: {
+        tecdocType: vehicleDetails.linkageTargetType,
+        tecdocId: vehicleDetails.linkageTargetId,
+      },
     });
 
     if (!vehicleDetails.description) {
       return;
     }
     this.selectedVehicleDetailsEmit.emit(vehicleDetails);
+    this.chooseVehicleVisible = false;
   }
 
   categorySelected(ev: CategoryPick): void {

@@ -15,7 +15,7 @@
           [type]="buttonType.PRIMARY"
           [theme]="buttonTheme.LIGHT_ORANGE"
           [label]="'Izaberi vozilo'"
-          (clickEvent)="chooseVehicleVisible = true"
+          (clickEvent)="openVehicleSelection()"
         >
         </autom-button>
 
@@ -45,7 +45,7 @@
           [type]="buttonType.PRIMARY"
           [theme]="buttonTheme.BLUE"
           [label]="'Kategorije'"
-          (clickEvent)="chooseCategoryVisible = true"
+          (clickEvent)="openCategories()"
         >
         </autom-button>
       </div>
@@ -121,6 +121,6 @@
 <autom-categories-popup
   *ngIf="chooseCategoryVisible"
   (close)="chooseCategoryVisible = false"
-  (requestVehicleSearch)="chooseVehicleVisible = true"
+  (requestVehicleSearch)="handleVehicleSearchRequest()"
 >
 </autom-categories-popup>
