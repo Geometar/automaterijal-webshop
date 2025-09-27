@@ -64,14 +64,19 @@ export class WebshopEmptyComponent implements OnInit {
   }
 
   handleSelectedVehicle(vehicleDetails: TDVehicleDetails): void {
-    this.urlHelperService.setQueryParams({
-      tecdocType: vehicleDetails.linkageTargetType,
-      tecdocId: vehicleDetails.linkageTargetId,
+    this.urlHelperService.navigateTo([
+      '/webshop'
+    ], {
+      queryParams: {
+        tecdocType: vehicleDetails.linkageTargetType,
+        tecdocId: vehicleDetails.linkageTargetId,
+      },
     });
 
     if (!vehicleDetails.description) {
       return;
     }
+
     this.selectedVehicleDetailsEmit.emit(vehicleDetails);
   }
 
