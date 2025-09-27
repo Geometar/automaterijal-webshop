@@ -172,12 +172,38 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
   // Restore persisted collapse on init
 
   // Toggle helpers
-  toggleSection(name: 'availability' | 'categories' | 'manufacturers') {
-    this.collapseState[name] = !this.collapseState[name];
-    localStorage.setItem(this.collapseKey, JSON.stringify(this.collapseState));
+  toggleSection(name: 'availability' | 'categories' | 'manufacturers'): void {
+    const isCurrentlyCollapsed = this.collapseState[name];
+    const nextValue = !isCurrentlyCollapsed;
+
+    if (this.isMobileView) {
+      const nextState: typeof this.collapseState = {
+        availability: true,
+        categories: true,
+        manufacturers: true,
+      };
+
+      nextState[name] = nextValue;
+      this.collapseState = nextState;
+    } else {
+      this.collapseState = {
+        ...this.collapseState,
+        [name]: nextValue,
+      };
+    }
+
+    this.persistCollapseState();
   }
   isCollapsed(name: 'availability' | 'categories' | 'manufacturers') {
     return !!this.collapseState[name];
+  }
+
+  private persistCollapseState(): void {
+    try {
+      localStorage.setItem(this.collapseKey, JSON.stringify(this.collapseState));
+    } catch {
+      // storage may be unavailable (SSR / private mode)
+    }
   }
 
   // Optional counters for chips (safe if arrays are missing)
