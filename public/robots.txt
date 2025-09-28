@@ -1,4 +1,21 @@
 User-agent: *
 Allow: /
+Disallow: /*?page=
+Disallow: /*?pageSize=
+Disallow: /*?naStanju=
+Disallow: /*?sortBy=
+Disallow: /*?sortDirection=
+Disallow: /*?searchTerm=
+Disallow: /*?proizvodjaci=
+Disallow: /*?mandatoryProid=
+Disallow: /*?podgrupe=
+Disallow: /*?grupe=
+Disallow: /*?pretrazitiGrupe=
+Disallow: /*?paged=
+Disallow: /*?showcase=
+Disallow: /*?assembleGroupId=
+Disallow: /*?tecdocTargetId=
+Disallow: /*?tecdocTargetType=
+Disallow: /api/
 
 Sitemap: https://automaterijal.com/sitemap.xml

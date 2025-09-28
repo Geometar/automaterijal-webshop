@@ -29,6 +29,11 @@ import { UrlHelperService } from '../../shared/service/utils/url-helper.service'
 import { WebshopConfig } from '../../shared/data-models/interface';
 import { WebshopLogicService } from '../../shared/service/utils/webshop-logic.service';
 import { WebshopStateService } from '../../shared/service/state/webshop-state.service';
+import {
+  buildCanonicalFromPath,
+  hasActiveFilterQuery,
+  normalizeRobotsTag,
+} from '../../shared/utils/seo-utils';
 
 export enum WebShopState {
   SHOW_ARTICLES_WITH_VEHICLE_DETAILS,
@@ -544,8 +549,19 @@ export class WebshopComponent implements OnDestroy, OnInit {
 
   private updateSeoTagsForState(): void {
     const context = this.buildSeoContext();
-    const canonical = this.buildCanonicalUrlForContext(context);
+    const queryParams = this.activatedRoute.snapshot.queryParams;
+    const shouldNoIndex = hasActiveFilterQuery(queryParams);
+
+    const baseCanonical = buildCanonicalFromPath(
+      this.urlHelperService.getCurrentPath() || '/'
+    );
+    const canonical = shouldNoIndex
+      ? baseCanonical
+      : this.buildCanonicalUrlForContext(context);
     const jsonLd = this.buildJsonLdForContext(context, canonical);
+    const robots = shouldNoIndex
+      ? 'noindex, follow'
+      : normalizeRobotsTag(context.robots);
 
     this.seoService.setCanonicalUrl(canonical);
 
@@ -556,20 +572,24 @@ export class WebshopComponent implements OnDestroy, OnInit {
       type: 'website',
       siteName: 'Automaterijal',
       locale: 'sr_RS',
-      robots: context.robots,
+      robots,
       image: 'https://automaterijal.com/images/logo/logo.svg',
       imageAlt: 'Automaterijal',
+      canonical,
     });
 
-    // 🔹 Pagination links
-    this.setPaginationLinks(
-      canonical,
-      context.page,
-      context.perPage,
-      context.resultCount
-    );
+    if (shouldNoIndex) {
+      this.seoService.setLinkRel('prev', null);
+      this.seoService.setLinkRel('next', null);
+    } else {
+      this.setPaginationLinks(
+        canonical,
+        context.page,
+        context.perPage,
+        context.resultCount
+      );
+    }
 
-    // 🔹 JSON-LD
     this.seoService.setJsonLd(jsonLd, 'seo-jsonld-webshop');
   }
 
@@ -655,7 +675,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
     } else if (hasSearch) {
       title = `Webshop pretraga: "${searchTerm}" - Automaterijal`;
       description = `Nažalost, nema rezultata za "${searchTerm}". Pokušajte sa drugim nazivom ili kataloškim brojem.`;
-      robots = 'noindex,follow';
+      robots = 'noindex, follow';
     } else if (page > 0 && !isVehicle && !isGroup) {
       title += ` (str. ${page + 1})`;
     }

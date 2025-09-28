@@ -58,6 +58,7 @@ import { SeoService } from '../../../shared/service/seo.service';
 import { SnackbarService } from '../../../shared/service/utils/snackbar.service';
 import { TecdocService } from '../../../shared/service/tecdoc.service';
 import { UrlHelperService } from '../../../shared/service/utils/url-helper.service';
+import { hasActiveFilterQuery, normalizeRobotsTag } from '../../../shared/utils/seo-utils';
 
 // Utils
 import { StringUtils } from '../../../shared/utils/string-utils';
@@ -133,6 +134,8 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   showcaseDataManufactures: ShowcaseSection[] = [];
   youTubeIds: string[] = [];
   private showcaseTakenIds = new Set<number>();
+  private routeSlug: string | null = null;
+  private slugMatchesCanonical = true;
 
   // Specs
   displayedSpecs: SpecEntry[] = [];
@@ -184,6 +187,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((params) => {
         const raw = params.get('id');
+        this.routeSlug = this.extractSlug(raw);
         this.id = this.parseId(raw);
         if (this.id) {
           this.fetchData(this.id);
@@ -227,11 +231,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
 
           // set canonical path with slug (id-brand-name-sku)
           const { idParam, url } = this.buildCanonical(this.data);
-          const current = this.route.snapshot.paramMap.get('id');
-          if (current && current !== idParam) {
-            history.replaceState({}, '', `/webshop/${idParam}`);
-          }
-          // If your SeoService has ensureCanonical, use it; else updateSeoTags below sets it.
+          this.updateSlugState(idParam);
           if (typeof (this.seoService as any).ensureCanonical === 'function') {
             (this.seoService as any).ensureCanonical(url);
           }
@@ -818,7 +818,14 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       (brand && name ? `${brand} ${name}` : 'Automaterijal proizvod');
 
     // Robots (index thin=off)
-    const robots = this.isThin(roba) ? 'noindex, follow' : 'index, follow';
+    let robots = this.isThin(roba) ? 'noindex, follow' : 'index, follow';
+    if (hasActiveFilterQuery(this.route.snapshot.queryParams)) {
+      robots = 'noindex, follow';
+    }
+    if (!this.slugMatchesCanonical) {
+      robots = 'noindex, follow';
+    }
+    robots = normalizeRobotsTag(robots);
 
     // Update metas & canonical
     this.seoService.updateSeoTags({
@@ -921,6 +928,35 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
 
   getPrimaryImageTitle(): string {
     return this.primaryImageMeta.title;
+  }
+
+  private updateSlugState(idParam: string): void {
+    const canonicalSlug = this.extractSlug(idParam);
+    if (!canonicalSlug) {
+      this.slugMatchesCanonical = true;
+      return;
+    }
+
+    const currentSlug = this.routeSlug;
+    this.slugMatchesCanonical = currentSlug === canonicalSlug;
+
+    if (!this.slugMatchesCanonical && typeof window !== 'undefined') {
+      const targetPath = `/webshop/${idParam}`;
+      const search = window.location.search || '';
+      const targetUrl = `${targetPath}${search}`;
+      const currentUrl = `${window.location.pathname}${window.location.search}`;
+      if (currentUrl !== targetUrl) {
+        window.location.replace(targetUrl);
+      }
+    }
+  }
+
+  private extractSlug(raw: string | null): string | null {
+    if (!raw) return null;
+    const dashIndex = raw.indexOf('-');
+    if (dashIndex === -1) return null;
+    const slug = raw.slice(dashIndex + 1).trim();
+    return slug.length ? slug : null;
   }
 
   private parseId(raw: string | null): number | null {

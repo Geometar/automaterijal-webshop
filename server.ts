@@ -19,6 +19,66 @@ const BE_API = 'https://automaterijal.com:8443';
 // LOCAL backend (odkomentariši za test)
 // const BE_API = 'http://localhost:8080';
 
+const PRODUCT_ROUTE_REGEX = /^\/webshop\/(\d+)(?:-([a-z0-9-]+))?$/i;
+
+interface ProductCanonicalMeta {
+  idParam: string;
+  slug: string | null;
+}
+
+function logDebug(message: string, payload?: unknown): void {
+  if ((process.env['LOG_LEVEL'] || '').toLowerCase() === 'debug') {
+    if (payload) {
+      console.debug(message, payload);
+    } else {
+      console.debug(message);
+    }
+  }
+}
+
+function normalizeWhitespace(value: unknown): string {
+  return String(value ?? '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function slugifyProductValue(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+async function resolveProductCanonicalMeta(id: string): Promise<ProductCanonicalMeta | null> {
+  try {
+    const upstream = `${BE_API}/api/roba/${id}`;
+    const response = await fetch(upstream);
+    if (!response.ok) {
+      logDebug('[PRODUCT REDIRECT] Upstream returned non-200', {
+        status: response.status,
+        statusText: response.statusText,
+      });
+      return null;
+    }
+
+    const data: any = await response.json();
+    const brand = normalizeWhitespace(data?.proizvodjac?.naziv);
+    const name = normalizeWhitespace(data?.naziv);
+    const sku = normalizeWhitespace(data?.katbr);
+    const slugSource = [brand, name, sku].filter(Boolean).join(' ');
+    const slug = slugSource ? slugifyProductValue(slugSource) : null;
+    const idParam = slug ? `${id}-${slug}` : id;
+    return { idParam, slug };
+  } catch (error) {
+    logDebug('[PRODUCT REDIRECT] Failed to resolve canonical slug', error);
+    return null;
+  }
+}
+
 // ───────────────────────────────────────────────────────────────────────────────
 // App factory
 // ───────────────────────────────────────────────────────────────────────────────
@@ -36,6 +96,13 @@ export function app(): express.Express {
   server.set('view engine', 'html');
   server.set('views', browserDistFolder);
 
+  server.use((req, res, next) => {
+    if (req.path.startsWith('/api') || req.path.startsWith('/error')) {
+      res.setHeader('X-Robots-Tag', 'noindex, follow');
+    }
+    next();
+  });
+
   // Healthcheck
   server.get(['/healthz', '/readyz'], (_req, res) => res.status(200).send('ok'));
 
@@ -44,11 +111,11 @@ export function app(): express.Express {
   // ───────────────────────────────────────────────────────────────────────────
   server.get(/^\/sitemap.*\.xml$/, async (req, res, next) => {
     const upstream = `${BE_API}${req.originalUrl}`;
-    console.log('[SITEMAP PROXY] START', { url: req.originalUrl, upstream });
+    logDebug('[SITEMAP PROXY] START', { url: req.originalUrl, upstream });
 
     try {
       const r = await fetch(upstream, { method: 'GET' });
-      console.log('[SITEMAP PROXY] RESPONSE', {
+      logDebug('[SITEMAP PROXY] RESPONSE', {
         status: r.status,
         ct: r.headers.get('content-type'),
       });
@@ -62,13 +129,54 @@ export function app(): express.Express {
       const buf = await r.arrayBuffer();
       res.send(Buffer.from(buf));
 
-      console.log('[SITEMAP PROXY] DONE', {
+      logDebug('[SITEMAP PROXY] DONE', {
         status: r.status,
         length: buf.byteLength,
       });
     } catch (err) {
-      console.error('[SITEMAP PROXY] ERROR', err);
+      logDebug('[SITEMAP PROXY] ERROR', err);
       next(err);
+    }
+  });
+
+  server.get(PRODUCT_ROUTE_REGEX, async (req, res, next) => {
+    try {
+      const match = req.path.match(PRODUCT_ROUTE_REGEX);
+      if (!match) {
+        return next();
+      }
+
+      const [, id, incomingSlug] = match;
+      const canonical = await resolveProductCanonicalMeta(id);
+      if (!canonical) {
+        res.setHeader('X-Robots-Tag', 'noindex, follow');
+        res.redirect(301, '/webshop');
+        return;
+      }
+
+      const search = req.url.includes('?') ? req.url.substring(req.url.indexOf('?')) : '';
+      const targetPath = `/webshop/${canonical.idParam}`;
+      const targetUrl = `${targetPath}${search}`;
+
+      if (!canonical.slug) {
+        res.setHeader('X-Robots-Tag', 'noindex, follow');
+        res.redirect(301, '/webshop');
+        return;
+      }
+
+      const providedSlug = (incomingSlug ?? '').toLowerCase();
+      if (!providedSlug || providedSlug !== canonical.slug.toLowerCase()) {
+        res.setHeader('X-Robots-Tag', 'noindex, follow');
+        res.redirect(301, targetUrl);
+        return;
+      }
+
+      return next();
+    } catch (error) {
+      logDebug('[PRODUCT REDIRECT] Handler error', error);
+      res.setHeader('X-Robots-Tag', 'noindex, follow');
+      res.redirect(301, '/webshop');
+      return;
     }
   });
 
@@ -127,6 +235,7 @@ export function app(): express.Express {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   server.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
     console.error('SSR/Server error:', err);
+    res.setHeader('X-Robots-Tag', 'noindex, follow');
     res.status(500).send('Server error');
   });
 
