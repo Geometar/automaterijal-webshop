@@ -271,10 +271,10 @@
     <ul class="oe-grid" role="list">
       <li *ngFor="let oe of oeNumbers | keyvalue">
         <a
-          href="#"
           class="oe-item"
           [routerLink]="['/webshop']"
           [queryParams]="{ searchTerm: oe.key }"
+          [attr.href]="'/webshop?searchTerm=' + oe.key"
         >
           {{ oe.key }} - {{ oe.value }}
         </a>

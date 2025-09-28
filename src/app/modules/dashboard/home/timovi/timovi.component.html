@@ -26,7 +26,7 @@
 
             <h4 class="card-title">Odaberite kvalitet za svoje vozilo</h4>
 
-            <a routerLink="/webshop" class="card-btn">
+            <a routerLink="/webshop" class="card-btn" href="/webshop">
               <autom-icon
                 source="arrow-right"
                 [color]="iconColor.INFO_25"
@@ -61,6 +61,7 @@
               [routerLink]="['/webshop']"
               [queryParams]="{ grupe: 'MIZ,MOM,MOS,MPU,MTR' }"
               class="card-btn"
+              href="/webshop?grupe=MIZ,MOM,MOS,MPU,MTR"
             >
               <autom-icon
                 source="arrow-right"
@@ -98,6 +99,7 @@
               [routerLink]="['/webshop']"
               [queryParams]="{ grupe: 'FILTTE' }"
               class="card-btn"
+              href="/webshop?grupe=FILTTE"
             >
               <autom-icon
                 source="arrow-right"

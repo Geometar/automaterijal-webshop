@@ -10,6 +10,7 @@
           class="product--card"
           *ngFor="let brand of brands"
           [routerLink]="['/webshop/manufacturers', brand.slug]"
+          [attr.href]="'/webshop/manufacturers/' + brand.slug"
         >
           <img [src]="brand.src" [alt]="brand.alt" loading="lazy" />
         </a>

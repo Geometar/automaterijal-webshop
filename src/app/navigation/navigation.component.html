@@ -33,6 +33,7 @@
         <li class="navbar-item">
           <a
             routerLink="/home"
+            href="/home"
             class="navbar-link"
             [ngClass]="currentUrl.includes('/home') ? 'nav-active' : null"
             >Home</a
@@ -41,6 +42,7 @@
         <li class="navbar-item">
           <a
             routerLink="/onama"
+            href="/onama"
             class="navbar-link"
             [ngClass]="currentUrl.includes('/onama') ? 'nav-active' : null"
             >O nama</a
@@ -49,6 +51,7 @@
         <li class="navbar-item">
           <a
             routerLink="/kontakt"
+            href="/kontakt"
             class="navbar-link"
             [ngClass]="currentUrl.includes('/kontakt') ? 'nav-active' : null"
             >Kontakt</a
@@ -57,6 +60,7 @@
         <li class="navbar-item">
           <a
             routerLink="/webshop"
+            href="/webshop"
             class="navbar-link"
             [ngClass]="currentUrl.includes('/webshop') ? 'nav-active' : null"
             >Webshop</a
@@ -65,6 +69,7 @@
         <li *ngIf="!loggedIn" class="navbar-item">
           <a
             routerLink="/login"
+            href="/login"
             [ngClass]="currentUrl.includes('/login') ? 'nav-active' : null"
             class="navbar-link color--figma-error-600"
             >Login</a
@@ -175,6 +180,7 @@
         <li>
           <a
             routerLink="/cart"
+            href="/cart"
             class="nav-action-btn nav-btn"
             [ngClass]="currentUrl.includes('/cart') ? 'icon-active' : null"
           >
@@ -220,6 +226,7 @@
   <a
     class="action-btn"
     routerLink="/home"
+    href="/home"
     aria-label="Početna"
     [attr.aria-current]="currentUrl.includes('/home') ? 'page' : null"
   >
@@ -235,6 +242,7 @@
   <a
     class="action-btn"
     routerLink="/webshop"
+    href="/webshop"
     aria-label="Webshop"
     [attr.aria-current]="currentUrl.includes('/webshop') ? 'page' : null"
   >
@@ -250,6 +258,7 @@
   <a
     class="action-btn"
     routerLink="/cart"
+    href="/cart"
     [attr.aria-label]="
       'Korpa' + (cartSize ? ', ' + cartSize + ' artikala' : '')
     "
@@ -270,6 +279,7 @@
     *ngIf="loggedIn"
     class="action-btn"
     routerLink="/invoices"
+    href="/invoices"
     aria-label="Porudžbenice"
     [attr.aria-current]="currentUrl.includes('/invoices') ? 'page' : null"
   >
@@ -285,6 +295,7 @@
     *ngIf="!loggedIn"
     class="action-btn"
     routerLink="/login"
+    href="/login"
     aria-label="Prijava"
     [attr.aria-current]="currentUrl.includes('/login') ? 'page' : null"
   >
@@ -342,70 +353,77 @@
   <ul class="mobile-menu-category-list flex--1">
     <!-- Standard links -->
     <li class="menu-category">
-      <a
-        routerLink="/home"
-        [ngClass]="currentUrl.includes('/home') ? 'nav-active' : null"
-        class="menu-title"
-        (click)="closeMobileSidebar()"
+    <a
+      routerLink="/home"
+      href="/home"
+      [ngClass]="currentUrl.includes('/home') ? 'nav-active' : null"
+      class="menu-title"
+      (click)="closeMobileSidebar()"
       >
         Home
       </a>
     </li>
     <li class="menu-category">
-      <a
-        routerLink="/onama"
-        [ngClass]="currentUrl.includes('/onama') ? 'nav-active' : null"
-        class="menu-title"
-        (click)="closeMobileSidebar()"
+    <a
+      routerLink="/onama"
+      href="/onama"
+      [ngClass]="currentUrl.includes('/onama') ? 'nav-active' : null"
+      class="menu-title"
+      (click)="closeMobileSidebar()"
       >
         O nama
       </a>
     </li>
     <li class="menu-category">
-      <a
-        routerLink="/kontakt"
-        [ngClass]="currentUrl.includes('/kontakt') ? 'nav-active' : null"
-        class="menu-title"
-        (click)="closeMobileSidebar()"
+    <a
+      routerLink="/kontakt"
+      href="/kontakt"
+      [ngClass]="currentUrl.includes('/kontakt') ? 'nav-active' : null"
+      class="menu-title"
+      (click)="closeMobileSidebar()"
       >
         Kontakt
       </a>
     </li>
     <li class="menu-category">
-      <a
-        routerLink="/webshop"
-        [ngClass]="currentUrl.includes('/webshop') ? 'nav-active' : null"
-        class="menu-title"
-        (click)="closeMobileSidebar()"
+    <a
+      routerLink="/webshop"
+      href="/webshop"
+      [ngClass]="currentUrl.includes('/webshop') ? 'nav-active' : null"
+      class="menu-title"
+      (click)="closeMobileSidebar()"
       >
         Webshop
       </a>
     </li>
     <li class="menu-category" *ngIf="!loggedIn">
-      <a
-        routerLink="/login"
-        [ngClass]="currentUrl.includes('/login') ? 'nav-active' : null"
-        class="menu-title color--figma-error-600"
-        (click)="closeMobileSidebar()"
+    <a
+      routerLink="/login"
+      href="/login"
+      [ngClass]="currentUrl.includes('/login') ? 'nav-active' : null"
+      class="menu-title color--figma-error-600"
+      (click)="closeMobileSidebar()"
         >Login</a
       >
     </li>
     <li class="menu-category" *ngIf="loggedIn">
-      <a
-        routerLink="/invoices"
-        [ngClass]="currentUrl.includes('/invoices') ? 'nav-active' : null"
-        class="menu-title"
-        (click)="closeMobileSidebar()"
+    <a
+      routerLink="/invoices"
+      href="/invoices"
+      [ngClass]="currentUrl.includes('/invoices') ? 'nav-active' : null"
+      class="menu-title"
+      (click)="closeMobileSidebar()"
       >
         Porudžbenice
       </a>
     </li>
     <li class="menu-category" *ngIf="loggedIn">
-      <a
-        class="menu-title"
-        [ngClass]="currentUrl.includes('/cart') ? 'nav-active' : null"
-        routerLink="/cart"
-        (click)="closeMobileSidebar()"
+    <a
+      class="menu-title"
+      [ngClass]="currentUrl.includes('/cart') ? 'nav-active' : null"
+      routerLink="/cart"
+      href="/cart"
+      (click)="closeMobileSidebar()"
       >
         Korpa
       </a>
@@ -417,6 +435,7 @@
     <span class="menu-section-label">Admin</span>
     <a
       routerLink="/sales-reports"
+      href="/sales-reports"
       [ngClass]="currentUrl.includes('/sales-reports') ? 'nav-active' : null"
       class="menu-title autom-padding--vertical__xxs"
       (click)="closeMobileSidebar()"
@@ -426,6 +445,7 @@
     </a>
     <a
       routerLink="/logs"
+      href="/logs"
       [ngClass]="currentUrl.includes('/logs') ? 'nav-active' : null"
       class="menu-title autom-padding--vertical__xxs"
       (click)="closeMobileSidebar()"

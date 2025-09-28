@@ -152,6 +152,7 @@
           class="btn-outline"
           [routerLink]="categoryUrl(g)"
           (click)="pickGroup(g)"
+          [attr.href]="categoryUrl(g)"
         >
           Prikaži sve iz grupe
         </a>
@@ -164,6 +165,7 @@
           [routerLink]="categoryUrl(g, sub)"
           (click)="pickSubgroup(g, sub)"
           [attr.aria-label]="sub.name"
+          [attr.href]="categoryUrl(g, sub)"
         >
           <span class="subcard__name">{{ sub.name }}</span>
           <span class="subcard__chev">›</span>
@@ -177,6 +179,7 @@
           class="btn-outline"
           [routerLink]="categoryUrl(g)"
           (click)="pickGroup(g)"
+          [attr.href]="categoryUrl(g)"
         >
           Otvori celu grupu
         </a>
@@ -205,6 +208,7 @@
           class="btn-outline"
           [routerLink]="categoryUrl(g)"
           (click)="pickGroup(g)"
+          [attr.href]="categoryUrl(g)"
         >
           Prikaži sve
         </a>
@@ -217,6 +221,7 @@
           [routerLink]="categoryUrl(g, sub)"
           (click)="pickSubgroup(g, sub)"
           [attr.aria-label]="sub.name"
+          [attr.href]="categoryUrl(g, sub)"
         >
           <span class="subcard__name">{{ sub.name }}</span>
           <span class="subcard__chev">›</span>
@@ -229,6 +234,7 @@
           class="btn-outline"
           [routerLink]="categoryUrl(g)"
           (click)="pickGroup(g)"
+          [attr.href]="categoryUrl(g)"
         >
           Otvori celu grupu
         </a>

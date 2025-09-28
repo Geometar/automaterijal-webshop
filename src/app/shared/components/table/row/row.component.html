@@ -22,7 +22,10 @@
   <!-- Details Section -->
   <div class="details-container">
     <h3 [class.disabled]="data.podGrupa === 1000000">
-      <a [routerLink]="['/webshop', data.robaid + '-' + getProductSlug(data)]">
+      <a
+        [routerLink]="['/webshop', data.robaid + '-' + getProductSlug(data)]"
+        [attr.href]="'/webshop/' + (data.robaid + '-' + getProductSlug(data))"
+      >
         <span class="color--figma-primary-800">
           {{ data.proizvodjac?.naziv }}</span
         >

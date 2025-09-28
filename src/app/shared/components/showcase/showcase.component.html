@@ -12,6 +12,7 @@
         [routerLink]="section.titleUrl"
         [queryParams]="{ naStanju: true }"
         class="section-link"
+        [attr.href]="section.titleUrl + '?naStanju=true'"
       >
         {{ section.title }}
         <span class="arrow-icon">→</span>

@@ -84,6 +84,9 @@
       [queryParams]="{ mandatoryproid: brand.id }"
       [title]="'Proizvođač: ' + brand.label"
       [attr.aria-label]="'Proizvođač: ' + brand.label"
+      [attr.href]="
+        '/webshop/manufacturers/' + brand.slug + '?mandatoryproid=' + brand.id
+      "
     >
       <li>
         <img
