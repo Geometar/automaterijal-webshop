@@ -628,9 +628,6 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   }
 
   private buildCanonical(roba: Roba): { idParam: string; url: string } {
-    const brand = this.normalizeWhitespace(roba.proizvodjac?.naziv);
-    const name = this.normalizeWhitespace(roba.naziv);
-    const sku = this.normalizeWhitespace(roba.katbr);
     const id = roba.robaid ?? '';
     const slug = this.buildSlug(roba);
     const idParam = slug ? `${id}-${slug}` : String(id);
@@ -642,6 +639,11 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     const brand = this.normalizeWhitespace(roba.proizvodjac?.naziv);
     const name = this.normalizeWhitespace(roba.naziv);
     const sku = this.normalizeWhitespace(roba.katbr);
+
+    if (!sku) {
+      return '';
+    }
+
     return StringUtils.slugify([brand, name, sku].filter(Boolean).join(' '));
   }
 

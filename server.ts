@@ -69,9 +69,12 @@ async function resolveProductCanonicalMeta(id: string): Promise<ProductCanonical
     const brand = normalizeWhitespace(data?.proizvodjac?.naziv);
     const name = normalizeWhitespace(data?.naziv);
     const sku = normalizeWhitespace(data?.katbr);
-    const slugSource = [brand, name, sku].filter(Boolean).join(' ');
-    const slug = slugSource ? slugifyProductValue(slugSource) : null;
-    const idParam = slug ? `${id}-${slug}` : id;
+    if (!sku) {
+      return { idParam: id, slug: null };
+    }
+
+    const slug = slugifyProductValue([brand, name, sku].filter(Boolean).join(' '));
+    const idParam = `${id}-${slug}`;
     return { idParam, slug };
   } catch (error) {
     logDebug('[PRODUCT REDIRECT] Failed to resolve canonical slug', error);
@@ -158,16 +161,16 @@ export function app(): express.Express {
       const targetPath = `/webshop/${canonical.idParam}`;
       const targetUrl = `${targetPath}${search}`;
 
-      if (!canonical.slug) {
-        res.setHeader('X-Robots-Tag', 'noindex, follow');
-        res.redirect(301, '/webshop');
-        return;
-      }
-
       const providedSlug = (incomingSlug ?? '').toLowerCase();
-      if (!providedSlug || providedSlug !== canonical.slug.toLowerCase()) {
+      if (canonical.slug) {
+        if (!providedSlug || providedSlug !== canonical.slug.toLowerCase()) {
+          res.setHeader('X-Robots-Tag', 'noindex, follow');
+          res.redirect(301, targetUrl);
+          return;
+        }
+      } else if (incomingSlug) {
         res.setHeader('X-Robots-Tag', 'noindex, follow');
-        res.redirect(301, targetUrl);
+        res.redirect(301, `/webshop/${canonical.idParam}${search}`);
         return;
       }
 
