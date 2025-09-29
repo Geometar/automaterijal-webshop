@@ -101,7 +101,7 @@
   }
 
   /* Unify buttons */
-  .nav-btn {
+  .nav-btn-webshop {
     height: 46px;
     border-radius: 9999px !important;
     padding: 0 16px;
@@ -248,10 +248,10 @@
         "search  search";
       gap: 10px;
     }
-    .nav-btn:first-child {
+    .nav-btn-webshop:first-child {
       grid-area: vehicle;
     }
-    .nav-btn:last-child {
+    .nav-btn-webshop:last-child {
       grid-area: categories;
     }
     .nav-search {
@@ -272,7 +272,7 @@
         "vehicle"
         "categories";
     }
-    .nav-btn,
+    .nav-btn-webshop,
     .nav-input ::ng-deep .mdc-text-field {
       height: 44px;
     }
@@ -280,7 +280,7 @@
 }
 
 /* unify button look & height */
-.nav-btn {
+.nav-btn-webshop {
   height: 46px;
   border-radius: 9999px !important;
   padding: 0 16px;
@@ -400,7 +400,7 @@
     }
   }
 
-  .nav-toolbar .nav-btn button {
+  .nav-toolbar .nav-btn-webshop button {
     height: 35px;
   }
   .nav-toolbar {
@@ -410,10 +410,10 @@
       "search  search";
     gap: 10px;
   }
-  .nav-btn:first-child {
+  .nav-btn-webshop:first-child {
     grid-area: vehicle;
   }
-  .nav-btn:last-child {
+  .nav-btn-webshop:last-child {
     grid-area: categories;
   }
   .nav-search {
@@ -433,7 +433,7 @@
   .nav-toolbar {
     gap: 8px;
   }
-  .nav-btn,
+  .nav-btn-webshop,
   .nav-input ::ng-deep .mdc-text-field {
     height: 44px;
   }
