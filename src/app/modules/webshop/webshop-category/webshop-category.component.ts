@@ -100,11 +100,15 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
     private urlHelperService: UrlHelperService
   ) { }
 
+  private get isBrowser(): boolean {
+    return isPlatformBrowser(this.platformId);
+  }
+
   get isMobileView(): boolean {
-    if (isPlatformBrowser(this.platformId)) {
-      return window.innerWidth < 991;
+    if (!this.isBrowser) {
+      return false;
     }
-    return false; // fallback za server-side render
+    return window.innerWidth < 991;
   }
 
   get isManufPage(): boolean {
@@ -113,6 +117,10 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
 
   /** Start of: Angular lifecycle hooks */
   ngOnInit(): void {
+    if (!this.isBrowser) {
+      return;
+    }
+
     const saved = localStorage.getItem(this.collapseKey);
     if (saved) {
       try { this.collapseState = { ...this.collapseState, ...JSON.parse(saved) }; } catch { }
@@ -199,6 +207,9 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
   }
 
   private persistCollapseState(): void {
+    if (!this.isBrowser) {
+      return;
+    }
     try {
       localStorage.setItem(this.collapseKey, JSON.stringify(this.collapseState));
     } catch {

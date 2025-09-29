@@ -18,6 +18,10 @@ export class AuthServerProvider {
   constructor(private http: HttpClient, private localStorageService: LocalStorageService, @Inject(PLATFORM_ID) private platformId: Object) { }
 
   getToken(): string {
+    if (!this.isBrowser()) {
+      return '';
+    }
+
     const tokenInSessionStorage: string | null = this.localStorageService.retrieve('authenticationToken');
     return tokenInSessionStorage ?? '';
   }
@@ -36,6 +40,10 @@ export class AuthServerProvider {
 
 
   logout(): Observable<void> {
+    if (!this.isBrowser()) {
+      return of();
+    }
+
     const jwt = this.localStorageService.retrieve('authenticationToken');
 
     if (!jwt) return of();

@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { LocalStorageService } from 'ngx-webstorage';
 import { TecdocSearchHistory } from '../../data-models/model/tecdoc';
 
@@ -8,7 +9,14 @@ import { TecdocSearchHistory } from '../../data-models/model/tecdoc';
 export class TecdocSearchHistoryService {
   private storageKey = 'searchedVehicles';
 
-  constructor(private localStorage: LocalStorageService) { }
+  constructor(
+    private localStorage: LocalStorageService,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) { }
+
+  private get isBrowser(): boolean {
+    return isPlatformBrowser(this.platformId);
+  }
 
   // Add a vehicle to local storage
   saveVehicle(vehicle: TecdocSearchHistory): void {
@@ -26,11 +34,18 @@ export class TecdocSearchHistoryService {
       vehicles = vehicles.slice(vehicles.length - 10); // Keep last 10 items
     }
 
+    if (!this.isBrowser) {
+      return;
+    }
+
     this.localStorage.store(this.storageKey, vehicles);
   }
 
   // Get history as an array of TecdocVehicle objects
   getVehiclesArray(): TecdocSearchHistory[] {
+    if (!this.isBrowser) {
+      return [];
+    }
     const data = this.localStorage.retrieve(this.storageKey) || [];
     return data.map((v: any) => new TecdocSearchHistory(v.id, v.type, v.description));
   }

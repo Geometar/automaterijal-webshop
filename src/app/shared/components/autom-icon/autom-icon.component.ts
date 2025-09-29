@@ -1,9 +1,10 @@
 import { ColorEnum } from '../../data-models/enums/color.enum';
-import { Component, Input, ViewEncapsulation } from '@angular/core';
+import { Component, Inject, Input, PLATFORM_ID, ViewEncapsulation } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MatIconModule, MatIconRegistry } from '@angular/material/icon';
 import { MatBadgeModule } from '@angular/material/badge';
 import { CommonModule } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
 
 // Directive
 import { AutomTooltipDirective } from '../autom-tooltip/autom-tooltip.directive';
@@ -76,16 +77,46 @@ export class AutomIconComponent {
   }
 
   /* eslint-disable no-unused-vars */
-  constructor(private iconRegistry: MatIconRegistry, private sanitizer: DomSanitizer) { }
+  constructor(
+    private iconRegistry: MatIconRegistry,
+    private sanitizer: DomSanitizer,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) { }
 
   ngOnChanges(): void {
     this.setIcons();
   }
 
   setIcons(): void {
+    if (!this.source) {
+      return;
+    }
+
+    const inline = INLINE_SVG_ICON_MAP[this.source];
+    if (inline) {
+      this.iconRegistry.addSvgIconLiteral(
+        this.source,
+        this.sanitizer.bypassSecurityTrustHtml(inline)
+      );
+      return;
+    }
+
+    if (!isPlatformBrowser(this.platformId)) {
+      this.iconRegistry.addSvgIconLiteral(
+        this.source,
+        this.sanitizer.bypassSecurityTrustHtml('<svg xmlns="http://www.w3.org/2000/svg"></svg>')
+      );
+      return;
+    }
+
     this.iconRegistry.addSvgIcon(
       this.source,
       this.sanitizer.bypassSecurityTrustResourceUrl('images/icons/' + this.source + '.svg')
     );
   }
 }
+
+const INLINE_SVG_ICON_MAP: Record<string, string> = {
+  'align-justify': `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 10H3M21 6H3M21 14H3M21 18H3" stroke="#18181B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  navigation: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 11L22 2L13 21L11 13L3 11Z" stroke="#18181B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+};

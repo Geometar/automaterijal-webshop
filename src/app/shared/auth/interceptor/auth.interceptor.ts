@@ -33,7 +33,10 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
     );
   }
 
-  const token: string | null = localStorageService.retrieve('authenticationToken');
+  const isBrowser = typeof window !== 'undefined';
+  const token: string | null = isBrowser
+    ? localStorageService.retrieve('authenticationToken')
+    : null;
 
   const modifiedRequest = request.clone({
     setHeaders: {
@@ -48,7 +51,9 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
         // Optional: check if backend returned a specific error message
         console.warn('Authentication expired or unauthorized. Logging out.');
 
-        localStorageService.clear('authenticationToken');  // Remove authentication token
+        if (isBrowser) {
+          localStorageService.clear('authenticationToken');  // Remove authentication token
+        }
         accountStateService.remove(); // Remove logged in user
         accountService.authenticate(null); // Clear authentication state
         router.navigate(['/login']);   // Redirect to login

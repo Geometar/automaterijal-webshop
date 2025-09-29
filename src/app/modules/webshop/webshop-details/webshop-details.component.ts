@@ -1,8 +1,10 @@
 import {
   Component,
   HostListener,
+  Inject,
   OnDestroy,
   OnInit,
+  PLATFORM_ID,
   ViewEncapsulation,
 } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -40,7 +42,7 @@ import { ShowcaseComponent, ShowcaseSection } from '../../../shared/components/s
 import { AddAttributesComponent } from './add-atributes/add-atributes.component';
 import { AutomIconComponent } from '../../../shared/components/autom-icon/autom-icon.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
-import { CommonModule, CurrencyPipe } from '@angular/common';
+import { CommonModule, CurrencyPipe, isPlatformBrowser } from '@angular/common';
 import { DividerComponent } from '../../../shared/components/divider/divider.component';
 import { InputFieldsComponent } from '../../../shared/components/input-fields/input-fields.component';
 import { PopupComponent } from '../../../shared/components/popup/popup.component';
@@ -136,6 +138,9 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   private showcaseTakenIds = new Set<number>();
   private routeSlug: string | null = null;
   private slugMatchesCanonical = true;
+  private get isBrowser(): boolean {
+    return isPlatformBrowser(this.platformId);
+  }
 
   // Specs
   displayedSpecs: SpecEntry[] = [];
@@ -175,7 +180,8 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     private seoService: SeoService,
     private snackbarService: SnackbarService,
     private tecDocService: TecdocService,
-    private urlHelperService: UrlHelperService
+    private urlHelperService: UrlHelperService,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) { }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -188,6 +194,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       .subscribe((params) => {
         const raw = params.get('id');
         this.routeSlug = this.extractSlug(raw);
+        this.applyRouteCanonical(raw);
         this.id = this.parseId(raw);
         if (this.id) {
           this.fetchData(this.id);
@@ -338,6 +345,10 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   // ─────────────────────────────────────────────────────────────────────────────
 
   openPdf(doc: TecDocDokumentacija) {
+    if (!this.isBrowser) {
+      return;
+    }
+
     this.tecDocService
       .getDocumentBytes(doc.docId!)
       .pipe(takeUntil(this.destroy$))
@@ -351,6 +362,9 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   }
 
   openLink(doc: TecDocDokumentacija) {
+    if (!this.isBrowser) {
+      return;
+    }
     window.open(doc.docUrl!, '_blank');
   }
 
@@ -542,8 +556,12 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   // ─────────────────────────────────────────────────────────────────────────────
 
   triggerImageUpload(): void {
-    const input = document.getElementById('imageUpload') as HTMLInputElement;
-    if (input) input.click();
+    if (!this.isBrowser) {
+      return;
+    }
+
+    const input = document.getElementById('imageUpload') as HTMLInputElement | null;
+    input?.click();
   }
   editAttributes(): void {
     this.showAddAttributes = true;
@@ -959,6 +977,23 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     if (dashIndex === -1) return null;
     const slug = raw.slice(dashIndex + 1).trim();
     return slug.length ? slug : null;
+  }
+
+  private applyRouteCanonical(raw: string | null): void {
+    if (!raw) {
+      return;
+    }
+
+    const idPart = this.parseId(raw);
+    if (!idPart) {
+      return;
+    }
+
+    const slug = this.extractSlug(raw);
+    const idParam = slug ? `${idPart}-${slug}` : String(idPart);
+    const canonical = `https://automaterijal.com/webshop/${idParam}`;
+    this.seoService.setCanonicalUrl(canonical);
+    this.seoService.setRobots('noindex, follow');
   }
 
   private parseId(raw: string | null): number | null {

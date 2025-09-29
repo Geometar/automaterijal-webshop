@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { LocalStorageService } from 'ngx-webstorage';
 import { BehaviorSubject } from 'rxjs';
 
@@ -14,11 +15,23 @@ export class CartStateService {
   cartSize$: BehaviorSubject<number> = new BehaviorSubject(0);
   roba$: BehaviorSubject<Roba[]> = new BehaviorSubject([] as Roba[]);
 
-  constructor(private localStorage: LocalStorageService) {
-    this.updateCartSize();
+  constructor(
+    private localStorage: LocalStorageService,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
+    if (this.isBrowser) {
+      this.updateCartSize();
+    }
+  }
+
+  private get isBrowser(): boolean {
+    return isPlatformBrowser(this.platformId);
   }
 
   getAll(): CartItem[] {
+    if (!this.isBrowser) {
+      return [];
+    }
     return this.localStorage.retrieve(this.storageKey) || [];
   }
 
@@ -39,22 +52,38 @@ export class CartStateService {
     // ✅ Smanjuje stanje robe
     roba.stanje = this.calculateNewStock(roba.stanje, quantity);
 
+    if (!this.isBrowser) {
+      return;
+    }
+
     this.localStorage.store(this.storageKey, cart);
     this.updateCartSize();
   }
 
   removeFromCart(itemId: number): void {
+    if (!this.isBrowser) {
+      return;
+    }
+
     const updatedCart = this.getAll().filter((item) => item.robaId !== itemId);
     this.localStorage.store(this.storageKey, updatedCart);
     this.updateCartSize();
   }
 
   resetCart(): void {
+    if (!this.isBrowser) {
+      return;
+    }
+
     this.localStorage.clear(this.storageKey);
     this.updateCartSize();
   }
 
   updateQuantity(itemId: number, quantity: number): void {
+    if (!this.isBrowser) {
+      return;
+    }
+
     let cart = this.getAll();
     const item = cart.find((i) => i.robaId === itemId);
 
@@ -68,6 +97,9 @@ export class CartStateService {
   }
 
   updateStockFromCart(robaList: any[]): void {
+    if (!this.isBrowser) {
+      return;
+    }
     let cart = this.getAll();
 
     robaList.forEach((roba) => {
@@ -79,6 +111,9 @@ export class CartStateService {
   }
 
   updateStockForItem(roba: any): void {
+    if (!this.isBrowser) {
+      return;
+    }
     let cart = this.getAll();
     const cartItem = cart.find((item) => item.robaId === roba.robaid);
 
@@ -103,6 +138,11 @@ export class CartStateService {
   }
 
   private updateCartSize(): void {
+    if (!this.isBrowser) {
+      this.cartSize$.next(0);
+      this.roba$.next([]);
+      return;
+    }
     const cartItems = this.getAll();
     this.cartSize$.next(cartItems.length)
     this.roba$.next(cartItems.map((cartItem: CartItem) => this.mapToRoba(cartItem)));
