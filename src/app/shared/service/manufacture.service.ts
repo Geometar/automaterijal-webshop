@@ -23,4 +23,8 @@ export class ManufactureService {
   getBySlug(slug: string): Observable<Manufacture> {
     return this.http.get<Manufacture>(`${DOMAIN_URL}/${slug}`);
   }
+
+  getAll(): Observable<Manufacture[]> {
+    return this.http.get<Manufacture[]>(DOMAIN_URL);
+  }
 }

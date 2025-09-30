@@ -61,18 +61,25 @@
 
   .products-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 1.5rem;
-    max-width: 1320px; // npr. 6 kartica * 220px + 5 * 24px gap
+    max-width: calc(5 * 220px + 4 * 1.5rem);
     width: 100%;
+    margin: 0 auto;
 
     autom-product-card {
       transition: transform 0.2s ease, box-shadow 0.2s ease;
-      width: fit-content;
+      width: 100%;
+
       &:hover {
         transform: translateY(-4px);
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
       }
+    }
+
+    ::ng-deep autom-product-card .product-card {
+      max-width: 220px;
+      width: 100%;
     }
   }
 }

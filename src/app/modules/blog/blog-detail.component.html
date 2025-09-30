@@ -1,0 +1,211 @@
+<section
+  class="blog-detail header-margin--top"
+  *ngIf="post() as article; else loadingOrError"
+>
+  <article class="article">
+    <nav class="article__nav" aria-label="Blog navigacija">
+      <a class="article__back" [routerLink]="['/blog']">
+        <span aria-hidden="true">←</span>
+        Nazad na blog
+      </a>
+    </nav>
+
+    <div class="article__hero">
+      <header class="article__header">
+        <div class="article__meta">
+          <a
+            [routerLink]="['/blog']"
+            class="meta-chip meta-chip--accent"
+            [queryParams]="
+              article.primaryCategorySlug
+                ? { category: article.primaryCategorySlug }
+                : null
+            "
+          >
+            {{ article.primaryCategoryName }}
+          </a>
+          <span class="meta-chip">
+            <span
+              class="meta-icon meta-icon--calendar"
+              aria-hidden="true"
+            ></span>
+            <time [attr.datetime]="article.publishedAt">{{
+              article.publishedAt | date : "d. MMM yyyy."
+            }}</time>
+          </span>
+          <span class="meta-chip" *ngIf="article.readingTimeMinutes">
+            <span class="meta-icon meta-icon--clock" aria-hidden="true"></span>
+            {{ article.readingTimeMinutes }} min čitanja
+          </span>
+        </div>
+        <h1>{{ article.title }}</h1>
+        <p class="article__excerpt">{{ article.excerpt }}</p>
+        <div class="article__author" *ngIf="article.author as author">
+          <img
+            *ngIf="author.avatar"
+            [src]="author.avatar"
+            [alt]="author.name"
+            loading="lazy"
+          />
+          <div>
+            <strong>{{ author.name }}</strong>
+            <span *ngIf="author.bio">{{ author.bio }}</span>
+          </div>
+        </div>
+      </header>
+
+      <figure class="article__cover" *ngIf="article.coverImageSrc">
+        <img
+          [src]="article.coverImageSrc"
+          [alt]="article.title"
+          loading="lazy"
+        />
+      </figure>
+    </div>
+
+    <div class="article__body">
+      <section class="article__content" [innerHTML]="htmlContent()"></section>
+
+      <footer class="article__footer">
+        <div class="article__tags" *ngIf="article.tags?.length; else noTags">
+          <span class="article__tags-title">Tagovi:</span>
+          <div class="article__tag-list">
+            <a
+              *ngFor="let tag of article.tags"
+              class="tag"
+              [routerLink]="['/blog']"
+              [queryParams]="{ tag: tag?.slug ?? tag?.name ?? '' }"
+            >
+              #{{ tag.name }}
+            </a>
+          </div>
+        </div>
+        <ng-template #noTags>
+          <div class="article__tags article__tags--empty">
+            <span class="article__tags-title">Tagovi:</span>
+            <span class="article__tags-placeholder"
+              >Autor još nije dodao tagove za ovaj tekst.</span
+            >
+          </div>
+        </ng-template>
+      </footer>
+    </div>
+  </article>
+
+  <autom-divider class="blog-showcase"></autom-divider>
+
+  <section
+    class="blog-showcase"
+    *ngIf="showcaseSections().length || showcaseLoading()"
+  >
+    <h2>Preporučeni proizvodi</h2>
+    <autom-showcase
+      [showcase]="showcaseSections()"
+      [loading]="showcaseLoading()"
+    ></autom-showcase>
+  </section>
+
+  <section class="related" *ngIf="related().length">
+    <h2>Povezani članci</h2>
+    <div class="related__grid">
+      <article class="related-card" *ngFor="let item of related()">
+        <a [routerLink]="['/blog', item.slug]">
+          <img
+            *ngIf="item.coverImageSrc"
+            [src]="item.coverImageSrc"
+            [alt]="item.title"
+            loading="lazy"
+          />
+          <div class="related-card__body">
+            <span class="category">{{ item.primaryCategoryName }}</span>
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.excerpt }}</p>
+          </div>
+        </a>
+      </article>
+    </div>
+  </section>
+
+  <section class="comments">
+    <h2>Komentari</h2>
+
+    <form
+      class="comment-form"
+      *ngIf="!commentLocked(); else commentLockedInfo"
+      (ngSubmit)="submitComment(article.slug)"
+    >
+      <div class="form-grid">
+        <label>
+          Ime i prezime
+          <input
+            type="text"
+            [(ngModel)]="commentAuthor"
+            name="author"
+            required
+            placeholder="Vaše ime"
+          />
+        </label>
+        <label>
+          Email (opciono)
+          <input
+            type="email"
+            [(ngModel)]="commentEmail"
+            name="email"
+            placeholder="primer@domen.com"
+          />
+        </label>
+      </div>
+      <label>
+        Komentar
+        <textarea
+          [(ngModel)]="commentBody"
+          name="content"
+          rows="4"
+          required
+          placeholder="Podelite svoje mišljenje"
+        ></textarea>
+      </label>
+      <button type="submit" [disabled]="submittingComment()">
+        {{ submittingComment() ? "Slanje..." : "Pošalji komentar" }}
+      </button>
+    </form>
+    <ng-template #commentLockedInfo>
+      <div class="comment-lock">
+        <p>Hvala što ste podelili svoje mišljenje!</p>
+        <p>Možete ostaviti novi komentar kada ponovo učitate stranicu.</p>
+        <button type="button" (click)="commentLocked.set(false)">
+          Ipak ponovo prikaži formu
+        </button>
+      </div>
+    </ng-template>
+
+    <div class="comment-list" *ngIf="comments().length; else noComments">
+      <article
+        class="comment"
+        *ngFor="let comment of comments(); trackBy: trackCommentBy"
+      >
+        <header>
+          <strong>{{ comment.authorName }}</strong>
+          <time [attr.datetime]="comment.createdAt">{{
+            comment.createdAt | date : "d. MMM yyyy. HH:mm"
+          }}</time>
+        </header>
+        <p>{{ comment.content }}</p>
+      </article>
+    </div>
+    <ng-template #noComments>
+      <p class="no-comments">Budite prvi koji će komentarisati ovaj tekst.</p>
+    </ng-template>
+  </section>
+</section>
+
+<ng-template #loadingOrError>
+  <div class="state header-margin--top" *ngIf="error(); else loader">
+    <h2>Članak nije pronađen</h2>
+    <p>{{ error() }}</p>
+    <a routerLink="/blog">Nazad na blog</a>
+  </div>
+  <ng-template #loader>
+    <div class="article-skeleton header-margin--top"></div>
+  </ng-template>
+</ng-template>

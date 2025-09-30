@@ -1,0 +1,693 @@
+<section class="blog-admin header-margin--top">
+  <header class="admin-header">
+    <div>
+      <h1>Blog administracija</h1>
+      <p>Upravljanje člancima, kategorijama i tagovima.</p>
+    </div>
+    <div class="header-actions">
+      <label>
+        Filter statusa
+        <select
+          [ngModel]="statusFilter()"
+          (ngModelChange)="changeStatusFilter($event)"
+        >
+          <option *ngFor="let status of statuses" [ngValue]="status">
+            {{ statusFilterLabel(status) }}
+          </option>
+        </select>
+      </label>
+      <autom-button
+        [label]="'Novi članak'"
+        [theme]="buttonThemes.BLUE"
+        [type]="buttonTypes.PRIMARY"
+        (clickEvent)="resetForm()"
+      ></autom-button>
+    </div>
+  </header>
+
+  <div class="admin-layout">
+    <section class="admin-list" aria-label="Postovi">
+      <div class="list-header">
+        <h2>Objave</h2>
+        <span *ngIf="loadingList()" class="tag">Učitavanje...</span>
+      </div>
+      <div class="list-empty" *ngIf="!posts().length && !loadingList()">
+        <p>Nema objava za selektovani filter.</p>
+      </div>
+      <ul class="post-list">
+        <li
+          *ngFor="let post of posts()"
+          [class.is-active]="editingPostId === post.id"
+        >
+          <div class="post-info">
+            <h3>{{ post.title }}</h3>
+            <div class="meta">
+              <span
+                class="status-pill"
+                [ngClass]="statusBadgeClass(post.status)"
+              >
+                {{ statusBadgeLabel(post.status) }}
+              </span>
+              <span class="dot" aria-hidden="true"></span>
+              <time [attr.datetime]="post.publishedAt">{{
+                post.publishedAt | date : "d. MMM yyyy. HH:mm"
+              }}</time>
+            </div>
+          </div>
+          <div class="post-actions">
+            <autom-button
+              [label]="'Uredi'"
+              [theme]="buttonThemes.LIGHT_GREY"
+              [type]="buttonTypes.SECONDARY"
+              (clickEvent)="editPost(post)"
+            ></autom-button>
+            <autom-button
+              *ngIf="post.status !== 'ARCHIVED'"
+              [label]="'Arhiviraj'"
+              [theme]="buttonThemes.LIGHT_ORANGE"
+              [type]="buttonTypes.SECONDARY"
+              (clickEvent)="archive(post)"
+            ></autom-button>
+            <autom-button
+              [label]="'Obriši'"
+              [theme]="buttonThemes.LIGHT_RED"
+              [type]="buttonTypes.SECONDARY"
+              (clickEvent)="delete(post)"
+            ></autom-button>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <section class="admin-form" aria-label="Forma za uređivanje">
+      <h2>{{ isEditing() ? "Uredi" : "Novi" }} članak</h2>
+      <form [formGroup]="form" (ngSubmit)="saveCurrentStatus()">
+        <div class="form-grid">
+          <autom-input-fields
+            class="form-control"
+            [clearBtn]="true"
+            [formControlName]="'title'"
+            [label]="'Naslov'"
+            [placeholder]="'Npr. Kako odabrati pravi filter ulja'"
+            [required]="true"
+            [size]="sizeEnum.FULL"
+            [type]="inputTypeEnum.TEXT"
+            [validators]="[{ required: true }]"
+            [hint]="
+              'Glavni naslov koji se prikazuje na listi i u detail prikazu.'
+            "
+            [value]="form.controls['title'].value ?? ''"
+            (emitSelected)="setFieldValue('title', $event)"
+            ngDefaultControl
+          ></autom-input-fields>
+
+          <autom-input-fields
+            class="form-control"
+            [clearBtn]="true"
+            [formControlName]="'slug'"
+            [label]="'Slug'"
+            [placeholder]="'npr. kako-odabrati-pravi-filter'"
+            [size]="sizeEnum.FULL"
+            [type]="inputTypeEnum.TEXT"
+            [hint]="
+              'URL segment. Ostavite prazno da se generiše automatski iz naslova.'
+            "
+            [value]="form.controls['slug'].value ?? ''"
+            (emitSelected)="setFieldValue('slug', $event)"
+            ngDefaultControl
+          ></autom-input-fields>
+        </div>
+
+        <autom-text-area
+          [formControlName]="'excerpt'"
+          [hint]="
+            'Kratak sažetak (do 2-3 rečenice) prikazan na listi i og meta tagovima.'
+          "
+          [label]="'Kratak opis'"
+          [maxLength]="400"
+          [rows]="4"
+          [value]="form.controls['excerpt'].value ?? ''"
+          (emitSelected)="setFieldValue('excerpt', $event)"
+          ngDefaultControl
+        ></autom-text-area>
+
+        <autom-input-fields
+          [clearBtn]="true"
+          [formControlName]="'coverImageUrl'"
+          [label]="'URL naslovne slike'"
+          [placeholder]="'https://example.com/image.jpg'"
+          [size]="sizeEnum.FULL"
+          [type]="inputTypeEnum.TEXT"
+          [hint]="
+            'Slika koja se prikazuje na listi i kao OpenGraph vizual (preporučeno 1200x630 px). Unesite URL ili otpremite sliku ispod.'
+          "
+          [value]="form.controls['coverImageUrl'].value ?? ''"
+          (emitSelected)="setFieldValue('coverImageUrl', $event)"
+          ngDefaultControl
+        ></autom-input-fields>
+
+        <div class="cover-image-control">
+          <div class="cover-image-actions">
+            <input
+              #coverImageInput
+              type="file"
+              accept="image/*"
+              hidden
+              (change)="onCoverImageSelected($event)"
+            />
+            <autom-button
+              [label]="coverImagePreview() ? 'Promeni sliku' : 'Otpremi sliku'"
+              [theme]="buttonThemes.DEFAULT"
+              [type]="buttonTypes.PRIMARY"
+              (clickEvent)="coverImageInput.click()"
+            ></autom-button>
+            <autom-button
+              *ngIf="coverImagePreview()"
+              [label]="'Ukloni'"
+              [theme]="buttonThemes.LIGHT_GREY"
+              [type]="buttonTypes.SECONDARY"
+              (clickEvent)="removeCoverImage()"
+            ></autom-button>
+          </div>
+
+          <p class="field-hint">Podržane JPG/PNG slike do 5MB. Ako ostavite prazno, koristi se podrazumevana ilustracija.</p>
+          <p class="field-hint field-hint--filename" *ngIf="coverImageName()">
+            Trenutna slika: {{ coverImageName() }}
+          </p>
+          <p class="field-error" *ngIf="coverImageError()">{{ coverImageError() }}</p>
+
+          <div class="cover-image-preview" *ngIf="coverImagePreview() as preview">
+            <img [src]="preview" alt="Pregled naslovne slike" />
+          </div>
+        </div>
+
+        <div class="rich-text-field">
+          <autom-label
+            [label]="'Sadržaj'"
+            [required]="true"
+            [size]="sizeEnum.FULL"
+          ></autom-label>
+          <quill-editor
+            formControlName="content"
+            [modules]="editorModules"
+            theme="snow"
+            placeholder="Unesite sadržaj članka"
+          ></quill-editor>
+          <p class="field-hint">
+            Koristite alatnu traku za formatiranje, linkove i slike. HTML se
+            upisuje automatski.
+          </p>
+        </div>
+
+        <div class="form-grid">
+          <autom-input-fields
+            class="form-control"
+            [clearBtn]="true"
+            [formControlName]="'metaTitle'"
+            [label]="'Meta title'"
+            [placeholder]="'Prilagođeni naslov za pretraživače'"
+            [size]="sizeEnum.FULL"
+            [type]="inputTypeEnum.TEXT"
+            [hint]="
+              'Opcionalno preklapa HTML title tag. Ako ostavite prazno koristi se naslov članka.'
+            "
+            [value]="form.controls['metaTitle'].value ?? ''"
+            (emitSelected)="setFieldValue('metaTitle', $event)"
+            ngDefaultControl
+          ></autom-input-fields>
+
+          <autom-input-fields
+            class="form-control"
+            [clearBtn]="true"
+            [formControlName]="'metaDescription'"
+            [label]="'Meta description'"
+            [placeholder]="'150-160 karaktera za SEO opis'"
+            [size]="sizeEnum.FULL"
+            [type]="inputTypeEnum.TEXT"
+            [hint]="
+              'Kratak opis za pretraživače i deljenje na društvenim mrežama.'
+            "
+            [value]="form.controls['metaDescription'].value ?? ''"
+            (emitSelected)="setFieldValue('metaDescription', $event)"
+            ngDefaultControl
+          ></autom-input-fields>
+        </div>
+
+        <div class="form-grid">
+          <autom-input-fields
+            class="form-control"
+            [clearBtn]="true"
+            [formControlName]="'canonicalUrl'"
+            [label]="'Canonical URL'"
+            [placeholder]="'https://automaterijal.com/blog/...'"
+            [size]="sizeEnum.FULL"
+            [type]="inputTypeEnum.TEXT"
+            [hint]="
+              'Optional – koristite samo ako canonical treba da pokazuje na drugu adresu.'
+            "
+            [value]="form.controls['canonicalUrl'].value ?? ''"
+            (emitSelected)="setFieldValue('canonicalUrl', $event)"
+            ngDefaultControl
+          ></autom-input-fields>
+
+          <autom-input-fields
+            class="form-control"
+            [clearBtn]="true"
+            [formControlName]="'metaKeywords'"
+            [label]="'Meta keywords'"
+            [placeholder]="'deo motora, filter ulja, ...'"
+            [size]="sizeEnum.FULL"
+            [type]="inputTypeEnum.TEXT"
+            [hint]="'Opcionalno – razdvojte ključne reči zarezom.'"
+            [value]="form.controls['metaKeywords'].value ?? ''"
+            (emitSelected)="setFieldValue('metaKeywords', $event)"
+            ngDefaultControl
+          ></autom-input-fields>
+        </div>
+
+        <div class="taxonomy-grid">
+          <div>
+            <h3>Kategorije</h3>
+            <p class="field-hint">
+              Odaberite jednu ili više kategorija koje najbolje opisuju tekst.
+            </p>
+            <div class="checkbox-list">
+              <label *ngFor="let category of categories()">
+                <input
+                  type="checkbox"
+                  [checked]="isCategorySelected(category)"
+                  (change)="toggleCategory(category)"
+                />
+                {{ category.name }}
+              </label>
+            </div>
+          </div>
+          <div>
+            <h3>Tagovi</h3>
+            <p class="field-hint">
+              Koristite tagove za dodatno grupisanje sadržaja i lakšu pretragu.
+            </p>
+            <div class="checkbox-list">
+              <label *ngFor="let tag of tags()">
+                <input
+                  type="checkbox"
+                  [checked]="isTagSelected(tag)"
+                  (change)="toggleTag(tag)"
+                />
+                {{ tag.name }}
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <section class="showcase-config">
+          <h3>Prodajni izlog (opciono)</h3>
+          <p class="field-hint">
+            Povežite blog sa proizvodima iz izloga. Možete prikazati artikle iz kategorije/podkategorije
+            ili odabranog proizvođača. Ako ostavite prazno, izlog se neće prikazati.
+          </p>
+
+          <div class="showcase-toggle">
+            <label class="toggle">
+              <input
+                type="checkbox"
+                [checked]="showcaseCategoryEnabled()"
+                (change)="onShowcaseCategoryToggle($event)"
+              />
+              <span>Prikaži artikle iz kategorije/podgrupe</span>
+            </label>
+          </div>
+
+          <div class="showcase-form" *ngIf="showcaseCategoryEnabled()">
+            <label>
+              Grupa
+              <select
+                [disabled]="!articleCategories().length"
+                [ngModel]="selectedCategoryGroupId()"
+                [ngModelOptions]="{ standalone: true }"
+                (ngModelChange)="onSelectCategoryGroup($event)"
+              >
+                <option value="">Izaberite grupu</option>
+                <option
+                  *ngFor="let group of articleCategories()"
+                  [ngValue]="group.groupId"
+                >
+                  {{ group.name }}
+                </option>
+              </select>
+            </label>
+
+            <label>
+              Podgrupa
+              <select
+                [disabled]="!availableSubCategories().length"
+                [ngModel]="selectedCategorySubGroupId()"
+                [ngModelOptions]="{ standalone: true }"
+                (ngModelChange)="onSelectCategorySubGroup($event)"
+              >
+                <option value="">Sve podgrupe</option>
+                <option
+                  *ngFor="let sub of availableSubCategories()"
+                  [ngValue]="sub.subGroupId != null ? sub.subGroupId.toString() : ''"
+                >
+                  {{ sub.name }}
+                </option>
+              </select>
+            </label>
+
+            <label>
+              Maksimalan broj artikala
+              <input
+                type="number"
+                min="1"
+                max="12"
+                [ngModel]="categoryLimit()"
+                [ngModelOptions]="{ standalone: true }"
+                (ngModelChange)="onCategoryLimitChange($event)"
+              />
+            </label>
+          </div>
+
+          <div class="showcase-toggle">
+            <label class="toggle">
+              <input
+                type="checkbox"
+                [checked]="showcaseManufacturerEnabled()"
+                (change)="onShowcaseManufacturerToggle($event)"
+              />
+              <span>Prikaži artikle od proizvođača</span>
+            </label>
+          </div>
+
+          <div class="showcase-form" *ngIf="showcaseManufacturerEnabled()">
+            <label>
+              Proizvođač
+              <select
+                [disabled]="!manufacturers().length"
+                [ngModel]="selectedManufacturerId()"
+                [ngModelOptions]="{ standalone: true }"
+                (ngModelChange)="onSelectManufacturer($event)"
+              >
+                <option value="">Izaberite proizvođača</option>
+                <option
+                  *ngFor="let manufacturer of manufacturers()"
+                  [ngValue]="manufacturer.proid != null
+                    ? manufacturer.proid.toString()
+                    : (manufacturer.naziv ?? '')"
+                >
+                  {{ manufacturer.naziv }}
+                </option>
+              </select>
+            </label>
+
+            <label>
+              Maksimalan broj artikala
+              <input
+                type="number"
+                min="1"
+                max="12"
+                [ngModel]="manufacturerLimit()"
+                [ngModelOptions]="{ standalone: true }"
+                (ngModelChange)="onManufacturerLimitChange($event)"
+              />
+            </label>
+          </div>
+        </section>
+
+        <div class="form-grid form-grid--aligned">
+          <div class="form-control">
+            <autom-select
+              [label]="'Status'"
+              [required]="true"
+              [selectedValue]="selectedStatus()"
+              [selectionList]="statusSelections"
+              (emitSelected)="onStatusSelected($event)"
+              ngDefaultControl
+            ></autom-select>
+            <p class="field-hint">
+              Kontroliše dostupnost članka na sajtu. Draft je vidljiv samo u
+              administraciji.
+            </p>
+          </div>
+
+          <autom-input-fields
+            [clearBtn]="true"
+            [formControlName]="'publishedAt'"
+            [label]="'Datum objave'"
+            [placeholder]="'Odaberite datum i vreme objave'"
+            [size]="sizeEnum.FULL"
+            [type]="inputTypeEnum.DATE_TIME"
+            [hint]="
+              'Popunjava se automatski pri objavi, ali možete zakazati objavu unapred.'
+            "
+            [value]="form.controls['publishedAt'].value ?? ''"
+            (emitSelected)="setFieldValue('publishedAt', $event)"
+            ngDefaultControl
+          ></autom-input-fields>
+        </div>
+
+        <div class="form-actions">
+          <autom-button
+            [disabled]="loadingForm()"
+            [label]="'Sačuvaj draft'"
+            [theme]="buttonThemes.LIGHT_GREY"
+            [type]="buttonTypes.PRIMARY"
+            (clickEvent)="saveDraft()"
+          ></autom-button>
+          <autom-button
+            [disabled]="loadingForm()"
+            [label]="'Objavi'"
+            [theme]="buttonThemes.LIGHT_ORANGE"
+            [type]="buttonTypes.PRIMARY"
+            (clickEvent)="publish()"
+          ></autom-button>
+          <autom-button
+            [disabled]="loadingForm()"
+            [label]="'Sačuvaj (status)'"
+            [theme]="buttonThemes.DEFAULT"
+            [type]="buttonTypes.PRIMARY"
+            (clickEvent)="saveCurrentStatus()"
+          ></autom-button>
+          <autom-button
+            [label]="'Reset'"
+            [theme]="buttonThemes.LIGHT_GREY"
+            [type]="buttonTypes.SECONDARY"
+            (clickEvent)="resetForm()"
+          ></autom-button>
+          <span *ngIf="loadingForm()" class="saving">Čuvanje...</span>
+        </div>
+        <div class="form-legend">
+          <h3>Kratko uputstvo</h3>
+          <ul>
+            <li><strong>Draft</strong> – samo administracija vidi članak; objava ga automatski vremenski pečatira.</li>
+            <li><strong>Objavi</strong> – postavlja status na „Objavljeno“ i popunjava datum objave ako nije definisan.</li>
+            <li><strong>Sačuvaj (status)</strong> – čuva sve izmene zadržavajući trenutno izabrani status.</li>
+            <li><strong>Naslovna slika</strong> – možete uneti URL ili otpremiti sliku (JPG/PNG do 5 MB). „Ukloni“ briše postojeću.</li>
+            <li><strong>Kategorije i tagovi</strong> – utiču na filtriranje i SEO meta podatke.</li>
+          </ul>
+        </div>
+        <button type="submit" class="sr-only" tabindex="-1" aria-hidden="true"></button>
+      </form>
+    </section>
+  </div>
+
+  <section class="taxonomy-management" aria-labelledby="taxonomy-management-title">
+    <header class="management-header">
+      <div>
+        <h2 id="taxonomy-management-title">Upravljanje kategorijama i tagovima</h2>
+        <p>
+          Kreirajte i uređujte taksonomije kako biste obezbedili tačne SEO filtre i lakše grupisanje sadržaja.
+        </p>
+      </div>
+    </header>
+
+    <div class="management-panels">
+      <article class="management-card">
+        <header class="management-card__header">
+          <div>
+            <h3>Kategorije</h3>
+            <p>Vodite računa da slug ostane jedinstven i SEO-friendly.</p>
+          </div>
+          <span *ngIf="categorySaving()" class="badge badge--loading">Čuvanje...</span>
+        </header>
+
+        <form [formGroup]="categoryForm" (ngSubmit)="submitCategory()" class="management-form">
+          <label>
+            Naziv
+            <input
+              type="text"
+              maxlength="80"
+              formControlName="name"
+              (input)="onCategoryNameInput($any($event.target).value)"
+              placeholder="npr. Saveti"
+            />
+          </label>
+
+          <label>
+            Slug
+            <div class="slug-field">
+              <input
+                type="text"
+                maxlength="80"
+                formControlName="slug"
+                (input)="onCategorySlugInput($any($event.target).value)"
+                placeholder="npr. saveti"
+              />
+              <button type="button" class="slug-btn" (click)="generateCategorySlug()">
+                Generiši
+              </button>
+            </div>
+          </label>
+
+          <label>
+            Opis (opciono)
+            <textarea
+              rows="2"
+              maxlength="200"
+              formControlName="description"
+              placeholder="Kratak opis kategorije"
+            ></textarea>
+          </label>
+
+          <div class="management-actions">
+            <autom-button
+              [disabled]="categorySaving()"
+              [label]="categoryForm.controls['id'].value ? 'Sačuvaj izmene' : 'Dodaj kategoriju'"
+              [theme]="buttonThemes.DEFAULT"
+              [type]="buttonTypes.PRIMARY"
+              (clickEvent)="submitCategory()"
+            ></autom-button>
+            <autom-button
+              [label]="'Reset'"
+              [theme]="buttonThemes.LIGHT_GREY"
+              [type]="buttonTypes.SECONDARY"
+              (clickEvent)="resetCategoryForm()"
+            ></autom-button>
+          </div>
+
+          <p class="form-feedback form-feedback--error" *ngIf="categoryError()">
+            {{ categoryError() }}
+          </p>
+          <p class="form-feedback form-feedback--success" *ngIf="categorySuccess()">
+            {{ categorySuccess() }}
+          </p>
+        </form>
+
+        <ul class="management-list">
+          <li
+            *ngFor="let category of categories()"
+            [class.is-active]="categoryForm.controls['id'].value === category.id"
+          >
+            <div class="item-meta">
+              <strong>{{ category.name }}</strong>
+              <span class="slug">/{{ category.slug }}</span>
+              <small *ngIf="category.description">{{ category.description }}</small>
+            </div>
+            <div class="item-actions">
+              <autom-button
+                [label]="'Uredi'"
+                [theme]="buttonThemes.LIGHT_GREY"
+                [type]="buttonTypes.SECONDARY"
+                (clickEvent)="editCategory(category)"
+              ></autom-button>
+              <autom-button
+                [label]="'Obriši'"
+                [theme]="buttonThemes.LIGHT_RED"
+                [type]="buttonTypes.SECONDARY"
+                (clickEvent)="deleteCategory(category)"
+              ></autom-button>
+            </div>
+          </li>
+        </ul>
+      </article>
+
+      <article class="management-card">
+        <header class="management-card__header">
+          <div>
+            <h3>Tagovi</h3>
+            <p>Dodajte specifične ključne reči za detaljnije filtriranje.</p>
+          </div>
+          <span *ngIf="tagSaving()" class="badge badge--loading">Čuvanje...</span>
+        </header>
+
+        <form [formGroup]="tagForm" (ngSubmit)="submitTag()" class="management-form">
+          <label>
+            Naziv
+            <input
+              type="text"
+              maxlength="60"
+              formControlName="name"
+              (input)="onTagNameInput($any($event.target).value)"
+              placeholder="npr. filter"
+            />
+          </label>
+
+          <label>
+            Slug
+            <div class="slug-field">
+              <input
+                type="text"
+                maxlength="80"
+                formControlName="slug"
+                (input)="onTagSlugInput($any($event.target).value)"
+                placeholder="npr. filter"
+              />
+              <button type="button" class="slug-btn" (click)="generateTagSlug()">
+                Generiši
+              </button>
+            </div>
+          </label>
+
+          <div class="management-actions">
+            <autom-button
+              [disabled]="tagSaving()"
+              [label]="tagForm.controls['id'].value ? 'Sačuvaj izmene' : 'Dodaj tag'"
+              [theme]="buttonThemes.DEFAULT"
+              [type]="buttonTypes.PRIMARY"
+              (clickEvent)="submitTag()"
+            ></autom-button>
+            <autom-button
+              [label]="'Reset'"
+              [theme]="buttonThemes.LIGHT_GREY"
+              [type]="buttonTypes.SECONDARY"
+              (clickEvent)="resetTagForm()"
+            ></autom-button>
+          </div>
+
+          <p class="form-feedback form-feedback--error" *ngIf="tagError()">
+            {{ tagError() }}
+          </p>
+          <p class="form-feedback form-feedback--success" *ngIf="tagSuccess()">
+            {{ tagSuccess() }}
+          </p>
+        </form>
+
+        <ul class="management-list">
+          <li
+            *ngFor="let tag of tags()"
+            [class.is-active]="tagForm.controls['id'].value === tag.id"
+          >
+            <div class="item-meta">
+              <strong>{{ tag.name }}</strong>
+              <span class="slug">/{{ tag.slug }}</span>
+            </div>
+            <div class="item-actions">
+              <autom-button
+                [label]="'Uredi'"
+                [theme]="buttonThemes.LIGHT_GREY"
+                [type]="buttonTypes.SECONDARY"
+                (clickEvent)="editTag(tag)"
+              ></autom-button>
+              <autom-button
+                [label]="'Obriši'"
+                [theme]="buttonThemes.LIGHT_RED"
+                [type]="buttonTypes.SECONDARY"
+                (clickEvent)="deleteTag(tag)"
+              ></autom-button>
+            </div>
+          </li>
+        </ul>
+      </article>
+    </div>
+  </section>
+</section>

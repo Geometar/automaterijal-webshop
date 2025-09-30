@@ -57,6 +57,14 @@
             >Kontakt</a
           >
         </li>
+        <li *ngIf="loggedIn && isAdmin" class="navbar-item">
+          <a
+            routerLink="/blog"
+            class="navbar-link"
+            [ngClass]="currentUrl.includes('/blog') ? 'nav-active' : null"
+            >Blog</a
+          >
+        </li>
         <li class="navbar-item">
           <a
             routerLink="/webshop"
@@ -102,6 +110,13 @@
                 <div class="menu-item-align">
                   <autom-icon [source]="iconEnum.PEN_TOOL"></autom-icon>
                   <span>Izvestaji</span>
+                </div>
+              </button>
+
+              <button mat-menu-item routerLink="/blog/admin">
+                <div class="menu-item-align">
+                  <autom-icon [source]="iconEnum.FILE_TEXT"></autom-icon>
+                  <span>Blog administracija</span>
                 </div>
               </button>
 
@@ -353,77 +368,87 @@
   <ul class="mobile-menu-category-list flex--1">
     <!-- Standard links -->
     <li class="menu-category">
-    <a
-      routerLink="/home"
-      href="/home"
-      [ngClass]="currentUrl.includes('/home') ? 'nav-active' : null"
-      class="menu-title"
-      (click)="closeMobileSidebar()"
+      <a
+        routerLink="/home"
+        href="/home"
+        [ngClass]="currentUrl.includes('/home') ? 'nav-active' : null"
+        class="menu-title"
+        (click)="closeMobileSidebar()"
       >
         Home
       </a>
     </li>
     <li class="menu-category">
-    <a
-      routerLink="/onama"
-      href="/onama"
-      [ngClass]="currentUrl.includes('/onama') ? 'nav-active' : null"
-      class="menu-title"
-      (click)="closeMobileSidebar()"
+      <a
+        routerLink="/onama"
+        href="/onama"
+        [ngClass]="currentUrl.includes('/onama') ? 'nav-active' : null"
+        class="menu-title"
+        (click)="closeMobileSidebar()"
       >
         O nama
       </a>
     </li>
     <li class="menu-category">
-    <a
-      routerLink="/kontakt"
-      href="/kontakt"
-      [ngClass]="currentUrl.includes('/kontakt') ? 'nav-active' : null"
-      class="menu-title"
-      (click)="closeMobileSidebar()"
+      <a
+        routerLink="/kontakt"
+        href="/kontakt"
+        [ngClass]="currentUrl.includes('/kontakt') ? 'nav-active' : null"
+        class="menu-title"
+        (click)="closeMobileSidebar()"
       >
         Kontakt
       </a>
     </li>
+    <li *ngIf="loggedIn && isAdmin" class="menu-category">
+      <a
+        routerLink="/blog"
+        [ngClass]="currentUrl.includes('/blog') ? 'nav-active' : null"
+        class="menu-title"
+        (click)="closeMobileSidebar()"
+      >
+        Blog
+      </a>
+    </li>
     <li class="menu-category">
-    <a
-      routerLink="/webshop"
-      href="/webshop"
-      [ngClass]="currentUrl.includes('/webshop') ? 'nav-active' : null"
-      class="menu-title"
-      (click)="closeMobileSidebar()"
+      <a
+        routerLink="/webshop"
+        href="/webshop"
+        [ngClass]="currentUrl.includes('/webshop') ? 'nav-active' : null"
+        class="menu-title"
+        (click)="closeMobileSidebar()"
       >
         Webshop
       </a>
     </li>
     <li class="menu-category" *ngIf="!loggedIn">
-    <a
-      routerLink="/login"
-      href="/login"
-      [ngClass]="currentUrl.includes('/login') ? 'nav-active' : null"
-      class="menu-title color--figma-error-600"
-      (click)="closeMobileSidebar()"
+      <a
+        routerLink="/login"
+        href="/login"
+        [ngClass]="currentUrl.includes('/login') ? 'nav-active' : null"
+        class="menu-title color--figma-error-600"
+        (click)="closeMobileSidebar()"
         >Login</a
       >
     </li>
     <li class="menu-category" *ngIf="loggedIn">
-    <a
-      routerLink="/invoices"
-      href="/invoices"
-      [ngClass]="currentUrl.includes('/invoices') ? 'nav-active' : null"
-      class="menu-title"
-      (click)="closeMobileSidebar()"
+      <a
+        routerLink="/invoices"
+        href="/invoices"
+        [ngClass]="currentUrl.includes('/invoices') ? 'nav-active' : null"
+        class="menu-title"
+        (click)="closeMobileSidebar()"
       >
         Porudžbenice
       </a>
     </li>
     <li class="menu-category" *ngIf="loggedIn">
-    <a
-      class="menu-title"
-      [ngClass]="currentUrl.includes('/cart') ? 'nav-active' : null"
-      routerLink="/cart"
-      href="/cart"
-      (click)="closeMobileSidebar()"
+      <a
+        class="menu-title"
+        [ngClass]="currentUrl.includes('/cart') ? 'nav-active' : null"
+        routerLink="/cart"
+        href="/cart"
+        (click)="closeMobileSidebar()"
       >
         Korpa
       </a>
@@ -442,6 +467,15 @@
     >
       <autom-icon [source]="iconEnum.PEN_TOOL"></autom-icon>
       Izveštaji
+    </a>
+    <a
+      routerLink="/blog/admin"
+      [ngClass]="currentUrl.includes('/blog/admin') ? 'nav-active' : null"
+      class="menu-title autom-padding--vertical__xxs"
+      (click)="closeMobileSidebar()"
+    >
+      <autom-icon [source]="iconEnum.FILE_TEXT"></autom-icon>
+      Blog administracija
     </a>
     <a
       routerLink="/logs"

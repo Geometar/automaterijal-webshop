@@ -1,0 +1,353 @@
+.blog-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 16px 64px;
+  color: var(--figma-grey-800, #1f2937);
+}
+
+.blog-header {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 32px;
+
+  &__title h1 {
+    margin: 0;
+    font-size: clamp(28px, 4vw, 36px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  &__subtitle {
+    margin: 4px 0 0;
+    font-size: 16px;
+    color: var(--figma-grey-500, #6b7280);
+  }
+
+  &__search {
+    position: relative;
+
+    input {
+      width: 100%;
+      padding: 12px 18px;
+      border-radius: 9999px;
+      border: 1px solid var(--figma-grey-200, #e5e7eb);
+      font-size: 15px;
+      outline: none;
+      transition: box-shadow 0.2s ease, border-color 0.2s ease;
+
+      &:focus {
+        border-color: var(--figma-primary-500, #0ea5e9);
+        box-shadow: 0 6px 16px rgba(14, 165, 233, 0.18);
+      }
+    }
+  }
+}
+
+.blog-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 32px;
+
+  @media (max-width: 991px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.blog-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.filter-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+  padding: 20px;
+  border: 1px solid var(--figma-grey-100, #f1f5f9);
+
+  h2 {
+    margin: 0 0 12px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--figma-grey-700, #374151);
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  button {
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: transparent;
+    padding: 8px 10px;
+    border-radius: 10px;
+    font-size: 14px;
+    color: var(--figma-grey-600, #4b5563);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.15s ease, color 0.15s ease;
+
+    &:hover {
+      background: rgba(14, 165, 233, 0.08);
+    }
+
+    &.is-active {
+      background: rgba(14, 165, 233, 0.16);
+      color: var(--figma-primary-700, #0369a1);
+      font-weight: 600;
+    }
+  }
+}
+
+.pill {
+  background: rgba(15, 118, 110, 0.12);
+  color: #0f766e;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 12px;
+}
+
+.tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  border: 1px solid rgba(14, 165, 233, 0.2);
+  border-radius: 9999px;
+  padding: 4px 10px;
+  font-size: 13px;
+  background: rgba(14, 165, 233, 0.08);
+  color: #0369a1;
+  transition: background 0.2s ease, color 0.2s ease;
+
+  &.is-active {
+    background: #0369a1;
+    color: #fff;
+  }
+}
+
+.pagination-card {
+  .page-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 12px 0;
+
+    button {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--figma-grey-200, #e2e8f0);
+      background: #f8fafc;
+      font-size: 13px;
+      font-weight: 600;
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .page-size {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 13px;
+
+    select {
+      border-radius: 8px;
+      border: 1px solid var(--figma-grey-200, #e2e8f0);
+      padding: 8px;
+    }
+  }
+}
+
+.blog-content {
+  min-height: 400px;
+}
+
+.posts-grid {
+  display: grid;
+  gap: 24px;
+}
+
+.post-card {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) 1fr;
+  gap: 20px;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 12px 34px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+
+  &__image {
+    display: block;
+    position: relative;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    &:hover img {
+      transform: scale(1.05);
+    }
+  }
+
+  &__placeholder {
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    width: 100%;
+    height: 100%;
+  }
+
+  &__body {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__meta {
+    font-size: 13px;
+    color: var(--figma-grey-500, #64748b);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+
+    .dot {
+      width: 4px;
+      height: 4px;
+      background: currentColor;
+      border-radius: 50%;
+      display: inline-block;
+    }
+  }
+
+  &__title {
+    margin: 0;
+    font-size: clamp(18px, 2.4vw, 22px);
+
+    a {
+      color: var(--figma-grey-900, #111827);
+      text-decoration: none;
+      transition: color 0.15s ease;
+
+      &:hover {
+        color: var(--figma-primary-600, #0284c7);
+      }
+    }
+  }
+
+  &__excerpt {
+    margin: 0;
+    color: var(--figma-grey-600, #4b5563);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  &__footer {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+}
+
+.read-more {
+  color: var(--figma-primary-700, #0369a1);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.tags .tag {
+  background: rgba(14, 165, 233, 0.12);
+  border: none;
+  color: #0ea5e9;
+  font-size: 12px;
+  padding: 2px 8px;
+}
+
+.skeleton-grid {
+  display: grid;
+  gap: 24px;
+}
+
+.skeleton-card {
+  height: 240px;
+  border-radius: 16px;
+  background: linear-gradient(110deg, #f1f5f9 8%, #e2e8f0 18%, #f1f5f9 33%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s linear infinite;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+.state {
+  border-radius: 16px;
+  background: #fff8f8;
+  padding: 36px;
+  text-align: center;
+  border: 1px solid rgba(248, 113, 113, 0.2);
+
+  h2 {
+    margin-top: 0;
+  }
+
+  button {
+    margin-top: 16px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    border: none;
+    background: #ef4444;
+    color: #fff;
+    font-weight: 600;
+  }
+
+  &--empty {
+    background: #f1f5f9;
+    border-color: #e2e8f0;
+  }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}

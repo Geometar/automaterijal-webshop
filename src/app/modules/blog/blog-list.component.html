@@ -1,0 +1,242 @@
+<section class="blog-page header-margin--top">
+  <div class="blog-header">
+    <div class="blog-header__title">
+      <h1>Automaterijal Blog</h1>
+      <p class="blog-header__subtitle">
+        Inspiracija, vodiči i vesti iz sveta auto delova
+      </p>
+    </div>
+    <div class="blog-header__search">
+      <label class="sr-only" for="blog-search">Pretraži blog</label>
+      <input
+        id="blog-search"
+        type="search"
+        [ngModel]="searchTerm()"
+        (ngModelChange)="onSearch($event)"
+        placeholder="Unesite frazu ili ključnu reč"
+        autocomplete="off"
+      />
+    </div>
+  </div>
+
+  <div class="blog-layout">
+    <aside class="blog-sidebar" aria-label="Filteri">
+      <div class="filter-card" *ngIf="canViewInternalStatuses()">
+        <h2>Status</h2>
+        <ul>
+          <li>
+            <button
+              type="button"
+              (click)="onChangeStatus('ALL')"
+              [class.is-active]="statusFilter() === 'ALL'"
+            >
+              Sve objave
+            </button>
+          </li>
+          <li>
+            <button
+              type="button"
+              (click)="onChangeStatus('PUBLISHED')"
+              [class.is-active]="statusFilter() === 'PUBLISHED'"
+            >
+              Objavljene
+            </button>
+          </li>
+          <li>
+            <button
+              type="button"
+              (click)="onChangeStatus('DRAFT')"
+              [class.is-active]="statusFilter() === 'DRAFT'"
+            >
+              Draft
+            </button>
+          </li>
+          <li>
+            <button
+              type="button"
+              (click)="onChangeStatus('ARCHIVED')"
+              [class.is-active]="statusFilter() === 'ARCHIVED'"
+            >
+              Arhivirane
+            </button>
+          </li>
+        </ul>
+      </div>
+
+      <div class="filter-card">
+        <h2>Kategorije</h2>
+        <ul>
+          <li>
+            <button
+              type="button"
+              (click)="onSelectCategory(null)"
+              [class.is-active]="!activeCategory()"
+            >
+              Sve objave
+            </button>
+          </li>
+          <li *ngFor="let category of categories()">
+            <button
+              type="button"
+              (click)="onSelectCategory(categoryIdentifier(category))"
+              [class.is-active]="
+                activeCategory() === categoryIdentifier(category)
+              "
+            >
+              {{ category.name }}
+              <span *ngIf="category.countDisplay !== undefined" class="pill">
+                {{ category.countDisplay }}
+              </span>
+            </button>
+          </li>
+        </ul>
+      </div>
+
+      <div class="filter-card" *ngIf="tags().length">
+        <h2>Tagovi</h2>
+        <div class="tag-cloud">
+          <button
+            type="button"
+            class="tag"
+            (click)="onSelectTag(null)"
+            [class.is-active]="!activeTag()"
+          >
+            #Sve
+          </button>
+          <button
+            type="button"
+            class="tag"
+            *ngFor="let tag of tags()"
+            (click)="onSelectTag(tagIdentifier(tag))"
+            [class.is-active]="activeTag() === tagIdentifier(tag)"
+          >
+            #{{ tag.name }}
+          </button>
+        </div>
+      </div>
+
+      <div class="filter-card pagination-card">
+        <h2>Stranica</h2>
+        <p>{{ page() + 1 }} / {{ totalPages() }}</p>
+        <div class="page-actions">
+          <button
+            type="button"
+            (click)="onChangePage(page() - 1)"
+            [disabled]="page() === 0"
+          >
+            ← Nazad
+          </button>
+          <button
+            type="button"
+            (click)="onChangePage(page() + 1)"
+            [disabled]="page() + 1 >= totalPages()"
+          >
+            Napred →
+          </button>
+        </div>
+        <label class="page-size">
+          Prikaz po strani
+          <select [ngModel]="size()" (ngModelChange)="onChangeSize($event)">
+            <option *ngFor="let option of pageSizeOptions" [ngValue]="option">
+              {{ option }}
+            </option>
+          </select>
+        </label>
+      </div>
+    </aside>
+
+    <main class="blog-content">
+      <ng-container *ngIf="error(); else listOrSkeleton">
+        <div class="state state--error">
+          <h2>Ups! Došlo je do greške</h2>
+          <p>{{ error() }}</p>
+          <button type="button" (click)="onChangePage(page())">
+            Pokušaj ponovo
+          </button>
+        </div>
+      </ng-container>
+
+      <ng-template #listOrSkeleton>
+        <div class="skeleton-grid" *ngIf="loading(); else postsGrid">
+          <article
+            class="skeleton-card"
+            *ngFor="let _ of [1, 2, 3, 4, 5, 6]"
+          ></article>
+        </div>
+
+        <ng-template #postsGrid>
+          <div class="posts-grid" *ngIf="posts().length; else emptyState">
+            <article
+              *ngFor="let post of posts(); trackBy: trackBySlug"
+              class="post-card"
+            >
+              <a
+                [routerLink]="['/blog', post.slug]"
+                class="post-card__image"
+                *ngIf="post.coverImageSrc; else placeholder"
+              >
+                <img
+                  [src]="post.coverImageSrc"
+                  [alt]="post.title"
+                  loading="lazy"
+                />
+              </a>
+              <ng-template #placeholder>
+                <div class="post-card__placeholder" aria-hidden="true"></div>
+              </ng-template>
+
+              <div class="post-card__body">
+                <div class="post-card__meta">
+                  <span class="post-card__category">
+                    {{ post.primaryCategoryName }}
+                  </span>
+                  <span class="dot" aria-hidden="true"></span>
+                  <time [attr.datetime]="post.publishedAt">{{
+                    post.publishedAt | date : "d. MMM yyyy."
+                  }}</time>
+                  <span
+                    class="dot"
+                    *ngIf="post.readingTimeMinutes"
+                    aria-hidden="true"
+                  ></span>
+                  <span *ngIf="post.readingTimeMinutes"
+                    >{{ post.readingTimeMinutes }} min čitanja</span
+                  >
+                </div>
+
+                <h2 class="post-card__title">
+                  <a [routerLink]="['/blog', post.slug]">{{ post.title }}</a>
+                </h2>
+
+                <p class="post-card__excerpt">{{ post.excerpt }}</p>
+
+                <div class="post-card__footer">
+                  <div class="tags" *ngIf="post.tags?.length">
+                    <span *ngFor="let tag of post.tags" class="tag"
+                      >#{{ tag.name }}</span
+                    >
+                  </div>
+                  <a class="read-more" [routerLink]="['/blog', post.slug]"
+                    >Pročitaj više →</a
+                  >
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <ng-template #emptyState>
+            <div class="state state--empty">
+              <h2>Nema objava</h2>
+              <p>
+                Pokušajte da uklonite neke filtere ili promenite frazu pretrage.
+              </p>
+              <button type="button" (click)="onSelectCategory(null)">
+                Svi članci
+              </button>
+            </div>
+          </ng-template>
+        </ng-template>
+      </ng-template>
+    </main>
+  </div>
+</section>

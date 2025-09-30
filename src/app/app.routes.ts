@@ -26,6 +26,22 @@ export const routes: Routes = [
       import('./modules/dashboard/kontakt/kontakt.component').then((m) => m.KontaktComponent)
   },
   {
+    path: 'blog',
+    loadComponent: () =>
+      import('./modules/blog/blog-list.component').then((m) => m.BlogListComponent)
+  },
+  {
+    path: 'blog/admin',
+    loadComponent: () =>
+      import('./modules/blog/blog-admin.component').then((m) => m.BlogAdminComponent),
+    canActivate: [salesGuard]
+  },
+  {
+    path: 'blog/:slug',
+    loadComponent: () =>
+      import('./modules/blog/blog-detail.component').then((m) => m.BlogDetailComponent)
+  },
+  {
     path: 'login',
     loadComponent: () =>
       import('./modules/login/login.component').then((m) => m.LoginComponent)
