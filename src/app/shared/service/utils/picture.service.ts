@@ -34,9 +34,10 @@ export class PictureService {
       const normalized = this.normalizeImagePath(r.slika.slikeUrl);
       if (normalized) {
         r.slika.slikeUrl = normalized;
-        r.slika.isUrl = true;
+        this.updateUrlFlag(r.slika, true);
       } else {
         r.slika.slikeUrl = undefined;
+        this.updateUrlFlag(r.slika, false);
       }
     }
 
@@ -59,9 +60,10 @@ export class PictureService {
     const normalizedUrl = this.normalizeImagePath(r.slika.slikeUrl);
     if (normalizedUrl) {
       r.slika.slikeUrl = normalizedUrl;
-      r.slika.isUrl = true;
+      this.updateUrlFlag(r.slika, true);
     } else {
       r.slika.slikeUrl = undefined;
+      this.updateUrlFlag(r.slika, false);
     }
   }
 
@@ -121,6 +123,10 @@ export class PictureService {
     }
 
     return null;
+  }
+
+  private updateUrlFlag(slika: Slika, value: boolean): void {
+    slika.isUrl = value ? true : undefined;
   }
 
   private arrayBufferToBase64(buf: ArrayBuffer): string {

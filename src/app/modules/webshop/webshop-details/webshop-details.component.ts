@@ -35,6 +35,7 @@ import {
   RobaBrojevi,
   TecDocDokumentacija,
 } from '../../../shared/data-models/model/roba';
+import { Slika } from '../../../shared/data-models/model/slika';
 import { TooltipModel } from '../../../shared/data-models/interface';
 import { ShowcaseComponent, ShowcaseSection } from '../../../shared/components/showcase/showcase.component';
 
@@ -688,7 +689,10 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
 
     const addImage = (candidate?: string | null) => {
       const normalised = this.normalizeStructuredImageUrl(candidate);
-      if (normalised && this.pictureService.hasImage({ slikeUrl: normalised, isUrl: true })) {
+      if (
+        normalised &&
+        this.pictureService.hasImage({ slikeUrl: normalised, isUrl: true } as Slika)
+      ) {
         urls.add(normalised);
       }
     };
