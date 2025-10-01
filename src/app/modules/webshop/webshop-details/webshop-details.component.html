@@ -1,26 +1,6 @@
 <section class="section" [class.section--loading]="loading">
   <ng-container *ngIf="!loading; else productSkeleton">
-    <div
-      class="product-container"
-      itemscope
-      itemtype="https://schema.org/Product"
-    >
-    <meta
-      itemprop="name"
-      [content]="(data.proizvodjac?.naziv || '') + ' ' + (data.naziv || '')"
-    />
-    <meta itemprop="sku" [content]="data.katbr || data.robaid + ''" />
-    <meta *ngIf="data.katbr" itemprop="mpn" [content]="data.katbr" />
-    <meta *ngIf="categoryLabel" itemprop="category" [content]="categoryLabel" />
-    <span itemprop="brand" itemscope itemtype="https://schema.org/Brand">
-      <meta itemprop="name" [content]="data.proizvodjac?.naziv || 'Brand'" />
-    </span>
-    <meta
-      itemprop="url"
-      [attr.content]="
-        'https://automaterijal.com/webshop/' + (data.robaid || '')
-      "
-    />
+    <div class="product-container">
     <div class="product-header">
       <h1 class="product-title" aria-label="Naziv proizvoda">
         {{ data.proizvodjac?.naziv }} {{ data.naziv }}
@@ -37,7 +17,6 @@
             [src]="getPrimaryImageSrc()"
             [alt]="getPrimaryImageAlt()"
             [title]="getPrimaryImageTitle()"
-            itemprop="image"
             decoding="async"
             fetchpriority="high"
           />
@@ -70,17 +49,14 @@
             <tbody>
               <tr
                 *ngFor="let spec of displayedSpecs; trackBy: trackSpec"
-                itemprop="additionalProperty"
-                itemscope
-                itemtype="https://schema.org/PropertyValue"
                 [class.spec-highlight]="spec.highlight"
               >
                 <th scope="row">
-                  <span itemprop="name">{{ spec.oznaka }}</span>
+                  <span>{{ spec.oznaka }}</span>
                   <span *ngIf="spec.jedinica" class="spec-unit">[{{ spec.jedinica }}]</span>
                 </th>
                 <td class="spec-value">
-                  <span itemprop="value">{{ spec.vrednost }}</span>
+                  <span>{{ spec.vrednost }}</span>
                 </td>
               </tr>
             </tbody>
@@ -122,22 +98,6 @@
 
         <!-- Kupovna kartica (sticky) -->
         <aside class="buy-card card">
-          <meta itemprop="priceCurrency" content="RSD" />
-          <meta itemprop="price" [content]="data.cena || 0" />
-          <meta
-            itemprop="availability"
-            [attr.content]="
-              data.podGrupa !== 1000000 && (data.stanje || 0) > 0
-                ? 'https://schema.org/InStock'
-                : 'https://schema.org/OutOfStock'
-            "
-          />
-          <meta
-            itemprop="url"
-            [content]="
-              'https://automaterijal.com/webshop/' + (data.robaid || '')
-            "
-          />
           <div
             class="stock"
             [class.ok]="data.stanje > 0"
@@ -291,7 +251,6 @@
     <div
       *ngIf="data.tekst; else checkSpecs"
       class="product-rich-text"
-      itemprop="description"
       [innerHTML]="sanitizedText"
       aria-label="Detaljan opis proizvoda"
     ></div>

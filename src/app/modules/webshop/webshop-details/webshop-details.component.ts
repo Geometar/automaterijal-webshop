@@ -799,6 +799,41 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     return related.length ? related : undefined;
   }
 
+  private resolvePrice(roba: Roba): number | undefined {
+    const raw = roba.cena as unknown;
+    if (typeof raw === 'number') {
+      return Number.isFinite(raw) ? raw : undefined;
+    }
+    if (typeof raw === 'string') {
+      const normalized = Number(raw.replace(',', '.'));
+      return Number.isFinite(normalized) ? normalized : undefined;
+    }
+    return undefined;
+  }
+
+  private buildOffer(roba: Roba, price: number | undefined, inStock: boolean, url: string) {
+    if (price === undefined) {
+      return undefined;
+    }
+    const currency = this.normalizeWhitespace((roba as any)?.valuta) || 'RSD';
+    const offer: any = {
+      '@type': 'Offer',
+      priceCurrency: currency,
+      url,
+      availability: inStock
+        ? 'https://schema.org/InStock'
+        : 'https://schema.org/OutOfStock',
+      itemCondition: 'https://schema.org/NewCondition',
+      seller: { '@type': 'Organization', name: 'Automaterijal' },
+    };
+
+    if (typeof price === 'number') {
+      offer.price = Number(price.toFixed(2));
+    }
+
+    return offer;
+  }
+
   // ─────────────────────────────────────────────────────────────────────────────
   // SEO main
   // ─────────────────────────────────────────────────────────────────────────────
@@ -809,7 +844,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     const sku = this.normalizeWhitespace(roba.katbr);       // merchant SKU
     const mpn = this.normalizeWhitespace(roba.katbrpro);    // manufacturer part number
     const id = roba.robaid ?? '';
-    const price = roba.cena ?? undefined;
+    const price = this.resolvePrice(roba);
     const inStock = (roba.stanje ?? 0) > 0;
     const group = this.normalizeWhitespace(roba.grupaNaziv);
     const subgroup = this.normalizeWhitespace(roba.podGrupaNaziv);
@@ -875,6 +910,8 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     const videoObjects = this.buildVideoObjects();
     const related = this.buildRelatedProducts(roba);
 
+    const offer = this.buildOffer(roba, price, inStock, url);
+
     const productJsonLd: any = {
       '@context': 'https://schema.org',
       '@type': 'Product',
@@ -888,17 +925,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       ...(additionalProps.length ? { additionalProperty: additionalProps } : {}),
       ...(videoObjects ? { hasVideo: videoObjects } : {}),
       ...(related ? { isRelatedTo: related } : {}),
-      offers: {
-        '@type': 'Offer',
-        priceCurrency: 'RSD',
-        url,
-        availability: inStock
-          ? 'http://schema.org/InStock'
-          : 'http://schema.org/OutOfStock',
-        ...(typeof price === 'number' ? { price: String(price) } : {}),
-        itemCondition: 'http://schema.org/NewCondition',
-        seller: { '@type': 'Organization', name: 'Automaterijal' },
-      },
+      ...(offer ? { offers: offer } : {}),
     };
     this.seoService.updateJsonLd(productJsonLd, 'jsonld-product');
 

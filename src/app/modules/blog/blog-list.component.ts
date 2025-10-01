@@ -280,17 +280,20 @@ export class BlogListComponent implements OnInit, OnDestroy {
 
   private updateSeo(query: BlogListQuery & { status?: BlogStatus | 'ALL' }, total: number, posts: BlogPreviewViewModel[]) {
     const baseTitle = 'Blog | Automaterijal';
+    const baseDescription =
+      'Automaterijal blog donosi savete, vodiče i vesti iz sveta auto delova, maziva i opreme za bezbednu i sigurnu vožnju.';
     const parts: string[] = [];
 
+    const categoryLabel = query.category
+      ? this.categories().find((c) => c.slug === query.category || String(c.id) === query.category)?.name ?? null
+      : null;
+    const tagLabel = query.tag
+      ? this.tags().find((t) => t.slug === query.tag || String(t.id) === query.tag)?.name ?? null
+      : null;
+
     if (query.search) parts.push(`Pretraga: "${query.search}"`);
-    if (query.category) {
-      const cat = this.categories().find((c) => c.slug === query.category || String(c.id) === query.category);
-      if (cat) parts.push(cat.name);
-    }
-    if (query.tag) {
-      const tag = this.tags().find((t) => t.slug === query.tag || String(t.id) === query.tag);
-      if (tag) parts.push(`#${tag.name}`);
-    }
+    if (categoryLabel) parts.push(categoryLabel);
+    if (tagLabel) parts.push(`#${tagLabel}`);
     if (query.status && query.status !== 'PUBLISHED') {
       if (query.status === 'DRAFT') parts.push('Draft');
       else if (query.status === 'ARCHIVED') parts.push('Arhivirano');
@@ -299,9 +302,14 @@ export class BlogListComponent implements OnInit, OnDestroy {
     }
 
     const title = parts.length ? `${parts.join(' · ')} | ${baseTitle}` : baseTitle;
+    const context = categoryLabel
+      ? ` u kategoriji ${categoryLabel}`
+      : tagLabel
+      ? ` za tag #${tagLabel}`
+      : '';
     const description = posts.length
-      ? `Pogledajte najnovije članke${query.category ? ' u kategoriji ' + parts[0] : ''}. Trenutno ${total} objava.`
-      : 'Trenutno nema objava koje odgovaraju kriterijumima pretrage.';
+      ? `${baseDescription} Trenutno ${total} objava${context}.`
+      : `${baseDescription} Trenutno nema objava koje odgovaraju kriterijumima pretrage.`;
 
     const url = this.buildCanonicalUrl(query);
 
