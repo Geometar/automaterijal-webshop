@@ -1,0 +1,8 @@
+.page-wrapper {
+  min-height: 100vh;      /* uvek bar visina ekrana */
+  display: flex;
+  flex-direction: column;
+}
+.page-wrapper > * {
+  flex: 1 0 auto;         /* zauzme prostor za content */
+}
