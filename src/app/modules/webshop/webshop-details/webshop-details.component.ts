@@ -33,6 +33,7 @@ import {
   Magacin,
   Roba,
   RobaBrojevi,
+  RobaTehnickiOpis,
   TecDocDokumentacija,
 } from '../../../shared/data-models/model/roba';
 import { Slika } from '../../../shared/data-models/model/slika';
@@ -736,19 +737,16 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
 
   private buildAdditionalProperties(roba: Roba): any[] {
     const props: any[] = [];
-    // Tehničke specifikacije
-    if (roba.tehnickiOpis?.length) {
-      for (const item of roba.tehnickiOpis) {
-        const name = this.normalizeWhitespace(item.oznaka);
-        const value = this.normalizeWhitespace(item.vrednost);
-        if (!name && !value) continue;
-        props.push({
-          '@type': 'PropertyValue',
-          name: [name, item.jedinica ? `[${item.jedinica}]` : ''].filter(Boolean).join(' ').trim(),
-          value: value || '—',
-        });
-      }
+    const specProperties = this.collectStructuredSpecs(roba);
+
+    for (const { name, value } of specProperties) {
+      props.push({
+        '@type': 'PropertyValue',
+        name,
+        value,
+      });
     }
+
     // OE brojevi kao jedan property (ili više, ali ovde grupujemo)
     if (this.oeNumbers.size > 0) {
       const joined = Array.from(this.oeNumbers.entries())
@@ -761,6 +759,70 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       });
     }
     return props;
+  }
+
+  private collectStructuredSpecs(roba: Roba): Array<{ name: string; value: string }> {
+    const specs: Array<{ name: string; value: string }> = [];
+    const seen = new Set<string>();
+    const invalidTokens = new Set(['—', '-', '–', 'n/a', 'nije dostupno']);
+
+    const mergeSources = (
+      source: RobaTehnickiOpis[] | undefined
+    ): RobaTehnickiOpis[] => (Array.isArray(source) ? source : []);
+
+    const sources: RobaTehnickiOpis[] = [
+      ...mergeSources(roba.tehnickiOpis),
+      ...mergeSources(roba.tdLinkageCriteria),
+    ];
+
+    sources.forEach((item) => {
+      if (!item) {
+        return;
+      }
+
+      const name = this.normalizeWhitespace(
+        typeof item.oznaka === 'number' ? String(item.oznaka) : item.oznaka
+      );
+
+      const valueRaw = this.normalizeWhitespace(
+        typeof item.vrednost === 'number' ? String(item.vrednost) : item.vrednost
+      );
+
+      if (!name || !valueRaw) {
+        return;
+      }
+
+      const unit = this.normalizeWhitespace(
+        typeof item.jedinica === 'number' ? String(item.jedinica) : item.jedinica
+      );
+
+      const lowerValue = valueRaw.toLowerCase();
+      if (invalidTokens.has(lowerValue)) {
+        return;
+      }
+
+      const valueWithUnit = unit && !lowerValue.includes(unit.toLowerCase())
+        ? `${valueRaw} ${unit}`.trim()
+        : valueRaw;
+
+      if (!valueWithUnit) {
+        return;
+      }
+
+      const normalizedValue = valueWithUnit.trim();
+      if (!normalizedValue || invalidTokens.has(normalizedValue.toLowerCase())) {
+        return;
+      }
+
+      const key = `${name}|${normalizedValue}`.toLowerCase();
+      if (seen.has(key)) {
+        return;
+      }
+      seen.add(key);
+      specs.push({ name, value: normalizedValue });
+    });
+
+    return specs;
   }
 
   private buildVideoObjects(): any[] | undefined {
