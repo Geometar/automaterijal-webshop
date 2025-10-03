@@ -9,6 +9,7 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { NavigationExtras } from '@angular/router';
 import { MatTableModule } from '@angular/material/table';
 
 // Component imports
@@ -105,14 +106,6 @@ export class TableComponent implements OnChanges {
         values: this.filter.mandatoryProid,
       } as Chip);
     }
-    if (this.filter.podgrupe?.length) {
-      this.filterChips.push({
-        label: 'Podgrupe',
-        values: this.filter.podgrupe.map(
-          (p) => this.categoriesState.getCategorySubgroupsLabelById(p)?.name
-        ),
-      } as Chip);
-    }
     if (this.filter.proizvodjaci?.length) {
       this.filterChips.push({
         label: 'Proizvodjaci',
@@ -131,6 +124,14 @@ export class TableComponent implements OnChanges {
       this.filterChips.push({
         label: 'Grupe',
         values: chosenCategories,
+      } as Chip);
+    }
+    if (this.filter.podgrupe?.length) {
+      this.filterChips.push({
+        label: 'Podgrupe',
+        values: this.filter.podgrupe.map(
+          (p) => this.categoriesState.getCategorySubgroupsLabelById(p)?.name
+        ),
       } as Chip);
     }
   }
@@ -174,40 +175,71 @@ export class TableComponent implements OnChanges {
 
   removeFilter(chip: Chip): void {
     const currentPath = this.urlHelperService.getCurrentPath();
+    const segments = currentPath.split('/').filter(Boolean);
+    const isWebshop = segments[0] === 'webshop';
+    const isCategoryPath = isWebshop && segments[1] === 'category';
+    const hasSubcategorySegment = isCategoryPath && segments.length > 3;
+    const isManufacturerPath = isWebshop && segments[1] === 'manufacturers';
 
-    // Ako smo na /webshop/category/... i brišemo grupu ili podgrupu
-    if (
-      currentPath.includes('/webshop/category') &&
-      (chip.label === 'Grupe' || chip.label === 'Podgrupe')
-    ) {
-      this.urlHelperService.navigateTo(['/webshop']);
+    if (chip.label === 'Podgrupe') {
+      const extras = this.buildNavigationExtras(['podgrupe']);
+
+      if (isCategoryPath && hasSubcategorySegment) {
+        const target = ['/webshop', 'category', segments[2]];
+        this.urlHelperService.navigateTo(target, extras);
+      } else {
+        this.urlHelperService.navigateTo(currentPath, extras);
+      }
       return;
     }
 
-    // Ako se uklanja proizvođač i trenutno smo na /webshop/manufacturers
-    if (
-      chip.label === 'Proizvodjaci' &&
-      currentPath.includes('/webshop/manufacturers')
-    ) {
-      this.urlHelperService.navigateTo(['/webshop']);
+    if (chip.label === 'Grupe') {
+      const extras = this.buildNavigationExtras(['grupe', 'podgrupe']);
+      this.urlHelperService.navigateTo(['/webshop'], extras);
       return;
     }
 
-    // Ako se uklanja proizvođač, ali postoji mandatoryproid → obriši sve
-    if (
-      chip.label === 'Proizvodjaci' &&
-      this.urlHelperService.hasQueryParam('mandatoryproid')
-    ) {
-      this.urlHelperService.clearQueryParams();
-      return;
-    }
-
-    // Standardno ponašanje za ostale chipove (generički query param)
     if (chip.label === 'Proizvodjaci') {
-      this.urlHelperService.removeQueryParam('proizvodjaci');
-      this.urlHelperService.removeQueryParam('mandatoryproid');
-    } else {
-      this.urlHelperService.removeQueryParam(chip.label.toLowerCase());
+      const extras = this.buildNavigationExtras(['proizvodjaci', 'mandatoryproid']);
+
+      if (isManufacturerPath || this.urlHelperService.hasQueryParam('mandatoryproid')) {
+        this.urlHelperService.navigateTo(['/webshop'], extras);
+      } else {
+        this.urlHelperService.navigateTo(currentPath, extras);
+      }
+      return;
     }
+
+    const extras = this.buildNavigationExtras([chip.label.toLowerCase()]);
+    this.urlHelperService.navigateTo(currentPath, extras);
+  }
+
+  private buildNavigationExtras(exclusions: string[]): NavigationExtras {
+    const params = { ...this.urlHelperService.readQueryParams() } as Record<string, any>;
+    const exclusionSet = new Set(exclusions.map((key) => key.toLowerCase()));
+
+    Object.keys(params).forEach((existingKey) => {
+      if (exclusionSet.has(existingKey.toLowerCase())) {
+        delete params[existingKey];
+        return;
+      }
+
+      const value = params[existingKey];
+      if (
+        value === undefined ||
+        value === null ||
+        value === '' ||
+        (Array.isArray(value) && value.length === 0)
+      ) {
+        delete params[existingKey];
+      }
+    });
+
+    const extras: NavigationExtras = { queryParamsHandling: '' };
+    if (Object.keys(params).length) {
+      extras.queryParams = params;
+    }
+
+    return extras;
   }
 }

@@ -115,6 +115,24 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
     return this.urlHelperService.getCurrentPath().startsWith('/webshop/manufacturers');
   }
 
+  get isCategoryPage(): boolean {
+    return this.urlHelperService.getCurrentPath().startsWith('/webshop/category');
+  }
+
+  get isCategoryWithSubgroup(): boolean {
+    if (!this.isCategoryPage) {
+      return false;
+    }
+
+    const segments = this.urlHelperService
+      .getCurrentPath()
+      .split('/')
+      .filter(Boolean);
+
+    // Expected structure: ['webshop', 'category', groupSlug, optional subSlug]
+    return segments.length >= 4;
+  }
+
   /** Start of: Angular lifecycle hooks */
   ngOnInit(): void {
     if (!this.isBrowser) {

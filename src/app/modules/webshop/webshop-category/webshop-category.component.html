@@ -45,7 +45,7 @@
     <!-- Categories -->
     <div
       class="filter-card"
-      *ngIf="categories"
+      *ngIf="categories && !isCategoryWithSubgroup"
       [class.collapsed]="isCollapsed('categories')"
     >
       <button
@@ -159,7 +159,7 @@
       </div>
     </div>
 
-    <div class="filter-card" *ngIf="categories">
+    <div class="filter-card" *ngIf="categories && !isCategoryWithSubgroup">
       <button
         class="section-title"
         type="button"
