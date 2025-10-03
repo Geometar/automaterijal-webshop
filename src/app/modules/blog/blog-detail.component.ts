@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation, inject, signal } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
@@ -42,6 +42,7 @@ const COMMENT_HIDE_TIMEOUT = 15 * 60 * 1000; // 15 minuta
   imports: [CommonModule, RouterModule, FormsModule, ShowcaseComponent, DividerComponent],
   templateUrl: './blog-detail.component.html',
   styleUrl: './blog-detail.component.scss',
+  encapsulation: ViewEncapsulation.None,
 })
 export class BlogDetailComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
