@@ -108,7 +108,7 @@
 /* Tall lists get own scroll */
 ::ng-deep category-filter,
 ::ng-deep manufacture-filter {
-  max-height: 300px;   /* <-- visina vidljivog dela */
+  max-height: 380px;   /* <-- visina vidljivog dela */
   overflow-y: auto;    /* <-- pojavi se scroll samo kad pređe */
   display: block;
 }

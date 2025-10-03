@@ -104,6 +104,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
   private lastRoutePageIndex = 0;
   private lastRouteRowsPerPage = 10;
   private hasProcessedRoute = false;
+  private pendingSubgroupSelection: string[] | undefined;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -362,17 +363,43 @@ export class WebshopComponent implements OnDestroy, OnInit {
           }
 
           let subGroupId = '';
+          let subGroupValues: string[] = [];
           let subName: string | null = null;
           if (subSlug) {
             const sub = this.categoriesState.getSubCategoryBySlug(group.groupId!, subSlug);
             if (sub) {
               subGroupId = sub.subGroupId?.toString() || '';
               subName = sub.name || null;
+              subGroupValues = subGroupId ? [subGroupId] : [];
+            }
+          } else {
+            const rawSub = p['podgrupe'];
+            const rawString = Array.isArray(rawSub)
+              ? rawSub.join(',')
+              : (rawSub ?? '').toString();
+            const subValues = rawString
+              .split(',')
+              .map((value: string) => value.trim())
+              .filter((value: string) => value.length > 0);
+
+            if (subValues.length) {
+              subGroupId = subValues.join(',');
+              subGroupValues = subValues;
+              const firstMatch = subValues
+                .map((value: string) =>
+                  group.articleSubGroups?.find((s) => String(s.subGroupId) === value)
+                )
+                .find((match: any) => !!match);
+
+              if (firstMatch) {
+                subName = firstMatch.name || null;
+              }
             }
           }
 
           this.currentCategoryName = group.name || '';
           this.currentSubcategoryName = subName;
+          this.pendingSubgroupSelection = subGroupValues.length ? subGroupValues : undefined;
 
           const params: QueryParams = {
             ...p,
@@ -458,6 +485,10 @@ export class WebshopComponent implements OnDestroy, OnInit {
 
     // 8. Set filter with the new one
     this.filter = newFilter;
+    if (this.pendingSubgroupSelection?.length) {
+      this.filter.podgrupe = [...new Set(this.pendingSubgroupSelection.map((value) => value.trim()))].filter(Boolean);
+    }
+    this.pendingSubgroupSelection = undefined;
 
     if (shouldSyncPagination) {
       this.syncPaginationQueryParams();

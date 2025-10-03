@@ -39,8 +39,21 @@ export class CategoriesStateService {
     if (!this.inFlight$) {
       this.inFlight$ = this.api.fetchCategories().pipe(
         tap((data) => {
-          this.categoryCache = data;
-          this.categories$.next(data);
+          const collator = new Intl.Collator('sr', { sensitivity: 'base' });
+          const normalise = (value?: string | null) =>
+            (value ?? '')
+              .normalize('NFKD')
+              .replace(/\s+/g, ' ')
+              .trim();
+
+          const sorted = (data ?? []).map((category) => ({
+            ...category,
+            articleSubGroups: [...(category.articleSubGroups ?? [])]
+              .sort((a, b) => collator.compare(normalise(a?.name), normalise(b?.name)))
+          }));
+
+          this.categoryCache = sorted;
+          this.categories$.next(sorted);
         }),
         catchError((err) => throwError(() => err)), // <-- pre shareReplay
         finalize(() => (this.inFlight$ = undefined)),
