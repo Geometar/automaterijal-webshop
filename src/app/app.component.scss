@@ -1,8 +1,20 @@
 .page-wrapper {
-  min-height: 100vh;      /* uvek bar visina ekrana */
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
-.page-wrapper > * {
-  flex: 1 0 auto;         /* zauzme prostor za content */
+
+.page-wrapper > :not(.page-content) {
+  flex: 0 0 auto; 
+}
+
+.page-content {
+  flex: 1 0 auto; 
+  min-height: 100vh; 
+}
+
+@supports (min-height: 100dvh) {
+  .page-content {
+    min-height: 100dvh; 
+  }
 }
