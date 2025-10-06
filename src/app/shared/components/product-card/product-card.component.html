@@ -102,11 +102,11 @@
     ></autom-input-fields>
 
     <autom-button
-      [label]="'Dodaj u korpu'"
-      [iconSource]="iconEnum.SHOPPING_CART"
-      [iconPrefix]="true"
       [disabled]="isOutOfStock"
       [iconColor]="colorEnum.INFO_25_FILL"
+      [iconPrefix]="true"
+      [iconSource]="iconEnum.SHOPPING_CART"
+      [label]="'Dodaj u korpu'"
       (clickEvent)="handleAddToCart($event)"
     ></autom-button>
   </div>
