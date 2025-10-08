@@ -57,7 +57,7 @@
             >Kontakt</a
           >
         </li>
-        <li *ngIf="loggedIn && isAdmin" class="navbar-item">
+        <li class="navbar-item">
           <a
             routerLink="/blog"
             class="navbar-link"
@@ -400,7 +400,7 @@
         Kontakt
       </a>
     </li>
-    <li *ngIf="loggedIn && isAdmin" class="menu-category">
+    <li class="menu-category">
       <a
         routerLink="/blog"
         [ngClass]="currentUrl.includes('/blog') ? 'nav-active' : null"
