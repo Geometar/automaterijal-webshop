@@ -7,41 +7,77 @@
     "textColor": "#0f172a",
     "accentColor": "#1f4ba0",
     "tagline": "Valvoline partner Automaterijala od 2021.",
-    "imageAlt": "Valvoline logotip na svetlom plavom gradientu"
+    "imageAlt": "Valvoline logotip na svetlom plavom gradientu",
+    "image": "/images/brands/valvoline.png"
   },
   "sections": [
     {
       "title": "160 godina inovacija u mazivima",
       "body": "Valvoline je jedan od najstarijih brendova maziva na svetu, poznat po naprednim formulama za benzinske i dizel motore, kao i specijalnim aplikacijama. Od 2021. Automaterijal distribuira asortiman motornih ulja, transmisijskih tečnosti, antifriza i aditiva koji pokrivaju potrebe modernih flota i servisa.",
       "highlights": [
-        { "title": "Advanced formulacije", "description": "Sinteza i aditivi razvijeni za maksimalnu zaštitu turbo, GDI i hibridnih motora." },
-        { "title": "OEM odobrenja", "description": "Specifikacije za Ford, GM, Stellantis, BMW, Mercedes i azijske proizvođače." },
-        { "title": "Kompletan program", "description": "Motorna ulja, ATF, gear ulja, kočione tečnosti i antifrizi." }
+        {
+          "title": "Advanced formulacije",
+          "description": "Sinteza i aditivi razvijeni za maksimalnu zaštitu turbo, GDI i hibridnih motora."
+        },
+        {
+          "title": "OEM odobrenja",
+          "description": "Specifikacije za Ford, GM, Stellantis, BMW, Mercedes i azijske proizvođače."
+        },
+        {
+          "title": "Kompletan program",
+          "description": "Motorna ulja, ATF, gear ulja, kočione tečnosti i antifrizi."
+        }
       ]
     },
     {
       "title": "Brza dostupnost i lager u Srbiji",
       "body": "Centralni magacin Automaterijala drži Valvoline proizvode za putnički i teretni program, dok specijalne industrijske i racing formulacije obezbeđujemo kroz redovne uvoze. Zahvaljujući optimizovanoj logistici, partneri dobijaju isporuku u roku od 24 sata.",
       "highlights": [
-        { "title": "Stalne zalihe", "description": "Top proizvodi kao što su SynPower, MaxLife i Premium Blue su odmah dostupni." },
-        { "title": "Raspoloživost za flote", "description": "Pakovanja od 1L do 208L za servisne mreže i industriju." },
-        { "title": "Planiranje nabavke", "description": "Analitika potrošnje i preporuke za optimizaciju lagera." }
+        {
+          "title": "Stalne zalihe",
+          "description": "Top proizvodi kao što su SynPower, MaxLife i Premium Blue su odmah dostupni."
+        },
+        {
+          "title": "Raspoloživost za flote",
+          "description": "Pakovanja od 1L do 208L za servisne mreže i industriju."
+        },
+        {
+          "title": "Planiranje nabavke",
+          "description": "Analitika potrošnje i preporuke za optimizaciju lagera."
+        }
       ]
     },
     {
       "title": "Tehnička podrška i brending",
       "body": "Automaterijal pruža kompletan Valvoline servisni koncept – od tehničkih preporuka i laboratorijskih testova ulja do marketing materijala i brendiranja servisnih lokacija. Naš tim obezbeđuje edukaciju osoblja i programe lojalnosti.",
       "highlights": [
-        { "title": "Analize ulja", "description": "Laboratorijska ispitivanja pomažu u produženju servisnih intervala i prevenciji kvarova." },
-        { "title": "Servisni koncept", "description": "Brendiranje, POS materijali i obuke za Valvoline servisne partnere." },
-        { "title": "Digitalna podrška", "description": "Online preporuke maziva, tehnički listovi i marketinške kampanje." }
+        {
+          "title": "Analize ulja",
+          "description": "Laboratorijska ispitivanja pomažu u produženju servisnih intervala i prevenciji kvarova."
+        },
+        {
+          "title": "Servisni koncept",
+          "description": "Brendiranje, POS materijali i obuke za Valvoline servisne partnere."
+        },
+        {
+          "title": "Digitalna podrška",
+          "description": "Online preporuke maziva, tehnički listovi i marketinške kampanje."
+        }
       ]
     }
   ],
   "seo": {
     "title": "Valvoline maziva – premium partner | Automaterijal",
     "description": "Automaterijal distribuira Valvoline maziva: motorna ulja, ATF, gear ulja i antifrize uz lokalni lager, tehničku podršku, laboratorijske analize i servisni koncept.",
-    "keywords": ["Valvoline Srbija", "Valvoline distributer", "Valvoline motorno ulje", "Valvoline MaxLife", "Valvoline SynPower", "Valvoline antifriz", "Automaterijal Valvoline"],
+    "keywords": [
+      "Valvoline Srbija",
+      "Valvoline distributer",
+      "Valvoline motorno ulje",
+      "Valvoline MaxLife",
+      "Valvoline SynPower",
+      "Valvoline antifriz",
+      "Automaterijal Valvoline"
+    ],
     "ogImage": "https://automaterijal.com/images/brands/valvoline.png"
   },
   "cta": {
@@ -53,5 +89,5 @@
     "subtitle": "Najprodavanija Valvoline maziva u našoj ponudi",
     "limit": 5
   },
-  "manufacturerId": "VALV"
+  "manufacturerId": "VA"
 }

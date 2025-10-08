@@ -62,7 +62,8 @@ import { SeoService } from '../../../shared/service/seo.service';
 import { SnackbarService } from '../../../shared/service/utils/snackbar.service';
 import { TecdocService } from '../../../shared/service/tecdoc.service';
 import { UrlHelperService } from '../../../shared/service/utils/url-helper.service';
-import { hasActiveFilterQuery, normalizeRobotsTag } from '../../../shared/utils/seo-utils';
+import { SITE_ORIGIN, hasActiveFilterQuery, normalizeRobotsTag } from '../../../shared/utils/seo-utils';
+import { environment } from '../../../../environment/environment';
 
 // Utils
 import { StringUtils } from '../../../shared/utils/string-utils';
@@ -120,6 +121,8 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   showAddAttributes = false;
   showDeleteWarningPopup = false;
   showImageDeleteWarningPopup = false;
+  shareLink: string | null = null;
+  private shareTitle: string = '';
   readonly skeletonRows = Array.from({ length: 5 });
 
   // Tooltip
@@ -221,6 +224,8 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
 
   fetchData(id: number): void {
     this.loading = true;
+    this.shareLink = null;
+    this.shareTitle = '';
     this.robaService
       .fetchDetails(id)
       .pipe(
@@ -233,6 +238,8 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
           this.pictureService.convertByteToImage(response);
 
           this.data = response;
+          this.shareLink = this.buildShareLink(response);
+          this.shareTitle = this.buildShareTitle(response);
           this.fillDocumentation();
           this.fillOeNumbers();
           this.prepareSpecs(this.data);
@@ -587,12 +594,129 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     this.editingText = false;
   }
 
+  shareProduct(): void {
+    if (!this.shareLink || !this.isBrowser) {
+      return;
+    }
+
+    const shareUrl = this.shareLink!;
+    const sharePayload = {
+      title: this.shareTitle,
+      text: this.shareTitle,
+      url: shareUrl,
+    };
+
+    const navigatorRef = typeof navigator !== 'undefined' ? (navigator as any) : null;
+    if (navigatorRef && 'share' in navigatorRef) {
+      this.copyShareLink(shareUrl, false);
+      navigatorRef
+        .share(sharePayload)
+        .then(() => {
+          this.snackbarService.showSuccess('Link je kopiran – možete ga nalepiti gde god želite.');
+        })
+        .catch((err: any) => {
+          if (!err || err?.name === 'AbortError') {
+            return;
+          }
+          this.copyShareLink(shareUrl);
+        });
+    } else {
+      this.copyShareLink(shareUrl);
+    }
+  }
+
   // ─────────────────────────────────────────────────────────────────────────────
   // SEO helpers
   // ─────────────────────────────────────────────────────────────────────────────
 
   private normalizeWhitespace(v: string | undefined | null): string {
     return (v ?? '').replace(/\s+/g, ' ').trim();
+  }
+
+  private copyShareLink(url: string, showMessage: boolean = true): void {
+    if (!this.isBrowser) {
+      return;
+    }
+    const navigatorRef = typeof navigator !== 'undefined' ? (navigator as any) : null;
+    if (navigatorRef?.clipboard?.writeText) {
+      navigatorRef.clipboard
+        .writeText(url)
+        .then(() => {
+          if (showMessage) {
+            this.snackbarService.showSuccess('Link za deljenje je kopiran u klipbord.');
+          }
+        })
+        .catch(() => this.legacyCopyShare(url, showMessage));
+    } else {
+      this.legacyCopyShare(url, showMessage);
+    }
+  }
+
+  private legacyCopyShare(url: string, showMessage: boolean = true): void {
+    if (!this.isBrowser || typeof document === 'undefined') {
+      return;
+    }
+    const textarea = document.createElement('textarea');
+    textarea.value = url;
+    textarea.setAttribute('readonly', '');
+    textarea.style.position = 'fixed';
+    textarea.style.top = '-1000px';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+    try {
+      const successful = document.execCommand('copy');
+      if (showMessage) {
+        if (successful) {
+          this.snackbarService.showSuccess('Link za deljenje je kopiran u klipbord.');
+        } else {
+          this.snackbarService.showError('Link nije moguće kopirati. Pokušajte ručno.');
+        }
+      }
+    } catch {
+      if (showMessage) {
+        this.snackbarService.showError('Link nije moguće kopirati. Pokušajte ručno.');
+      }
+    } finally {
+      document.body.removeChild(textarea);
+    }
+  }
+
+  private buildShareTitle(roba: Roba): string {
+    const brand = this.normalizeWhitespace(roba?.proizvodjac?.naziv);
+    const name = this.normalizeWhitespace(roba?.naziv);
+    const sku = this.normalizeWhitespace(roba?.katbr);
+    const baseTitle = [brand, name].filter(Boolean).join(' ').trim();
+    if (baseTitle && sku) {
+      return `${baseTitle} (${sku})`;
+    }
+    return baseTitle || sku || 'Automaterijal proizvod';
+  }
+
+  private buildShareLink(roba: Roba): string | null {
+    const id = roba?.robaid;
+    if (!id) {
+      return null;
+    }
+    const origin = this.getShareOrigin();
+    return `${origin}/share/webshop/${id}`;
+  }
+
+  private getShareOrigin(): string {
+    if (environment.production) {
+      return SITE_ORIGIN;
+    }
+
+    if (this.isBrowser && typeof window !== 'undefined' && window.location?.origin) {
+      const origin = window.location.origin;
+      if (!origin.includes('localhost:4200')) {
+        return origin;
+      }
+    }
+
+    const apiBase = (environment.apiUrl || '').replace(/\/$/, '');
+    return apiBase || SITE_ORIGIN;
   }
 
   private syncDisplayedSpecs(): void {

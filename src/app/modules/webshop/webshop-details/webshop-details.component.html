@@ -1,377 +1,410 @@
 <section class="section" [class.section--loading]="loading">
   <ng-container *ngIf="!loading; else productSkeleton">
     <div class="product-container">
-    <div class="product-header">
-      <h1 class="product-title" aria-label="Naziv proizvoda">
-        {{ data.proizvodjac?.naziv }} {{ data.naziv }}
-      </h1>
-      <p class="product-article">Kat br: {{ data.katbr }}</p>
-    </div>
+      <div class="product-header">
+        <div class="product-heading">
+          <h1 class="product-title" aria-label="Naziv proizvoda">
+            {{ data.proizvodjac?.naziv }} {{ data.naziv }}
+          </h1>
+          <p class="product-article" *ngIf="data.katbr">
+            Kat br: {{ data.katbr }}
+          </p>
+        </div>
+        <autom-button
+          *ngIf="shareLink"
+          class="product-share-button"
+          [type]="buttonType.SECONDARY"
+          [iconPrefix]="true"
+          [iconSource]="iconEnum.SHARE"
+          [iconColor]="colorEnum.INFO_25_FILL"
+          [label]="'Podeli proizvod'"
+          (clickEvent)="shareProduct()"
+        ></autom-button>
+      </div>
 
-    <article class="product-details">
-      <div class="product-hero">
-        <!-- Slika / gallery -->
-        <figure class="product-media">
-          <img
-            class="product-img"
-            [src]="getPrimaryImageSrc()"
-            [alt]="getPrimaryImageAlt()"
-            [title]="getPrimaryImageTitle()"
-            decoding="async"
-            fetchpriority="high"
-          />
-          <figcaption *ngIf="data?.proizvodjacLogo" class="media-caption">
+      <article class="product-details">
+        <div class="product-hero">
+          <!-- Slika / gallery -->
+          <figure class="product-media">
             <img
-              *ngIf="data?.proizvodjacLogo"
-              class="brand-logo"
-              [src]="data!.proizvodjacLogo"
-              [alt]="'Logo ' + (data.proizvodjac!.naziv || '')"
+              class="product-img"
+              [src]="getPrimaryImageSrc()"
+              [alt]="getPrimaryImageAlt()"
+              [title]="getPrimaryImageTitle()"
+              decoding="async"
+              fetchpriority="high"
             />
-            <span>{{ data.proizvodjac?.naziv }}</span>
-          </figcaption>
-        </figure>
+            <figcaption *ngIf="data?.proizvodjacLogo" class="media-caption">
+              <img
+                *ngIf="data?.proizvodjacLogo"
+                class="brand-logo"
+                [src]="data!.proizvodjacLogo"
+                [alt]="'Logo ' + (data.proizvodjac!.naziv || '')"
+              />
+              <span>{{ data.proizvodjac?.naziv }}</span>
+            </figcaption>
+          </figure>
 
-        <!-- Specifikacije -->
-        <aside
-          *ngIf="hasSpecs; else fallbackHighlights"
-          class="product-specs card"
-          [attr.aria-labelledby]="specTitleId"
-        >
-          <header class="specs-header">
-            <h2 class="specs-title" [id]="specTitleId">Specifikacije</h2>
-            <span *ngIf="specOverflow && !showAllSpecs" class="specs-count"
-              >+{{ specOverflow }} dodatnih stavki</span
-            >
-          </header>
-
-          <table class="specs-table">
-            <caption class="sr-only">Specifikacije proizvoda</caption>
-            <tbody>
-              <tr
-                *ngFor="let spec of displayedSpecs; trackBy: trackSpec"
-                [class.spec-highlight]="spec.highlight"
+          <!-- Specifikacije -->
+          <aside
+            *ngIf="hasSpecs; else fallbackHighlights"
+            class="product-specs card"
+            [attr.aria-labelledby]="specTitleId"
+          >
+            <header class="specs-header">
+              <h2 class="specs-title" [id]="specTitleId">Specifikacije</h2>
+              <span *ngIf="specOverflow && !showAllSpecs" class="specs-count"
+                >+{{ specOverflow }} dodatnih stavki</span
               >
-                <th scope="row">
-                  <span>{{ spec.oznaka }}</span>
-                  <span *ngIf="spec.jedinica" class="spec-unit">[{{ spec.jedinica }}]</span>
-                </th>
-                <td class="spec-value">
-                  <span>{{ spec.vrednost }}</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+            </header>
 
-          <div class="spec-toggle" *ngIf="specOverflow > 0">
-            <autom-button
-              [label]="showAllSpecs ? 'Prikaži manje' : 'Prikaži sve specifikacije'"
-              [type]="buttonType.TERNARY"
-              (clickEvent)="toggleSpecs()"
-            ></autom-button>
-          </div>
-        </aside>
+            <table class="specs-table">
+              <caption class="sr-only">
+                Specifikacije proizvoda
+              </caption>
+              <tbody>
+                <tr
+                  *ngFor="let spec of displayedSpecs; trackBy: trackSpec"
+                  [class.spec-highlight]="spec.highlight"
+                >
+                  <th scope="row">
+                    <span>{{ spec.oznaka }}</span>
+                    <span *ngIf="spec.jedinica" class="spec-unit"
+                      >[{{ spec.jedinica }}]</span
+                    >
+                  </th>
+                  <td class="spec-value">
+                    <span>{{ spec.vrednost }}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
 
-        <ng-template #fallbackHighlights>
-          <aside class="product-highlights card" aria-label="Istaknute informacije">
-            <p class="specs-fallback">
-              <autom-icon [source]="iconEnum.INFO" class="specs-info-icon"></autom-icon>
-              Specifikacije nisu dostupne za ovaj artikal.
-            </p>
-            <ul class="bullets">
-              <li *ngIf="data.proizvodjac?.naziv">
-                <i class="dot"></i
-                ><strong>{{ data.proizvodjac?.naziv }}</strong> — pouzdan brend
-              </li>
-              <li *ngIf="data.grupaNaziv">
-                <i class="dot"></i>{{ data.grupaNaziv }}
-                <span *ngIf="data.podGrupaNaziv">› {{ data.podGrupaNaziv }}</span>
-              </li>
-              <li *ngIf="data.stanje > 0">
-                <i class="dot"></i>Na stanju — spremno za brzu isporuku
-              </li>
-              <li *ngIf="data.katbr">
-                <i class="dot"></i>Kat. broj: {{ data.katbr }}
-              </li>
+            <div class="spec-toggle" *ngIf="specOverflow > 0">
+              <autom-button
+                [label]="
+                  showAllSpecs ? 'Prikaži manje' : 'Prikaži sve specifikacije'
+                "
+                [type]="buttonType.TERNARY"
+                (clickEvent)="toggleSpecs()"
+              ></autom-button>
+            </div>
+          </aside>
+
+          <ng-template #fallbackHighlights>
+            <aside
+              class="product-highlights card"
+              aria-label="Istaknute informacije"
+            >
+              <p class="specs-fallback">
+                <autom-icon
+                  [source]="iconEnum.INFO"
+                  class="specs-info-icon"
+                ></autom-icon>
+                Specifikacije nisu dostupne za ovaj artikal.
+              </p>
+              <ul class="bullets">
+                <li *ngIf="data.proizvodjac?.naziv">
+                  <i class="dot"></i
+                  ><strong>{{ data.proizvodjac?.naziv }}</strong> — pouzdan
+                  brend
+                </li>
+                <li *ngIf="data.grupaNaziv">
+                  <i class="dot"></i>{{ data.grupaNaziv }}
+                  <span *ngIf="data.podGrupaNaziv"
+                    >› {{ data.podGrupaNaziv }}</span
+                  >
+                </li>
+                <li *ngIf="data.stanje > 0">
+                  <i class="dot"></i>Na stanju — spremno za brzu isporuku
+                </li>
+                <li *ngIf="data.katbr">
+                  <i class="dot"></i>Kat. broj: {{ data.katbr }}
+                </li>
+              </ul>
+            </aside>
+          </ng-template>
+
+          <!-- Kupovna kartica (sticky) -->
+          <aside class="buy-card card">
+            <div
+              class="stock"
+              [class.ok]="data.stanje > 0"
+              [class.nope]="!data.stanje"
+            >
+              <span class="led"></span
+              >{{ data.stanje > 0 ? "Na stanju" : "Nema na stanju" }}
+            </div>
+
+            <div class="price-wrap">
+              <div class="price">{{ data.cena! | rsdCurrency }}</div>
+              <div class="note">cena sa PDV-om</div>
+            </div>
+
+            <div class="actions">
+              <autom-input-fields
+                [clearBtn]="false"
+                [disableInput]="!data.stanje"
+                [customClass]="'qty'"
+                [max]="data!.stanje!"
+                [min]="1"
+                [roundOff]="true"
+                [size]="sizeEnum.MEDIUM"
+                [type]="inputTypeEnum.QUANTITY"
+                [validators]="[
+                  { name: 'max', value: data.stanje },
+                  { name: 'min', value: 1 }
+                ]"
+                [step]="1"
+                [value]="quantity"
+                (emitSelected)="modifyQuantity($event)"
+                ngDefaultControl
+              ></autom-input-fields>
+
+              <autom-button
+                [disabled]="!data.stanje"
+                [iconPrefix]="true"
+                [iconSource]="iconEnum.SHOPPING_CART"
+                [iconColor]="colorEnum.INFO_25_FILL"
+                [label]="'Dodaj u korpu'"
+                (clickEvent)="addToShopingCart()"
+              ></autom-button>
+            </div>
+
+            <ul class="trust">
+              <li><i class="shield"></i> Sigurno plaćanje</li>
+              <li><i class="truck"></i> Brza isporuka</li>
             </ul>
           </aside>
-        </ng-template>
-
-        <!-- Kupovna kartica (sticky) -->
-        <aside class="buy-card card">
-          <div
-            class="stock"
-            [class.ok]="data.stanje > 0"
-            [class.nope]="!data.stanje"
-          >
-            <span class="led"></span
-            >{{ data.stanje > 0 ? "Na stanju" : "Nema na stanju" }}
-          </div>
-
-          <div class="price-wrap">
-            <div class="price">{{ data.cena! | rsdCurrency }}</div>
-            <div class="note">cena sa PDV-om</div>
-          </div>
-
-          <div class="actions">
-            <autom-input-fields
-              [clearBtn]="false"
-              [disableInput]="!data.stanje"
-              [customClass]="'qty'"
-              [max]="data!.stanje!"
-              [min]="1"
-              [roundOff]="true"
-              [size]="sizeEnum.MEDIUM"
-              [type]="inputTypeEnum.QUANTITY"
-              [validators]="[
-                { name: 'max', value: data.stanje },
-                { name: 'min', value: 1 }
-              ]"
-              [step]="1"
-              [value]="quantity"
-              (emitSelected)="modifyQuantity($event)"
-              ngDefaultControl
-            ></autom-input-fields>
-
-            <autom-button
-              [disabled]="!data.stanje"
-              [iconPrefix]="true"
-              [iconSource]="iconEnum.SHOPPING_CART"
-              [iconColor]="colorEnum.INFO_25_FILL"
-              [label]="'Dodaj u korpu'"
-              (clickEvent)="addToShopingCart()"
-            ></autom-button>
-          </div>
-
-          <ul class="trust">
-            <li><i class="shield"></i> Sigurno plaćanje</li>
-            <li><i class="truck"></i> Brza isporuka</li>
-          </ul>
-        </aside>
-      </div>
-    </article>
-  </div>
-  <div
-    *ngIf="documentKeys && documentKeys.length !== 0"
-    class="product-container documentation documentation--section"
-    aria-label="Dokumentacija proizvoda"
-  >
-    <div *ngFor="let key of documentKeys">
-      <h3 class="product-title">{{ key }}</h3>
-      <div class="util__flex--center autom-flex-wrap--column">
-        <!-- PDF -->
-        <ng-container *ngFor="let document of getDocumentByKey(key)">
-          <div
-            class="documentation--section-padding"
-            *ngIf="document.docFileTypeName!.toUpperCase().indexOf('PDF') > -1"
-          >
-            <ng-container>
-              <span (click)="openPdf(document)">
+        </div>
+      </article>
+    </div>
+    <div
+      *ngIf="documentKeys && documentKeys.length !== 0"
+      class="product-container documentation documentation--section"
+      aria-label="Dokumentacija proizvoda"
+    >
+      <div *ngFor="let key of documentKeys">
+        <h3 class="product-title">{{ key }}</h3>
+        <div class="util__flex--center autom-flex-wrap--column">
+          <!-- PDF -->
+          <ng-container *ngFor="let document of getDocumentByKey(key)">
+            <div
+              class="documentation--section-padding"
+              *ngIf="
+                document.docFileTypeName!.toUpperCase().indexOf('PDF') > -1
+              "
+            >
+              <ng-container>
+                <span (click)="openPdf(document)">
+                  <autom-icon
+                    [tooltip]="pdfToolTip"
+                    [source]="iconEnum.FILE_SEARCH"
+                  ></autom-icon>
+                </span>
+              </ng-container>
+            </div>
+          </ng-container>
+        </div>
+        <div class="util__flex--center autom-flex-wrap--column">
+          <!-- Youtube -->
+          <ng-container *ngFor="let document of getDocumentByKey(key)">
+            <div
+              class="youtube-wrapper documentation--section-padding"
+              *ngIf="
+                document.docFileTypeName!.toUpperCase().indexOf('URL') > -1 &&
+                document.docUrl?.includes('youtube')
+              "
+            >
+              <youtube-player [videoId]="document.saniraniUrl"></youtube-player>
+            </div>
+            <div
+              class="documentation--section-padding"
+              *ngIf="
+                document.docFileTypeName!.toUpperCase().indexOf('URL') > -1 &&
+                (document.docTypeId === 6 || document.docTypeId === 17)
+              "
+            >
+              <span (click)="openLink(document)">
                 <autom-icon
-                  [tooltip]="pdfToolTip"
-                  [source]="iconEnum.FILE_SEARCH"
+                  [tooltip]="{ tooltipText: 'Link: ' + document.docUrl }"
+                  [source]="iconEnum.LINK"
                 ></autom-icon>
               </span>
-            </ng-container>
-          </div>
-        </ng-container>
-      </div>
-      <div class="util__flex--center autom-flex-wrap--column">
-        <!-- Youtube -->
-        <ng-container *ngFor="let document of getDocumentByKey(key)">
-          <div
-            class="youtube-wrapper documentation--section-padding"
-            *ngIf="
-              document.docFileTypeName!.toUpperCase().indexOf('URL') > -1 &&
-              document.docUrl?.includes('youtube')
-            "
-          >
-            <youtube-player [videoId]="document.saniraniUrl"></youtube-player>
-          </div>
-          <div
-            class="documentation--section-padding"
-            *ngIf="
-              document.docFileTypeName!.toUpperCase().indexOf('URL') > -1 &&
-              (document.docTypeId === 6 || document.docTypeId === 17)
-            "
-          >
-            <span (click)="openLink(document)">
-              <autom-icon
-                [tooltip]="{ tooltipText: 'Link: ' + document.docUrl }"
-                [source]="iconEnum.LINK"
-              ></autom-icon>
-            </span>
-          </div>
-        </ng-container>
-      </div>
-      <div class="util__flex--center autom-flex-wrap--column">
-        <!-- JPEG -->
-        <ng-container *ngFor="let document of getDocumentByKey(key)">
-          <div
-            class="documentation--section-padding"
-            *ngIf="document.docFileTypeName!.toUpperCase().indexOf('JPEG') > -1"
-          >
-            <img
-              class="document-image"
-              [src]="document.dokument"
-              [attr.alt]="document.docFileTypeName || 'Dokumentacija'"
-              decoding="async"
-              loading="lazy"
-            />
-          </div>
-        </ng-container>
+            </div>
+          </ng-container>
+        </div>
+        <div class="util__flex--center autom-flex-wrap--column">
+          <!-- JPEG -->
+          <ng-container *ngFor="let document of getDocumentByKey(key)">
+            <div
+              class="documentation--section-padding"
+              *ngIf="
+                document.docFileTypeName!.toUpperCase().indexOf('JPEG') > -1
+              "
+            >
+              <img
+                class="document-image"
+                [src]="document.dokument"
+                [attr.alt]="document.docFileTypeName || 'Dokumentacija'"
+                decoding="async"
+                loading="lazy"
+              />
+            </div>
+          </ng-container>
+        </div>
       </div>
     </div>
-  </div>
-  <div *ngIf="oeNumbers.size > 0" class="product-container documentation">
-    <h3 class="oe-title">OE brojevi</h3>
-    <p class="oe-subtitle">
-      OE referentni brojevi koji su uporedivi sa originalnim brojem rezervnog
-      dela:
-    </p>
-    <ul class="oe-grid" role="list">
-      <li *ngFor="let oe of oeNumbers | keyvalue">
-        <a
-          class="oe-item"
-          [routerLink]="['/webshop']"
-          [queryParams]="{ searchTerm: oe.key }"
-          [attr.href]="'/webshop?searchTerm=' + oe.key"
-        >
-          {{ oe.key }} - {{ oe.value }}
-        </a>
-      </li>
-    </ul>
-  </div>
-
-  <div *ngIf="!editingText" class="product-container documentation">
-    <h3 class="oe-title" *ngIf="data.tekst || !data.tehnickiOpis?.length">
-      Informacije o proizvodu
-    </h3>
-
-    <!-- Ako postoji tekst -->
-    <div
-      *ngIf="data.tekst; else checkSpecs"
-      class="product-rich-text"
-      [innerHTML]="sanitizedText"
-      aria-label="Detaljan opis proizvoda"
-    ></div>
-
-    <!-- Ako nema tekst, proveri specifikacije -->
-    <ng-template #checkSpecs>
-      <!-- Ako postoje specifikacije, ne prikazujemo ništa -->
-      <ng-container
-        *ngIf="data.tehnickiOpis?.length; else noDescription"
-      ></ng-container>
-    </ng-template>
-
-    <!-- Ako nema ni tekst ni specifikacije -->
-    <ng-template #noDescription>
-      <p class="product-fallback">
-        Detaljan opis trenutno nije dostupan za ovaj proizvod. Kontaktirajte nas
-        za dodatne informacije ili tehničke detalje.
+    <div *ngIf="oeNumbers.size > 0" class="product-container documentation">
+      <h3 class="oe-title">OE brojevi</h3>
+      <p class="oe-subtitle">
+        OE referentni brojevi koji su uporedivi sa originalnim brojem rezervnog
+        dela:
       </p>
-    </ng-template>
-  </div>
-
-  <autom-divider *ngIf="showcaseDataCategories.length"></autom-divider>
-
-  <autom-showcase
-    *ngIf="showcaseDataCategories.length"
-    [showcase]="showcaseDataCategories"
-    [loading]="loading"
-  ></autom-showcase>
-
-  <autom-showcase
-    *ngIf="showcaseDataManufactures.length"
-    [showcase]="showcaseDataManufactures"
-    [loading]="loading"
-  ></autom-showcase>
-
-  <div *ngIf="editingText" class="product-container documentation">
-    <h3 class="oe-title">Informacije o proizvodu</h3>
-    <autom-text-area
-      [placeholder]="'Unesite vas opis ovde'"
-      [value]="data.tekst!"
-      [maxLength]="2000"
-      [editable]="true"
-      (emitSelected)="textChanged($event)"
-    ></autom-text-area>
-    <div *ngIf="editingText" class="edit-description-actions">
-      <autom-button
-        [label]="'Otkaži'"
-        [theme]="buttonTheme.LIGHT_GREY"
-        [type]="buttonType.TERNARY"
-        (clickEvent)="cancelTextEdit()"
-      ></autom-button>
-      <autom-button
-        [label]="'Sačuvaj opis'"
-        [theme]="buttonTheme.DEFAULT"
-        [type]="buttonType.PRIMARY"
-        (clickEvent)="saveTextDescription()"
-      ></autom-button>
-    </div>
-  </div>
-  <div *ngIf="isAdmin" class="admin-edit-footer">
-    <h3 class="admin-edit-title">Admin tools</h3>
-    <div class="admin-edit-actions">
-      <autom-button
-        [label]="'Upload image'"
-        [iconSource]="iconEnum.IMAGE"
-        [iconColor]="colorEnum.INFO_25"
-        [iconPrefix]="true"
-        [theme]="buttonTheme.LIGHT_ORANGE"
-        [type]="buttonType.PRIMARY"
-        (clickEvent)="triggerImageUpload()"
-      ></autom-button>
-
-      <autom-button
-        [label]="'Edit attributes'"
-        [iconSource]="iconEnum.SETTINGS"
-        [iconColor]="colorEnum.INFO_25"
-        [iconPrefix]="true"
-        [theme]="buttonTheme.LIGHT_ORANGE"
-        [type]="buttonType.PRIMARY"
-        (clickEvent)="editAttributes()"
-      ></autom-button>
-
-      <autom-button
-        [label]="'Edit description'"
-        [iconSource]="iconEnum.EDIT"
-        [iconColor]="colorEnum.INFO_25"
-        [iconPrefix]="true"
-        [theme]="buttonTheme.LIGHT_ORANGE"
-        [type]="buttonType.PRIMARY"
-        (clickEvent)="editDescription()"
-      ></autom-button>
-
-      <autom-button
-        [label]="'Izbrisi svu dokumentaciju'"
-        [iconSource]="iconEnum.DELETE"
-        [iconColor]="colorEnum.INFO_25"
-        [iconPrefix]="true"
-        [theme]="buttonTheme.DARK_RED"
-        [type]="buttonType.PRIMARY"
-        (clickEvent)="showDeleteWarningPopup = true"
-      ></autom-button>
-
-      <autom-button
-        [label]="'Izbrisi sliku'"
-        [iconSource]="iconEnum.DELETE"
-        [iconColor]="colorEnum.INFO_25"
-        [iconPrefix]="true"
-        [theme]="buttonTheme.DARK_RED"
-        [type]="buttonType.PRIMARY"
-        (clickEvent)="showImageDeleteWarningPopup = true"
-      ></autom-button>
+      <ul class="oe-grid" role="list">
+        <li *ngFor="let oe of oeNumbers | keyvalue">
+          <a
+            class="oe-item"
+            [routerLink]="['/webshop']"
+            [queryParams]="{ searchTerm: oe.key }"
+            [attr.href]="'/webshop?searchTerm=' + oe.key"
+          >
+            {{ oe.key }} - {{ oe.value }}
+          </a>
+        </li>
+      </ul>
     </div>
 
-    <!-- Hidden file input for image upload -->
-    <input
-      type="file"
-      id="imageUpload"
-      accept="image/*"
-      (change)="onImageSelected($event)"
-      hidden
-    />
+    <div *ngIf="!editingText" class="product-container documentation">
+      <h3 class="oe-title" *ngIf="data.tekst || !data.tehnickiOpis?.length">
+        Informacije o proizvodu
+      </h3>
+
+      <!-- Ako postoji tekst -->
+      <div
+        *ngIf="data.tekst; else checkSpecs"
+        class="product-rich-text"
+        [innerHTML]="sanitizedText"
+        aria-label="Detaljan opis proizvoda"
+      ></div>
+
+      <!-- Ako nema tekst, proveri specifikacije -->
+      <ng-template #checkSpecs>
+        <!-- Ako postoje specifikacije, ne prikazujemo ništa -->
+        <ng-container
+          *ngIf="data.tehnickiOpis?.length; else noDescription"
+        ></ng-container>
+      </ng-template>
+
+      <!-- Ako nema ni tekst ni specifikacije -->
+      <ng-template #noDescription>
+        <p class="product-fallback">
+          Detaljan opis trenutno nije dostupan za ovaj proizvod. Kontaktirajte
+          nas za dodatne informacije ili tehničke detalje.
+        </p>
+      </ng-template>
+    </div>
+
+    <autom-divider *ngIf="showcaseDataCategories.length"></autom-divider>
+
+    <autom-showcase
+      *ngIf="showcaseDataCategories.length"
+      [showcase]="showcaseDataCategories"
+      [loading]="loading"
+    ></autom-showcase>
+
+    <autom-showcase
+      *ngIf="showcaseDataManufactures.length"
+      [showcase]="showcaseDataManufactures"
+      [loading]="loading"
+    ></autom-showcase>
+
+    <div *ngIf="editingText" class="product-container documentation">
+      <h3 class="oe-title">Informacije o proizvodu</h3>
+      <autom-text-area
+        [placeholder]="'Unesite vas opis ovde'"
+        [value]="data.tekst!"
+        [maxLength]="2000"
+        [editable]="true"
+        (emitSelected)="textChanged($event)"
+      ></autom-text-area>
+      <div *ngIf="editingText" class="edit-description-actions">
+        <autom-button
+          [label]="'Otkaži'"
+          [theme]="buttonTheme.LIGHT_GREY"
+          [type]="buttonType.TERNARY"
+          (clickEvent)="cancelTextEdit()"
+        ></autom-button>
+        <autom-button
+          [label]="'Sačuvaj opis'"
+          [theme]="buttonTheme.DEFAULT"
+          [type]="buttonType.PRIMARY"
+          (clickEvent)="saveTextDescription()"
+        ></autom-button>
+      </div>
+    </div>
+    <div *ngIf="isAdmin" class="admin-edit-footer">
+      <h3 class="admin-edit-title">Admin tools</h3>
+      <div class="admin-edit-actions">
+        <autom-button
+          [label]="'Upload image'"
+          [iconSource]="iconEnum.IMAGE"
+          [iconColor]="colorEnum.INFO_25"
+          [iconPrefix]="true"
+          [theme]="buttonTheme.LIGHT_ORANGE"
+          [type]="buttonType.PRIMARY"
+          (clickEvent)="triggerImageUpload()"
+        ></autom-button>
+
+        <autom-button
+          [label]="'Edit attributes'"
+          [iconSource]="iconEnum.SETTINGS"
+          [iconColor]="colorEnum.INFO_25"
+          [iconPrefix]="true"
+          [theme]="buttonTheme.LIGHT_ORANGE"
+          [type]="buttonType.PRIMARY"
+          (clickEvent)="editAttributes()"
+        ></autom-button>
+
+        <autom-button
+          [label]="'Edit description'"
+          [iconSource]="iconEnum.EDIT"
+          [iconColor]="colorEnum.INFO_25"
+          [iconPrefix]="true"
+          [theme]="buttonTheme.LIGHT_ORANGE"
+          [type]="buttonType.PRIMARY"
+          (clickEvent)="editDescription()"
+        ></autom-button>
+
+        <autom-button
+          [label]="'Izbrisi svu dokumentaciju'"
+          [iconSource]="iconEnum.DELETE"
+          [iconColor]="colorEnum.INFO_25"
+          [iconPrefix]="true"
+          [theme]="buttonTheme.DARK_RED"
+          [type]="buttonType.PRIMARY"
+          (clickEvent)="showDeleteWarningPopup = true"
+        ></autom-button>
+
+        <autom-button
+          [label]="'Izbrisi sliku'"
+          [iconSource]="iconEnum.DELETE"
+          [iconColor]="colorEnum.INFO_25"
+          [iconPrefix]="true"
+          [theme]="buttonTheme.DARK_RED"
+          [type]="buttonType.PRIMARY"
+          (clickEvent)="showImageDeleteWarningPopup = true"
+        ></autom-button>
+      </div>
+
+      <!-- Hidden file input for image upload -->
+      <input
+        type="file"
+        id="imageUpload"
+        accept="image/*"
+        (change)="onImageSelected($event)"
+        hidden
+      />
     </div>
   </ng-container>
 </section>
@@ -385,7 +418,10 @@
 
     <div class="product-hero skeleton-hero-grid">
       <figure class="product-media skeleton-media">
-        <div class="skeleton-block skeleton-block--image" aria-hidden="true"></div>
+        <div
+          class="skeleton-block skeleton-block--image"
+          aria-hidden="true"
+        ></div>
       </figure>
 
       <aside class="product-specs card skeleton-card" aria-hidden="true">
@@ -407,7 +443,10 @@
       </aside>
     </div>
 
-    <div class="product-container documentation skeleton-stack" aria-hidden="true">
+    <div
+      class="product-container documentation skeleton-stack"
+      aria-hidden="true"
+    >
       <div class="skeleton-line skeleton-line--heading"></div>
       <div class="skeleton-line skeleton-line--text"></div>
       <div class="skeleton-line skeleton-line--text"></div>
