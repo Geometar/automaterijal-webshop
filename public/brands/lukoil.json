@@ -1,0 +1,57 @@
+{
+  "name": "LUKOIL",
+  "logo": "/images/brands/lukoil.png",
+  "description": "Automaterijal je od 2024. godine zvanični uvoznik i distributer LUKOIL maziva za Srbiju. Donosimo kompletan asortiman za putnički i teretni program, kao i industrijske aplikacije, uz logistiku i tehničku podršku iz našeg regionalnog centra.",
+  "hero": {
+    "background": "linear-gradient(135deg, rgba(255, 245, 247, 1) 0%, rgba(255, 220, 228, 0.82) 44%, rgba(255, 165, 186, 0.62) 100%)",
+    "textColor": "#0f172a",
+    "accentColor": "#e11d30",
+    "tagline": "Zvanični LUKOIL uvoznik za Srbiju od 2024.",
+    "imageAlt": "LUKOIL kanisteri i industrijska burad u crveno-belim tonovima"
+  },
+  "sections": [
+    {
+      "title": "Novo partnerstvo za domaće tržište",
+      "body": "LUKOIL je jedna od najvećih globalnih energetskih kompanija sa proizvodnjom maziva za više od 100 zemalja. Automaterijal od 2024. godine preuzima zvaničan uvoz za Srbiju kako bismo domaćim servisima i industriji obezbedili originalne LUKOIL proizvode uz brzu isporuku i zvaničnu garanciju porekla.",
+      "highlights": [
+        { "title": "Direktan uvoz", "description": "Originalni proizvodi sa centralnog skladišta i potpunom sledljivošću isporuka." },
+        { "title": "Logistika u Srbiji", "description": "Regionalni lager omogućava isporuke u roku od 24 sata za ključne programe." },
+        { "title": "Tehnička podrška", "description": "Inženjerski tim pruža preporuke maziva, analize ulja i edukaciju servisa." }
+      ]
+    },
+    {
+      "title": "LUKOIL portfelj",
+      "body": "U ponudi su LUKOIL GENESIS i AVANTGARDE serije za savremene putničke i teretne motore, kao i industrijska ulja za hidrauliku, transmisije, reduktore i specijalne primene. Dostupni su i proizvodi za poljoprivredu, građevinske mašine i energetiku.",
+      "highlights": [
+        { "title": "LUKOIL GENESIS", "description": "Premium sintetička ulja za vozila sa najnovijim OEM specifikacijama i produženim intervalima." },
+        { "title": "LUKOIL AVANTGARDE", "description": "Maziva za kamionske flote i off-highway opremu sa zaštitom od habanja i ekonomijom goriva." },
+        { "title": "Industrijska linija", "description": "Hidraulična, transmisiona i kompresorska ulja za fabrike, logistiku i energetiku." }
+      ]
+    },
+    {
+      "title": "Program podrške partnerima",
+      "body": "Automaterijal razvija program podrške za LUKOIL partnere – od izbora proizvoda i kreiranja servisnih protokola do marketing paketa i analize ulja. Pomažemo servisima da uvedu LUKOIL brendiranje, a industrijskim kupcima obezbeđujemo monitoring performansi.",
+      "highlights": [
+        { "title": "Servisni koncept", "description": "Brendirani materijali, POS oprema i obuke za LUKOIL servise i prodajna mesta." },
+        { "title": "Analize i monitoring", "description": "Laboratorijska kontrola uzorka ulja i praćenje ključnih parametara rada opreme." },
+        { "title": "Dokumentacija i usklađenost", "description": "Bezbednosni listovi, OEM potvrde i podrška pri sertifikaciji procesa." }
+      ]
+    }
+  ],
+  "seo": {
+    "title": "LUKOIL maziva – zvanični uvoznik za Srbiju | Automaterijal",
+    "description": "Automaterijal je zvanični uvoznik LUKOIL maziva za Srbiju od 2024. GENESIS, AVANTGARDE i industrijske linije uz brzu logistiku, tehničku podršku i analize ulja iz regionalnog centra.",
+    "keywords": ["LUKOIL maziva Srbija", "LUKOIL uvoznik", "LUKOIL distributer Automaterijal", "LUKOIL Genesis ulja", "LUKOIL Avantgarde", "LUKOIL industrijska ulja", "LUKOIL analiza ulja"],
+    "ogImage": "https://automaterijal.com/images/brands/lukoil.png"
+  },
+  "cta": {
+    "label": "Pogledaj LUKOIL ponudu",
+    "url": "/webshop/manufacturers/lukoil"
+  },
+  "showcase": {
+    "title": "LUKOIL bestseleri",
+    "subtitle": "Najtraženija LUKOIL maziva za putnički i teretni program",
+    "limit": 5
+  },
+  "manufacturerId": "LKOIL"
+}

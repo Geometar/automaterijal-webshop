@@ -1,0 +1,57 @@
+{
+  "name": "Bottari",
+  "logo": "/images/brands/bottari.png",
+  "description": "Automaterijal distribuira Bottari dodatnu opremu i auto kozmetiku italijanske grupe od sredine 2010-ih. Program obuhvata praktične dodatke za enterijer, eksterijer, bezbednost i sezonsko održavanje vozila.",
+  "hero": {
+    "background": "linear-gradient(135deg, rgba(252, 250, 240, 1) 0%, rgba(247, 234, 199, 0.8) 44%, rgba(243, 213, 143, 0.6) 100%)",
+    "textColor": "#0f172a",
+    "accentColor": "#f59e0b",
+    "tagline": "Bottari dodatna oprema za svako vozilo",
+    "imageAlt": "Bottari logotip na svetlom žutom gradientu"
+  },
+  "sections": [
+    {
+      "title": "Kompletna dodatna oprema",
+      "body": "Bottari nudi širok asortiman dodatne opreme: navlake, patosnice, metlice brisača, dečiju sigurnosnu opremu, lance za sneg, kozmetiku i potrošni materijal. Automaterijal prati trendove i obezbeđuje sezonske novitete tokom cele godine.",
+      "highlights": [
+        { "title": "Širok izbor", "description": "Preko 3.000 artikala za enterijer, eksterijer i bezbednost." },
+        { "title": "Sezonski program", "description": "Lanci za sneg, zimski setovi, letnja zaštita i kamp oprema." },
+        { "title": "Retail pakovanja", "description": "Atraktivno pakovanje za prodajna mesta i servise." }
+      ]
+    },
+    {
+      "title": "Lokalna dostupnost i merchandising",
+      "body": "Naš magacin drži Bottari artikle sa najvećom potražnjom, dok sezonu planiramo unapred. Pomažemo partnerima u kreiranju retail prezentacija, POP materijala i online ponuda.",
+      "highlights": [
+        { "title": "Planiranje sezona", "description": "Analiza prodaje obezbeđuje pravovremeno dopunjavanje zaliha." },
+        { "title": "POS podrška", "description": "Stalci, displeji i grafika za prodavnice i servise." },
+        { "title": "Drop-shipping", "description": "Brze isporuke direktno na adresu partnera ili krajnjeg kupca." }
+      ]
+    },
+    {
+      "title": "Kategorizacija i promocija",
+      "body": "Automaterijal pomaže klijentima da kreiraju Bottari asortiman prema kanalima prodaje. Obučavamo prodajni tim, obezbeđujemo digitalne kataloge i promocije za akcijske periode.",
+      "highlights": [
+        { "title": "Custom asortimani", "description": "Predlog kategorija prema tipu prodavnice ili servisa." },
+        { "title": "Marketing kampanje", "description": "Akcije i bundle ponude za visoke sezonske potražnje." },
+        { "title": "Digitalni katalog", "description": "E-katalog i fotografije spremne za e-commerce i društvene mreže." }
+      ]
+    }
+  ],
+  "seo": {
+    "title": "Bottari dodatna oprema – zvanični distributer | Automaterijal",
+    "description": "Automaterijal distribuira Bottari dodatnu opremu i auto kozmetiku. Širok asortiman sezonskih i univerzalnih proizvoda uz lokalni lager, merchandising i logističku podršku.",
+    "keywords": ["Bottari Srbija", "Bottari distributer", "auto oprema Bottari", "Bottari kozmetika", "Bottari lanci za sneg", "Bottari dodatna oprema", "Automaterijal Bottari"],
+    "ogImage": "https://automaterijal.com/images/brands/bottari.png"
+  },
+  "cta": {
+    "label": "Pogledaj Bottari program",
+    "url": "/webshop/manufacturers/bottari"
+  },
+  "showcase": {
+    "title": "Bottari bestseleri",
+    "subtitle": "Najtraženiji Bottari proizvodi iz naše ponude",
+    "limit": 5
+  },
+  "manufacturerId": "BOTT"
+}

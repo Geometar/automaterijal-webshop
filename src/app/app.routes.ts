@@ -42,6 +42,11 @@ export const routes: Routes = [
       import('./modules/blog/blog-detail.component').then((m) => m.BlogDetailComponent)
   },
   {
+    path: 'brendovi/:slug',
+    loadComponent: () =>
+      import('./modules/brands/brand-page/brand-page.component').then((m) => m.BrandPageComponent)
+  },
+  {
     path: 'login',
     loadComponent: () =>
       import('./modules/login/login.component').then((m) => m.LoginComponent)

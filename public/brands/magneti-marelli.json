@@ -1,0 +1,57 @@
+{
+  "name": "Magneti Marelli",
+  "logo": "/images/brands/magneti_marelli.png",
+  "description": "Automaterijal već više od decenije distribuira Magneti Marelli komponente za svetlosne, elektronske i mehaničke sisteme vozila. Nudimo OE kvalitet za putnička vozila, komercijalni program i specijalne aplikacije.",
+  "hero": {
+    "background": "linear-gradient(135deg, rgba(247, 249, 255, 1) 0%, rgba(213, 224, 247, 0.8) 44%, rgba(185, 206, 245, 0.62) 100%)",
+    "textColor": "#0f172a",
+    "accentColor": "#003a8c",
+    "tagline": "Magneti Marelli distributer sa dugogodišnjim iskustvom",
+    "imageAlt": "Magneti Marelli logotip na svetlom plavom gradientu"
+  },
+  "sections": [
+    {
+      "title": "OE rešenja za elektriku i mehaniku",
+      "body": "Magneti Marelli isporučuje osvetljenje, elektroniku motora, karoserijske komponente i potrošni materijal. Automaterijal obezbeđuje kompletan aftermarket program – od farova i LED modula do pumpi, filtera i ovjes komponenti.",
+      "highlights": [
+        { "title": "Fabrika prvougradnje", "description": "Komponente koje koristi širok spektar evropskih i globalnih proizvođača vozila." },
+        { "title": "Multi-brand pokrivenost", "description": "Rešenja za Fiat, Alfa Romeo, Jeep, PSA, VW grupu i mnoštvo drugih marki." },
+        { "title": "Širok portfelj", "description": "Osvetljenje, elektronika, motoriči, pumpe, filteri i servisni potrošni materijal." }
+      ]
+    },
+    {
+      "title": "Lokalne zalihe i logistika",
+      "body": "Naš magacin drži ključne Magneti Marelli artikle za popularne modele vozila. Organizujemo brzu distribuciju ka mreži servisa i veleprodaja, uz mogućnost specijalnih porudžbina direktno iz centralnih skladišta.",
+      "highlights": [
+        { "title": "Stalna dostupnost", "description": "Funkcionalni delovi i osvetljenje za najtraženije modele su odmah na stanju." },
+        { "title": "Specijalne narudžbine", "description": "Dovoz retkih referenci i profesionalnih alata u kratkim rokovima." },
+        { "title": "Praćenje potražnje", "description": "Analitika prodaje pomaže partnerima da optimizuju sopstvene zalihe." }
+      ]
+    },
+    {
+      "title": "Tehnička podrška i obuke",
+      "body": "Automaterijal pruža pristup Magneti Marelli tehničkim uputstvima, dijagnostičkim alatima i programima lojalnosti. Naš tim pomaže servisima pri kodiranju elektronike i pravilnoj ugradnji osvetljenja.",
+      "highlights": [
+        { "title": "Tehnički bilteni", "description": "Detaljna uputstva za montažu i podešavanje elektronskih sistema." },
+        { "title": "Dijagnostički alati", "description": "Podrška za Magneti Marelli check-up uređaje i softver." },
+        { "title": "Marketing i lojalnost", "description": "Programi podrške za servise koji grade Magneti Marelli identitet." }
+      ]
+    }
+  ],
+  "seo": {
+    "title": "Magneti Marelli delovi – ovlašćeni distributer | Automaterijal",
+    "description": "Automaterijal već više od decenije distribuira Magneti Marelli osvetljenje, elektroniku i mehaničke komponente. OE kvalitet uz lokalni lager, brzu isporuku i tehničku podršku.",
+    "keywords": ["Magneti Marelli Srbija", "Magneti Marelli distributer", "Magneti Marelli osvetljenje", "Magneti Marelli elektronika", "Magneti Marelli delovi", "Automaterijal Magneti Marelli"],
+    "ogImage": "https://automaterijal.com/images/brands/magneti_marelli.png"
+  },
+  "cta": {
+    "label": "Pogledaj Magneti Marelli ponudu",
+    "url": "/webshop/manufacturers/magneti-marelli"
+  },
+  "showcase": {
+    "title": "Magneti Marelli bestseleri",
+    "subtitle": "Najtraženiji Magneti Marelli delovi u našoj ponudi",
+    "limit": 5
+  },
+  "manufacturerId": "MAGNM"
+}

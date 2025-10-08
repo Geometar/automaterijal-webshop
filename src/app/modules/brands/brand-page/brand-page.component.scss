@@ -1,0 +1,231 @@
+.brand-page {
+  display: block;
+  background: #ffffff;
+  color: #0f172a;
+}
+
+.brand-hero {
+  position: relative;
+  padding: clamp(3rem, 7vw, 5rem) clamp(1.5rem, 5vw, 4rem);
+  overflow: hidden;
+
+  &__accent {
+    position: absolute;
+    inset: 0;
+    opacity: 0.05;
+    pointer-events: none;
+  }
+
+  &__wrapper {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: clamp(2rem, 4vw, 3.5rem);
+    align-items: start;
+
+    @media (min-width: 992px) {
+      grid-template-columns: minmax(0, 1.1fr) auto;
+      align-items: center;
+    }
+  }
+
+  &__content {
+    max-width: 640px;
+    display: grid;
+    gap: clamp(1rem, 3vw, 1.75rem);
+    text-align: left;
+  }
+
+  &__tagline {
+    font-size: 0.9rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin: 0;
+    font-weight: 600;
+    color: inherit;
+    opacity: 0.7;
+  }
+
+  &__description {
+    margin: 0;
+    font-size: 1.05rem;
+    line-height: 1.8;
+  }
+
+  &__cta {
+    display: flex;
+  }
+
+  &__visual {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 2.25rem);
+    justify-items: center;
+    align-content: center;
+
+    @media (min-width: 992px) {
+      justify-items: end;
+    }
+  }
+
+  &__logo {
+    max-width: clamp(150px, 18vw, 240px);
+    padding: clamp(1.1rem, 3vw, 1.8rem);
+    background: linear-gradient(140deg, rgba(255, 255, 255, 0.94), rgba(241, 245, 255, 0.68));
+    border-radius: 24px;
+    box-shadow: 0 28px 58px rgba(15, 23, 42, 0.16);
+    backdrop-filter: blur(10px);
+
+    img {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
+  }
+
+  &__media {
+    display: none;
+  }
+
+  @media (max-width: 991px) {
+    &__visual {
+      justify-items: center;
+    }
+
+    &__logo {
+      max-width: clamp(140px, 32vw, 180px);
+    }
+  }
+}
+
+// ... rest file continues
+
+.brand-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.95rem 1.75rem;
+  border-radius: 999px;
+  background: var(--brand-accent, #f97316);
+  color: #ffffff;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 16px 38px rgba(249, 115, 22, 0.34);
+
+  &:hover,
+  &:focus-visible {
+    transform: translateY(-1px);
+    box-shadow: 0 20px 44px rgba(249, 115, 22, 0.42);
+  }
+}
+
+.brand-sections {
+  padding: 4rem 0;
+
+  .brand-section {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 3rem;
+
+    &__text {
+      width: min(100%, 880px);
+      background: rgba(255, 255, 255, 0.78);
+      padding: 3rem clamp(1.5rem, 3vw, 3rem);
+      border-radius: 28px;
+      box-shadow: 0 16px 38px rgba(15, 23, 42, 0.12);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+
+      h2 {
+        font-size: 2.05rem;
+        margin-bottom: 1rem;
+      }
+
+      .brand-section__body {
+        font-size: 1.05rem;
+        line-height: 1.8;
+        white-space: pre-line;
+        margin-bottom: 1.75rem;
+        max-width: 640px;
+      }
+    }
+
+    &__highlights {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 1rem;
+      width: 100%;
+
+      li {
+        padding: 1.1rem 1.4rem;
+        border-radius: 16px;
+        background: rgba(15, 23, 42, 0.05);
+        text-align: left;
+
+        .highlight-title {
+          display: block;
+          font-weight: 600;
+          margin-bottom: 0.4rem;
+        }
+
+        p {
+          margin: 0;
+          font-size: 0.95rem;
+          color: rgba(15, 23, 42, 0.78);
+        }
+      }
+    }
+
+    &__image {
+      margin-top: 2.5rem;
+      position: relative;
+      width: min(100%, 460px);
+
+      &::before {
+        content: '';
+        position: absolute;
+        inset: -28px -28px -18px;
+        background: linear-gradient(135deg, rgba(249, 115, 22, 0.15), rgba(251, 191, 36, 0.12));
+        border-radius: 32px;
+        z-index: 0;
+      }
+
+      img {
+        width: 100%;
+        border-radius: 24px;
+        box-shadow: 0 26px 48px rgba(15, 23, 42, 0.16);
+        position: relative;
+        z-index: 1;
+      }
+    }
+  }
+}
+
+.brand-showcase {
+  padding: 4rem 0 5rem;
+  background: #ffffff;
+
+  autom-showcase {
+    display: block;
+  }
+}
+
+.brand-page__loading,
+.brand-page__not-found {
+  padding: 6rem 0;
+  text-align: center;
+
+  span,
+  p {
+    color: rgba(15, 23, 42, 0.7);
+  }
+
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+  }
+}

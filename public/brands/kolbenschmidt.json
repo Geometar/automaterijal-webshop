@@ -1,0 +1,57 @@
+{
+  "name": "Kolbenschmidt",
+  "logo": "/images/brands/kolbenschmidt.png",
+  "description": "Kolbenschmidt klipovi, čaure, ležajevi i kompletni sklopovi motora deo su Automaterijal portfolija od 1997. godine. Kao dugogodišnji partner Rheinmetall Automotive grupe, obezbeđujemo OE kvalitet za remont motora putničkih i teretnih vozila.",
+  "hero": {
+    "background": "linear-gradient(135deg, rgba(244, 249, 255, 1) 0%, rgba(209, 227, 246, 0.8) 44%, rgba(176, 207, 241, 0.62) 100%)",
+    "textColor": "#0f172a",
+    "accentColor": "#005a96",
+    "tagline": "Kolbenschmidt partner Automaterijala od 1997.",
+    "imageAlt": "Kolbenschmidt logotip na svetlom plavom gradientu"
+  },
+  "sections": [
+    {
+      "title": "Komponente motora za OE i aftermarket",
+      "body": "Kolbenschmidt je sinonim za klipove, cilindarske čaure, karike i ležajeve koje koriste vodeći proizvođači motora. Automaterijal nudi rešenja za putnički, komercijalni i industrijski program, uključujući specifične setove za remont teških dizel motora.",
+      "highlights": [
+        { "title": "OE tehnologija", "description": "Identični materijali i tolerancije kao pri fabričkoj ugradnji." },
+        { "title": "Kompletni kitovi", "description": "Setovi klipova, karika i ležajeva za brzu obnovu motora." },
+        { "title": "Industrijske aplikacije", "description": "Rešenja za agregate, poljoprivredne i građevinske mašine." }
+      ]
+    },
+    {
+      "title": "Magacin i logistika za remont programe",
+      "body": "Ključne Kolbenschmidt referencije držimo na lageru u Srbiji kako bismo servisima i mašinskim radionicama omogućili kratke rokove. Uz podršku našeg planiranja zaliha, kupci imaju dostupnost i za specijalne narudžbine.",
+      "highlights": [
+        { "title": "Planirane zalihe", "description": "Analiziramo potražnju i uvozimo serije prema sezoni remonta." },
+        { "title": "Brza distribucija", "description": "Isporuke u roku od 24 sata za većinu referenci u Srbiji." },
+        { "title": "Specijalne porudžbine", "description": "Direktan uvoz za retke motore i vintage programe." }
+      ]
+    },
+    {
+      "title": "Tehnička ekspertiza pri remontu",
+      "body": "Naš tehnički tim pomaže pri izboru tolerancija, proračunu klirensa i preporukama za montažu Kolbenschmidt komponenti. Obuke i priručnici smanjuju rizik od grešaka pri remontu motora.",
+      "highlights": [
+        { "title": "Podrška mašinskim radionicama", "description": "Saveti za honovanje, merenje klipnog zazora i uparivanje ležajeva." },
+        { "title": "Dokumentacija i priručnici", "description": "Pristup tehničkim listovima i smernicama proizvođača." },
+        { "title": "Analiza reklamacija", "description": "Tim pomaže u pronalasku uzroka prevremenog habanja ili pregrevanja." }
+      ]
+    }
+  ],
+  "seo": {
+    "title": "Kolbenschmidt motori – ovlašćena distribucija | Automaterijal",
+    "description": "Automaterijal distribuira Kolbenschmidt klipove, čaure i ležajeve od 1997. godine. OE kvalitet, lokalni lager i tehnička podrška za remont motora putničkih i teretnih vozila.",
+    "keywords": ["Kolbenschmidt Srbija", "Kolbenschmidt klipovi", "Kolbenschmidt distributer", "remont motora delovi", "Kolbenschmidt ležajevi", "Kolbenschmidt karike", "Rheinmetall Kolbenschmidt"],
+    "ogImage": "https://automaterijal.com/images/brands/kolbenschmidt.png"
+  },
+  "cta": {
+    "label": "Pogledaj Kolbenschmidt ponudu",
+    "url": "/webshop/manufacturers/kolbenschmidt"
+  },
+  "showcase": {
+    "title": "Kolbenschmidt bestseleri",
+    "subtitle": "Najtraženije Kolbenschmidt komponente za remont motora",
+    "limit": 5
+  },
+  "manufacturerId": "KS"
+}

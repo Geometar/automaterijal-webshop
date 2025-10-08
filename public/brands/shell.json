@@ -1,0 +1,57 @@
+{
+  "name": "Shell",
+  "logo": "/images/brands/shell.png",
+  "description": "Automaterijal je zvanični Shell distributer u Srbiji od 2016. Donosimo kompletan Shell portfelj za putnički i teretni program, kao i industrijska rešenja, uz logistiku, tehničku podršku i više od 1.000 tona isporučenih maziva godišnje.",
+  "hero": {
+    "background": "linear-gradient(135deg, rgba(255, 250, 240, 1) 0%, rgba(255, 233, 209, 0.82) 46%, rgba(255, 213, 166, 0.6) 100%)",
+    "textColor": "#1f2937",
+    "accentColor": "#f59e0b",
+    "tagline": "Zvanični Shell distributer u Srbiji od 2016.",
+    "imageAlt": "Shell burad, kanister Helix i posuda Tellus na toploj narandžastoj pozadini"
+  },
+  "sections": [
+    {
+      "title": "Zašto Shell i Automaterijal",
+      "body": "Shell maziva pokrivaju svaku primenu – od putničkih automobila i komercijalnih flota do zahtevne industrije. Kao zvanični partner, Automaterijal od 2016. vodi distribuciju za srpsko tržište uz sertifikovane inženjere, regionalni lager i servisne koncepte za partner servise.",
+      "highlights": [
+        { "title": "Globalna ekspertiza", "description": "Shell je globalni lider u mazivima 16+ godina sa više od 500 OEM odobrenja za vozila i industrijske sisteme." },
+        { "title": "Regionalna logistika", "description": "Centralni magacin u Srbiji i svakodnevne isporuke obezbeđuju stalnu dostupnost celog Shell asortimana." },
+        { "title": "Stručni tim", "description": "Sertifikovani Shell Lubricants Specialist tim obezbeđuje selekciju maziva, analize ulja i implementaciju servisnih koncepata." }
+      ]
+    },
+    {
+      "title": "Ključne linije proizvoda",
+      "body": "Naša ponuda obuhvata Shell Helix i Rimula serije za putnički i teretni program, Shell Gadus masti za ekstremna opterećenja, kao i Spirax, Tellus i Corena rešenja za transmisije, hidrauliku i kompresore. Godišnje isporučujemo preko 1.000 tona Shell maziva partnerima širom regiona.",
+      "highlights": [
+        { "title": "Shell Helix", "description": "Sintetička ulja koja štite turbo benzinske i dizel motore uz maksimalne performanse i čistoću." },
+        { "title": "Shell Rimula", "description": "Maziva za flote i komercijalni transport sa produženim servisnim intervalima i uštedom goriva." },
+        { "title": "Shell Gadus", "description": "Specijalne masti za industrijske sisteme i mašine visokog opterećenja i ekstremnih uslova." }
+      ]
+    },
+    {
+      "title": "Servisni koncepti i industrijska rešenja",
+      "body": "Automaterijal implementira Shell servisne koncepte za automobile, kamionske flote i off-highway mašine – od izbora maziva i kontrolisanog skladištenja do opreme za aplikaciju. Industrijskim pogonima isporučujemo specijalizovane proizvode uz Shell LubeAdvisor i LubeAnalyst programe koji produžavaju intervale i smanjuju zastoje.",
+      "highlights": [
+        { "title": "Shell servisni brending", "description": "Kompletna podrška za Shell Helix i Rimula servisne stanice – vizuelni identitet, obuka i merchandising." },
+        { "title": "Industrija 4.0", "description": "Programi LubeExpert i LubeAnalyst sa laboratorijskim analizama i monitoringom kritičnih sistema u realnom vremenu." },
+        { "title": "Tehnička dokumentacija", "description": "Komplet OEM potvrda, sigurnosni listovi i audit podrška za industrijske korisnike i sertifikacije." }
+      ]
+    }
+  ],
+  "seo": {
+    "title": "Shell maziva – zvanični distributer za Srbiju | Automaterijal",
+    "description": "Automaterijal je zvanični distributer Shell maziva u Srbiji – Helix, Rimula, Gadus, Spirax, Tellus i Corena linije uz servisne koncepte, laboratorijske analize i logistiku koja godišnje isporuči više od 1.000 tona proizvoda.",
+    "keywords": ["Shell maziva Srbija", "Shell distributer Automaterijal", "Shell ulje Helix", "Shell Rimula maziva", "Shell industrijska rešenja", "Shell servisni koncept", "Shell analiza ulja"],
+    "ogImage": "https://automaterijal.com/images/brands/shell.png"
+  },
+  "cta": {
+    "label": "Pogledaj sve Shell proizvode",
+    "url": "/webshop/manufacturers/shell"
+  },
+  "showcase": {
+    "title": "Shell bestseleri",
+    "subtitle": "Najtraženiji Shell proizvodi iz Automaterijal ponude",
+    "limit": 5
+  },
+  "manufacturerId": "SHELL"
+}

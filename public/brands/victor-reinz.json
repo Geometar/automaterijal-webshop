@@ -1,0 +1,57 @@
+{
+  "name": "Victor Reinz",
+  "logo": "/images/brands/victor_reinz.png",
+  "description": "Victor Reinz brtve i setovi zaptiva ulaze u Automaterijalovu ponudu od 1997. godine. Kroz direktnu saradnju obezbeđujemo OE kvalitet za motore, menjače i izduvne sisteme putničkih i teretnih vozila.",
+  "hero": {
+    "background": "linear-gradient(135deg, rgba(246, 251, 255, 1) 0%, rgba(210, 235, 247, 0.82) 44%, rgba(180, 223, 246, 0.64) 100%)",
+    "textColor": "#0f172a",
+    "accentColor": "#0095d9",
+    "tagline": "Victor Reinz partner od 1997.",
+    "imageAlt": "Victor Reinz logotip na svetlom tirkiznom gradientu"
+  },
+  "sections": [
+    {
+      "title": "Kompletne OE brtve za motore i transmisije",
+      "body": "Victor Reinz obezbeđuje originalne brtvene sisteme koje koriste vodeći proizvođači motora. Automaterijal distribuira setove brtvi glave motora, dihtunge kartera, semeringe i zaptivne prstenove za evropske, azijske i američke aplikacije.",
+      "highlights": [
+        { "title": "OE specifikacije", "description": "Komponentne koje prate iste tolerancije i materijale kao fabrička ugradnja." },
+        { "title": "Kompletni setovi", "description": "Sve brtve za remont motora u jednoj kutiji – uključujući vijčani materijal i brtvene paste." },
+        { "title": "Široka pokrivenost", "description": "Program za automobile, lake i teške kamione, poljoprivredu i mašine." }
+      ]
+    },
+    {
+      "title": "Regionalni lager i logistika",
+      "body": "Naša distribuciona mreža osigurava da ključni Victor Reinz artikli budu dostupni odmah. Serviseri i veleprodaje dobijaju isporuku iz centralnog magacina u Srbiji uz podršku za planiranje sezonskih zaliha.",
+      "highlights": [
+        { "title": "Brza isporuka", "description": "Artikle šaljemo istog dana u većinu gradova Srbije i regiona." },
+        { "title": "Praćenje potražnje", "description": "Analitika potrošnje pomaže pri rotaciji setova i posebnih aplikacija." },
+        { "title": "Posebne porudžbine", "description": "Organizujemo specijalne OEM narudžbine za flotne i industrijske kupce." }
+      ]
+    },
+    {
+      "title": "Tehnička podrška i dokumentacija",
+      "body": "Automaterijal obezbeđuje pristup Victor Reinz tehničkim biltenima, video uputstvima i konsultacijama oko pritezanja i sekvenci montaže. Naš tehnički tim asistira pri odabiru brtvi za remont i pri rešavanju reklamacija vezanih za curenje.",
+      "highlights": [
+        { "title": "Uputstva za montažu", "description": "Detaljne procedure pritezanja i preporuke za pripremu dodirnih površina." },
+        { "title": "Analiza uzroka kvarova", "description": "Podrška servisima u dijagnostici curenja i prevenciji ponovljenih otkaza." },
+        { "title": "Digitalni katalozi", "description": "Pristup TecDoc i Victor Reinz e-katalogu kroz Automaterijal portal." }
+      ]
+    }
+  ],
+  "seo": {
+    "title": "Victor Reinz brtve – ovlašćena distribucija | Automaterijal",
+    "description": "Automaterijal distribuira Victor Reinz brtve od 1997. godine. OE setovi zaptiva za motore, transmisije i izduvne sisteme uz lokalni lager i tehničku podršku.",
+    "keywords": ["Victor Reinz Srbija", "Victor Reinz brtve", "Victor Reinz distributer", "set brtvi motor", "brtve glave motora", "Victor Reinz TecDoc", "Automaterijal brtve"],
+    "ogImage": "https://automaterijal.com/images/brands/victor_reinz.png"
+  },
+  "cta": {
+    "label": "Pogledaj Victor Reinz ponudu",
+    "url": "/webshop/manufacturers/victor-reinz"
+  },
+  "showcase": {
+    "title": "Victor Reinz bestseleri",
+    "subtitle": "Najtraženiji Victor Reinz setovi i brtve",
+    "limit": 5
+  },
+  "manufacturerId": "VR"
+}

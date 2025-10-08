@@ -1,0 +1,57 @@
+{
+  "name": "Bilstein",
+  "logo": "/images/brands/bilstain.png",
+  "description": "Bilstein amortizeri i sistemi ogibljenja nalaze se u Automaterijal portfoliju od 2000. godine. Kao ovlašćeni distributer nudimo OE zamenu i sportske aplikacije za putnička, komercijalna i specijalna vozila.",
+  "hero": {
+    "background": "linear-gradient(135deg, rgba(248, 251, 255, 1) 0%, rgba(219, 232, 248, 0.82) 44%, rgba(189, 214, 255, 0.64) 100%)",
+    "textColor": "#0f172a",
+    "accentColor": "#0057b8",
+    "tagline": "Bilstein ogibljenje u ponudi od 2000.",
+    "imageAlt": "Bilstein logotip na svetlom plavo-žutom gradientu"
+  },
+  "sections": [
+    {
+      "title": "OE i performance amortizeri",
+      "body": "Bilstein je globalni standard za gasne amortizere, sportske sisteme ogibljenja i komplete za spuštanje. Automaterijal obezbeđuje OE zamenu, B4/B6/B8 programe, kao i kompletnu podršku za Bilstein B12 i B14 kitove.",
+      "highlights": [
+        { "title": "OE kvaliteta", "description": "Amortizeri razvijeni i testirani u saradnji sa proizvođačima vozila." },
+        { "title": "Performance linije", "description": "Rešenja za sportske i tuning aplikacije sa podešavanjem visine i tvrdoće." },
+        { "title": "Kompletni setovi", "description": "Spremno rešenje za brzu zamenu prednjih i zadnjih amortizera." }
+      ]
+    },
+    {
+      "title": "Magacin i brza isporuka",
+      "body": "Najtraženije Bilstein reference se nalaze u našem centralnom magacinu, dok specijalne artikle uvozimo na zahtev. Servisi dobijaju brzu isporuku i podršku pri planiranju sezone zamene ogibljenja.",
+      "highlights": [
+        { "title": "Lokalne zalihe", "description": "Ključni modeli amortizera za popularna vozila su dostupni odmah." },
+        { "title": "Specijalne narudžbine", "description": "Direktan uvoz sportskih i off-road kitova u kratkim rokovima." },
+        { "title": "Praćenje rezervi", "description": "Analitika potrošnje pomaže da servisi drže optimalan stock." }
+      ]
+    },
+    {
+      "title": "Tehnička podrška i edukacija",
+      "body": "Automaterijal organizuje obuke i pruža tehničke smernice za pravilnu ugradnju Bilstein amortizera, merenje geometrije i adaptaciju elektronskih sistema ogibljenja.",
+      "highlights": [
+        { "title": "Obuke za servise", "description": "Treninzi za zamenu amortizera, sabirnih modula i aktivnih sistema." },
+        { "title": "Geometrija i adaptacija", "description": "Saveti za resetovanje elektronike i očuvanje fabričkih parametara." },
+        { "title": "Tehnički bilteni", "description": "Pristup Bilstein dokumentaciji i video vodičima." }
+      ]
+    }
+  ],
+  "seo": {
+    "title": "Bilstein amortizeri – ovlašćena distribucija | Automaterijal",
+    "description": "Automaterijal distribuira Bilstein amortizere i ogibljenje od 2000. godine. OE zamena i performance kitovi uz lokalni lager i tehničku podršku za servise.",
+    "keywords": ["Bilstein Srbija", "Bilstein amortizeri", "Bilstein distributer", "Bilstein B4 B6", "Bilstein sportski kit", "zamena amortizera Bilstein", "Bilstein geometrija"],
+    "ogImage": "https://automaterijal.com/images/brands/bilstain.png"
+  },
+  "cta": {
+    "label": "Pogledaj Bilstein ponudu",
+    "url": "/webshop/manufacturers/bilstein"
+  },
+  "showcase": {
+    "title": "Bilstein bestseleri",
+    "subtitle": "Najprodavaniji Bilstein amortizeri i setovi",
+    "limit": 5
+  },
+  "manufacturerId": "BIL"
+}

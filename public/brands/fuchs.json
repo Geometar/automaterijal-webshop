@@ -1,0 +1,57 @@
+{
+  "name": "FUCHS",
+  "logo": "/images/brands/fuchs.png",
+  "description": "Automaterijal je zvanični uvoznik i distributer FUCHS maziva za Srbiju. Partnerstvo gradimo od 2014. godine, a od 2024. direktno uvozimo kompletan FUCHS portfelj za putnički, komercijalni i industrijski program.",
+  "hero": {
+    "background": "linear-gradient(135deg, rgba(248, 250, 255, 1) 0%, rgba(219, 230, 248, 0.85) 44%, rgba(187, 206, 247, 0.68) 100%)",
+    "textColor": "#051022",
+    "accentColor": "#0a318a",
+    "tagline": "Zvanični FUCHS distributer od 2014, uvoznik od 2024.",
+    "imageAlt": "FUCHS kanisteri i industrijska burad na plavoj podlozi"
+  },
+  "sections": [
+    {
+      "title": "Zašto Automaterijal i FUCHS",
+      "body": "FUCHS je najveći nezavisni proizvođač maziva na svetu, sa više od 135 godina iskustva i OEM odobrenjima vodećih proizvođača vozila i opreme. Automaterijal od 2014. vodi distribuciju za srpsko tržište, a od 2024. preuzima direktan uvoz, što partnerima donosi bržu dostupnost i potpunu tehničku podršku.",
+      "highlights": [
+        { "title": "OEM poverenje", "description": "500+ zvaničnih OEM odobrenja obuhvata putnički, teretni i industrijski segment." },
+        { "title": "Lokalni lager", "description": "Regionalni magacin u Srbiji obezbeđuje redovne zalihe najtraženijih FUCHS proizvoda." },
+        { "title": "Tehnička ekspertiza", "description": "Tim sertifikovanih inženjera pruža odabir maziva, programiranje intervala i optimizaciju troškova." }
+      ]
+    },
+    {
+      "title": "Kompletan FUCHS portfelj",
+      "body": "Naš program pokriva FUCHS TITAN motorna ulja za putnički program, AGRIFARM rešenja za poljoprivredu i flote, te RENOLIN industrijske hidraulične i kompresorske serije. Uvozimo i specijalna maziva prema zahtevima energetike, metalske i prehrambene industrije.",
+      "highlights": [
+        { "title": "FUCHS TITAN", "description": "Sintetička i hibridna motorna ulja za najnovije benzinske i dizel motore." },
+        { "title": "FUCHS AGRIFARM", "description": "Maziva za traktore i off-highway opremu sa univerzalnim UTTO formulacijama." },
+        { "title": "FUCHS RENOLIN", "description": "Industrijska ulja za hidraulične sisteme, kompresore i reduktore visokih performansi." }
+      ]
+    },
+    {
+      "title": "Rešenja po meri industrije",
+      "body": "Automaterijal razvija programe podmazivanja za fabrike, energetiku i logistiku uz FUCHS specijalističke servise. Implementiramo LUBRICANTS.PLUS programe optimizacije, obezbeđujemo monitoring uz FUCHS Maintain i organizujemo obuke za proizvodne timove.",
+      "highlights": [
+        { "title": "Audit podmazivanja", "description": "Kompletna analiza procesa sa predlogom FUCHS proizvoda i praćenjem potrošnje." },
+        { "title": "Laboratorijske analize", "description": "Brza laboratorijska dijagnostika ulja kroz FUCHS Maintain uslugu za prevenciju zastoja." },
+        { "title": "Obuke i dokumentacija", "description": "Sertifikovane obuke, tehnički listovi i podrška pri usklađivanju sa standardima kvaliteta." }
+      ]
+    }
+  ],
+  "seo": {
+    "title": "FUCHS maziva – zvanični uvoznik i distributer | Automaterijal",
+    "description": "Automaterijal je zvanični uvoznik i distributer FUCHS maziva u Srbiji. TITAN, AGRIFARM, RENOLIN i specijalna industrijska maziva uz lokalni lager, tehničku podršku i laboratorijske analize.",
+    "keywords": ["FUCHS maziva Srbija", "FUCHS distributer", "FUCHS uvoznik Automaterijal", "FUCHS TITAN ulja", "FUCHS RENOLIN industrija", "FUCHS AGRIFARM Srbija", "FUCHS Maintain analize"],
+    "ogImage": "https://automaterijal.com/images/brands/fuchs.png"
+  },
+  "cta": {
+    "label": "Pogledaj FUCHS program",
+    "url": "/webshop/manufacturers/fuchs"
+  },
+  "showcase": {
+    "title": "FUCHS bestseleri",
+    "subtitle": "Najprodavanija FUCHS maziva iz naše ponude",
+    "limit": 5
+  },
+  "manufacturerId": "FUCHS"
+}

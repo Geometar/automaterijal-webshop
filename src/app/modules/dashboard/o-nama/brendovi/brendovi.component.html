@@ -24,10 +24,9 @@
           <a
             class="brand"
             *ngFor="let brand of getBrandsForSection(section)"
-            [routerLink]="['/webshop']"
-            [queryParams]="{ mandatoryproid: brand.id }"
-            [attr.aria-label]="'Pogledaj proizvode brenda ' + brand.alt"
-            [attr.href]="'/webshop?mandatoryproid=' + brand.id"
+            [routerLink]="['/brendovi', brand.slug]"
+            [attr.aria-label]="'Otvori stranicu brenda ' + brand.alt"
+            [attr.href]="'/brendovi/' + brand.slug"
           >
             <img [src]="brand.src" [alt]="brand.alt" loading="lazy" />
           </a>

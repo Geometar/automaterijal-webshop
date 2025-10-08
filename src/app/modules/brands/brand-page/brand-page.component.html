@@ -1,0 +1,111 @@
+<ng-container *ngIf="vm$ | async as vm; else loading">
+  <ng-container *ngIf="vm; else notFound">
+    <article class="brand-page header-margin--top">
+      <section
+        class="brand-hero"
+        [style.background]="heroBackground"
+        [style.color]="heroTextColor"
+        [style.--brand-accent]="accentColor"
+      >
+        <div class="brand-hero__accent" [style.background]="accentColor"></div>
+        <div class="container brand-hero__wrapper">
+          <div class="brand-hero__content">
+            <p class="brand-hero__tagline" *ngIf="vm.page.hero?.tagline">
+              {{ vm.page.hero?.tagline }}
+            </p>
+            <h1>{{ vm.page.name }}</h1>
+            <p class="brand-hero__description">{{ vm.page.description }}</p>
+
+            <div class="brand-hero__cta" *ngIf="vm.ctaHref && vm.ctaLabel">
+              <a
+                class="brand-cta"
+                [routerLink]="!vm.ctaExternal ? vm.ctaRouterLink : null"
+                [queryParams]="!vm.ctaExternal ? vm.ctaQueryParams : null"
+                [attr.href]="vm.ctaHref"
+                [attr.target]="vm.ctaExternal ? '_blank' : null"
+                rel="noopener"
+              >
+                {{ vm.ctaLabel }}
+              </a>
+            </div>
+          </div>
+
+          <div class="brand-hero__visual" *ngIf="vm.page.logo">
+            <div class="brand-hero__logo">
+              <img
+                [src]="vm.page.logo"
+                [alt]="vm.page.hero?.imageAlt || vm.page.name"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="brand-sections" *ngIf="vm.page.sections?.length">
+        <div class="container">
+          <article
+            class="brand-section"
+            *ngFor="let section of vm.page.sections; trackBy: trackSection"
+          >
+            <div class="brand-section__text">
+              <h2>{{ section.title }}</h2>
+              <p class="brand-section__body">{{ section.body }}</p>
+              <ul
+                class="brand-section__highlights"
+                *ngIf="getHighlights(section).length"
+              >
+                <li *ngFor="let highlight of getHighlights(section)">
+                  <span class="highlight-title">{{ highlight.title }}</span>
+                  <p *ngIf="highlight.description">
+                    {{ highlight.description }}
+                  </p>
+                </li>
+              </ul>
+              <figure class="brand-section__image" *ngIf="section.image">
+                <img
+                  [src]="section.image"
+                  [alt]="section.title"
+                  loading="lazy"
+                />
+              </figure>
+            </div>
+          </article>
+        </div>
+      </section>
+      <autom-divider></autom-divider>
+
+      <section
+        class="brand-showcase"
+        *ngIf="showcaseSections.length || showcaseLoading"
+      >
+        <autom-showcase
+          [showcase]="showcaseSections"
+          [loading]="showcaseLoading"
+        ></autom-showcase>
+      </section>
+    </article>
+  </ng-container>
+</ng-container>
+
+<ng-template #loading>
+  <div class="brand-page__loading">
+    <span>Učitavanje brenda…</span>
+  </div>
+</ng-template>
+
+<ng-template #notFound>
+  <section class="brand-page__not-found">
+    <div class="container">
+      <h1>Brend nije pronađen</h1>
+      <p>Vratite se na listu brendova i pokušajte ponovo.</p>
+      <a
+        class="brand-cta"
+        [routerLink]="['/home']"
+        fragment="brendovi"
+        href="/home#brendovi"
+        >Nazad na brendove</a
+      >
+    </div>
+  </section>
+</ng-template>

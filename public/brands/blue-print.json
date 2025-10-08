@@ -1,0 +1,57 @@
+{
+  "name": "Blue Print",
+  "logo": "/images/brands/blue_print.png",
+  "description": "Blue Print deo je Automaterijal portfolija od 2000. godine. Specijalizovani smo za azijska i američka vozila, obezbeđujući originalne zamenske delove – od filtera i kočnica do motornog programa i elektronike.",
+  "hero": {
+    "background": "linear-gradient(135deg, rgba(246, 251, 255, 1) 0%, rgba(214, 232, 246, 0.82) 44%, rgba(185, 218, 245, 0.64) 100%)",
+    "textColor": "#0f172a",
+    "accentColor": "#0f5c8c",
+    "tagline": "Blue Print partner od 2000.",
+    "imageAlt": "Blue Print logotip na svetlom plavom gradientu"
+  },
+  "sections": [
+    {
+      "title": "Specijalista za azijska i američka vozila",
+      "body": "Blue Print pokriva vozila japanske, korejske i američke proizvodnje koja zahtevaju specifične komponente. Automaterijal donosi širok portfolio filtera, kočnica, motornog programa i elektronike za brzu i pouzdanu popravku.",
+      "highlights": [
+        { "title": "OE matching kvalitet", "description": "Delovi razvijeni prema specifikaciji proizvođača vozila." },
+        { "title": "Široka pokrivenost", "description": "Rešenja za Toyota, Hyundai, Kia, Nissan, Ford, Chrysler i druge brendove." },
+        { "title": "Kompletni setovi", "description": "Setovi kvačila, diskova, lanaca i pumpi prilagođeni modelima." }
+      ]
+    },
+    {
+      "title": "Lokalni lager i brza dostupnost",
+      "body": "Naš magacin u Srbiji drži Blue Print artikle sa najvećom potražnjom, dok specifične reference obezbeđujemo kroz redovne uvozne cikluse. Servisi i veleprodaje dobijaju precizne informacije o zalihama i alternativama.",
+      "highlights": [
+        { "title": "Stalne zalihe", "description": "Filteri, kočnice i remenje za najpopularnije modele su odmah dostupni." },
+        { "title": "Specijalne narudžbine", "description": "Isporuka retkih referenci kroz nedeljne isporuke iz ADE mreže." },
+        { "title": "Digitalni katalog", "description": "Brza identifikacija delova putem Blue Print e-kataloga i TecDoc-a." }
+      ]
+    },
+    {
+      "title": "Tehnička i komercijalna podrška",
+      "body": "Automaterijal obezbeđuje pristup Blue Print tehnotehničkim informacijama, servisnim biltenima i programima lojalnosti. Pomažemo servisima da optimizuju nabavku i pravilnu montažu specifičnih komponenti.",
+      "highlights": [
+        { "title": "Tehnički bilteni", "description": "Detaljna uputstva i saveti za rešavanje tipičnih kvarova." },
+        { "title": "Obuke za timove", "description": "Radionice o specifičnostima azijskih i američkih platformi." },
+        { "title": "Program lojalnosti", "description": "Marketing podrška i posebni uslovi za partnere sa većim obrtom." }
+      ]
+    }
+  ],
+  "seo": {
+    "title": "Blue Print delovi – specijalista za azijska vozila | Automaterijal",
+    "description": "Automaterijal distribuira Blue Print delove od 2000. godine. Originalne zamenske komponente za japanska, korejska i američka vozila uz lokalni lager i tehničku podršku.",
+    "keywords": ["Blue Print Srbija", "Blue Print distributer", "delovi za japanska vozila", "Blue Print filteri", "Blue Print kočnice", "Blue Print katalog", "Automaterijal Blue Print"],
+    "ogImage": "https://automaterijal.com/images/brands/blue_print.png"
+  },
+  "cta": {
+    "label": "Pogledaj Blue Print program",
+    "url": "/webshop/manufacturers/blue-print"
+  },
+  "showcase": {
+    "title": "Blue Print bestseleri",
+    "subtitle": "Najtraženiji Blue Print delovi za azijska vozila",
+    "limit": 5
+  },
+  "manufacturerId": "BLUE"
+}

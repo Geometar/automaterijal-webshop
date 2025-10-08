@@ -1,0 +1,57 @@
+{
+  "name": "Mahle",
+  "logo": "/images/brands/mahle.png",
+  "description": "Mahle je od 2019. godine strateški partner Automaterijala. Kao zvanični distributer, nudimo filtere, klipno-sklopne komponente i termomanagement rešenja Mahle grupe za putnički, teretni i industrijski program.",
+  "hero": {
+    "background": "linear-gradient(135deg, rgba(245, 249, 255, 1) 0%, rgba(212, 225, 246, 0.82) 44%, rgba(185, 209, 244, 0.64) 100%)",
+    "textColor": "#0f172a",
+    "accentColor": "#003366",
+    "tagline": "Mahle distributer Automaterijala od 2019.",
+    "imageAlt": "Mahle logotip na svetlom plavom gradientu"
+  },
+  "sections": [
+    {
+      "title": "OE kvalitet za vozila i industriju",
+      "body": "Mahle je globalni lider u filterima, komponentama motora i termomanagement rešenjima. Automaterijal obezbeđuje kompletan aftermarket program – od filtera vazduha, ulja i goriva do klipova, ležajeva i hladnjaka.",
+      "highlights": [
+        { "title": "OE tehnologija", "description": "Mahle proizvodi se isporučuju direktno proizvođačima vozila i zadovoljavaju najviše standarde." },
+        { "title": "Kompletan portfolio", "description": "Filteri, motori, klimatski sistemi i elektronika za putnička i komercijalna vozila." },
+        { "title": "Industrijske aplikacije", "description": "Rešenja za građevinske mašine, poljoprivredu i energetiku." }
+      ]
+    },
+    {
+      "title": "Lokalna dostupnost i logistika",
+      "body": "Ključni Mahle artikli nalaze se na lageru Automaterijala u Srbiji. Pratimo potrošnju i obezbeđujemo redovne isporuke direktno iz Mahle distribucionih centara za specijalne narudžbine.",
+      "highlights": [
+        { "title": "Zalihe u Srbiji", "description": "Filteri i termomanagement delovi za najpopularnije modele vozila dostupni odmah." },
+        { "title": "Brza isporuka", "description": "Narudžbine isporučujemo u roku od 24 sata na teritoriji Srbije i regiona." },
+        { "title": "Specijalne porudžbine", "description": "Za specifične aplikacije organizujemo direktan uvoz sa praćenjem pošiljke." }
+      ]
+    },
+    {
+      "title": "Tehnička i komercijalna podrška",
+      "body": "Automaterijal obezbeđuje Mahle Aftermarket obuke, pristup dokumentaciji, kao i podršku pri rešavanju reklamacija. Partnerima pomažemo u planiranju kategorija i promociji Mahle brenda.",
+      "highlights": [
+        { "title": "Mahle TechTool", "description": "Digitalni priručnici, video uputstva i tehnički bilteni dostupni servisima." },
+        { "title": "Obuke i webinari", "description": "Redovni treninzi o novim tehnologijama i servisnim procedurama." },
+        { "title": "Marketinška podrška", "description": "POS materijali, lojalti programi i promotivne kampanje za partnere." }
+      ]
+    }
+  ],
+  "seo": {
+    "title": "Mahle delovi – zvanični distributer | Automaterijal",
+    "description": "Automaterijal je Mahle distributer od 2019. godine. Filteri, motori i termomanagement rešenja uz lokalni lager, brzu isporuku i tehničku podršku.",
+    "keywords": ["Mahle Srbija", "Mahle distributer", "Mahle filteri", "Mahle motori", "Mahle termomanagement", "Mahle aftermarket", "Automaterijal Mahle"],
+    "ogImage": "https://automaterijal.com/images/brands/mahle.png"
+  },
+  "cta": {
+    "label": "Pogledaj Mahle ponudu",
+    "url": "/webshop/manufacturers/mahle"
+  },
+  "showcase": {
+    "title": "Mahle bestseleri",
+    "subtitle": "Najprodavaniji Mahle filteri i komponente",
+    "limit": 5
+  },
+  "manufacturerId": "MAHL"
+}

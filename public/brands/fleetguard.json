@@ -1,0 +1,57 @@
+{
+  "name": "Fleetguard",
+  "logo": "/images/brands/fleetguard.png",
+  "description": "Fleetguard filteri ulaze u Automaterijal ponudu od 2022. godine. Kao deo Cummins grupe, Fleetguard isporučuje premium filtraciona rešenja za kamione, građevinske i industrijske mašine – uz podršku našeg regionalnog lagera.",
+  "hero": {
+    "background": "linear-gradient(135deg, rgba(255, 248, 248, 1) 0%, rgba(255, 222, 222, 0.82) 44%, rgba(255, 192, 192, 0.64) 100%)",
+    "textColor": "#0f172a",
+    "accentColor": "#d8242a",
+    "tagline": "Fleetguard filtracija u ponudi od 2022.",
+    "imageAlt": "Fleetguard logotip na svetlom crveno-belim gradientu"
+  },
+  "sections": [
+    {
+      "title": "Cummins Filtration tehnologija",
+      "body": "Fleetguard nudi OEM filtraciona rešenja za teška vozila i industrijske aplikacije. Automaterijal distribuira filtere za ulje, gorivo, vazduh, hidrauliku i rashladne sisteme – uključujući kompletnu paletu za vozni park kamiona i mašina.",
+      "highlights": [
+        { "title": "OEM partnerstva", "description": "Filtracioni sistemi razvijeni za Cummins, Caterpillar, Volvo, MAN i druge proizvođače." },
+        { "title": "Napredne tehnologije", "description": "NanoNet i Stratapore mediji za maksimalnu zaštitu motora i sistema." },
+        { "title": "Kompletan program", "description": "Filteri ulja, goriva, vazduha, dizel izduvnih tečnosti i rashladnih tečnosti." }
+      ]
+    },
+    {
+      "title": "Lokalne zalihe za flote i industriju",
+      "body": "Naši lageri drže ključne Fleetguard artikle za kamionske i industrijske programe. Organizujemo isporuke u kratkim rokovima i planiramo zalihe prema potrebama flotnih i industrijskih klijenata.",
+      "highlights": [
+        { "title": "Planiranje zaliha", "description": "Analiziramo potrošnju i optimizujemo stock za sezonske radne cikluse." },
+        { "title": "Brza logistika", "description": "Isporuka u roku od 24 sata na teritoriji Srbije i regiona." },
+        { "title": "Drop-shipping", "description": "Direktna isporuka radionicama, rudnicima i industrijskim pogonima." }
+      ]
+    },
+    {
+      "title": "Tehnička podrška i analize",
+      "body": "Automaterijal obezbeđuje Fleetguard tehničku dokumentaciju, cross-reference tabele i podršku pri izboru filtera. Naš tim asistira u analizi rashladnih tečnosti i programima održavanja za produženje servisnih intervala.",
+      "highlights": [
+        { "title": "Cross-reference alati", "description": "Brza zamena referenci kroz Fleetguard i Cummins baze podataka." },
+        { "title": "Analiza rashladnih tečnosti", "description": "Programi kontrole korozije i produženja životnog veka motora." },
+        { "title": "Obuke za održavanje", "description": "Treninzi o najboljim praksama filtracije za flote i industriju." }
+      ]
+    }
+  ],
+  "seo": {
+    "title": "Fleetguard filteri – Cummins filtracija | Automaterijal",
+    "description": "Automaterijal distribuira Fleetguard filtere od 2022. godine. Cummins tehnologija filtracije za kamione i industrijske mašine uz lokalni lager, brzu isporuku i tehničku podršku.",
+    "keywords": ["Fleetguard Srbija", "Fleetguard filteri", "Cummins Filtration distributer", "Fleetguard gorivo", "Fleetguard ulje", "Fleetguard vazduh", "Filtracija flote"],
+    "ogImage": "https://automaterijal.com/images/brands/fleetguard.png"
+  },
+  "cta": {
+    "label": "Pogledaj Fleetguard program",
+    "url": "/webshop/manufacturers/fleetguard"
+  },
+  "showcase": {
+    "title": "Fleetguard bestseleri",
+    "subtitle": "Najtraženiji Fleetguard filteri za flote i industriju",
+    "limit": 5
+  },
+  "manufacturerId": "FTG"
+}

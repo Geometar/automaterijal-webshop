@@ -1,0 +1,57 @@
+{
+  "name": "Febi",
+  "logo": "/images/brands/febi.png",
+  "description": "Febi je deo Automaterijal ponude od 2000. godine. Kao zvanični distributer Ferdinand Bilstein grupe za Srbiju nudimo više od 44.000 referenci – od šasije i kočionih sistema do upravljačkog i motor programa.",
+  "hero": {
+    "background": "linear-gradient(135deg, rgba(255, 248, 248, 1) 0%, rgba(255, 227, 227, 0.78) 44%, rgba(255, 200, 200, 0.6) 100%)",
+    "textColor": "#111827",
+    "accentColor": "#d30021",
+    "tagline": "Febi partner od 2000. godine",
+    "imageAlt": "Febi logotip na svetlom crvenom gradientu"
+  },
+  "sections": [
+    {
+      "title": "Širok asortiman za evropska vozila",
+      "body": "Ferdinand Bilstein je sinonim za kvalitetne zamenske delove za putnička i laka komercijalna vozila. Automaterijal distribuira Febi delove za šasiju, kočnice, motor, elektriku i rashladne sisteme, uz stalnu dopunu lagera za najtraženije modele.",
+      "highlights": [
+        { "title": "44.000+ artikala", "description": "Kompletan program za evropska vozila – od VW i BMW do Mercedes, MAN i DAF." },
+        { "title": "OE matching quality", "description": "Febi delovi koji zadovoljavaju ili prevazilaze specifikacije proizvođača vozila." },
+        { "title": "Katalozi i TecDoc", "description": "Brza identifikacija delova kroz Febi kataloge i naš prodajni tim." }
+      ]
+    },
+    {
+      "title": "Isporuke iz centralnog magacina",
+      "body": "Naš magacin u Srbiji drži stalnu zalihu Febi artikala sa najbržim obrtom. Distribuiramo veleprodajama, servisima i flotama sa isporukom u roku od 24 sata, uz mogućnost preciznog planiranja zaliha.",
+      "highlights": [
+        { "title": "Optimizovane zalihe", "description": "Praćenje potrošnje i automatske dopune iz centrale Ferdinand Bilstein-a." },
+        { "title": "Drop-shipping", "description": "Isporuke direktno na adresu servisa uz digitalno praćenje pošiljke." },
+        { "title": "Komercijalna podrška", "description": "Posebni rabati i marketinški programi za partnere." }
+      ]
+    },
+    {
+      "title": "Tehnička podrška i edukacija",
+      "body": "Automaterijal pruža pristup Febi PROtips sadržaju, video tutorijalima i obukama za pravilnu ugradnju. Naš tim pomaže servisima da reše reklamacije i identifikuju uzroke preuranjenog habanja.",
+      "highlights": [
+        { "title": "PROtips biblioteka", "description": "Praktični saveti za montažu i dijagnostiku problema sa Febi delovima." },
+        { "title": "Obuke na lokaciji", "description": "Edukacija servisnih timova o novim platformama i specifičnim sistemima." },
+        { "title": "Analiza reklamacija", "description": "Zajednički rad na prevenciji grešaka i produženju radnog veka komponenti." }
+      ]
+    }
+  ],
+  "seo": {
+    "title": "Febi delovi – zvanični distributer | Automaterijal",
+    "description": "Automaterijal distribuira Febi delove od 2000. godine. Originalni zamenski delovi za šasiju, kočnice, motor i elektriku uz lokalni lager i tehničku podršku.",
+    "keywords": ["Febi Srbija", "Febi distributer", "Ferdinand Bilstein delovi", "Febi šasija", "Febi kočnice", "Febi motorni delovi", "Febi TecDoc"],
+    "ogImage": "https://automaterijal.com/images/brands/febi.png"
+  },
+  "cta": {
+    "label": "Pogledaj Febi program",
+    "url": "/webshop/manufacturers/febi"
+  },
+  "showcase": {
+    "title": "Febi bestseleri",
+    "subtitle": "Najprodavaniji Febi delovi iz našeg lagera",
+    "limit": 5
+  },
+  "manufacturerId": "FEBI"
+}

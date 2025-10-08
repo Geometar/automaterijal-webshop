@@ -1,0 +1,57 @@
+{
+  "name": "Energizer",
+  "logo": "/images/brands/energizer.png",
+  "description": "Automaterijal je nacionalni distributer Energizer akumulatora i startnih rešenja. Donosimo premium baterije za putnički i komercijalni program, kao i napredne AGM/EFB tehnologije za vozila sa start-stop sistemima.",
+  "hero": {
+    "background": "linear-gradient(135deg, rgba(255, 248, 240, 1) 0%, rgba(255, 224, 196, 0.82) 44%, rgba(255, 198, 150, 0.64) 100%)",
+    "textColor": "#0f172a",
+    "accentColor": "#f97316",
+    "tagline": "Energizer akumulatori za pouzdan start",
+    "imageAlt": "Energizer logotip na toplom narandžastom gradientu"
+  },
+  "sections": [
+    {
+      "title": "Premium akumulatori za svaku primenu",
+      "body": "Energizer baterije poznate su po snazi hladnog starta i dugom veka trajanja. Automaterijal distribuira kompletnu gamu – od klasičnih olovnih baterija do AGM i EFB modela za start-stop vozila, kao i rešenja za kamione i specijalne mašine.",
+      "highlights": [
+        { "title": "AGM i EFB tehnologija", "description": "Napredne baterije za moderna vozila sa start-stop sistemima i visokim energetskim zahtevima." },
+        { "title": "Visok CCA", "description": "Pouzdan start i pri ekstremno niskim temperaturama zahvaljujući poboljšanim pločama." },
+        { "title": "Industrijski program", "description": "Posebne serije za komercijalna vozila, kamione, autobuse i radne mašine." }
+      ]
+    },
+    {
+      "title": "Logistika i upravljanje zalihama",
+      "body": "Naš magacin drži širok raspon Energizer baterija kako bismo pokrili sve kapacitete i polaritete. Organizujemo brze isporuke, povrat stare robe i rotaciju zaliha u skladu sa pravilima skladištenja akumulatora.",
+      "highlights": [
+        { "title": "Sve kapacitete na stanju", "description": "Od 35Ah do 230Ah, sa izborom polariteta i dimenzija za evropske i azijske standarde." },
+        { "title": "Brza isporuka", "description": "Distribucija u roku od 24 sata i drop-shipping prema servisima i prodavnicama." },
+        { "title": "Zbrinjavanje starih baterija", "description": "Preuzimanje, skladištenje i reciklaža u skladu sa propisima." }
+      ]
+    },
+    {
+      "title": "Tehnička i prodajna podrška",
+      "body": "Automaterijal pomaže partnerima da izaberu pravi akumulator, obezbeđuje test opremu i obuke za prodajne timove. Uz promotivni materijal i programe lojalnosti gradimo Energizer prepoznatljivost.",
+      "highlights": [
+        { "title": "Test oprema", "description": "Dostupni profesionalni testeri i punjači za dijagnostiku napona i kapaciteta." },
+        { "title": "Edukacija prodajnog tima", "description": "Treninzi o pravilnoj montaži, održavanju i reklamacionim procedurama." },
+        { "title": "Marketing podrška", "description": "POS materijali, promo akcije i kampanje za sezonske potražnje." }
+      ]
+    }
+  ],
+  "seo": {
+    "title": "Energizer akumulatori – zvanični distributer | Automaterijal",
+    "description": "Automaterijal distribuira Energizer akumulatore i startna rešenja. AGM/EFB baterije za putnički i komercijalni program uz lokalni lager, logistiku i tehničku podršku.",
+    "keywords": ["Energizer akumulatori Srbija", "Energizer distributer", "Energizer AGM", "Energizer EFB", "akumulatori start stop", "Automaterijal Energizer"],
+    "ogImage": "https://automaterijal.com/images/brands/energizer.png"
+  },
+  "cta": {
+    "label": "Pogledaj Energizer ponudu",
+    "url": "/webshop/manufacturers/energizer"
+  },
+  "showcase": {
+    "title": "Energizer bestseleri",
+    "subtitle": "Najtraženiji Energizer akumulatori u našoj ponudi",
+    "limit": 5
+  },
+  "manufacturerId": "ENERG"
+}

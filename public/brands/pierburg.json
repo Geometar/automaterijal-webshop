@@ -1,0 +1,57 @@
+{
+  "name": "Pierburg",
+  "logo": "/images/brands/pierburg.png",
+  "description": "Partnerstvo sa Pierburgom gradimo od 1997. godine. Automaterijal obezbeđuje originalne Pierburg ventile, pumpe i module za sisteme usisa, vazduha i goriva – za OEM zahteve, servisere i industrijske kupce u Srbiji i regionu.",
+  "hero": {
+    "background": "linear-gradient(135deg, rgba(245, 250, 255, 1) 0%, rgba(211, 229, 248, 0.82) 44%, rgba(179, 214, 247, 0.62) 100%)",
+    "textColor": "#0f172a",
+    "accentColor": "#0b72c4",
+    "tagline": "Pierburg partner Automaterijala od 1997.",
+    "imageAlt": "Pierburg logotip na svetlom plavom gradientu"
+  },
+  "sections": [
+    {
+      "title": "Originalni sistemi za usis, vazduh i gorivo",
+      "body": "Pierburg je deo Rheinmetall Automotive grupe i globalni standard za EGR ventile, pneumatske aktuatorske sisteme, pumpe za vazduh i elektronske upravljačke module. Automaterijal obezbeđuje ponudu koja pokriva putnička, dostavna i teretna vozila, kao i specijalnu opremu.",
+      "highlights": [
+        { "title": "OEM specifikacije", "description": "Komponente su identične onima koje se isporučuju fabrika-ma proizvođača vozila." },
+        { "title": "Napredna kontrola emisija", "description": "Pierburg EGR i SCR rešenja pomažu vozilima da ispune Euro 6 norme." },
+        { "title": "Širok portfolio", "description": "Više od 4.000 artikala – od pumpi goriva i vazduha do aktuatora i senzora." }
+      ]
+    },
+    {
+      "title": "Logistika i tehnička podrška iz Srbije",
+      "body": "Naš regionalni magacin u Srbiji čuva ključne Pierburg artikle na stanju, uz praćenje potražnje flota i velikih servisa. Brza distribucija omogućava isporuku u roku od 24 sata na teritoriji Srbije i Zapadnog Balkana.",
+      "highlights": [
+        { "title": "Stalna dostupnost", "description": "Kritični artikli su uvek na stanju zahvaljujući koordinaciji prodaje i logistike." },
+        { "title": "Drop-shipping za servise", "description": "Isporuke direktno na adresu servisa ili krajnjeg korisnika uz praćenje u realnom vremenu." },
+        { "title": "Planiranje zaliha", "description": "Analiziramo potrošnju i optimizujemo rezerve prema sezoni i portfoliju vozila." }
+      ]
+    },
+    {
+      "title": "Tehničke konsultacije i edukacija",
+      "body": "Automaterijal kombinuje Pierburg katalog alate sa sopstvenim tehničkim timom. Pomažemo servisima da dijagnostikuju probleme sa usisom, vakuumom i emisijama, uz treninge o ugradnji i kalibraciji komponenti.",
+      "highlights": [
+        { "title": "Podrška pri dijagnostici", "description": "Analiza simptoma i izbor odgovarajućih Pierburg modula za vozila Euro 4–6." },
+        { "title": "Obuke za timove", "description": "Radionice o pravilnoj montaži EGR i sekundarnih vazdušnih pumpi uz priručnike i video materijale." },
+        { "title": "Dokumentacija", "description": "Pristup tehničkim listovima, uputstvima i servisnim biltenima direktno iz Pierburg baze." }
+      ]
+    }
+  ],
+  "seo": {
+    "title": "Pierburg delovi – zvanični distributer | Automaterijal",
+    "description": "Automaterijal je Pierburg partner od 1997. godine. Originalni EGR ventili, pumpe i aktuatori uz lokalni lager, tehničku podršku i brzu isporuku za servise u Srbiji.",
+    "keywords": ["Pierburg Srbija", "Pierburg distributer", "Pierburg EGR ventil", "Pierburg pumpe", "Rheinmetall Pierburg", "Pierburg delovi Beograd", "Pierburg servis podrška"],
+    "ogImage": "https://automaterijal.com/images/brands/pierburg.png"
+  },
+  "cta": {
+    "label": "Pogledaj Pierburg ponudu",
+    "url": "/webshop/manufacturers/pierburg"
+  },
+  "showcase": {
+    "title": "Pierburg bestseleri",
+    "subtitle": "Najtraženije Pierburg komponente iz našeg lagera",
+    "limit": 5
+  },
+  "manufacturerId": "PIERB"
+}
