@@ -81,20 +81,60 @@
         "@graph": [
           {
             "@type": "Organization",
+            "@id": "https://automaterijal.com/#organization",
             "name": "Automaterijal d.o.o.",
             "url": "https://automaterijal.com/",
             "logo": "https://automaterijal.com/images/logo/logo.svg",
+            "foundingDate": "1990",
             "sameAs": [
               "https://www.facebook.com/automaterijal",
               "https://www.instagram.com/automaterijal"
+            ],
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "Kralja Milutina 159",
+              "addressLocality": "Šabac",
+              "postalCode": "15000",
+              "addressCountry": "RS"
+            },
+            "contactPoint": [
+              {
+                "@type": "ContactPoint",
+                "contactType": "Customer Service",
+                "telephone": "+38115319000",
+                "availableLanguage": ["sr"],
+                "areaServed": ["RS"]
+              }
+            ],
+            "brand": [
+              { "@type": "Brand", "name": "Shell" },
+              { "@type": "Brand", "name": "LUKOIL" },
+              { "@type": "Brand", "name": "FUCHS" },
+              { "@type": "Brand", "name": "Valvoline" },
+              { "@type": "Brand", "name": "Febi" },
+              { "@type": "Brand", "name": "Bilstein" },
+              { "@type": "Brand", "name": "Blue Print" },
+              { "@type": "Brand", "name": "Hi-Q" },
+              { "@type": "Brand", "name": "Mahle" },
+              { "@type": "Brand", "name": "Fleetguard" },
+              { "@type": "Brand", "name": "Victor Reinz" },
+              { "@type": "Brand", "name": "Pierburg" },
+              { "@type": "Brand", "name": "Kolbenschmidt" },
+              { "@type": "Brand", "name": "Magneti Marelli" },
+              { "@type": "Brand", "name": "Bottari" },
+              { "@type": "Brand", "name": "Energizer" }
             ]
           },
           {
             "@type": "AutoPartsStore",
+            "@id": "https://automaterijal.com/#store",
             "name": "Automaterijal d.o.o.",
             "image": "https://automaterijal.com/images/navigation/hero-banner.png",
             "url": "https://automaterijal.com/",
             "telephone": "+38115319000",
+            "parentOrganization": {
+              "@id": "https://automaterijal.com/#organization"
+            },
             "address": {
               "@type": "PostalAddress",
               "streetAddress": "Kralja Milutina 159",
@@ -121,15 +161,46 @@
                 "opens": "08:00",
                 "closes": "14:00"
               }
-            ]
+            ],
+            "brand": [
+              { "@type": "Brand", "name": "Shell" },
+              { "@type": "Brand", "name": "LUKOIL" },
+              { "@type": "Brand", "name": "FUCHS" },
+              { "@type": "Brand", "name": "Valvoline" },
+              { "@type": "Brand", "name": "Febi" },
+              { "@type": "Brand", "name": "Bilstein" },
+              { "@type": "Brand", "name": "Blue Print" },
+              { "@type": "Brand", "name": "Hi-Q" },
+              { "@type": "Brand", "name": "Mahle" },
+              { "@type": "Brand", "name": "Fleetguard" },
+              { "@type": "Brand", "name": "Victor Reinz" },
+              { "@type": "Brand", "name": "Pierburg" },
+              { "@type": "Brand", "name": "Kolbenschmidt" },
+              { "@type": "Brand", "name": "Magneti Marelli" },
+              { "@type": "Brand", "name": "Bottari" },
+              { "@type": "Brand", "name": "Energizer" }
+            ],
+            "knowsAbout": [
+              "maziva za putnička vozila",
+              "industrijska maziva",
+              "auto delovi i servisni potrošni materijal",
+              "kočioni sistemi",
+              "filteri i akumulatori"
+            ],
+            "areaServed": ["RS"]
           },
           {
             "@type": "WebSite",
+            "@id": "https://automaterijal.com/#website",
             "url": "https://automaterijal.com/",
+            "name": "Automaterijal",
+            "publisher": {
+              "@id": "https://automaterijal.com/#organization"
+            },
             "potentialAction": {
               "@type": "SearchAction",
-              "target": "https://automaterijal.com/webshop?search={query}",
-              "query-input": "required name=query"
+              "target": "https://automaterijal.com/webshop?search={search_term_string}",
+              "query-input": "required name=search_term_string"
             }
           }
         ]

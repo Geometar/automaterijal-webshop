@@ -31,7 +31,7 @@ import { RobaService } from '../../../shared/service/roba.service';
 import { SeoService } from '../../../shared/service/seo.service';
 
 // Utils
-import { buildCanonicalFromPath } from '../../../shared/utils/seo-utils';
+import { SITE_ORIGIN, buildCanonicalFromPath } from '../../../shared/utils/seo-utils';
 import { StringUtils } from '../../../shared/utils/string-utils';
 import { DividerComponent } from '../../../shared/components/divider/divider.component';
 
@@ -80,6 +80,7 @@ export class BrandPageComponent implements OnDestroy {
     tap(() => {
       this.showcaseSections = [];
       this.showcaseLoading = false;
+      this.seoService.clearJsonLd('brand-jsonld');
     }),
     switchMap((slug) => {
       if (!slug) {
@@ -127,6 +128,7 @@ export class BrandPageComponent implements OnDestroy {
 
           this.applyHeroStyles(page);
           this.updateSeo(slug, page);
+          this.updateBrandSchema(slug, page);
           this.loadShowcase(manufacturerId, manufacturerSlug, page);
 
           return {
@@ -186,6 +188,65 @@ export class BrandPageComponent implements OnDestroy {
       keywords,
     });
     this.seoService.preloadImage(page.logo);
+  }
+
+  private updateBrandSchema(slug: string, page: BrandPageData): void {
+    const brandUrl = buildCanonicalFromPath(`/brendovi/${slug}`);
+    const logoUrl = this.toAbsoluteUrl(page.logo);
+    const knowsAbout = (page.sections ?? [])
+      .map((section) => section.title?.trim())
+      .filter((title): title is string => Boolean(title));
+    const offerUrl = this.resolveCtaHref(page, slug);
+
+    const brandSchema: Record<string, unknown> = {
+      '@context': 'https://schema.org',
+      '@type': 'Brand',
+      '@id': `${brandUrl}#brand`,
+      name: page.name,
+      description: page.description,
+      url: brandUrl,
+      logo: logoUrl,
+      image: logoUrl,
+      brandOverview: page.hero?.tagline,
+      parentOrganization: {
+        '@id': `${SITE_ORIGIN}/#organization`,
+      },
+      hasOfferCatalog: offerUrl
+        ? {
+            '@type': 'OfferCatalog',
+            name: `${page.name} proizvodi`,
+            url: offerUrl,
+          }
+        : undefined,
+      knowsAbout: knowsAbout.length ? knowsAbout : undefined,
+    };
+
+    // Remove undefined fields before serializing
+    Object.keys(brandSchema).forEach((key) => {
+      if (brandSchema[key] === undefined) {
+        delete brandSchema[key];
+      }
+    });
+
+    this.seoService.setJsonLd(brandSchema, 'brand-jsonld');
+  }
+
+  private toAbsoluteUrl(path?: string | null): string {
+    if (!path) {
+      return `${SITE_ORIGIN}/images/logo/logo.svg`;
+    }
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      return path;
+    }
+    return `${SITE_ORIGIN}${path.startsWith('/') ? path : `/${path}`}`;
+  }
+
+  private resolveCtaHref(page: BrandPageData, slug: string): string | null {
+    const { cta } = page;
+    if (cta?.url) {
+      return this.toAbsoluteUrl(cta.url);
+    }
+    return `${SITE_ORIGIN}/webshop/manufacturers/${slug}`;
   }
 
   private loadShowcase(manufacturerId: string | null, manufacturerSlug: string, page: BrandPageData): void {
