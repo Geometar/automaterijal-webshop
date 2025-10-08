@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 220" role="img" aria-labelledby="title">
+  <title id="title">Valvoline logo</title>
+  <defs>
+    <linearGradient id="shadow" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0.18"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="220" fill="none"/>
+  <g transform="translate(20 20)">
+    <path d="M40 0h98l-67 120H0z" fill="#d71920"/>
+    <path d="M118 0h118l-67 120h-118z" fill="#0095d9"/>
+    <path d="M109 0h60l-49 120H60z" fill="#0b2a6b"/>
+  </g>
+  <text x="160" y="185" font-family="Montserrat, 'Open Sans', Arial, sans-serif" font-size="48" font-weight="700" text-anchor="middle" fill="#0b2a6b">
+    Valvoline
+  </text>
+</svg>

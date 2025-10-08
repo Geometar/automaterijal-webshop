@@ -28,6 +28,15 @@
       "section": "MOTOR_OIL"
     },
     {
+      "src": "/images/brands/valvoline.png",
+      "alt": "Valvoline",
+      "label": "Valvoline",
+      "id": "VALV",
+      "slug": "valvoline",
+      "visible": true,
+      "section": "MOTOR_OIL"
+    },
+    {
       "src": "/images/brands/febi.png",
       "alt": "Febi",
       "label": "Febi",

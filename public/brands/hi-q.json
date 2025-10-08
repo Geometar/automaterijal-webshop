@@ -1,18 +1,18 @@
 {
   "name": "Hi-Q",
   "logo": "/images/brands/hiq.png",
-  "description": "Automaterijal od 2021. godine distribuira Hi-Q kočione sisteme korejske kompanije Sangsin. Kroz lokalni lager nudimo disk pločice, pakne i kočione diskove koji zadovoljavaju OEM standarde za putnička i laka komercijalna vozila.",
+  "description": "Automaterijal od 2023. godine distribuira Hi-Q kočione sisteme korejske kompanije Sangsin. Kroz lokalni lager nudimo disk pločice, pakne i kočione diskove koji zadovoljavaju OEM standarde za putnička i laka komercijalna vozila.",
   "hero": {
     "background": "linear-gradient(135deg, rgba(248, 251, 255, 1) 0%, rgba(215, 230, 249, 0.82) 44%, rgba(186, 214, 249, 0.64) 100%)",
     "textColor": "#0f172a",
     "accentColor": "#003c9b",
-    "tagline": "Hi-Q kočioni program od 2021.",
+    "tagline": "Hi-Q kočioni program od 2023.",
     "imageAlt": "Hi-Q logotip na svetlom plavom gradientu"
   },
   "sections": [
     {
       "title": "OEM kvalitet korejskog proizvođača",
-      "body": "Hi-Q je globalni brend kompanije Sangsin Brake koji se ugrađuje u Hyundai, Kia i druge OEM programe. Automaterijal obezbeđuje disk pločice, pakne, diskove i prateći kočioni hardver za evropska i azijska vozila.",
+      "body": "Hi-Q je globalni brend kompanije Sangsin Brake koji se ugrađuje u Hyundai, Kia i druge OEM programe. Automaterijal od 2023. obezbeđuje disk pločice, pakne, diskove i prateći kočioni hardver za evropska i azijska vozila.",
       "highlights": [
         { "title": "Fabrika prvougradnje", "description": "Hi-Q proizvodi su homologovani od strane brojnih proizvođača vozila." },
         { "title": "Napredne smeše", "description": "Ferodo formulacije sa niskom emisijom prašine i visokim koeficijentom trenja." },
@@ -40,7 +40,7 @@
   ],
   "seo": {
     "title": "Hi-Q kočnice – zvanični distributer | Automaterijal",
-    "description": "Automaterijal distribuira Hi-Q kočione pločice, diskove i pakne od 2021. godine. OEM kvalitet Sangsin Brake uz lokalni lager, brzu isporuku i tehničku podršku.",
+    "description": "Automaterijal distribuira Hi-Q kočione pločice, diskove i pakne od 2023. godine. OEM kvalitet Sangsin Brake uz lokalni lager, brzu isporuku i tehničku podršku.",
     "keywords": ["Hi-Q kočnice", "Hi-Q Srbija", "Sangsin Brake distributer", "Hi-Q kočione pločice", "Hi-Q diskovi", "kočioni sistem Hi-Q", "Automaterijal Hi-Q"],
     "ogImage": "https://automaterijal.com/images/brands/hiq.png"
   },
