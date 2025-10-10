@@ -5,6 +5,13 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { Observable, Subject, catchError, forkJoin, map, of, switchMap, takeUntil, tap } from 'rxjs';
 import { BlogService } from '../../../shared/service/blog.service';
+
+// Autom imports
+import { DividerComponent } from '../../../shared/components/divider/divider.component';
+import { MetaPillComponent } from '../../../shared/components/meta-pill/meta-pill.component';
+import { ShowcaseComponent, ShowcaseSection } from '../../../shared/components/showcase/showcase.component';
+
+// Data models
 import {
   BlogComment,
   BlogCommentRequest,
@@ -13,14 +20,16 @@ import {
   BlogShowcaseCategoryConfig,
   BlogShowcaseManufacturerConfig,
 } from '../../../shared/data-models/model';
-import { SeoService } from '../../../shared/service/seo.service';
-import { ShowcaseComponent, ShowcaseSection } from '../../../shared/components/showcase/showcase.component';
-import { RobaService } from '../../../shared/service/roba.service';
 import { Filter, Magacin, Roba } from '../../../shared/data-models/model/roba';
+
+// Services
+import { RobaService } from '../../../shared/service/roba.service';
+import { SeoService } from '../../../shared/service/seo.service';
+import { SnackbarService } from '../../../shared/service/utils/snackbar.service';
 import { UrlHelperService } from '../../../shared/service/utils/url-helper.service';
+
+// Utils
 import { StringUtils } from '../../../shared/utils/string-utils';
-import { DividerComponent } from '../../../shared/components/divider/divider.component';
-import { MetaPillComponent } from '../../../shared/components/meta-pill/meta-pill.component';
 
 type BlogPostDetailViewModel = BlogPostDetail & {
   primaryCategorySlug: string | null;
@@ -52,6 +61,7 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
   private readonly sanitizer = inject(DomSanitizer);
   private readonly robaService = inject(RobaService);
   private readonly urlHelperService = inject(UrlHelperService);
+  private readonly snackbar = inject(SnackbarService);
 
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
@@ -133,7 +143,7 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
         }),
         catchError((err) => {
           console.error('Failed to submit comment', err);
-          alert('Trenutno nije moguće poslati komentar.');
+          this.snackbar.showError('Trenutno nije moguće poslati komentar.');
           return of(null);
         }),
         tap(() => this.submittingComment.set(false)),

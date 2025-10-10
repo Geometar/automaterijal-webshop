@@ -7,6 +7,16 @@ import { Subject, catchError, of, takeUntil, tap } from 'rxjs';
 import { QuillModule, type QuillModules } from 'ngx-quill';
 
 import { BlogService } from '../../../shared/service/blog.service';
+
+// Autom imports
+import { AutomLabelComponent } from '../../../shared/components/autom-label/autom-label.component';
+import { ButtonComponent } from '../../../shared/components/button/button.component';
+import { InputFieldsComponent } from '../../../shared/components/input-fields/input-fields.component';
+import { SelectComponent } from '../../../shared/components/select/select.component';
+import { SelectModel } from '../../../shared/data-models/interface/selected-item.interface';
+import { TextAreaComponent } from '../../../shared/components/text-area/text-area.component';
+
+// Data models
 import {
   BlogCategory,
   BlogListQuery,
@@ -22,22 +32,23 @@ import {
   BlogCategoryPayload,
   BlogTagPayload,
 } from '../../../shared/data-models/model';
-import { InputFieldsComponent } from '../../../shared/components/input-fields/input-fields.component';
+
+// Enums
 import {
   ButtonThemes,
   ButtonTypes,
   InputTypeEnum,
   SizeEnum,
 } from '../../../shared/data-models/enums';
-import { TextAreaComponent } from '../../../shared/components/text-area/text-area.component';
-import { AutomLabelComponent } from '../../../shared/components/autom-label/autom-label.component';
-import { SelectComponent } from '../../../shared/components/select/select.component';
-import { SelectModel } from '../../../shared/data-models/interface/selected-item.interface';
-import { ButtonComponent } from '../../../shared/components/button/button.component';
-import { CategoriesStateService } from '../../../shared/service/state/categories-state.service';
-import { ArticleCategories, SubCategories } from '../../../shared/data-models/model/article-categories';
-import { ManufactureService } from '../../../shared/service/manufacture.service';
 import { Manufacture } from '../../../shared/data-models/model';
+import { ArticleCategories, SubCategories } from '../../../shared/data-models/model/article-categories';
+
+// Services
+import { CategoriesStateService } from '../../../shared/service/state/categories-state.service';
+import { ManufactureService } from '../../../shared/service/manufacture.service';
+import { SnackbarService } from '../../../shared/service/utils/snackbar.service';
+
+// Utils
 import { StringUtils } from '../../../shared/utils/string-utils';
 
 const DEFAULT_IMAGE_CONTENT_TYPE = 'image/jpeg';
@@ -77,6 +88,7 @@ export class BlogAdminComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly categoriesState = inject(CategoriesStateService);
   private readonly manufactureService = inject(ManufactureService);
+  private readonly snackbar = inject(SnackbarService);
 
   readonly statuses: Array<BlogStatus | 'ALL'> = ['ALL', 'PUBLISHED', 'DRAFT', 'ARCHIVED'];
   readonly postStatuses: BlogStatus[] = ['DRAFT', 'PUBLISHED', 'ARCHIVED'];
@@ -343,7 +355,7 @@ export class BlogAdminComponent implements OnInit, OnDestroy {
         catchError((err) => {
           console.error('Failed to load post detail', err);
           this.loadingForm.set(false);
-          alert('Nije moguće učitati detalje posta.');
+          this.snackbar.showError('Nije moguće učitati detalje posta.');
           return of(null);
         }),
         takeUntil(this.destroy$)
@@ -683,7 +695,7 @@ export class BlogAdminComponent implements OnInit, OnDestroy {
         }),
         catchError((err) => {
           console.error('Delete failed', err);
-          alert('Nije moguće obrisati članak.');
+          this.snackbar.showError('Nije moguće obrisati članak.');
           return of(void 0);
         }),
         takeUntil(this.destroy$)
@@ -743,7 +755,7 @@ export class BlogAdminComponent implements OnInit, OnDestroy {
   private saveWithStatus(status: BlogStatus): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      alert('Popunite obavezna polja.');
+      this.snackbar.showError('Popunite obavezna polja.');
       return;
     }
 
@@ -766,7 +778,7 @@ export class BlogAdminComponent implements OnInit, OnDestroy {
         }),
         catchError((err) => {
           console.error('Save failed', err);
-          alert('Čuvanje nije uspelo. Proverite podatke.');
+          this.snackbar.showError('Čuvanje nije uspelo. Proverite podatke.');
           this.loadingForm.set(false);
           return of(null);
         }),
