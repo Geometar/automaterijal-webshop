@@ -4,7 +4,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { Observable, Subject, catchError, forkJoin, map, of, switchMap, takeUntil, tap } from 'rxjs';
-import { BlogService } from '../../shared/service/blog.service';
+import { BlogService } from '../../../shared/service/blog.service';
 import {
   BlogComment,
   BlogCommentRequest,
@@ -12,15 +12,15 @@ import {
   BlogPreview,
   BlogShowcaseCategoryConfig,
   BlogShowcaseManufacturerConfig,
-} from '../../shared/data-models/model';
-import { SeoService } from '../../shared/service/seo.service';
-import { ShowcaseComponent, ShowcaseSection } from '../../shared/components/showcase/showcase.component';
-import { RobaService } from '../../shared/service/roba.service';
-import { Filter, Magacin, Roba } from '../../shared/data-models/model/roba';
-import { UrlHelperService } from '../../shared/service/utils/url-helper.service';
-import { StringUtils } from '../../shared/utils/string-utils';
-import { DividerComponent } from '../../shared/components/divider/divider.component';
-import { MetaPillComponent } from '../../shared/components/meta-pill/meta-pill.component';
+} from '../../../shared/data-models/model';
+import { SeoService } from '../../../shared/service/seo.service';
+import { ShowcaseComponent, ShowcaseSection } from '../../../shared/components/showcase/showcase.component';
+import { RobaService } from '../../../shared/service/roba.service';
+import { Filter, Magacin, Roba } from '../../../shared/data-models/model/roba';
+import { UrlHelperService } from '../../../shared/service/utils/url-helper.service';
+import { StringUtils } from '../../../shared/utils/string-utils';
+import { DividerComponent } from '../../../shared/components/divider/divider.component';
+import { MetaPillComponent } from '../../../shared/components/meta-pill/meta-pill.component';
 
 type BlogPostDetailViewModel = BlogPostDetail & {
   primaryCategorySlug: string | null;

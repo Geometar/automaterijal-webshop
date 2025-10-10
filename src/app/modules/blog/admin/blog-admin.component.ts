@@ -6,7 +6,7 @@ import { RouterModule } from '@angular/router';
 import { Subject, catchError, of, takeUntil, tap } from 'rxjs';
 import { QuillModule, type QuillModules } from 'ngx-quill';
 
-import { BlogService } from '../../shared/service/blog.service';
+import { BlogService } from '../../../shared/service/blog.service';
 import {
   BlogCategory,
   BlogListQuery,
@@ -21,24 +21,24 @@ import {
   BlogTag,
   BlogCategoryPayload,
   BlogTagPayload,
-} from '../../shared/data-models/model';
-import { InputFieldsComponent } from '../../shared/components/input-fields/input-fields.component';
+} from '../../../shared/data-models/model';
+import { InputFieldsComponent } from '../../../shared/components/input-fields/input-fields.component';
 import {
   ButtonThemes,
   ButtonTypes,
   InputTypeEnum,
   SizeEnum,
-} from '../../shared/data-models/enums';
-import { TextAreaComponent } from '../../shared/components/text-area/text-area.component';
-import { AutomLabelComponent } from '../../shared/components/autom-label/autom-label.component';
-import { SelectComponent } from '../../shared/components/select/select.component';
-import { SelectModel } from '../../shared/data-models/interface/selected-item.interface';
-import { ButtonComponent } from '../../shared/components/button/button.component';
-import { CategoriesStateService } from '../../shared/service/state/categories-state.service';
-import { ArticleCategories, SubCategories } from '../../shared/data-models/model/article-categories';
-import { ManufactureService } from '../../shared/service/manufacture.service';
-import { Manufacture } from '../../shared/data-models/model';
-import { StringUtils } from '../../shared/utils/string-utils';
+} from '../../../shared/data-models/enums';
+import { TextAreaComponent } from '../../../shared/components/text-area/text-area.component';
+import { AutomLabelComponent } from '../../../shared/components/autom-label/autom-label.component';
+import { SelectComponent } from '../../../shared/components/select/select.component';
+import { SelectModel } from '../../../shared/data-models/interface/selected-item.interface';
+import { ButtonComponent } from '../../../shared/components/button/button.component';
+import { CategoriesStateService } from '../../../shared/service/state/categories-state.service';
+import { ArticleCategories, SubCategories } from '../../../shared/data-models/model/article-categories';
+import { ManufactureService } from '../../../shared/service/manufacture.service';
+import { Manufacture } from '../../../shared/data-models/model';
+import { StringUtils } from '../../../shared/utils/string-utils';
 
 const DEFAULT_IMAGE_CONTENT_TYPE = 'image/jpeg';
 const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
@@ -822,31 +822,31 @@ export class BlogAdminComponent implements OnInit, OnDestroy {
 
     const categoryConfig = this.showcaseCategoryEnabled() && this.selectedCategoryGroupId()
       ? {
-          groupId: this.selectedCategoryGroupId()!,
-          groupName:
-            this.selectedCategoryGroupName() ||
-            this.articleCategories().find((c) => c.groupId === this.selectedCategoryGroupId())?.name ||
-            undefined,
-          subGroupId: this.normalizeSubGroupId(this.selectedCategorySubGroupId()),
-          subGroupName:
-            this.selectedCategorySubGroupName() ||
-            this.availableSubCategories().find(
-              (s) => String(s.subGroupId) === this.selectedCategorySubGroupId()
-            )?.name ||
-            undefined,
-          limit: this.normalizeLimit(this.categoryLimit()),
-        } satisfies BlogShowcaseCategoryConfig
+        groupId: this.selectedCategoryGroupId()!,
+        groupName:
+          this.selectedCategoryGroupName() ||
+          this.articleCategories().find((c) => c.groupId === this.selectedCategoryGroupId())?.name ||
+          undefined,
+        subGroupId: this.normalizeSubGroupId(this.selectedCategorySubGroupId()),
+        subGroupName:
+          this.selectedCategorySubGroupName() ||
+          this.availableSubCategories().find(
+            (s) => String(s.subGroupId) === this.selectedCategorySubGroupId()
+          )?.name ||
+          undefined,
+        limit: this.normalizeLimit(this.categoryLimit()),
+      } satisfies BlogShowcaseCategoryConfig
       : null;
 
     const manufacturerConfig = this.showcaseManufacturerEnabled() && this.selectedManufacturerId()
       ? {
-          manufacturerId: this.selectedManufacturerId()!,
-          manufacturerName:
-            this.selectedManufacturerName() ||
-            this.manufacturers().find((m) => String(m.proid) === this.selectedManufacturerId())?.naziv ||
-            undefined,
-          limit: this.normalizeLimit(this.manufacturerLimit()),
-        } satisfies BlogShowcaseManufacturerConfig
+        manufacturerId: this.selectedManufacturerId()!,
+        manufacturerName:
+          this.selectedManufacturerName() ||
+          this.manufacturers().find((m) => String(m.proid) === this.selectedManufacturerId())?.naziv ||
+          undefined,
+        limit: this.normalizeLimit(this.manufacturerLimit()),
+      } satisfies BlogShowcaseManufacturerConfig
       : null;
 
     if (categoryConfig || manufacturerConfig) {

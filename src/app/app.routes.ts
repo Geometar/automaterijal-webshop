@@ -38,13 +38,13 @@ export const routes: Routes = [
   {
     path: 'blog/admin',
     loadComponent: () =>
-      import('./modules/blog/blog-admin.component').then((m) => m.BlogAdminComponent),
+      import('./modules/blog/admin/blog-admin.component').then((m) => m.BlogAdminComponent),
     canActivate: [salesGuard]
   },
   {
     path: 'blog/:slug',
     loadComponent: () =>
-      import('./modules/blog/blog-detail.component').then((m) => m.BlogDetailComponent)
+      import('./modules/blog/detail/blog-detail.component').then((m) => m.BlogDetailComponent)
   },
   {
     path: 'brendovi/:slug',
