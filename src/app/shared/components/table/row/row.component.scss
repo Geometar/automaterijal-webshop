@@ -110,21 +110,56 @@
     flex: 2;
     padding: 0 16px;
 
-    h3 {
-      font-size: 18px;
-      margin: 0 0 8px;
-      color: var(--figma-grey-800);
+    h3.product-heading {
+      font-size: 17px !important;
+      font-weight: 600 !important;
+      margin: 0 0 6px !important;
+      color: var(--figma-grey-900) !important;
       transition: color 0.15s ease, text-decoration-color 0.15s ease;
 
       .product-name-fragment {
-        margin-left: 4px;
+        color: var(--figma-primary-700) !important;
+        font-weight: 600 !important;
+      }
+
+      a {
+        color: var(--figma-primary-700) !important;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 6px;
+        transition: color 0.15s ease;
+      }
+
+      .product-link__chev {
+        color: var(--figma-grey-500) !important;
+        font-size: 15px !important;
+        text-decoration: none;
+        transition: transform 0.15s ease, color 0.15s ease;
+      }
+
+      .product-link__brand {
+        color: var(--figma-accent-pink-700) !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
       }
     }
     @media (hover: hover) and (pointer: fine) {
-      h3:hover {
-        text-decoration: underline;
+      h3.product-heading:hover {
         cursor: pointer;
         color: var(--figma-grey-600);
+
+        a {
+          color: var(--figma-primary-600);
+          text-decoration: underline;
+        }
+
+        .product-link__chev {
+          color: currentColor;
+          transform: translateX(2px);
+        }
       }
     }
 
@@ -132,6 +167,75 @@
       font-size: 14px;
       color: var(--figma-grey-600);
       margin: 0 0 16px;
+    }
+
+    .product-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 14px;
+    }
+
+    .meta-chip {
+      align-items: center;
+      border-radius: 9999px;
+      display: inline-flex;
+      font-weight: 600;
+      font-size: 13px;
+      gap: 6px;
+      padding: 4px 12px;
+      text-decoration: none;
+      transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease,
+        transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .meta-chip--sku {
+      background: var(--figma-grey-50);
+      border: 1px solid var(--figma-grey-100);
+      color: var(--figma-grey-700);
+      letter-spacing: 0.04em;
+    }
+
+    .meta-chip__prefix {
+      color: var(--figma-grey-500);
+    }
+
+    .meta-chip__value {
+      font-family: 'SFMono-Regular', 'JetBrains Mono', 'Fira Code', monospace;
+      font-weight: 600;
+    }
+
+    .meta-chip--category {
+      background: linear-gradient(135deg, rgba(27, 95, 255, 0.08), rgba(27, 95, 255, 0.02));
+      border: 1px solid rgba(27, 95, 255, 0.18);
+      color: var(--figma-primary-700);
+      box-shadow: 0 3px 8px rgba(27, 95, 255, 0.08);
+    }
+
+    .plain-category {
+      cursor: default;
+    }
+
+    .category-link__separator {
+      color: var(--figma-grey-400);
+      font-weight: 500;
+    }
+
+    .category-link__chev {
+      color: var(--figma-grey-500);
+      font-size: 13px;
+      margin-left: 2px;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .meta-chip--category:hover {
+        background: linear-gradient(135deg, rgba(27, 95, 255, 0.14), rgba(27, 95, 255, 0.04));
+        border-color: rgba(27, 95, 255, 0.28);
+        color: var(--figma-primary-800);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 14px rgba(27, 95, 255, 0.14);
+      }
     }
 
     .specifications {
@@ -282,14 +386,53 @@
     padding: 0 10px;
     text-align: center;
 
-    h3 {
-      font-size: 17px;
-      margin-bottom: 6px;
+    h3.product-heading {
+      font-size: 16px !important;
+      margin-bottom: 8px !important;
+
+      a {
+        justify-content: center;
+      }
+
+      .product-link__brand {
+        color: var(--figma-grey-500) !important;
+        font-size: 15px !important;
+      }
+
+      .product-name-fragment {
+        color: var(--figma-primary-700) !important;
+        font-size: 16px !important;
+      }
+
+      .product-link__chev {
+        font-size: 14px !important;
+      }
     }
 
     p {
       font-size: 13px;
       margin-bottom: 6px;
+    }
+
+    .product-meta {
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .meta-chip {
+      font-size: 12px;
+      gap: 4px;
+      padding: 4px 10px;
+      box-shadow: none;
+    }
+
+    .meta-chip--category {
+      box-shadow: 0 2px 6px rgba(27, 95, 255, 0.08);
+    }
+
+    .meta-chip__value {
+      font-size: 12px;
     }
 
     .specifications {

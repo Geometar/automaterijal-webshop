@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
@@ -48,7 +48,7 @@ import { PictureService, ProductImageMeta } from '../../../service/utils/picture
   templateUrl: './row.component.html',
   styleUrl: './row.component.scss',
 })
-export class RowComponent implements OnInit {
+export class RowComponent implements OnInit, OnChanges {
   @Input() data!: Roba;
   @Input() showAddToBasket = false;
   @Input() showCloseBtn = false;
@@ -75,6 +75,8 @@ export class RowComponent implements OnInit {
   hasMoreThanFiveSpecs = false;
   isEmployee = false;
   showAllSpecs = false;
+  categoryHref: string | null = null;
+  categoryLinkSegments: string[] | null = null;
 
   stringUtils = StringUtils;
 
@@ -104,10 +106,17 @@ export class RowComponent implements OnInit {
     private pictureService: PictureService
   ) { }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['data']) {
+      this.computeCategoryLink();
+    }
+  }
+
   ngOnInit() {
     this.isEmployee = this.accountStateService.isEmployee();
     this.quantity = this.data.kolicina ?? this.quantity;
     this.updateDisplayedSpecs();
+    this.computeCategoryLink();
   }
 
   updateDisplayedSpecs() {
@@ -186,5 +195,25 @@ export class RowComponent implements OnInit {
 
   getProductImageTitle(): string {
     return this.productImageMeta.title;
+  }
+
+  private computeCategoryLink(): void {
+    const groupName = this.data?.grupaNaziv?.trim();
+    const subName = this.data?.podGrupaNaziv?.trim();
+
+    if (!groupName) {
+      this.categoryHref = null;
+      this.categoryLinkSegments = null;
+      return;
+    }
+
+    const segments = ['/webshop', 'category', StringUtils.slugify(groupName)];
+
+    if (subName) {
+      segments.push(StringUtils.slugify(subName));
+    }
+
+    this.categoryLinkSegments = segments;
+    this.categoryHref = segments.join('/');
   }
 }

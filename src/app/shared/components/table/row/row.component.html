@@ -21,35 +21,50 @@
 
   <!-- Details Section -->
   <div class="details-container">
-    <h3 [class.disabled]="data.podGrupa === 1000000">
+    <h3 class="product-heading" [class.disabled]="data.podGrupa === 1000000">
       <a
+        class="product-link"
         [routerLink]="['/webshop', data.robaid + '-' + getProductSlug(data)]"
         [attr.href]="'/webshop/' + (data.robaid + '-' + getProductSlug(data))"
       >
-        <span class="color--figma-primary-800">
+        <span class="product-link__brand">
           {{ data.proizvodjac?.naziv }}</span
         >
         <span class="product-name-fragment">{{ nameWithoutManufacturer }}</span>
+        <span class="product-link__chev" aria-hidden="true">›</span>
       </a>
     </h3>
 
-    <p class="autom-margin__none">
-      Kataloški broj:
-      <span
-        class="color--figma-primary-800 display--inline font-medium"
-      >
-        {{ data.katbr }}
+    <div class="product-meta">
+      <span class="meta-chip meta-chip--sku" *ngIf="data.katbr">
+        <span class="meta-chip__prefix">#</span>
+        <span class="meta-chip__value">{{ data.katbr }}</span>
       </span>
-    </p>
 
-    <p class="autom-margin__none">
-      Kategorija:
-      <span
-        class="color--figma-primary-800 display--inline font-medium"
-      >
-        {{ data!.podGrupaNaziv }}
-      </span>
-    </p>
+      <ng-container *ngIf="categoryHref; else plainCategory">
+        <a
+          class="meta-chip meta-chip--category"
+          [routerLink]="categoryLinkSegments"
+          [attr.href]="categoryHref"
+        >
+          <span class="category-link__group" *ngIf="data?.grupaNaziv">{{ data.grupaNaziv }}</span>
+          <span
+            class="category-link__separator"
+            *ngIf="data?.grupaNaziv && data?.podGrupaNaziv"
+            aria-hidden="true"
+          >
+            /
+          </span>
+          <span class="category-link__sub" *ngIf="data?.podGrupaNaziv">{{ data.podGrupaNaziv }}</span>
+          <span class="category-link__chev" aria-hidden="true">›</span>
+        </a>
+      </ng-container>
+      <ng-template #plainCategory>
+        <span class="meta-chip meta-chip--category plain-category">
+          {{ data!.podGrupaNaziv || data!.grupaNaziv }}
+        </span>
+      </ng-template>
+    </div>
 
     <p *ngIf="isEmployee">
       Stanje:
