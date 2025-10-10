@@ -196,7 +196,7 @@
   p,
   li {
     font-size: clamp(18px, 2.35vw, 20px);
-    line-height: 1.78;
+    line-height: 1.48;
   }
 
   ul,
@@ -204,7 +204,7 @@
     padding-left: clamp(20px, 2vw, 28px);
     display: flex;
     flex-direction: column;
-    gap: clamp(10px, 1.6vw, 14px);
+    gap: clamp(6px, 1.4vw, 8px);
   }
 
   a {
