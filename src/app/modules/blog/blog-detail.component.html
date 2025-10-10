@@ -13,9 +13,11 @@
     <div class="article__hero">
       <header class="article__header">
         <div class="article__meta">
-          <a
+          <autom-meta-pill
+            class="article__meta-pill article__meta-pill--accent"
+            variant="accent"
+            size="lg"
             [routerLink]="['/blog']"
-            class="meta-chip meta-chip--accent"
             [queryParams]="
               article.primaryCategorySlug
                 ? { category: article.primaryCategorySlug }
@@ -23,20 +25,24 @@
             "
           >
             {{ article.primaryCategoryName }}
-          </a>
-          <span class="meta-chip">
-            <span
-              class="meta-icon meta-icon--calendar"
-              aria-hidden="true"
-            ></span>
+          </autom-meta-pill>
+
+          <autom-meta-pill class="article__meta-pill" variant="soft" size="lg">
+            <span class="meta-icon meta-icon--calendar" aria-hidden="true"></span>
             <time [attr.datetime]="article.publishedAt">{{
               article.publishedAt | date : "d. MMM yyyy."
             }}</time>
-          </span>
-          <span class="meta-chip" *ngIf="article.readingTimeMinutes">
+          </autom-meta-pill>
+
+          <autom-meta-pill
+            *ngIf="article.readingTimeMinutes"
+            class="article__meta-pill"
+            variant="soft"
+            size="lg"
+          >
             <span class="meta-icon meta-icon--clock" aria-hidden="true"></span>
             {{ article.readingTimeMinutes }} min čitanja
-          </span>
+          </autom-meta-pill>
         </div>
         <h1>{{ article.title }}</h1>
         <p class="article__excerpt">{{ article.excerpt }}</p>

@@ -36,33 +36,44 @@
     </h3>
 
     <div class="product-meta">
-      <span class="meta-chip meta-chip--sku" *ngIf="data.katbr">
-        <span class="meta-chip__prefix">#</span>
-        <span class="meta-chip__value">{{ data.katbr }}</span>
-      </span>
+      <autom-meta-pill
+        *ngIf="data.katbr"
+        class="product-meta__sku"
+        variant="neutral"
+        size="md"
+        prefix="#"
+        [value]="data.katbr"
+        [ariaLabel]="'Kataloški broj ' + data.katbr"
+      ></autom-meta-pill>
 
       <ng-container *ngIf="categoryHref; else plainCategory">
-        <a
-          class="meta-chip meta-chip--category"
+        <autom-meta-pill
+          class="product-meta__category category-pill"
+          variant="primary"
+          size="md"
           [routerLink]="categoryLinkSegments"
-          [attr.href]="categoryHref"
+          [suffix]="categorySuffix"
+          [ariaLabel]="categoryAriaLabel"
         >
-          <span class="category-link__group" *ngIf="data?.grupaNaziv">{{ data.grupaNaziv }}</span>
+          <span class="category-pill__group" *ngIf="data?.grupaNaziv">{{ data.grupaNaziv }}</span>
           <span
-            class="category-link__separator"
+            class="category-pill__separator"
             *ngIf="data?.grupaNaziv && data?.podGrupaNaziv"
             aria-hidden="true"
           >
             /
           </span>
-          <span class="category-link__sub" *ngIf="data?.podGrupaNaziv">{{ data.podGrupaNaziv }}</span>
-          <span class="category-link__chev" aria-hidden="true">›</span>
-        </a>
+          <span class="category-pill__sub" *ngIf="data?.podGrupaNaziv">{{ data.podGrupaNaziv }}</span>
+        </autom-meta-pill>
       </ng-container>
       <ng-template #plainCategory>
-        <span class="meta-chip meta-chip--category plain-category">
+        <autom-meta-pill
+          class="product-meta__category category-pill"
+          variant="primary"
+          size="md"
+        >
           {{ data!.podGrupaNaziv || data!.grupaNaziv }}
-        </span>
+        </autom-meta-pill>
       </ng-template>
     </div>
 

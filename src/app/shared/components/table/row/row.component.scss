@@ -177,65 +177,33 @@
       margin: 0 0 14px;
     }
 
-    .meta-chip {
-      align-items: center;
-      border-radius: 9999px;
+    .product-meta autom-meta-pill {
       display: inline-flex;
-      font-weight: 600;
-      font-size: 13px;
-      gap: 6px;
-      padding: 4px 12px;
-      text-decoration: none;
-      transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease,
-        transform 0.2s ease, box-shadow 0.2s ease;
+      max-width: 100%;
     }
 
-    .meta-chip--sku {
-      background: var(--figma-grey-50);
-      border: 1px solid var(--figma-grey-100);
-      color: var(--figma-grey-700);
-      letter-spacing: 0.04em;
-    }
-
-    .meta-chip__prefix {
-      color: var(--figma-grey-500);
-    }
-
-    .meta-chip__value {
+    .product-meta__sku .meta-pill__value {
       font-family: 'SFMono-Regular', 'JetBrains Mono', 'Fira Code', monospace;
       font-weight: 600;
+      letter-spacing: 0.03em;
     }
 
-    .meta-chip--category {
-      background: linear-gradient(135deg, rgba(27, 95, 255, 0.08), rgba(27, 95, 255, 0.02));
-      border: 1px solid rgba(27, 95, 255, 0.18);
-      color: var(--figma-primary-700);
-      box-shadow: 0 3px 8px rgba(27, 95, 255, 0.08);
+    .product-meta__category.category-pill .meta-pill__inner {
+      gap: 6px;
     }
 
-    .plain-category {
-      cursor: default;
-    }
-
-    .category-link__separator {
+    .category-pill__separator {
       color: var(--figma-grey-400);
       font-weight: 500;
     }
 
-    .category-link__chev {
-      color: var(--figma-grey-500);
-      font-size: 13px;
-      margin-left: 2px;
+    .category-pill__group,
+    .category-pill__sub {
+      color: inherit;
     }
 
-    @media (hover: hover) and (pointer: fine) {
-      .meta-chip--category:hover {
-        background: linear-gradient(135deg, rgba(27, 95, 255, 0.14), rgba(27, 95, 255, 0.04));
-        border-color: rgba(27, 95, 255, 0.28);
-        color: var(--figma-primary-800);
-        transform: translateY(-1px);
-        box-shadow: 0 6px 14px rgba(27, 95, 255, 0.14);
-      }
+    .product-meta__category .meta-pill__suffix {
+      color: var(--figma-grey-500);
     }
 
     .specifications {
@@ -420,18 +388,18 @@
       margin-bottom: 12px;
     }
 
-    .meta-chip {
+    .product-meta autom-meta-pill .meta-pill__inner {
       font-size: 12px;
       gap: 4px;
       padding: 4px 10px;
       box-shadow: none;
     }
 
-    .meta-chip--category {
+    .product-meta autom-meta-pill.product-meta__category .meta-pill__inner {
       box-shadow: 0 2px 6px rgba(27, 95, 255, 0.08);
     }
 
-    .meta-chip__value {
+    .product-meta autom-meta-pill .meta-pill__value {
       font-size: 12px;
     }
 

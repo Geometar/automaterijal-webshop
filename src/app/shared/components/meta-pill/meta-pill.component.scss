@@ -1,0 +1,132 @@
+:host {
+  display: inline-flex;
+  max-width: 100%;
+}
+
+.meta-pill__inner {
+  align-items: center;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  box-shadow: none;
+  display: inline-flex;
+  gap: 6px;
+  justify-content: center;
+  line-height: 1.2;
+  text-decoration: none;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.meta-pill--sm {
+  padding: 2px 8px;
+  font-size: 12px;
+}
+
+.meta-pill--md {
+  padding: 4px 12px;
+  font-size: 13px;
+}
+
+.meta-pill--lg {
+  padding: 6px 16px;
+  font-size: clamp(14px, 1.8vw, 15px);
+}
+
+.meta-pill--neutral {
+  background: var(--figma-grey-50, #f9fafb);
+  border-color: var(--figma-grey-100, #edf2f7);
+  color: var(--figma-grey-700, #4b5563);
+}
+
+.meta-pill--primary {
+  background: linear-gradient(135deg, rgba(27, 95, 255, 0.08), rgba(27, 95, 255, 0.02));
+  border-color: rgba(27, 95, 255, 0.18);
+  color: var(--figma-primary-700, #1d4ed8);
+  box-shadow: 0 3px 8px rgba(27, 95, 255, 0.08);
+}
+
+.meta-pill--accent {
+  background: rgba(191, 219, 254, 0.7);
+  border-color: rgba(59, 130, 246, 0.24);
+  color: #1d4ed8;
+  box-shadow: none;
+}
+
+.meta-pill--soft {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(148, 163, 184, 0.2);
+  color: var(--figma-grey-600, #4b5563);
+  box-shadow: none;
+}
+
+.meta-pill--ghost {
+  background: transparent;
+  border-color: transparent;
+  color: inherit;
+}
+
+.meta-pill--clickable.meta-pill__inner:hover {
+  cursor: pointer;
+}
+
+.meta-pill--clickable.meta-pill--neutral:hover {
+  background: var(--figma-grey-75, #f1f5f9);
+  border-color: var(--figma-grey-200, #e2e8f0);
+  color: var(--figma-grey-800, #374151);
+  transform: translateY(-1px);
+}
+
+.meta-pill--clickable.meta-pill--primary:hover {
+  background: linear-gradient(135deg, rgba(27, 95, 255, 0.14), rgba(27, 95, 255, 0.04));
+  border-color: rgba(27, 95, 255, 0.28);
+  color: var(--figma-primary-800, #1e3a8a);
+  box-shadow: 0 6px 14px rgba(27, 95, 255, 0.14);
+  transform: translateY(-1px);
+}
+
+.meta-pill--clickable.meta-pill--accent:hover {
+  background: rgba(191, 219, 254, 0.82);
+  border-color: rgba(59, 130, 246, 0.3);
+  transform: translateY(-1px);
+}
+
+.meta-pill--clickable.meta-pill--soft:hover {
+  background: rgba(255, 255, 255, 0.98);
+  border-color: rgba(148, 163, 184, 0.32);
+  transform: translateY(-1px);
+}
+
+.meta-pill--disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.meta-pill__label,
+.meta-pill__value,
+.meta-pill__prefix,
+.meta-pill__suffix {
+  display: inline-flex;
+  align-items: center;
+}
+
+.meta-pill__value {
+  font-weight: inherit;
+}
+
+.meta-pill__prefix {
+  color: var(--figma-grey-500, #6b7280);
+}
+
+.meta-pill__suffix {
+  color: inherit;
+}
+
+:host-context(.article__meta) .meta-pill__inner.meta-pill--lg {
+  font-size: clamp(14px, 1.8vw, 15px);
+}

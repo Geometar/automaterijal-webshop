@@ -1,0 +1,42 @@
+<ng-template #pillContent>
+  <span *ngIf="prefix" class="meta-pill__prefix">{{ prefix }}</span>
+  <span *ngIf="label" class="meta-pill__label">{{ label }}</span>
+  <span *ngIf="value" class="meta-pill__value">{{ value }}</span>
+  <ng-content></ng-content>
+  <span *ngIf="suffix" class="meta-pill__suffix">{{ suffix }}</span>
+</ng-template>
+
+<ng-container [ngSwitch]="linkType">
+  <a
+    *ngSwitchCase="'router'"
+    [ngClass]="hostClasses"
+    class="meta-pill__inner"
+    [routerLink]="routerLink"
+    [queryParams]="queryParams"
+    [attr.aria-label]="ariaLabel"
+  >
+    <ng-container *ngTemplateOutlet="pillContent"></ng-container>
+  </a>
+
+  <a
+    *ngSwitchCase="'href'"
+    [ngClass]="hostClasses"
+    class="meta-pill__inner"
+    [attr.href]="href"
+    [attr.target]="target"
+    [attr.rel]="rel"
+    [attr.download]="download"
+    [attr.aria-label]="ariaLabel"
+  >
+    <ng-container *ngTemplateOutlet="pillContent"></ng-container>
+  </a>
+
+  <span
+    *ngSwitchDefault
+    [ngClass]="hostClasses"
+    class="meta-pill__inner"
+    [attr.aria-label]="ariaLabel"
+  >
+    <ng-container *ngTemplateOutlet="pillContent"></ng-container>
+  </span>
+</ng-container>

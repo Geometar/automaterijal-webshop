@@ -20,6 +20,7 @@ import { Filter, Magacin, Roba } from '../../shared/data-models/model/roba';
 import { UrlHelperService } from '../../shared/service/utils/url-helper.service';
 import { StringUtils } from '../../shared/utils/string-utils';
 import { DividerComponent } from '../../shared/components/divider/divider.component';
+import { MetaPillComponent } from '../../shared/components/meta-pill/meta-pill.component';
 
 type BlogPostDetailViewModel = BlogPostDetail & {
   primaryCategorySlug: string | null;
@@ -39,7 +40,7 @@ const COMMENT_HIDE_TIMEOUT = 15 * 60 * 1000; // 15 minuta
 @Component({
   selector: 'app-blog-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ShowcaseComponent, DividerComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ShowcaseComponent, DividerComponent, MetaPillComponent],
   templateUrl: './blog-detail.component.html',
   styleUrl: './blog-detail.component.scss',
   encapsulation: ViewEncapsulation.None,

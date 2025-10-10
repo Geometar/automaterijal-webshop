@@ -7,6 +7,7 @@ import { AutomIconComponent } from '../../autom-icon/autom-icon.component';
 import { ButtonComponent } from '../../button/button.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { InputFieldsComponent } from '../../input-fields/input-fields.component';
+import { MetaPillComponent } from '../../meta-pill/meta-pill.component';
 
 // Data models
 import { Roba } from '../../../data-models/model/roba';
@@ -40,6 +41,7 @@ import { PictureService, ProductImageMeta } from '../../../service/utils/picture
     CommonModule,
     FormsModule,
     InputFieldsComponent,
+    MetaPillComponent,
     ReactiveFormsModule,
     RouterModule,
     RsdCurrencyPipe,
@@ -70,6 +72,7 @@ export class RowComponent implements OnInit, OnChanges {
   displayedTehnickiOpis: any[] = [];
   displayedSpecs: any[] = [];
   zoomedImageUrl: string | null = null;
+  readonly categorySuffix = '›';
 
   // Misc
   hasMoreThanFiveSpecs = false;
@@ -195,6 +198,21 @@ export class RowComponent implements OnInit, OnChanges {
 
   getProductImageTitle(): string {
     return this.productImageMeta.title;
+  }
+
+  get categoryAriaLabel(): string | null {
+    const groupName = this.data?.grupaNaziv?.trim();
+    const subName = this.data?.podGrupaNaziv?.trim();
+
+    if (!groupName && !subName) {
+      return null;
+    }
+
+    if (groupName && subName) {
+      return `Prikaži kategoriju ${groupName} / ${subName}`;
+    }
+
+    return `Prikaži kategoriju ${groupName ?? subName}`;
   }
 
   private computeCategoryLink(): void {

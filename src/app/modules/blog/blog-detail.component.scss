@@ -62,21 +62,17 @@
   gap: 10px;
 }
 
-.meta-chip {
+.article__meta-pill .meta-pill__inner {
   display: inline-flex;
-  align-items: center;
   gap: 8px;
   padding: 6px 14px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.9);
   font-size: clamp(14px, 1.8vw, 15px);
   font-weight: 600;
-  color: var(--figma-grey-600, #4b5563);
   text-decoration: none;
-  border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
-.meta-chip--accent {
+.article__meta-pill--accent .meta-pill__inner {
   background: rgba(191, 219, 254, 0.7);
   border-color: rgba(59, 130, 246, 0.24);
   color: #1d4ed8;
