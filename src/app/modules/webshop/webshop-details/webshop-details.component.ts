@@ -253,6 +253,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
           }
 
           this.updateSeoTags(this.data);
+          this.applyOgImageMeta(this.data);
           this.loadShowcase(this.data);
         },
         error: (err: HttpErrorResponse) => {
@@ -1024,6 +1025,24 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   // SEO main
   // ─────────────────────────────────────────────────────────────────────────────
 
+  private buildOgImageAlt(roba: Roba): string {
+    const brand = this.normalizeWhitespace(roba.proizvodjac?.naziv);
+    const name = this.normalizeWhitespace(roba.naziv);
+    const base = [brand, name].filter(Boolean).join(' ');
+    return base || 'Automaterijal proizvod';
+  }
+
+  private applyOgImageMeta(roba: Roba): void {
+    const imageMeta: ProductImageMeta = this.pictureService.buildProductImageMeta(roba);
+    const url = this.absoluteImage(imageMeta?.src ?? null);
+    const alt = this.normalizeWhitespace(imageMeta?.alt) || this.buildOgImageAlt(roba);
+
+    this.seoService.setOgImageMeta({
+      url,
+      alt,
+    });
+  }
+
   private updateSeoTags(roba: Roba): void {
     const brand = this.normalizeWhitespace(roba.proizvodjac?.naziv);
     const name = this.normalizeWhitespace(roba.naziv);
@@ -1058,9 +1077,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     const images = this.collectProductImages(roba);
     const ogImage = images[0];
 
-    const ogImageAlt =
-      baseTitle ||
-      (brand && name ? `${brand} ${name}` : 'Automaterijal proizvod');
+    const ogImageAlt = this.buildOgImageAlt(roba);
 
     // Robots (index thin=off)
     let robots = this.isThin(roba) ? 'noindex, follow' : 'index, follow';
@@ -1103,6 +1120,10 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       '@type': 'Product',
       name: baseTitle || name || brand || 'Proizvod',
       sku: sku || String(id),
+      mainEntityOfPage: {
+        '@type': 'WebPage',
+        '@id': url,
+      },
       ...(mpn ? { mpn } : {}),
       ...(brand ? { brand: { '@type': 'Brand', name: brand } } : {}),
       image: images,
