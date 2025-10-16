@@ -180,8 +180,16 @@ export class RowComponent implements OnInit, OnChanges {
   }
 
   getProductSlug(data: any): string {
-    const parts = [data.proizvodjac?.naziv, data.naziv, data.katbr].filter((x) => !!x);
-    return StringUtils.slugify(parts.join(' '));
+    return StringUtils.productSlug(data?.proizvodjac?.naziv, data?.naziv, data?.katbr);
+  }
+
+  getRouteParam(data: any): string | null {
+    const id = data?.robaid;
+    if (id == null) {
+      return null;
+    }
+    const slug = this.getProductSlug(data);
+    return slug ? `${id}-${slug}` : String(id);
   }
 
   get productImageMeta(): ProductImageMeta {

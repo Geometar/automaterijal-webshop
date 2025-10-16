@@ -26,4 +26,20 @@ export class StringUtils {
       .replace(/-/g, ' ')
       .replace(/\b\w/g, (c) => c.toUpperCase());
   }
+
+  static productSlug(
+    brand?: string | null,
+    name?: string | null,
+    sku?: string | number | null
+  ): string {
+    const parts = [brand, name, sku].filter(
+      (part) => part !== null && part !== undefined && `${part}`.trim().length
+    );
+
+    if (!parts.length) {
+      return '';
+    }
+
+    return this.slugify(parts.map((p) => `${p}`.trim()).join(' '));
+  }
 }

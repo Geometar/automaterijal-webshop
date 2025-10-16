@@ -75,9 +75,19 @@ export class AutomProductCardComponent implements OnInit {
   /* ----------------------------- Actions ----------------------------- */
 
   handleClick(event?: MouseEvent): void {
-    if (this.roba?.robaid != null) {
-      this.router.navigate(['/webshop', this.roba.robaid + '-' + this.getProductSlug(this.roba)]);
+    if (event?.defaultPrevented) {
+      return;
     }
+
+    event?.preventDefault();
+    event?.stopPropagation();
+
+    const targetParam = this.getRouteParam(this.roba);
+    if (!targetParam) {
+      return;
+    }
+
+    this.router.navigate(['/webshop', targetParam]);
   }
 
   handleAddToCart(event?: Event): void {
@@ -193,8 +203,16 @@ export class AutomProductCardComponent implements OnInit {
   }
 
   getProductSlug(data: any): string {
-    const parts = [data.proizvodjac?.naziv, data.naziv, data.katbr].filter((x) => !!x);
-    return StringUtils.slugify(parts.join(' '));
+    return StringUtils.productSlug(data?.proizvodjac?.naziv, data?.naziv, data?.katbr);
+  }
+
+  getRouteParam(data: any): string | null {
+    const id = data?.robaid;
+    if (id == null) {
+      return null;
+    }
+    const slug = this.getProductSlug(data);
+    return slug ? `${id}-${slug}` : String(id);
   }
 
   get productImageMeta(): ProductImageMeta {

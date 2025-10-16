@@ -10,6 +10,7 @@ import {
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { catchError, finalize, forkJoin, Observable, of, Subject, takeUntil } from 'rxjs';
+import { distinctUntilChanged, map } from 'rxjs/operators';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 // Enums
@@ -195,9 +196,12 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.route.paramMap
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((params) => {
-        const raw = params.get('id');
+      .pipe(
+        takeUntil(this.destroy$),
+        map((params) => params.get('id')),
+        distinctUntilChanged()
+      )
+      .subscribe((raw) => {
         this.routeSlug = this.extractSlug(raw);
         this.applyRouteCanonical(raw);
         this.id = this.parseId(raw);
@@ -263,6 +267,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   }
 
   private loadShowcase(roba: Roba): void {
+    this.showcaseTakenIds.clear();
     this.showcaseDataCategories = [];
     this.showcaseDataManufactures = [];
 
@@ -789,7 +794,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       return '';
     }
 
-    return StringUtils.slugify([brand, name, sku].filter(Boolean).join(' '));
+    return StringUtils.productSlug(brand, name, sku);
   }
 
   private isThin(roba: Roba): boolean {
