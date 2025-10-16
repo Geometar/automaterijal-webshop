@@ -14,7 +14,7 @@ import bootstrap from './src/main.server';
 const PORT = Number(process.env['PORT'] || 4000);
 
 // PROD backend
-const BE_API = 'https://automaterijal.com:8443';
+const BE_API = process.env['BE_API'] || 'http://127.0.0.1:8443';
 
 // LOCAL backend (odkomentariši za test)
 // const BE_API = 'http://localhost:8080';
@@ -185,6 +185,13 @@ export function app(): express.Express {
 
   // Static assets
   const hashedFilePattern = /(?:\.|-)[A-Za-z0-9]{8,}\.(?:js|css|woff2?|ttf)$/;
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // Blokiraj SSR da ne obrađuje /api/* rute (da ih ne guta posle 20 min)
+  // ───────────────────────────────────────────────────────────────────────────
+  server.get(/^\/api(\/.*)?$/, (_req, res) => {
+    res.status(404).send('API handled by backend');
+  });
 
   server.use(
     '/assets',

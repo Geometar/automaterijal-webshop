@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://automaterijal.com:8443',
+  apiUrl: 'https://automaterijal.com',
   devDown: false
 };
