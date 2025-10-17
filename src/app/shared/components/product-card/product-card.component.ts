@@ -111,6 +111,31 @@ export class AutomProductCardComponent implements OnInit {
     return Math.floor(value); // ensure integer
   }
 
+  private parseNumber(raw: unknown): number {
+    if (typeof raw === 'number') {
+      return Number.isFinite(raw) ? raw : 0;
+    }
+
+    if (typeof raw === 'string') {
+      const normalized = raw
+        .replace('%', '')
+        .replace(/\s+/g, '')
+        .replace(',', '.');
+      const parsed = Number(normalized);
+      return Number.isFinite(parsed) ? parsed : 0;
+    }
+
+    return 0;
+  }
+
+  private getDiscountValue(): number {
+    return this.parseNumber((this.roba as any)?.rabat);
+  }
+
+  private getPriceValue(): number {
+    return this.parseNumber(this.roba?.cena);
+  }
+
   /* ----------------------- Derived business flags -------------------- */
 
   // TecDoc-only article recognition (by business rule)
@@ -143,26 +168,53 @@ export class AutomProductCardComponent implements OnInit {
   /* ---------------------------- Pricing ------------------------------ */
 
   get hasDiscount(): boolean {
-    // Treat 0 or undefined as no discount; require valid price > 0
-    const rabat = this.roba?.rabat ?? 0;
-    const cena = this.roba?.cena ?? 0;
+    const rabat = this.getDiscountValue();
+    const cena = this.getPriceValue();
     return rabat > 0 && cena > 0 && rabat < 100;
   }
 
   get oldPrice(): number | null {
-    if (!this.hasDiscount) return null;
-    const cena = this.roba!.cena!;
-    const rabat = this.roba!.rabat!;
+    if (!this.hasDiscount) {
+      return null;
+    }
+
+    const rabat = this.getDiscountValue();
+    const cena = this.getPriceValue();
     const denom = 1 - rabat / 100;
-    if (denom <= 0) return null; // safety for 100% or invalid
+    if (denom <= 0) {
+      return null;
+    }
+
     const val = cena / denom;
     return Math.round(val * 100) / 100;
   }
 
   get savings(): number | null {
-    if (!this.hasDiscount || !this.oldPrice) return null;
-    const s = this.oldPrice - (this.roba?.cena ?? 0);
-    return s > 0 ? Math.round(s * 100) / 100 : null;
+    if (!this.hasDiscount) {
+      return null;
+    }
+
+    const oldPrice = this.oldPrice;
+    if (!oldPrice) {
+      return null;
+    }
+
+    const cena = this.getPriceValue();
+    const savings = oldPrice - cena;
+    return savings > 0 ? Math.round(savings * 100) / 100 : null;
+  }
+
+  get discountLabel(): string {
+    const raw = (this.roba as any)?.rabat;
+    if (raw === null || raw === undefined) {
+      return '';
+    }
+
+    if (typeof raw === 'number') {
+      return String(raw);
+    }
+
+    return String(raw).trim();
   }
 
   /* ------------------------- Unit price (L) -------------------------- */

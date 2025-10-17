@@ -8,7 +8,7 @@
   [attr.aria-disabled]="isTecDocOnly ? 'true' : null"
 >
   <!-- Badge: popust (gore desno) -->
-  <div class="discount-badge" *ngIf="hasDiscount">-{{ roba.rabat }}%</div>
+  <div class="discount-badge" *ngIf="hasDiscount">-{{ discountLabel }}%</div>
 
   <!-- Ikonica: u korpi (gore levo) -->
   <div

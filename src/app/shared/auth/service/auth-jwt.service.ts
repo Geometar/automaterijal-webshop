@@ -7,7 +7,7 @@ import { Credentials, JwtToken } from '../../data-models/model';
 import { isPlatformBrowser } from '@angular/common';
 
 const LOGIN_URL = environment.apiUrl + '/api/auth/signin';
-const LOGOUT_URL = environment.apiUrl + '/logout';
+const LOGOUT_URL = environment.apiUrl + '/api/logout';
 const PARTNER_URL = environment.apiUrl + '/api/partner';
 
 @Injectable({
