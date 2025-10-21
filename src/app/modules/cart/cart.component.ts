@@ -46,6 +46,7 @@ import { RsdCurrencyPipe } from '../../shared/pipe/rsd-currency.pipe';
 
 // Service
 import { AccountStateService } from '../../shared/service/state/account-state.service';
+import { AnalyticsService } from '../../shared/service/analytics.service';
 import { CartService } from '../../shared/service/cart.service';
 import { CartStateService } from '../../shared/service/state/cart-state.service';
 import { InvoiceService } from '../../shared/service/invoice.service';
@@ -110,6 +111,7 @@ export class CartComponent implements OnInit, OnDestroy {
   emailAddressPattern = EMAIL_ADDRESS;
 
   private destroy$ = new Subject<void>();
+  private hasTrackedCartView = false;
 
   constructor(
     private accountStateService: AccountStateService,
@@ -120,7 +122,8 @@ export class CartComponent implements OnInit, OnDestroy {
     private router: Router,
     private pictureService: PictureService,
     private snackbarService: SnackbarService,
-    private seo: SeoService
+    private seo: SeoService,
+    private analytics: AnalyticsService
   ) {
     this.cartForm = this.fb.group({
       address: ['', Validators.required],
@@ -201,6 +204,17 @@ export class CartComponent implements OnInit, OnDestroy {
         this.pictureService.convertByteToImageArray(roba);
         this.roba = roba;
         this.sumTotal();
+
+        if (this.roba.length) {
+          const accountSnapshot = this.accountStateService.get();
+          const cartSnapshot = this.cartStateService.getAll();
+          if (!this.hasTrackedCartView) {
+            this.analytics.trackViewCart(cartSnapshot, accountSnapshot);
+            this.hasTrackedCartView = true;
+          }
+        } else {
+          this.hasTrackedCartView = false;
+        }
       },
       error: () => {
         this.roba = [];
@@ -239,6 +253,17 @@ export class CartComponent implements OnInit, OnDestroy {
   submitInvoice(): void {
     this.invoiceSubmitted = true;
     this.buildInvoiceFromForm();
+    const cartItemsSnapshot = this.cartStateService.getAll();
+    const accountSnapshot = this.accountStateService.get();
+
+    if (cartItemsSnapshot.length) {
+      this.analytics.trackBeginCheckout(
+        cartItemsSnapshot,
+        accountSnapshot,
+        this.buildCheckoutMetadata()
+      );
+    }
+
     this.invoiceService
       .submit(this.invoice!)
       .pipe(
@@ -250,8 +275,18 @@ export class CartComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (item: Roba[]) => {
           if (!item.length) {
+            if (cartItemsSnapshot.length) {
+              this.analytics.trackPurchase(
+                this.generateTransactionId(),
+                cartItemsSnapshot,
+                this.total,
+                accountSnapshot,
+                { tax: this.pdv, shipping: 0 }
+              );
+            }
             this.snackbarService.showAutoClose('Porudžbina je uspešno poslata i uskoro će biti obradjena.', SnackbarPosition.TOP);
             this.router.navigateByUrl('/webshop');
+            this.hasTrackedCartView = false;
             this.cartStateService.resetCart();
           } else {
             // TODO: Add fallback
@@ -301,6 +336,31 @@ export class CartComponent implements OnInit, OnDestroy {
     const valueHelp = new ValueHelp();
     valueHelp.id = id;
     return valueHelp;
+  }
+
+  private buildCheckoutMetadata(): Record<string, unknown> {
+    const metadata: Record<string, unknown> = {
+      step: 'submit_invoice',
+      logged_in: this.loggedIn,
+    };
+
+    const payment = this.cartForm.get('payment')?.value;
+    if (payment) {
+      metadata['payment_method'] = payment;
+    }
+
+    const transport = this.cartForm.get('transport')?.value;
+    if (transport) {
+      metadata['shipping_method'] = transport;
+    }
+
+    return metadata;
+  }
+
+  private generateTransactionId(): string {
+    const timestamp = Date.now().toString(36);
+    const random = Math.floor(Math.random() * 1_000_000).toString(36);
+    return `order-${timestamp}-${random}`;
   }
 
   private buildAnonymousNote(): string {

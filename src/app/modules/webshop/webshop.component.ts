@@ -12,11 +12,13 @@ import { WebshopRobaComponent } from './webshop-roba/webshop-roba.component';
 import { WebshopVehiclesComponent } from './webshop-vehicles/webshop-vehicles.component';
 
 // Data models
-import { Filter, Magacin } from '../../shared/data-models/model/roba';
+import { Filter, Magacin, Roba } from '../../shared/data-models/model/roba';
 import { TablePage } from '../../shared/data-models/model/page';
 import { TDVehicleDetails } from '../../shared/data-models/model/tecdoc';
 
 // Services
+import { AccountStateService } from '../../shared/service/state/account-state.service';
+import { AnalyticsService } from '../../shared/service/analytics.service';
 import { CartStateService } from '../../shared/service/state/cart-state.service';
 import { CategoriesStateService } from '../../shared/service/state/categories-state.service';
 import { ConfigService } from '../../shared/service/config.service';
@@ -29,6 +31,8 @@ import { UrlHelperService } from '../../shared/service/utils/url-helper.service'
 import { WebshopConfig } from '../../shared/data-models/interface';
 import { WebshopLogicService } from '../../shared/service/utils/webshop-logic.service';
 import { WebshopStateService } from '../../shared/service/state/webshop-state.service';
+
+// Utils
 import {
   buildCanonicalFromPath,
   hasActiveFilterQuery,
@@ -118,7 +122,9 @@ export class WebshopComponent implements OnDestroy, OnInit {
     private seoService: SeoService,
     private stateService: WebshopStateService,
     private tecdocService: TecdocService,
-    private urlHelperService: UrlHelperService
+    private urlHelperService: UrlHelperService,
+    private analytics: AnalyticsService,
+    private accountStateService: AccountStateService
   ) { }
 
   /** Angular lifecycle hooks start */
@@ -200,6 +206,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
           );
           this.magacinData = response;
           this.currentState = this.state.SHOW_ARTICLES;
+          this.emitListView(response.robaDto?.content);
           this.updateSeoTagsForState();
         },
         error: (err: HttpErrorResponse) => {
@@ -238,6 +245,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
             response.robaDto!.content
           );
           this.magacinData = response;
+          this.emitListView(response.robaDto?.content);
         },
         error: (err: HttpErrorResponse) => {
           const error = err.error?.details || err.error;
@@ -622,6 +630,82 @@ export class WebshopComponent implements OnDestroy, OnInit {
     }
 
     this.seoService.setJsonLd(jsonLd, 'seo-jsonld-webshop');
+  }
+
+  private emitListView(items: Roba[] | undefined): void {
+    if (!items?.length) {
+      return;
+    }
+
+    const account = this.accountStateService.get();
+    this.analytics.trackViewItemList(
+      items,
+      this.buildListName(),
+      account,
+      this.buildListMetadata()
+    );
+  }
+
+  private buildListName(): string {
+    if (this.searchTerm) {
+      return 'Webshop Search Results';
+    }
+
+    if (this.selectedBrandName) {
+      return 'Webshop Brand Listing';
+    }
+
+    if (this.currentCategoryName && this.currentSubcategoryName) {
+      return `Webshop Category: ${this.currentCategoryName} > ${this.currentSubcategoryName}`;
+    }
+
+    if (this.currentCategoryName) {
+      return `Webshop Category: ${this.currentCategoryName}`;
+    }
+
+    if (this.selectedVehicleDetails) {
+      return 'Webshop Vehicle Parts';
+    }
+
+    return 'Webshop Catalog';
+  }
+
+  private buildListMetadata(): Record<string, unknown> {
+    const metadata: Record<string, unknown> = {
+      page_index: this.pageIndex,
+      page_size: this.rowsPerPage,
+    };
+
+    if (this.searchTerm) {
+      metadata['search_term'] = this.searchTerm;
+    }
+
+    if (this.selectedBrandName) {
+      metadata['brand'] = this.selectedBrandName;
+    }
+
+    if (this.currentCategoryName) {
+      metadata['category'] = this.currentCategoryName;
+    }
+
+    if (this.currentSubcategoryName) {
+      metadata['subcategory'] = this.currentSubcategoryName;
+    }
+
+    if (this.selectedVehicleDetails?.mfrName) {
+      metadata['vehicle_mfr'] = this.selectedVehicleDetails.mfrName;
+    }
+
+    if (this.selectedVehicleDetails?.vehicleModelSeriesName) {
+      metadata['vehicle_model'] =
+        this.selectedVehicleDetails.vehicleModelSeriesName;
+    }
+
+    if (this.selectedVehicleDetails?.description) {
+      metadata['vehicle_description'] = this.selectedVehicleDetails.description;
+    }
+
+    return metadata;
   }
 
   private buildSeoContext() {

@@ -7,6 +7,10 @@ import { BehaviorSubject } from 'rxjs';
 import { Manufacture } from '../../data-models/model/proizvodjac';
 import { CartItem, Roba } from '../../data-models/model/roba';
 
+// Services
+import { AccountStateService } from './account-state.service';
+import { AnalyticsService } from '../analytics.service';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -16,6 +20,8 @@ export class CartStateService {
   roba$: BehaviorSubject<Roba[]> = new BehaviorSubject([] as Roba[]);
 
   constructor(
+    private accountStateService: AccountStateService,
+    private analytics: AnalyticsService,
     private localStorage: LocalStorageService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
@@ -38,15 +44,18 @@ export class CartStateService {
   addToCart(roba: any, quantity: number = 1): void {
     let cart = this.getAll();
     const existingItem = cart.find((item) => item.robaId === roba.robaid);
+    let trackedItem: CartItem;
 
     if (existingItem) {
       existingItem.quantity! += quantity;
       existingItem.totalPrice = (existingItem.unitPrice ?? 1) * existingItem.quantity!;
+      trackedItem = existingItem;
     } else {
       const newItem: CartItem = this.mapToCartItem(roba);
       newItem.quantity = quantity;
       newItem.totalPrice = (newItem.unitPrice ?? 1) * quantity;
       cart.push(newItem);
+      trackedItem = newItem;
     }
 
     // ✅ Smanjuje stanje robe
@@ -58,6 +67,9 @@ export class CartStateService {
 
     this.localStorage.store(this.storageKey, cart);
     this.updateCartSize();
+
+    const account = this.accountStateService.get();
+    this.analytics.trackAddToCart(trackedItem, quantity, account);
   }
 
   removeFromCart(itemId: number): void {
@@ -65,9 +77,17 @@ export class CartStateService {
       return;
     }
 
-    const updatedCart = this.getAll().filter((item) => item.robaId !== itemId);
+    const cart = this.getAll();
+    const removedItem = cart.find((item) => item.robaId === itemId);
+    const updatedCart = cart.filter((item) => item.robaId !== itemId);
     this.localStorage.store(this.storageKey, updatedCart);
     this.updateCartSize();
+
+    if (removedItem) {
+      const account = this.accountStateService.get();
+      const quantityRemoved = removedItem.quantity ?? 1;
+      this.analytics.trackRemoveFromCart(removedItem, quantityRemoved, account);
+    }
   }
 
   resetCart(): void {
@@ -144,7 +164,7 @@ export class CartStateService {
       return;
     }
     const cartItems = this.getAll();
-    this.cartSize$.next(cartItems.length)
+    this.cartSize$.next(cartItems.length);
     this.roba$.next(cartItems.map((cartItem: CartItem) => this.mapToRoba(cartItem)));
   }
 

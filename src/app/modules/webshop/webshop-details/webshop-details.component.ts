@@ -56,18 +56,19 @@ import { YouTubePlayer } from '@angular/youtube-player';
 
 // Services
 import { AccountStateService } from '../../../shared/service/state/account-state.service';
+import { AnalyticsService } from '../../../shared/service/analytics.service';
 import { CartStateService } from '../../../shared/service/state/cart-state.service';
+import { environment } from '../../../../environment/environment';
 import { PictureService, ProductImageMeta } from '../../../shared/service/utils/picture.service';
 import { RobaService } from '../../../shared/service/roba.service';
 import { SeoService } from '../../../shared/service/seo.service';
 import { SnackbarService } from '../../../shared/service/utils/snackbar.service';
 import { TecdocService } from '../../../shared/service/tecdoc.service';
 import { UrlHelperService } from '../../../shared/service/utils/url-helper.service';
-import { SITE_ORIGIN, hasActiveFilterQuery, normalizeRobotsTag } from '../../../shared/utils/seo-utils';
-import { environment } from '../../../../environment/environment';
 
 // Utils
 import { StringUtils } from '../../../shared/utils/string-utils';
+import { SITE_ORIGIN, hasActiveFilterQuery, normalizeRobotsTag } from '../../../shared/utils/seo-utils';
 
 interface SpecEntry {
   id: string;
@@ -187,6 +188,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     private snackbarService: SnackbarService,
     private tecDocService: TecdocService,
     private urlHelperService: UrlHelperService,
+    private analytics: AnalyticsService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) { }
 
@@ -259,6 +261,10 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
           this.updateSeoTags(this.data);
           this.applyOgImageMeta(this.data);
           this.loadShowcase(this.data);
+          this.analytics.trackViewItem(
+            this.data,
+            this.accountStateService.get()
+          );
         },
         error: (err: HttpErrorResponse) => {
           console.error('fetchDetails error', err.error?.details || err.error);
@@ -334,6 +340,15 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
               titleUrl,
               artikli: picked
             }];
+            this.analytics.trackViewItemList(
+              picked,
+              'Related Category Items',
+              this.accountStateService.get(),
+              {
+                list_context: 'related_category',
+                base_item: roba.robaid,
+              }
+            );
           }
         }
 
@@ -350,6 +365,15 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
               titleUrl,
               artikli: picked
             }];
+            this.analytics.trackViewItemList(
+              picked,
+              'Related Brand Items',
+              this.accountStateService.get(),
+              {
+                list_context: 'related_brand',
+                base_item: roba.robaid,
+              }
+            );
           }
         }
       });
