@@ -5,6 +5,7 @@ import {
   OnDestroy,
   OnInit,
   PLATFORM_ID,
+  TransferState,
   ViewEncapsulation,
 } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -69,6 +70,7 @@ import { UrlHelperService } from '../../../shared/service/utils/url-helper.servi
 // Utils
 import { StringUtils } from '../../../shared/utils/string-utils';
 import { SITE_ORIGIN, hasActiveFilterQuery, normalizeRobotsTag } from '../../../shared/utils/seo-utils';
+import { SSR_PRODUCT_STATE_KEY } from '../../../shared/tokens/ssr-product.token';
 
 interface SpecEntry {
   id: string;
@@ -185,11 +187,12 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private sanitizer: DomSanitizer,
     private seoService: SeoService,
+    private transferState: TransferState,
     private snackbarService: SnackbarService,
     private tecDocService: TecdocService,
     private urlHelperService: UrlHelperService,
     private analytics: AnalyticsService,
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: Object,
   ) { }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -208,7 +211,10 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
         this.applyRouteCanonical(raw);
         this.id = this.parseId(raw);
         if (this.id) {
-          this.fetchData(this.id);
+          const hydrated = this.tryHydrateFromTransferState(this.id);
+          if (!hydrated) {
+            this.fetchData(this.id);
+          }
         } else {
           console.warn('Nevažeći ID u ruti:', raw);
         }
@@ -228,6 +234,57 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   // API
   // ─────────────────────────────────────────────────────────────────────────────
 
+  private tryHydrateFromTransferState(id: number): boolean {
+    if (!this.transferState.hasKey(SSR_PRODUCT_STATE_KEY)) {
+      return false;
+    }
+
+    const payload = this.transferState.get<Roba | null>(SSR_PRODUCT_STATE_KEY, null);
+    if (this.isBrowser) {
+      this.transferState.remove(SSR_PRODUCT_STATE_KEY);
+    }
+
+    if (!payload) {
+      return false;
+    }
+
+    const payloadId = Number((payload as any)?.robaid ?? (payload as any)?.robaId);
+    if (!Number.isFinite(payloadId) || payloadId !== id) {
+      return false;
+    }
+
+    const hydrated = Object.assign(new Roba(), payload);
+    this.loading = false;
+    this.handleProductLoad(hydrated);
+    return true;
+  }
+
+  private handleProductLoad(response: Roba): void {
+    this.pictureService.convertByteToImage(response);
+
+    this.data = response;
+    this.shareLink = this.buildShareLink(response);
+    this.shareTitle = this.buildShareTitle(response);
+    this.fillDocumentation();
+    this.fillOeNumbers();
+    this.prepareSpecs(this.data);
+    this.setSanitizedText();
+
+    const { idParam, url } = this.buildCanonical(this.data);
+    this.updateSlugState(idParam);
+    if (typeof (this.seoService as any).ensureCanonical === 'function') {
+      (this.seoService as any).ensureCanonical(url);
+    }
+
+    this.updateSeoTags(this.data);
+    this.applyOgImageMeta(this.data);
+    this.loadShowcase(this.data);
+    this.analytics.trackViewItem(
+      this.data,
+      this.accountStateService.get()
+    );
+  }
+
   fetchData(id: number): void {
     this.loading = true;
     this.shareLink = null;
@@ -240,31 +297,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (response: Roba) => {
-          // ensure image bytes are converted to data URL for display
-          this.pictureService.convertByteToImage(response);
-
-          this.data = response;
-          this.shareLink = this.buildShareLink(response);
-          this.shareTitle = this.buildShareTitle(response);
-          this.fillDocumentation();
-          this.fillOeNumbers();
-          this.prepareSpecs(this.data);
-          this.setSanitizedText();
-
-          // set canonical path with slug (id-brand-name-sku)
-          const { idParam, url } = this.buildCanonical(this.data);
-          this.updateSlugState(idParam);
-          if (typeof (this.seoService as any).ensureCanonical === 'function') {
-            (this.seoService as any).ensureCanonical(url);
-          }
-
-          this.updateSeoTags(this.data);
-          this.applyOgImageMeta(this.data);
-          this.loadShowcase(this.data);
-          this.analytics.trackViewItem(
-            this.data,
-            this.accountStateService.get()
-          );
+          this.handleProductLoad(response);
         },
         error: (err: HttpErrorResponse) => {
           console.error('fetchDetails error', err.error?.details || err.error);
