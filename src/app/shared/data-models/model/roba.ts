@@ -1,6 +1,7 @@
 import { Manufacture } from "./proizvodjac";
 import { PaginatedResponse } from "./page";
 import { Slika } from "./slika";
+import { WebshopPrimaryFilter } from "../enums/webshop-primary-filter.enum";
 
 export class Filter {
   grupe?: string[];
@@ -12,6 +13,7 @@ export class Filter {
   raspolozivost?: string = 'Svi artikli';
   paged: boolean = false;
   showcase: boolean = false;
+  filterBy?: WebshopPrimaryFilter;
 
   Filter() {
     this.naStanju = false;

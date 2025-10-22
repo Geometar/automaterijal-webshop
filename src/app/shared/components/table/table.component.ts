@@ -182,7 +182,7 @@ export class TableComponent implements OnChanges {
     const isManufacturerPath = isWebshop && segments[1] === 'manufacturers';
 
     if (chip.label === 'Podgrupe') {
-      const extras = this.buildNavigationExtras(['podgrupe']);
+      const extras = this.buildNavigationExtras(['podgrupe', 'filterBy']);
 
       if (isCategoryPath && hasSubcategorySegment) {
         const target = ['/webshop', 'category', segments[2]];
@@ -194,13 +194,13 @@ export class TableComponent implements OnChanges {
     }
 
     if (chip.label === 'Grupe') {
-      const extras = this.buildNavigationExtras(['grupe', 'podgrupe']);
+      const extras = this.buildNavigationExtras(['grupe', 'podgrupe', 'filterBy']);
       this.urlHelperService.navigateTo(['/webshop'], extras);
       return;
     }
 
     if (chip.label === 'Proizvodjaci') {
-      const extras = this.buildNavigationExtras(['proizvodjaci', 'mandatoryproid']);
+      const extras = this.buildNavigationExtras(['proizvodjaci', 'mandatoryproid', 'filterBy']);
 
       if (isManufacturerPath || this.urlHelperService.hasQueryParam('mandatoryproid')) {
         this.urlHelperService.navigateTo(['/webshop'], extras);

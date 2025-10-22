@@ -35,6 +35,7 @@ import {
   PositionEnum,
   SizeEnum,
 } from '../../../shared/data-models/enums';
+import { WebshopPrimaryFilter } from '../../../shared/data-models/enums/webshop-primary-filter.enum';
 
 // Service
 import { UrlHelperService } from '../../../shared/service/utils/url-helper.service';
@@ -158,12 +159,16 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
   onSubgroupsChanged(updatedIds: string[]): void {
     this.urlHelperService.addOrUpdateQueryParams({
       podgrupe: updatedIds,
+      filterBy: updatedIds.length
+        ? WebshopPrimaryFilter.Subcategory
+        : (this.filter.grupe?.length ? WebshopPrimaryFilter.Category : null),
     });
   }
 
   onManufactureChanged(ids: (string | number)[]): void {
     this.urlHelperService.addOrUpdateQueryParams({
       proizvodjaci: ids,
+      filterBy: ids.length ? WebshopPrimaryFilter.Manufacture : null,
     });
   }
 
@@ -245,7 +250,8 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
     this.urlHelperService.setQueryParams({
       naStanju: null,
       podgrupe: null,
-      proizvodjaci: null
+      proizvodjaci: null,
+      filterBy: null,
     });
     this.manufacturerPreFilter = '';
     this.buildManufactureModels();

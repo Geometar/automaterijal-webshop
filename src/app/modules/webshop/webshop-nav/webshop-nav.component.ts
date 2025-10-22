@@ -35,6 +35,7 @@ import {
 import { ConfigService } from '../../../shared/service/config.service';
 import { UrlHelperService } from '../../../shared/service/utils/url-helper.service';
 import { CategoryPick } from '../../../shared/data-models/model';
+import { WebshopPrimaryFilter } from '../../../shared/data-models/enums/webshop-primary-filter.enum';
 
 export class NavTitles {
   title: string = '';
@@ -127,11 +128,18 @@ export class WebshopNavComponent implements OnChanges {
     this.searchTerm = searchTerm?.value ? searchTerm?.value.trim() : '';
 
     if (this.searchTerm) {
+      const hasGroups = this.urlHelperService.hasQueryParam('grupe');
+      const hasManufacturers = this.urlHelperService.hasQueryParam('mandatoryproid');
+      const hasSubgroups = this.urlHelperService.hasQueryParam('podgrupe');
       if (
-        !this.urlHelperService.hasQueryParam('mandatoryproid') &&
-        !this.urlHelperService.hasQueryParam('grupe')
+        !hasManufacturers &&
+        !hasGroups &&
+        !hasSubgroups
       ) {
-        this.urlHelperService.setQueryParams({ searchTerm: this.searchTerm });
+        this.urlHelperService.setQueryParams({
+          searchTerm: this.searchTerm,
+          filterBy: WebshopPrimaryFilter.SearchTerm,
+        });
       } else {
         this.urlHelperService.addOrUpdateQueryParams({
           searchTerm: this.searchTerm,
@@ -191,6 +199,11 @@ export class WebshopNavComponent implements OnChanges {
       page: 0,
       naStanju: true,
       searchTerm: null,
+      filterBy: ev.groupId
+        ? ev.kind === 'subgroup'
+          ? WebshopPrimaryFilter.Subcategory
+          : WebshopPrimaryFilter.Category
+        : null,
     };
 
     this.urlHelperService.setQueryParams(next);

@@ -265,8 +265,8 @@
           <a
             class="oe-item"
             [routerLink]="['/webshop']"
-            [queryParams]="{ searchTerm: oe.key }"
-            [attr.href]="'/webshop?searchTerm=' + oe.key"
+            [queryParams]="{ searchTerm: oe.key, filterBy: 'searchTerm' }"
+            [attr.href]="'/webshop?searchTerm=' + oe.key + '&filterBy=searchTerm'"
           >
             {{ oe.key }} - {{ oe.value }}
           </a>

@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { WebshopPrimaryFilter } from '../../data-models/enums/webshop-primary-filter.enum';
 import { Filter } from '../../data-models/model/roba';
 
 @Injectable({
@@ -15,6 +16,10 @@ export class WebshopLogicService {
     filter.naStanju = params['naStanju'] === 'true';
     filter.podgrupe = this.parseArrayParam(params['podgrupe']);
     filter.proizvodjaci = this.parseArrayParam(params['proizvodjaci']);
+    const filterBy = this.parseFilterBy(params['filterBy']);
+    if (filterBy) {
+      filter.filterBy = filterBy;
+    }
     return filter;
   }
 
@@ -66,5 +71,21 @@ export class WebshopLogicService {
       .map((v) => v.trim())
       .filter((v) => v.length > 0);
     return parts.length ? parts : undefined;
+  }
+
+  private parseFilterBy(value: unknown): WebshopPrimaryFilter | undefined {
+    if (!value) {
+      return undefined;
+    }
+
+    const raw = Array.isArray(value) ? value[0] : value;
+    if (typeof raw !== 'string') {
+      return undefined;
+    }
+
+    const normalized = raw.trim() as WebshopPrimaryFilter;
+    return Object.values(WebshopPrimaryFilter).includes(normalized)
+      ? normalized
+      : undefined;
   }
 }

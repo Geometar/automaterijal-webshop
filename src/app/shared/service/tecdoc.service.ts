@@ -102,6 +102,10 @@ export class TecdocService {
       parameterObject['podgrupe'] = filter.podgrupe;
     }
 
+    if (filter.filterBy) {
+      parameterObject['filterBy'] = filter.filterBy;
+    }
+
     const parametersString = this.helperService.formatQueryParameters(parameterObject);
 
     return this.http

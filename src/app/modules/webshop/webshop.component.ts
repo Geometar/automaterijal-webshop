@@ -16,6 +16,9 @@ import { Filter, Magacin, Roba } from '../../shared/data-models/model/roba';
 import { TablePage } from '../../shared/data-models/model/page';
 import { TDVehicleDetails } from '../../shared/data-models/model/tecdoc';
 
+// Enums
+import { WebshopPrimaryFilter } from '../../shared/data-models/enums/webshop-primary-filter.enum';
+
 // Services
 import { AccountStateService } from '../../shared/service/state/account-state.service';
 import { AnalyticsService } from '../../shared/service/analytics.service';
@@ -48,6 +51,7 @@ export enum WebShopState {
 interface QueryParams {
   assembleGroupId?: string;
   assemblyGroupName?: string;
+  filterBy?: WebshopPrimaryFilter;
   grupe?: string;
   mandatoryproid?: string;
   pageIndex?: string;
@@ -105,6 +109,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
   private config: WebshopConfig | null = null;
   private currentCategoryName: string | null = null;
   private currentSubcategoryName: string | null = null;
+  private primaryFilter: WebshopPrimaryFilter | null = null;
   private lastRoutePageIndex = 0;
   private lastRouteRowsPerPage = 10;
   private hasProcessedRoute = false;
@@ -312,9 +317,10 @@ export class WebshopComponent implements OnDestroy, OnInit {
 
   private handleWebshopParams(p: Params): void {
     this.selectedBrandName = null;
+    const trimmedSearch = ((p['searchTerm'] || '') as string).trim();
     const params = {
       ...p,
-      searchTerm: (p['searchTerm'] || '').trim(),
+      searchTerm: trimmedSearch,
       grupe: (p['grupe'] || '').toString(),
       proizvodjaci: (p['proizvodjaci'] || '').toString(),
       assembleGroupId: (p['assembleGroupId'] || '').toString(),
@@ -325,6 +331,19 @@ export class WebshopComponent implements OnDestroy, OnInit {
       rowsPerPage:
         p['rowsPerPage'] !== undefined ? String(p['rowsPerPage']) : '',
     } as QueryParams;
+
+    const explicitFilterBy = this.normalizeFilterBy(p['filterBy']);
+    if (explicitFilterBy) {
+      params.filterBy = explicitFilterBy;
+    } else if (this.hasValue(p['podgrupe'])) {
+      params.filterBy = WebshopPrimaryFilter.Subcategory;
+    } else if (this.hasValue(p['grupe'])) {
+      params.filterBy = WebshopPrimaryFilter.Category;
+    } else if (this.hasValue(p['mandatoryproid']) || this.hasValue(p['proizvodjaci'])) {
+      params.filterBy = WebshopPrimaryFilter.Manufacture;
+    } else if (trimmedSearch) {
+      params.filterBy = WebshopPrimaryFilter.SearchTerm;
+    }
 
     this.handleQueryParams(params);
   }
@@ -340,6 +359,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
             searchTerm: ((p['searchTerm'] || '') as string).trim(),
             mandatoryproid: m.proid,
           } as QueryParams;
+          params.filterBy = WebshopPrimaryFilter.Manufacture;
           this.handleQueryParams(params);
         } else {
           this.currentState = this.state.SHOW_EMPTY_CONTAINER;
@@ -415,9 +435,36 @@ export class WebshopComponent implements OnDestroy, OnInit {
             grupe: group.groupId?.toString(),
             podgrupe: subGroupId,
           };
+          params.filterBy = subSlug ? WebshopPrimaryFilter.Subcategory : WebshopPrimaryFilter.Category;
           this.handleQueryParams(params);
         },
       });
+  }
+
+  private normalizeFilterBy(value: unknown): WebshopPrimaryFilter | undefined {
+    if (!value) {
+      return undefined;
+    }
+
+    const raw = Array.isArray(value) ? value[0] : value;
+    if (typeof raw !== 'string') {
+      return undefined;
+    }
+
+    const normalized = raw.trim() as WebshopPrimaryFilter;
+    return Object.values(WebshopPrimaryFilter).includes(normalized)
+      ? normalized
+      : undefined;
+  }
+
+  private hasValue(value: unknown): boolean {
+    if (Array.isArray(value)) {
+      return value.some((v) => this.hasValue(v));
+    }
+    if (value === null || value === undefined) {
+      return false;
+    }
+    return String(value).trim().length > 0;
   }
 
   private finalizeLoading(): void {
@@ -493,6 +540,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
 
     // 8. Set filter with the new one
     this.filter = newFilter;
+    this.primaryFilter = newFilter.filterBy ?? null;
     if (this.pendingSubgroupSelection?.length) {
       this.filter.podgrupe = [...new Set(this.pendingSubgroupSelection.map((value) => value.trim()))].filter(Boolean);
     }
@@ -703,6 +751,10 @@ export class WebshopComponent implements OnDestroy, OnInit {
 
     if (this.selectedVehicleDetails?.description) {
       metadata['vehicle_description'] = this.selectedVehicleDetails.description;
+    }
+
+    if (this.primaryFilter) {
+      metadata['primary_filter'] = this.primaryFilter;
     }
 
     return metadata;

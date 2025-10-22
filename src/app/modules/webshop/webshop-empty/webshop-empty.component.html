@@ -81,11 +81,11 @@
       *ngFor="let brand of brands"
       class="brand-card"
       [routerLink]="['/webshop/manufacturers', brand.slug]"
-      [queryParams]="{ mandatoryproid: brand.id }"
+      [queryParams]="{ mandatoryproid: brand.id, filterBy: 'manufacture' }"
       [title]="'Proizvođač: ' + brand.label"
       [attr.aria-label]="'Proizvođač: ' + brand.label"
       [attr.href]="
-        '/webshop/manufacturers/' + brand.slug + '?mandatoryproid=' + brand.id
+        '/webshop/manufacturers/' + brand.slug + '?mandatoryproid=' + brand.id + '&filterBy=manufacture'
       "
     >
       <li>

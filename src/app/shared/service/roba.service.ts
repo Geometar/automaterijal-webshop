@@ -70,6 +70,10 @@ export class RobaService {
       parameterObject['showcase'] = true;
     }
 
+    if (filter.filterBy) {
+      parameterObject['filterBy'] = filter.filterBy;
+    }
+
     const parametersString = this.helperService.formatQueryParameters(parameterObject);
 
     const realDataUrl = DOMAIN_URL + ROBA_URL + parametersString;
