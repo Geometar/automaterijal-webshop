@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { catchError, Observable, throwError } from 'rxjs';
 
 // Data models
-import { Partner, PasswordChange } from '../data-models/model';
+import { Partner, PasswordChange, PartnerCardResponse } from '../data-models/model';
 
 // Env
 import { environment } from '../../../environment/environment';
@@ -12,7 +12,8 @@ import { environment } from '../../../environment/environment';
 import { ServiceHelpersService } from './utils/service-helpers.service';
 
 const DOMAIN_URL = environment.apiUrl + '/api/partner';
-const KOMERCIJALISTI_URL = '/komercijalsti'
+const KOMERCIJALISTI_URL = '/komercijalsti';
+const PARTNER_CARD_URL = '/kartica';
 const PASSWORD_CHANGE_URL = '/promena-sifre';
 
 @Injectable({
@@ -26,6 +27,15 @@ export class PartnerService {
     const fullUrl = DOMAIN_URL + KOMERCIJALISTI_URL;
     return this.http
       .get<Partner[]>(fullUrl)
+      .pipe(
+        catchError((error: any) => throwError(error))
+      );
+  }
+
+  public getPartnerCard(): Observable<PartnerCardResponse> {
+    const fullUrl = DOMAIN_URL + PARTNER_CARD_URL;
+    return this.http
+      .get<PartnerCardResponse>(fullUrl)
       .pipe(
         catchError((error: any) => throwError(error))
       );

@@ -1,0 +1,86 @@
+<section class="header-margin--top partner-card">
+  <autom-header
+    [headerData]="headerData"
+    [headingLevel]="headingLevelEnum.H2"
+  ></autom-header>
+
+  <div
+    *ngIf="summaryCards.length"
+    class="partner-card__summary"
+  >
+    <div
+      class="partner-card__summary-card"
+      *ngFor="let card of summaryCards; trackBy: trackBySummaryCard"
+      [ngClass]="{
+        'is-currency': card.isCurrency,
+        'is-negative': card.isCurrency && (card.amount ?? 0) < 0
+      }"
+    >
+      <span class="label">{{ card.label }}</span>
+      <span
+        class="value"
+        [ngClass]="{ negative: card.isCurrency && (card.amount ?? 0) < 0 }"
+        >
+        {{ card.isCurrency
+          ? ((card.amount ?? 0) | rsdCurrency)
+          : card.value }}
+      </span
+      >
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="partner-card__loading">
+    <spinner></spinner>
+  </div>
+
+  <div *ngIf="!loading && errorMessage" class="partner-card__error">
+    {{ errorMessage }}
+  </div>
+
+  <ng-container *ngIf="!loading && !errorMessage">
+    <div
+      *ngIf="groupViews.length; else partnerCardEmpty"
+      class="partner-card__groups"
+    >
+      <section
+        *ngFor="let groupView of groupViews; trackBy: trackByGroup"
+        class="partner-card__group"
+        [ngClass]="{
+          'partner-card__group--novcana': isNovcanaGroup(groupView.data.tip)
+        }"
+      >
+        <div class="partner-card__group-header">
+          <div class="partner-card__group-title">
+            <h3>{{ groupView.data.tip || 'N/A' }}</h3>
+          </div>
+        </div>
+
+        <div class="partner-card__table-wrapper">
+          <ng-container *ngIf="groupView.totalItems; else groupEmpty">
+            <autom-table-flat
+              [columns]="groupView.columns"
+              [displayedColumns]="groupView.displayedColumns"
+              [dataSource]="groupView.dataSource"
+              [pagination]="{
+                length: groupView.totalItems,
+                pageIndex: groupView.pageIndex,
+                pageSize: groupView.pageSize,
+                pageSizeOptions: groupView.pageSizeOptions
+              }"
+              (pageChange)="onGroupPageChange(groupView, $event)"
+            ></autom-table-flat>
+          </ng-container>
+          <ng-template #groupEmpty>
+            <div class="partner-card__group-empty">
+              Trenutno nema stavki za prikaz.
+            </div>
+          </ng-template>
+        </div>
+      </section>
+    </div>
+  </ng-container>
+
+  <ng-template #partnerCardEmpty>
+    <div class="partner-card__empty">Trenutno nema stavki za prikaz.</div>
+  </ng-template>
+</section>

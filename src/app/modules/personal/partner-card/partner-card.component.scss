@@ -1,0 +1,171 @@
+.partner-card {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding-bottom: 48px;
+
+  &__summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin: 16px 0 8px;
+    padding: 20px 24px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, var(--figma-grey-25), #ffffff);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+  }
+
+  &__summary-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 18px 22px;
+    border-radius: 14px;
+    background: var(--figma-base-white);
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    min-width: 220px;
+    flex: 1 1 220px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      border: 1px solid transparent;
+      background: linear-gradient(135deg, rgba(48, 146, 255, 0.15), rgba(15, 23, 42, 0.05)) border-box;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    &:hover::after {
+      opacity: 1;
+    }
+
+    .label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--figma-grey-600);
+    }
+
+    .value {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--figma-grey-900);
+      display: block;
+      word-break: break-word;
+
+      &.negative {
+        color: var(--figma-error-600);
+      }
+    }
+
+    &.is-currency .value {
+      font-size: 18px;
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  &__loading,
+  &__empty,
+  &__error {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    border-radius: 16px;
+    background: var(--figma-base-white);
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
+    color: var(--figma-grey-600);
+    font-weight: 500;
+  }
+
+  &__error {
+    color: var(--figma-error-600);
+  }
+
+  &__groups {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  &__group {
+    padding: 24px;
+    border-radius: 16px;
+    background: var(--figma-base-white);
+    box-shadow: 0 16px 30px rgba(15, 23, 42, 0.08);
+
+    &--novcana {
+      border: 1px solid var(--figma-primary-100);
+    }
+  }
+
+  &__group-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  &__group-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    h3 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--figma-grey-900);
+    }
+  }
+
+  &__table-wrapper {
+    margin-top: 16px;
+    overflow-x: auto;
+    background: var(--figma-base-white);
+    border-radius: 12px;
+    border: 1px solid var(--figma-grey-100);
+  }
+
+  &__group-empty {
+    text-align: center;
+    font-weight: 500;
+    color: var(--figma-grey-600);
+    padding: 24px;
+  }
+
+  @media (max-width: 1024px) {
+    &__group {
+      padding: 20px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    gap: 24px;
+
+    &__summary {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    &__group-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+}

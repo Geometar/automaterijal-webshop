@@ -91,6 +91,12 @@ export const routes: Routes = [
       import('./modules/cart/cart.component').then((m) => m.CartComponent)
   },
   {
+    path: 'partner-card',
+    loadComponent: () =>
+      import('./modules/personal/partner-card/partner-card.component').then((m) => m.PartnerCardComponent),
+    canActivate: [authGuard]
+  },
+  {
     path: 'invoices',
     loadComponent: () =>
       import('./modules/personal/invoices/invoices.component').then((m) => m.InvoicesComponent),

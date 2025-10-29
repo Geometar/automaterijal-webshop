@@ -105,27 +105,12 @@
   font-size: 13px;
 }
 
-.custom-profile-menu .menu-header .menu-balance {
-  background-color: #f3f4f6;
-  border-radius: 6px;
-  color: #374151;
-  display: flex;
-  font-size: 13px;
-  justify-content: space-between;
-  padding: 6px 10px;
-}
-
 .custom-profile-menu .menu-header .label {
   font-weight: 500;
 }
 
 .custom-profile-menu .menu-header .value {
   font-weight: 600;
-}
-
-.custom-profile-menu .menu-header .value.negative {
-  color: #dc2626;
-  transition: color 0.3s ease;
 }
 
 // Mobile / small laptop design
@@ -276,25 +261,6 @@ $breakpoint-sm: 768px;
   flex-direction: column;
   gap: 6px;
   font-size: 14px;
-}
-
-.menu-balance {
-  display: flex;
-  justify-content: space-between;
-  font-size: 13px;
-  color: #374151;
-}
-
-.menu-balance .label {
-  font-weight: 500;
-}
-
-.menu-balance .value {
-  font-weight: 600;
-}
-
-.menu-balance .value.negative {
-  color: #dc2626;
 }
 
 .menu-social-container {

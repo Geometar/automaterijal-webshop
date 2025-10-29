@@ -155,26 +155,15 @@
                   <span class="span">{{ account?.email }}</span>
                 </div>
 
-                <div class="menu-balance">
-                  <span class="label">Stanje:</span>
-                  <span
-                    class="value"
-                    [ngClass]="{ negative: account?.stanje! < 0 }"
-                    >{{ account?.stanje! | rsdCurrency }}</span
-                  >
-                </div>
-
-                <div class="menu-balance">
-                  <span class="label">Van valute:</span>
-                  <span
-                    class="value"
-                    [ngClass]="{ negative: account?.stanjeporoku! < 0 }"
-                    >{{ account?.stanjeporoku! | rsdCurrency }}</span
-                  >
-                </div>
               </div>
 
               <mat-divider></mat-divider>
+              <button mat-menu-item routerLink="/partner-card">
+                <div class="menu-item-align">
+                  <autom-icon [source]="iconEnum.CREDIT_CARD"></autom-icon>
+                  <span>Kartica partnera</span>
+                </div>
+              </button>
               <button mat-menu-item routerLink="/invoices">
                 <div class="menu-item-align">
                   <autom-icon [source]="iconEnum.BOOK"></autom-icon>
@@ -347,21 +336,6 @@
     <div class="menu-header">
       <strong>{{ account?.naziv }}</strong>
       <div class="email">{{ account?.email }}</div>
-      <div class="menu-balance">
-        <span class="label">Stanje:</span>
-        <span class="value" [ngClass]="{ negative: account?.stanje! < 0 }">
-          {{ account?.stanje! | rsdCurrency }}
-        </span>
-      </div>
-      <div class="menu-balance">
-        <span class="label">Van valute:</span>
-        <span
-          class="value"
-          [ngClass]="{ negative: account?.stanjeporoku! < 0 }"
-        >
-          {{ account?.stanjeporoku! | rsdCurrency }}
-        </span>
-      </div>
     </div>
   </div>
 

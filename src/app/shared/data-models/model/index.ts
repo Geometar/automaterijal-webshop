@@ -6,6 +6,7 @@ export * from './email';
 export * from './invoice';
 export * from './log';
 export * from './page';
+export * from './partner-card';
 export * from './partner';
 export * from './proizvodjac';
 export * from './sales-report';
