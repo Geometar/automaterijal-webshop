@@ -1,299 +1,243 @@
-/* 🔹 Ensure the filter container is centered */
 .filter-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16px; /* Spacing between elements */
-  width: 100%;
-  margin-top: 20px;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-top: 24px;
 
-  /* 🔹 Icons container (keeps icons aligned left) */
   .filter-icons {
     display: flex;
-    gap: 10px;
-    padding-right: 20px;
-    padding-top: 70px;
+    gap: 12px;
 
-    .mat-icon {
-      width: 26px;
-      height: 26px;
+    autom-icon[aria-pressed='true'] {
+      filter: drop-shadow(0 6px 16px rgba(255, 168, 0, 0.35));
     }
   }
 
-  /* 🔹 Search Input (Ensures it's centered) */
   .filter-groups {
-    flex-grow: 1;
-    max-width: 450px;
-    margin-top: 25px;
+    flex: 1 1 340px;
+    max-width: 480px;
   }
 }
 
 .assembly-groups-container {
-  align-items: center;
+  margin-top: 32px;
+  width: 100%;
+
+  &.grid-view {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    align-items: stretch;
+  }
+
+  &.list-view-wrapper {
+    display: block;
+  }
+}
+
+.assembly-group-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 16px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
   display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  justify-content: center;
-  margin-top: 50px;
+  flex-direction: column;
+  padding: 24px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 
-  .is-grandchild {
-    padding-left: 24px;
-    position: relative;
-    font-style: normal;
-    color: var(--figma-grey-700);
-
-    &:hover {
-      background: var(--figma-bg-light);
-      text-decoration: underline;
-      cursor: pointer;
-    }
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 44px rgba(15, 23, 42, 0.16);
   }
 
-  .tree-icon {
-    margin-right: 6px;
-    font-size: 0.9em;
-    opacity: 0.7;
+  &.expanded {
+    box-shadow: 0 22px 50px rgba(15, 23, 42, 0.18);
   }
 
-  .layer-child-item {
+  &.is-muted {
+    opacity: 0.75;
+  }
+
+  .card-header {
     display: flex;
     align-items: center;
-    gap: 6px;
-    margin-bottom: 4px;
-    cursor: pointer;
+    margin-bottom: 12px;
 
-    &:hover {
-      color: var(--figma-accent-yellow-700);
-      text-decoration: underline;
+    h3 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--figma-grey-900);
+      cursor: pointer;
+      transition: color 0.2s ease;
+
+      &:hover {
+        color: var(--figma-accent-yellow-700);
+      }
     }
 
-    &.is-grandchild {
-      padding-left: 16px;
-      font-style: normal;
-      opacity: 0.85;
-      font-size: 0.92em;
+    .icon {
+      font-size: 1.2rem;
+    }
+  }
 
-      .tree-icon {
-        opacity: 0.6;
+  .card-body {
+    flex: 1 1 auto;
+    font-size: 0.97rem;
+    color: var(--figma-grey-800);
+  }
+
+  .child-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    &.collapsing li {
+      opacity: 0.6;
+    }
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 10px;
+      transition: background 0.2s ease, color 0.2s ease;
+
+      color: var(--figma-grey-800);
+
+      &:hover {
+        background: rgba(255, 168, 0, 0.12);
+        color: var(--figma-accent-yellow-700);
+      }
+
+      &.is-grandchild {
+        padding-left: 24px;
+        font-size: 0.9rem;
+
+        .tree-icon {
+          opacity: 0.6;
+        }
+      }
+
+      &.is-muted {
+        opacity: 0.75;
       }
     }
   }
 
   .tree-icon {
-    margin-right: 4px;
-    font-size: 0.9em;
-  }
-
-  .is-grandchild {
-    padding-left: 24px;
-    position: relative;
-    font-style: normal;
-    color: var(--figma-grey-700);
-
-    &:hover {
-      background: var(--figma-bg-light);
-      text-decoration: underline;
-      cursor: pointer;
-    }
-  }
-
-  .tree-icon {
-    margin-right: 6px;
-    font-size: 0.9em;
-    opacity: 0.7;
-  }
-
-  .assembly-group-card {
-    background: #fff;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
-    display: flex;
-    display: flex;
-    flex-direction: column;
-    flex-direction: column;
-    justify-content: space-between;
-    justify-content: space-between; // Ovo je ključno!
-    max-height: 300px;
-    min-height: 300px;
-    overflow: hidden;
-    padding: 16px;
-    position: relative;
-    transition: max-height 0.5s ease-in-out, padding-bottom 0.5s ease-in-out;
-    width: 450px;
-  }
-
-  .assembly-group-card.expanded {
-    max-height: 1000px;
-    overflow-y: auto;
-    padding-bottom: 20px;
-  }
-
-  .assembly-group-card.collapsing {
-    max-height: 300px;
-  }
-
-  .card-header {
-    align-items: center;
-    display: flex;
-    font-size: 0.95em;
-    font-weight: bold;
-    margin-bottom: 8px;
-  }
-
-  .card-header h3:hover {
-    color: var(--figma-accent-yellow-700);
-    cursor: pointer;
-  }
-
-  .card-header .icon {
-    display: inline;
-    margin-right: 8px;
-  }
-  .card-body {
-    flex: 1 1 auto;
-    font-size: 0.9em;
-    overflow-y: auto;
-    padding-left: 8px;
-  }
-
-  .child-list {
-    list-style: none;
-    padding-left: 0;
-  }
-
-  .child-list li {
-    align-items: center;
-    animation: fadeInUp 0.3s ease-in-out forwards;
-    cursor: pointer;
-    display: flex;
-    margin-bottom: 4px;
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  .child-list.collapsing li {
-    opacity: 0;
-    transform: translateY(-10px);
-    transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
-  }
-
-  .child-list li:hover {
-    color: var(--figma-accent-yellow-700);
-    text-decoration: underline;
-  }
-
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    font-size: 0.9rem;
   }
 
   .card-footer {
-    border-top: 1px solid #eee; // opciono, radi vizuelne separacije
+    padding-top: 16px;
     display: flex;
     justify-content: center;
-    padding-top: 12px;
+  }
+}
+
+.show-all-btn {
+  min-width: 130px;
+}
+
+.list-view-container {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.list-item {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+
+  &.is-muted {
+    opacity: 0.75;
   }
 
-  .show-all-btn {
-    border-radius: 4px;
-    border: none;
-    color: white;
-    cursor: pointer;
-    font-size: 0.85em;
-    padding: 2px 12px;
-    transition: all 0.3s ease-in-out;
-  }
-
-  /* 🔹 List View */
-  .list-view-container {
-    width: 100%;
-    list-style-type: none;
-    padding: 0;
-  }
-
-  /* 🔹 List Header (Top-Level Category with Arrow) */
   .list-header {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
-    font-weight: bold;
-    padding: 10px;
-    gap: 5px;
-    border-bottom: 1px solid #ddd;
-  }
-
-  .list-header-value:hover {
-    background: var(--figma-bg-light);
-    color: var(--figma-accent-yellow-700);
-    text-decoration: underline;
+    gap: 8px;
+    padding: 14px 18px;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--figma-grey-900);
     cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+
+    &:hover {
+      background: rgba(248, 250, 252, 0.8);
+      color: var(--figma-accent-yellow-700);
+    }
+
+    .arrow {
+      transition: transform 0.25s ease;
+
+      &.expanded {
+        transform: rotate(90deg);
+      }
+    }
+
+    .list-header-value {
+      flex: 1;
+    }
   }
 
-  .list-header:hover {
-    background: var(--figma-bg-light);
-  }
-
-  /* 🔹 Expand/Collapse Arrow */
-  .arrow {
-    cursor: pointer;
-    margin-right: 10px;
-    transition: transform 0.3s ease-in-out;
-  }
-
-  .arrow.expanded {
-    transform: rotate(90deg);
-  }
-
-  /* 🔹 Nested List (Initially Hidden) */
-  /* 🔹 Default (Hidden State) */
   .nested-list {
-    list-style-type: none;
-    padding-left: 20px;
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
-  }
+    list-style: none;
+    margin: 0;
+    padding: 0 18px 14px 36px;
+    display: none;
+    gap: 6px;
+    flex-direction: column;
 
-  /* 🔹 Expanded State */
-  .nested-list.expanded {
-    max-height: 500px; /* Adjust this if needed */
-    overflow: auto;
-    opacity: 1;
-  }
-
-  .nested-item {
-    padding: 6px 22px;
-    cursor: pointer;
-    font-size: 0.9em;
-  }
-
-  .nested-item:hover {
-    background: var(--figma-bg-light);
-    color: var(--figma-accent-yellow-700);
-    text-decoration: underline;
-  }
-
-  /* 🔹 Animations */
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
+    &.expanded {
+      display: flex;
     }
-    to {
-      opacity: 1;
-      transform: translateY(0);
+
+    .nested-item {
+      padding: 6px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+
+      &:hover {
+        background: rgba(255, 168, 0, 0.12);
+        color: var(--figma-accent-yellow-700);
+      }
+
+      &.is-grandchild {
+        padding-left: 22px;
+        font-size: 0.92rem;
+      }
+
+      &.is-muted {
+        opacity: 0.75;
+      }
     }
   }
+}
 
-  .list-item {
-    animation: fadeIn 0.3s ease-in-out;
-  }
+.highlight {
+  background: rgba(220, 38, 38, 0.2);
+  border-radius: 6px;
+  color: #b91c1c;
+  padding: 2px 4px;
+  font-weight: 700;
 }

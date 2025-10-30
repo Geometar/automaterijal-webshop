@@ -1,5 +1,14 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
-import { trigger, style, animate, transition } from '@angular/animations';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewEncapsulation
+} from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 // Component imported
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
@@ -21,18 +30,10 @@ import { UrlHelperService } from '../../../../shared/service/utils/url-helper.se
   templateUrl: './assembly-groups.component.html',
   styleUrl: './assembly-groups.component.scss',
   encapsulation: ViewEncapsulation.None,
-  animations: [
-    trigger('fadeIn', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateY(10px)' }),
-        animate('300ms ease-out', style({ opacity: 1, transform: 'translateY(0)' })),
-      ]),
-    ]),
-  ],
 })
-export class AssemblyGroupsComponent implements OnInit {
+export class AssemblyGroupsComponent implements OnInit, OnChanges {
   @Input() assemblyGroups: AssemblyGroup[] = [];
-  @Output() event = new EventEmitter<AssemblyGroup>()
+  @Output() assemblyGroupSelected = new EventEmitter<AssemblyGroup>();
 
   // Enums
   iconEnum = IconsEnum;
@@ -42,34 +43,57 @@ export class AssemblyGroupsComponent implements OnInit {
   structuredGroups: AssemblyGroup[] = [];
   expandedNodes: Set<number> = new Set();
   expandedCards: Set<number> = new Set();
+  private autoExpandedNodes: Set<number> = new Set();
+  private autoExpandedCards: Set<number> = new Set();
+  private matchedGroupIds: Set<number> = new Set();
+  private highlightCache = new Map<string, SafeHtml>();
 
   // View mode
-  showLayerView = true;
-  showListView = false;
+  viewMode: 'grid' | 'list' = 'grid';
+  searchTerm = '';
 
-  constructor(private urlHelperService: UrlHelperService) { }
+  constructor(
+    private urlHelperService: UrlHelperService,
+    private sanitizer: DomSanitizer
+  ) { }
 
   // Start of: Angular lifecycle
 
   ngOnInit() {
-    this.structuredGroups = this.buildHierarchy(this.assemblyGroups);
-    if (this.urlHelperService.hasQueryParam('listView')) {
-      this.showListViewHandler();
+    this.initializeViewMode();
+    this.rebuildHierarchy();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['assemblyGroups']) {
+      this.rebuildHierarchy();
     }
   }
 
   // End of: Angular lifecycle
 
-  showLayerViewHandler(): void {
-    this.showLayerView = true;
-    this.showListView = false;
+  activateGridView(): void {
+    if (this.viewMode === 'grid') {
+      return;
+    }
+    this.viewMode = 'grid';
     this.urlHelperService.removeQueryParam('listView');
   }
 
-  showListViewHandler(): void {
-    this.showListView = true;
-    this.showLayerView = false;
-    this.urlHelperService.addOrUpdateQueryParams({ listView: true })
+  activateListView(): void {
+    if (this.viewMode === 'list') {
+      return;
+    }
+    this.viewMode = 'list';
+    this.urlHelperService.addOrUpdateQueryParams({ listView: true });
+  }
+
+  isGridView(): boolean {
+    return this.viewMode === 'grid';
+  }
+
+  isListView(): boolean {
+    return this.viewMode === 'list';
   }
 
   buildHierarchy(groups: AssemblyGroup[]): AssemblyGroup[] {
@@ -77,7 +101,11 @@ export class AssemblyGroupsComponent implements OnInit {
 
     // Step 1: Initialize the map with empty children
     groups.forEach(group => {
-      parentMap.set(group.assemblyGroupNodeId!, { ...group, childrenNodes: [] });
+      const clone: AssemblyGroup = {
+        ...group,
+        childrenNodes: []
+      };
+      parentMap.set(group.assemblyGroupNodeId!, clone);
     });
 
     const rootGroups: AssemblyGroup[] = [];
@@ -145,80 +173,154 @@ export class AssemblyGroupsComponent implements OnInit {
   }
 
   filterStructuredGroups(searchTerm: string): void {
-    if (!searchTerm) {
-      // Reset: Collapse everything if there was a previous filter
-      this.expandedNodes.clear();
-      this.structuredGroups = this.buildHierarchy(this.assemblyGroups);
+    this.applySearchTerm(searchTerm);
+  }
+
+  toggleShowAll(cardId: number, event?: MouseEvent): void {
+    event?.stopPropagation();
+    if (this.expandedCards.has(cardId)) {
+      this.expandedCards.delete(cardId);
       return;
     }
-
-    const matchesSearch = (group: AssemblyGroup): boolean => {
-      return group.assemblyGroupName!.toLowerCase().includes(searchTerm.toLowerCase());
-    };
-
-    const filterGroups = (groups: AssemblyGroup[]): AssemblyGroup[] => {
-      return groups
-        .map(group => {
-          const filteredChildren = filterGroups(group.childrenNodes!);
-          if (matchesSearch(group) || filteredChildren.length > 0) {
-            this.expandedNodes.add(group.assemblyGroupNodeId!); // Expand on match
-            return { ...group, childrenNodes: filteredChildren };
-          }
-          return null;
-        })
-        .filter(group => group !== null) as AssemblyGroup[];
-    };
-
-    this.structuredGroups = filterGroups(this.buildHierarchy(this.assemblyGroups));
+    this.expandedCards.add(cardId);
   }
 
-
-  toggleShowAll(cardId: number) {
-    const element = document.getElementById(`group-${cardId}`);
-    const content = document.getElementById(`content-${cardId}`);
-
-    if (this.expandedCards.has(cardId)) {
-      // Start fading out content immediately
-      if (content) {
-        content.classList.add('collapsing');
-      }
-
-      // Shrink the card after a short delay to sync animations
-      if (element) {
-        element.classList.add('collapsing');
-      }
-
-      setTimeout(() => {
-        this.expandedCards.delete(cardId);
-        if (element) {
-          element.classList.remove('expanded', 'collapsing');
-        }
-        if (content) {
-          content.classList.remove('collapsing');
-        }
-      }, 100); // Sync with CSS transition time
-    } else {
-      this.expandedCards.add(cardId);
-    }
-  }
-
-  toggleList(assemblyGroupId: number) {
+  toggleList(assemblyGroupId: number): void {
     if (this.expandedNodes.has(assemblyGroupId)) {
       this.expandedNodes.delete(assemblyGroupId);
-    } else {
-      this.expandedNodes.add(assemblyGroupId);
+      return;
     }
+    this.expandedNodes.add(assemblyGroupId);
   }
 
   isListExpanded(cardId: number): boolean {
-    return this.expandedNodes.has(cardId);
+    return this.expandedNodes.has(cardId) || (this.searchTerm ? this.autoExpandedNodes.has(cardId) : false);
   }
 
-  isExpanded(cardId: number): boolean {
-    return this.expandedCards.has(cardId);
+  isCardExpanded(cardId: number): boolean {
+    return this.expandedCards.has(cardId) || (this.searchTerm ? this.autoExpandedCards.has(cardId) : false);
   }
 
-  searchForArticlesWithAssembleGroup(data: AssemblyGroup): void {
-    this.event.emit(data);
+  shouldShowAllChildren(cardId: number | undefined): boolean {
+    if (cardId === undefined) {
+      return true;
+    }
+    return this.isCardExpanded(cardId);
+  }
+
+  onGroupSelected(group: AssemblyGroup, event?: MouseEvent): void {
+    event?.stopPropagation();
+    this.assemblyGroupSelected.emit(group);
+  }
+
+  trackByGroup = (_: number, group: AssemblyGroup): number =>
+    group.assemblyGroupNodeId ?? _; // fallback
+
+  getHighlightedName(group: AssemblyGroup | undefined): SafeHtml {
+    if (!group?.assemblyGroupNodeId || !group.assemblyGroupName) {
+      return '';
+    }
+
+    const baseKey = group.assemblyGroupNodeId.toString();
+
+    if (!this.searchTerm) {
+      if (!this.highlightCache.has(baseKey)) {
+        this.highlightCache.set(
+          baseKey,
+          this.sanitizer.bypassSecurityTrustHtml(group.assemblyGroupName)
+        );
+      }
+      return this.highlightCache.get(baseKey)!;
+    }
+
+    const cacheKey = `${group.assemblyGroupNodeId}-${this.searchTerm.toLowerCase()}`;
+    if (this.highlightCache.has(cacheKey)) {
+      return this.highlightCache.get(cacheKey)!;
+    }
+
+    const escapedTerm = this.escapeRegExp(this.searchTerm);
+    const regex = new RegExp(`(${escapedTerm})`, 'gi');
+    const highlighted = group.assemblyGroupName.replace(
+      regex,
+      '<span class="highlight">$1</span>'
+    );
+
+    const safe = this.sanitizer.bypassSecurityTrustHtml(highlighted);
+    this.highlightCache.set(cacheKey, safe);
+    return safe;
+  }
+
+  isMatchedGroup(groupId: number | undefined): boolean {
+    if (!groupId || !this.searchTerm) {
+      return false;
+    }
+    return this.matchedGroupIds.has(groupId);
+  }
+
+  private rebuildHierarchy(): void {
+    this.highlightCache.clear();
+    this.structuredGroups = this.buildHierarchy(this.assemblyGroups ?? []);
+    this.applySearchTerm(this.searchTerm, true);
+  }
+
+  private initializeViewMode(): void {
+    this.viewMode = this.urlHelperService.hasQueryParam('listView') ? 'list' : 'grid';
+  }
+
+  private applySearchTerm(term: string, preserveManualExpansion = false): void {
+    const normalizedTerm = (term ?? '').trim();
+    this.searchTerm = normalizedTerm;
+    this.highlightCache.clear();
+    this.matchedGroupIds.clear();
+    this.autoExpandedNodes.clear();
+    this.autoExpandedCards.clear();
+
+    if (!normalizedTerm) {
+      this.structuredGroups = this.buildHierarchy(this.assemblyGroups ?? []);
+      this.matchedGroupIds.clear();
+      return;
+    }
+
+    const lowerTerm = normalizedTerm.toLowerCase();
+
+    const traverse = (group: AssemblyGroup, ancestorIds: number[]): boolean => {
+      const groupId = group.assemblyGroupNodeId;
+      const name = group.assemblyGroupName ?? '';
+      const matches = name.toLowerCase().includes(lowerTerm);
+
+      let descendantMatch = false;
+      (group.childrenNodes ?? []).forEach((child) => {
+        if (traverse(child, groupId ? [...ancestorIds, groupId] : ancestorIds)) {
+          descendantMatch = true;
+        }
+      });
+
+      if ((matches || descendantMatch) && groupId !== undefined) {
+        this.matchedGroupIds.add(groupId);
+        this.autoExpandedCards.add(groupId);
+        this.autoExpandedNodes.add(groupId);
+        ancestorIds.forEach((ancestorId) => {
+          this.autoExpandedCards.add(ancestorId);
+          this.autoExpandedNodes.add(ancestorId);
+        });
+        return true;
+      }
+
+      return matches || descendantMatch;
+    };
+
+    const filteredRoots: AssemblyGroup[] = [];
+
+    this.structuredGroups.forEach((group) => {
+      if (traverse(group, [])) {
+        filteredRoots.push(group);
+      }
+    });
+
+    this.structuredGroups = filteredRoots;
+  }
+
+  private escapeRegExp(value: string): string {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 }

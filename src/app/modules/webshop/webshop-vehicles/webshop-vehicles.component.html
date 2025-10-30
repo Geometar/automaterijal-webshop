@@ -5,7 +5,7 @@
   <assembly-groups
     *ngIf="!assemblyGroupLoading && showAssemblyGroups"
     [assemblyGroups]="assemblyGroups"
-    (event)="getArticlesByAssembleGroup($event)"
+    (assemblyGroupSelected)="getArticlesByAssembleGroup($event)"
   ></assembly-groups>
   <div *ngIf="assemblyGroupLoading && showAssemblyGroups" class="spinner">
     <spinner></spinner>

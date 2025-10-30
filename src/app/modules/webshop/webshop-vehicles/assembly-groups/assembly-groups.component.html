@@ -1,23 +1,30 @@
 <div class="util__flex--center filter-container">
   <div class="filter-icons">
-    <!-- Grid View Icon -->
     <autom-icon
       [source]="iconEnum.THREE_LAYERS"
-      [color]="showLayerView ? colorEnum.YELLOW_700 : colorEnum.RICH_BLACK"
+      [color]="isGridView() ? colorEnum.YELLOW_700 : colorEnum.RICH_BLACK"
       [tooltip]="{ tooltipText: 'Mrežni prikaz (Grid View)' }"
-      (click)="showLayerViewHandler()"
+      [attr.aria-pressed]="isGridView()"
+      role="button"
+      tabindex="0"
+      (click)="activateGridView()"
+      (keyup.enter)="activateGridView()"
+      (keyup.space)="activateGridView()"
     ></autom-icon>
 
-    <!-- List View Icon -->
     <autom-icon
       [source]="iconEnum.ALIGN_LEFT"
-      [color]="showListView ? colorEnum.YELLOW_700 : colorEnum.RICH_BLACK"
+      [color]="isListView() ? colorEnum.YELLOW_700 : colorEnum.RICH_BLACK"
       [tooltip]="{ tooltipText: 'Prikaz kao lista (List View)' }"
-      (click)="showListViewHandler()"
+      [attr.aria-pressed]="isListView()"
+      role="button"
+      tabindex="0"
+      (click)="activateListView()"
+      (keyup.enter)="activateListView()"
+      (keyup.space)="activateListView()"
     ></autom-icon>
   </div>
 
-  <!-- Search Input (Remains Centered) -->
   <autom-input-fields
     class="filter-groups"
     [label]="'Filtriraj grupe'"
@@ -27,46 +34,56 @@
     (emitSelected)="filterStructuredGroups($event)"
   ></autom-input-fields>
 </div>
-<div class="assembly-groups-container">
-  <ng-container *ngIf="showLayerView">
+
+<div
+  class="assembly-groups-container"
+  [ngClass]="{
+    'grid-view': isGridView(),
+    'list-view-wrapper': isListView()
+  }"
+>
+  <ng-container *ngIf="isGridView()">
     <div
       class="assembly-group-card"
-      *ngFor="let group of structuredGroups"
+      *ngFor="let group of structuredGroups; trackBy: trackByGroup"
       [ngClass]="{
-        expanded: isExpanded(group.assemblyGroupNodeId!),
-        collapsing: !isExpanded(group.assemblyGroupNodeId!)
+        expanded: isCardExpanded(group.assemblyGroupNodeId!),
+        'is-muted': searchTerm && !isMatchedGroup(group.assemblyGroupNodeId!)
       }"
-      [id]="'group-' + group.assemblyGroupNodeId"
     >
       <div class="card-header">
-        <h3 (click)="searchForArticlesWithAssembleGroup(group)">
-          <span class="icon">📦</span> {{ group.assemblyGroupName }}
+        <h3 (click)="onGroupSelected(group)">
+          <span class="icon">📦</span>
+          <span [innerHTML]="getHighlightedName(group)"></span>
         </h3>
       </div>
       <div class="card-body">
         <ul
           class="child-list"
-          [id]="'content-' + group.assemblyGroupNodeId"
-          [ngClass]="{ collapsing: !isExpanded(group.assemblyGroupNodeId!) }"
+          [ngClass]="{
+            collapsing: !isCardExpanded(group.assemblyGroupNodeId!)
+          }"
         >
           <li
             *ngFor="
-              let child of expandedCards.has(group.assemblyGroupNodeId!)
+              let child of shouldShowAllChildren(group.assemblyGroupNodeId!)
                 ? group.childrenNodes
-                : group.childrenNodes?.slice(0, 5)
+                : group.childrenNodes?.slice(0, 5);
+              trackBy: trackByGroup
             "
             class="layer-child-item"
             [ngClass]="{
-              'is-grandchild': child.parentNodeId !== group.assemblyGroupNodeId
+              'is-grandchild': child.parentNodeId !== group.assemblyGroupNodeId,
+              'is-muted': searchTerm && !isMatchedGroup(child.assemblyGroupNodeId)
             }"
-            (click)="searchForArticlesWithAssembleGroup(child)"
+            (click)="onGroupSelected(child, $event)"
           >
             <span
               class="tree-icon"
               *ngIf="child.parentNodeId !== group.assemblyGroupNodeId"
               >🛠️</span
             >
-            {{ child.assemblyGroupName }}
+            <span [innerHTML]="getHighlightedName(child)"></span>
           </li>
         </ul>
       </div>
@@ -74,31 +91,38 @@
         <autom-button
           class="show-all-btn"
           [label]="
-            expandedCards.has(group.assemblyGroupNodeId!)
+            isCardExpanded(group.assemblyGroupNodeId!)
               ? 'Prikaži manje'
               : 'Prikaži sve'
           "
-          (click)="toggleShowAll(group.assemblyGroupNodeId!)"
+          (click)="toggleShowAll(group.assemblyGroupNodeId!, $event)"
         >
         </autom-button>
       </div>
     </div>
   </ng-container>
 
-  <!-- List View -->
-  <ul *ngIf="showListView" class="list-view-container">
-    <li *ngFor="let group of structuredGroups" class="list-item">
-      <div class="list-header" (click)="toggleList(group.assemblyGroupNodeId!)">
+  <ul *ngIf="isListView()" class="list-view-container">
+    <li
+      *ngFor="let group of structuredGroups; trackBy: trackByGroup"
+      class="list-item"
+      [ngClass]="{
+        'is-muted': searchTerm && !isMatchedGroup(group.assemblyGroupNodeId!)
+      }"
+    >
+      <div class="list-header">
         <span
           class="arrow"
           [ngClass]="{ expanded: isListExpanded(group.assemblyGroupNodeId!) }"
-          >▶</span
+          (click)="toggleList(group.assemblyGroupNodeId!); $event.stopPropagation()"
         >
+          ▶
+        </span>
         <span
           class="list-header-value"
-          (click)="searchForArticlesWithAssembleGroup(group)"
-          >{{ group.assemblyGroupName }}</span
-        >
+          [innerHTML]="getHighlightedName(group)"
+          (click)="onGroupSelected(group, $event)"
+        ></span>
       </div>
       <ul
         class="nested-list"
@@ -106,19 +130,20 @@
         *ngIf="isListExpanded(group.assemblyGroupNodeId!)"
       >
         <li
-          *ngFor="let child of group.childrenNodes"
+          *ngFor="let child of group.childrenNodes; trackBy: trackByGroup"
           class="nested-item"
           [ngClass]="{
-            'is-grandchild': child.parentNodeId !== group.assemblyGroupNodeId
+            'is-grandchild': child.parentNodeId !== group.assemblyGroupNodeId,
+            'is-muted': searchTerm && !isMatchedGroup(child.assemblyGroupNodeId)
           }"
-          (click)="searchForArticlesWithAssembleGroup(child)"
+          (click)="onGroupSelected(child, $event)"
         >
           <span
             class="tree-icon"
             *ngIf="child.parentNodeId !== group.assemblyGroupNodeId"
             >🛠️</span
           >
-          {{ child.assemblyGroupName }}
+          <span [innerHTML]="getHighlightedName(child)"></span>
         </li>
       </ul>
     </li>
