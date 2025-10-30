@@ -4,6 +4,43 @@
     [headingLevel]="headingLevelEnum.H2"
   ></autom-header>
 
+  <div *ngIf="isAdmin" class="partner-card__admin">
+    <div class="partner-card__admin-card">
+      <span class="partner-card__admin-tag">Admin alat</span>
+      <h3 class="partner-card__admin-title">Pregled kartica partnera</h3>
+      <p class="partner-card__admin-subtitle">
+        Pronađite partnera i preuzmite njegove dokumente bez napuštanja ove
+        stranice.
+      </p>
+      <div class="partner-card__admin-controls">
+        <typeahead
+          [data]="admin.items"
+          [label]="'Pronađi partnera'"
+          [selectedItem]="admin.selection"
+          (emit)="onPartnerSelected($event)"
+          (search)="onPartnerSearch($event)"
+        ></typeahead>
+        <div *ngIf="admin.loading" class="partner-card__admin-status">
+          Pretraga...
+        </div>
+      </div>
+      <div *ngIf="admin.error" class="partner-card__admin-error">
+        {{ admin.error }}
+      </div>
+      <div *ngIf="admin.partner" class="partner-card__admin-selected">
+        <span class="partner-card__admin-selected-label"
+          >Trenutno prikazujemo</span
+        >
+        <span class="partner-card__admin-selected-value">
+          {{ admin.partner.naziv || admin.selection?.value }}
+        </span>
+      </div>
+      <div *ngIf="!admin.partner" class="partner-card__admin-placeholder">
+        Odaberite partnera da biste prikazali njegovu karticu.
+      </div>
+    </div>
+  </div>
+
   <div *ngIf="summaryCards.length" class="partner-card__summary">
     <div
       class="partner-card__summary-card"
@@ -32,7 +69,7 @@
   </div>
 
   <ng-container *ngIf="!loading && !errorMessage">
-    <autom-divider></autom-divider>
+    <autom-divider *ngIf="!isAdmin || admin.partner"></autom-divider>
     <div
       *ngIf="groupViews.length; else partnerCardEmpty"
       class="partner-card__groups"
@@ -76,6 +113,12 @@
   </ng-container>
 
   <ng-template #partnerCardEmpty>
-    <div class="partner-card__empty">Trenutno nema stavki za prikaz.</div>
+    <div class="partner-card__empty">
+      {{
+        isAdmin && !admin.partner
+          ? "Pronađite i odaberite partnera kako biste videli karticu."
+          : "Trenutno nema stavki za prikaz."
+      }}
+    </div>
   </ng-template>
 </section>

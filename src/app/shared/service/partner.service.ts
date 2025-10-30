@@ -14,6 +14,8 @@ import { ServiceHelpersService } from './utils/service-helpers.service';
 const DOMAIN_URL = environment.apiUrl + '/api/partner';
 const KOMERCIJALISTI_URL = '/komercijalsti';
 const PARTNER_CARD_URL = '/kartica';
+const PARTNER_CARD_ADMIN_URL = '/kartica-admin';
+const PARTNER_SEARCH_URL = '/pretraga';
 const PASSWORD_CHANGE_URL = '/promena-sifre';
 
 @Injectable({
@@ -36,6 +38,28 @@ export class PartnerService {
     const fullUrl = DOMAIN_URL + PARTNER_CARD_URL;
     return this.http
       .get<PartnerCardResponse>(fullUrl)
+      .pipe(
+        catchError((error: any) => throwError(error))
+      );
+  }
+
+  public getPartnerCardAdmin(partnerPpid: number): Observable<PartnerCardResponse> {
+    const fullUrl = `${DOMAIN_URL}/${partnerPpid}${PARTNER_CARD_ADMIN_URL}`;
+    return this.http
+      .get<PartnerCardResponse>(fullUrl)
+      .pipe(
+        catchError((error: any) => throwError(error))
+      );
+  }
+
+  public searchPartners(term: string): Observable<Partner[]> {
+    const parameterObject = {} as any;
+    parameterObject['naziv'] = term ?? '';
+    const parametersString = this.serviceHelpersService.formatQueryParameters(parameterObject);
+
+    const fullUrl = DOMAIN_URL + PARTNER_SEARCH_URL + parametersString;
+    return this.http
+      .get<Partner[]>(fullUrl)
       .pipe(
         catchError((error: any) => throwError(error))
       );

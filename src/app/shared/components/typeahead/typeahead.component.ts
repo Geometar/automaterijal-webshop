@@ -1,7 +1,14 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges
+} from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map, startWith, tap } from 'rxjs/operators';
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
 
@@ -14,6 +21,7 @@ export interface TypeaheadItem {
   key?: string | number;
   value?: string;
   img?: string;
+  meta?: string;
 }
 
 @Component({
@@ -36,15 +44,29 @@ export class TypeaheadComponent implements OnChanges {
   @Input() data: TypeaheadItem[] = [];
   @Input() disabled = false;
   @Input() label = '';
+  @Input() debounce = 300;
+  @Input() minLength = 2;
   @Input() selectedItem: TypeaheadItem | null = null;
   @Output() emit = new EventEmitter<TypeaheadItem | null>();
+  @Output() search = new EventEmitter<string>();
 
   stateCtrl = new FormControl({ value: '', disabled: this.disabled });
   filteredStates: Observable<TypeaheadItem[]>;
+  private dataSubject = new BehaviorSubject<TypeaheadItem[]>([]);
 
   constructor() {
-    this.filteredStates = this.stateCtrl.valueChanges.pipe(
-      map(state => (state ? this._filterStates(state) : this.data.slice())),
+    const valueChanges$ = this.stateCtrl.valueChanges.pipe(
+      debounceTime(this.debounce),
+      distinctUntilChanged(),
+      tap((value) => this.handleSearch(value)),
+      startWith('')
+    );
+
+    this.filteredStates = combineLatest([
+      valueChanges$,
+      this.dataSubject.asObservable()
+    ]).pipe(
+      map(([state, data]) => (state ? this.filterStates(state, data) : data.slice()))
     );
   }
 
@@ -57,8 +79,8 @@ export class TypeaheadComponent implements OnChanges {
       }
     }
 
-    if (changes['data'] && this.data.length === 0) {
-      this.stateCtrl.setValue('', { emitEvent: true });
+    if (changes['data']) {
+      this.dataSubject.next(this.data.slice());
     }
 
     if (changes['selectedItem']) {
@@ -97,9 +119,31 @@ export class TypeaheadComponent implements OnChanges {
     }, 150);
   }
 
-  private _filterStates(value: string): TypeaheadItem[] {
+  private handleSearch(rawValue: unknown): void {
+    if (typeof rawValue !== 'string') {
+      return;
+    }
+
+    const value = rawValue.trim();
+    if (this.selectedItem?.value?.trim() === value) {
+      return;
+    }
+
+    if (!value) {
+      this.search.emit('');
+      return;
+    }
+
+    if (value.length < this.minLength) {
+      return;
+    }
+
+    this.search.emit(value);
+  }
+
+  private filterStates(value: string, data: TypeaheadItem[]): TypeaheadItem[] {
     const filterValue = value.toLowerCase();
 
-    return this.data.filter(item => item.value!.toLowerCase().includes(filterValue));
+    return data.filter(item => item.value!.toLowerCase().includes(filterValue));
   }
 }

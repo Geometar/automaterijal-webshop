@@ -1,5 +1,8 @@
 <form class="typeahead-form">
-  <mat-form-field class="typeahead-full-width">
+  <mat-form-field
+    appearance="fill"
+    class="typeahead-field"
+  >
     <mat-label>{{ label }}</mat-label>
     <input
       matInput
@@ -17,15 +20,13 @@
         *ngFor="let state of filteredStates | async"
         [value]="state.value"
       >
-        <img
-          *ngIf="state.img"
-          [src]="state.img"
-          alt=""
-          class="typeahead-option-img"
-          height="25"
-          loading="lazy"
-        />
-        <span>{{ state.value }}</span>
+        <div class="typeahead-option-content">
+          <span class="typeahead-option-main">{{ state.value }}</span>
+          <span
+            *ngIf="state.meta"
+            class="typeahead-option-meta"
+          >{{ state.meta }}</span>
+        </div>
       </mat-option>
     </mat-autocomplete>
   </mat-form-field>

@@ -7,6 +7,7 @@ import { finalize, Subject, takeUntil } from 'rxjs';
 // Components
 import { AutomHeaderComponent } from '../../../shared/components/autom-header/autom-header.component';
 import { DividerComponent } from '../../../shared/components/divider/divider.component';
+import { TypeaheadComponent, TypeaheadItem } from '../../../shared/components/typeahead/typeahead.component';
 import { SpinnerComponent } from '../../../shared/components/spinner/spinner.component';
 import { TableFlatComponent } from '../../../shared/components/table-flat/table-flat.component';
 
@@ -15,7 +16,8 @@ import { HeaderData } from '../../../shared/data-models/interface/header.interfa
 import {
   PartnerCardGroup,
   PartnerCardItem,
-  PartnerCardResponse
+  PartnerCardResponse,
+  Partner
 } from '../../../shared/data-models/model';
 
 // Enums
@@ -26,8 +28,12 @@ import { AutomTableColumn, CellType } from '../../../shared/data-models/enums/ta
 import { RsdCurrencyPipe } from '../../../shared/pipe/rsd-currency.pipe';
 
 // Services
-import { PartnerService } from '../../../shared/service/partner.service';
 import { AccountStateService } from '../../../shared/service/state/account-state.service';
+import { PartnerService } from '../../../shared/service/partner.service';
+import {
+  PartnerCardAdminSelectionResult,
+  PartnerCardAdminService
+} from './partner-card-admin.service';
 
 interface PartnerCardGroupView {
   data: PartnerCardGroup;
@@ -57,8 +63,16 @@ export const PartnerCardHeader: HeaderData = {
 @Component({
   selector: 'app-partner-card',
   standalone: true,
-  imports: [AutomHeaderComponent, CommonModule, SpinnerComponent, RsdCurrencyPipe, TableFlatComponent, DividerComponent],
-  providers: [CurrencyPipe],
+  imports: [
+    AutomHeaderComponent,
+    CommonModule,
+    SpinnerComponent,
+    RsdCurrencyPipe,
+    TableFlatComponent,
+    DividerComponent,
+    TypeaheadComponent
+  ],
+  providers: [CurrencyPipe, PartnerCardAdminService],
   templateUrl: './partner-card.component.html',
   styleUrl: './partner-card.component.scss',
   encapsulation: ViewEncapsulation.None
@@ -71,6 +85,7 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
   headingLevelEnum = HeadingLevelEnum;
   loading = false;
   summaryCards: SummaryCard[] = [];
+  isAdmin = false;
 
   private destroy$ = new Subject<void>();
   private readonly novcanaTip = 'novcana stavka';
@@ -79,11 +94,20 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
 
   constructor(
     private accountStateService: AccountStateService,
-    private partnerService: PartnerService
+    private partnerService: PartnerService,
+    public admin: PartnerCardAdminService
   ) { }
 
   ngOnInit(): void {
-    this.setupBalanceCards();
+    this.isAdmin = this.accountStateService.isAdmin();
+
+    if (this.isAdmin) {
+      this.summaryCards = [];
+      return;
+    }
+
+    const account = this.accountStateService.get();
+    this.setupBalanceCards(account);
     this.loadPartnerCard();
   }
 
@@ -98,8 +122,69 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
   trackBySummaryCard = (_index: number, card: SummaryCard): string =>
     `${card.label}-${card.isCurrency ? card.amount : card.value}`;
 
-  private loadPartnerCard(): void {
+  // ----------------------------------------
+  // Admin actions
+  // ----------------------------------------
+  onPartnerSearch(term: string): void {
+    if (!this.isAdmin) {
+      return;
+    }
+
+    this.errorMessage = '';
+    this.admin.search(term);
+  }
+
+  onPartnerSelected(item: TypeaheadItem | null): void {
+    if (!this.isAdmin) {
+      return;
+    }
+
+    const result: PartnerCardAdminSelectionResult = this.admin.select(item);
+    this.setupBalanceCards(result.partner ?? null);
+
+    if (result.error) {
+      this.groups = [];
+      this.groupViews = [];
+      this.errorMessage = result.error;
+      return;
+    }
+
+    if (!result.partnerId) {
+      this.groups = [];
+      this.groupViews = [];
+      this.errorMessage = '';
+      return;
+    }
+
+    this.errorMessage = '';
+    this.loadPartnerCard(result.partnerId);
+  }
+
+  private loadPartnerCard(partnerPpid?: number): void {
     this.loading = true;
+    this.errorMessage = '';
+    if (partnerPpid !== undefined) {
+      this.groups = [];
+      this.groupViews = [];
+      this.partnerService
+        .getPartnerCardAdmin(partnerPpid)
+        .pipe(
+          takeUntil(this.destroy$),
+          finalize(() => {
+            this.loading = false;
+          })
+        )
+        .subscribe({
+          next: (response: PartnerCardResponse) => {
+            this.handlePartnerCardResponse(response);
+          },
+          error: () => {
+            this.handlePartnerCardError();
+          }
+        });
+      return;
+    }
+
     this.partnerService
       .getPartnerCard()
       .pipe(
@@ -109,20 +194,23 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
         })
       )
       .subscribe({
-        next: (response: PartnerCardResponse) => {
-          this.groups = this.splitDocumentGroups(
-            this.normalizeGroups(response?.groups ?? [])
-          );
-          this.buildGroupViews();
-          this.errorMessage = '';
-        },
-        error: () => {
-          this.groups = [];
-          this.groupViews = [];
-          this.errorMessage =
-            'Kartica trenutno nije dostupna. Molimo pokušajte ponovo.';
-        }
+        next: (response: PartnerCardResponse) => this.handlePartnerCardResponse(response),
+        error: () => this.handlePartnerCardError()
       });
+  }
+
+  private handlePartnerCardResponse(response: PartnerCardResponse): void {
+    const normalized = this.normalizeGroups(response?.groups ?? []);
+    this.groups = this.splitDocumentGroups(normalized);
+    this.buildGroupViews();
+    this.errorMessage = '';
+  }
+
+  private handlePartnerCardError(): void {
+    this.groups = [];
+    this.groupViews = [];
+    this.errorMessage =
+      'Kartica trenutno nije dostupna. Molimo pokušajte ponovo.';
   }
 
   private normalizeGroups(groups: PartnerCardGroup[]): PartnerCardGroup[] {
@@ -138,9 +226,9 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
         stanje: this.asNumber(item.stanje)
       }));
 
-      const totalDuguje = this.firstValidNumber(group.totalDuguje, this.sum(items, 'duguje'));
-      const totalPotrazuje = this.firstValidNumber(group.totalPotrazuje, this.sum(items, 'potrazuje'));
-      const totalStanje = this.firstValidNumber(group.totalStanje, this.sum(items, 'stanje'));
+      const totalDuguje = this.firstValidNumber(group.totalDuguje, this.sumAmounts(items, 'duguje'));
+      const totalPotrazuje = this.firstValidNumber(group.totalPotrazuje, this.sumAmounts(items, 'potrazuje'));
+      const totalStanje = this.firstValidNumber(group.totalStanje, this.sumAmounts(items, 'stanje'));
       const normalizedGroupTip = this.normalizeString(group.tip) ?? this.findFirstType(items) ?? '';
 
       return {
@@ -183,9 +271,9 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
         result.push({
           tip: group.tip,
           displayTip: documentName,
-          totalDuguje: this.sum(documentItems, 'duguje'),
-          totalPotrazuje: this.sum(documentItems, 'potrazuje'),
-          totalStanje: this.sum(documentItems, 'stanje'),
+          totalDuguje: this.sumAmounts(documentItems, 'duguje'),
+          totalPotrazuje: this.sumAmounts(documentItems, 'potrazuje'),
+          totalStanje: this.sumAmounts(documentItems, 'stanje'),
           stavke: documentItems
         });
       });
@@ -198,13 +286,6 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
     view.pageIndex = event.pageIndex;
     view.pageSize = event.pageSize;
     this.updateGroupData(view);
-  }
-
-  private sum(
-    items: PartnerCardItem[],
-    field: keyof Pick<PartnerCardItem, 'duguje' | 'potrazuje' | 'stanje'>
-  ): number {
-    return items.reduce((acc, item) => acc + (item[field] ?? 0), 0);
   }
 
   private findFirstType(items: PartnerCardItem[]): string {
@@ -265,6 +346,13 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
     view.dataSource.data = items.slice(start, end);
   }
 
+  private sumAmounts(
+    items: PartnerCardItem[],
+    field: keyof Pick<PartnerCardItem, 'duguje' | 'potrazuje' | 'stanje'>
+  ): number {
+    return items.reduce((acc, item) => acc + (item[field] ?? 0), 0);
+  }
+
   private sortGroups(groups: PartnerCardGroup[]): PartnerCardGroup[] {
     const priority = (tip: string | undefined) => {
       const normalized = this.normalizeTipValue(tip);
@@ -308,37 +396,37 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
       .replace(/[\u0300-\u036f]/g, '');
   }
 
-  private setupBalanceCards(): void {
-    const account = this.accountStateService.get();
-
-    if (!account) {
+  private setupBalanceCards(
+    source?: Pick<Partner, 'naziv' | 'email' | 'stanje' | 'stanjeporoku'> | null
+  ): void {
+    if (!source) {
       this.summaryCards = [];
       return;
     }
 
     const cards: SummaryCard[] = [];
 
-    if (account.naziv) {
-      cards.push({ label: 'Partner', value: account.naziv, isCurrency: false });
+    if (source.naziv) {
+      cards.push({ label: 'Partner', value: source.naziv, isCurrency: false });
     }
 
-    if (account.email) {
-      cards.push({ label: 'Email', value: account.email, isCurrency: false });
+    if (source.email) {
+      cards.push({ label: 'Email', value: source.email, isCurrency: false });
     }
 
-    if (account.stanje !== undefined && account.stanje !== null) {
+    if (source.stanje !== undefined && source.stanje !== null) {
       cards.push({
         label: 'Stanje',
         isCurrency: true,
-        amount: account.stanje
+        amount: source.stanje
       });
     }
 
-    if (account.stanjeporoku !== undefined && account.stanjeporoku !== null) {
+    if (source.stanjeporoku !== undefined && source.stanjeporoku !== null) {
       cards.push({
         label: 'Van valute',
         isCurrency: true,
-        amount: account.stanjeporoku
+        amount: source.stanjeporoku
       });
     }
 
