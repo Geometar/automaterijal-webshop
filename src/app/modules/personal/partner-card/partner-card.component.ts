@@ -6,6 +6,7 @@ import { finalize, Subject, takeUntil } from 'rxjs';
 
 // Components
 import { AutomHeaderComponent } from '../../../shared/components/autom-header/autom-header.component';
+import { DividerComponent } from '../../../shared/components/divider/divider.component';
 import { SpinnerComponent } from '../../../shared/components/spinner/spinner.component';
 import { TableFlatComponent } from '../../../shared/components/table-flat/table-flat.component';
 
@@ -30,6 +31,7 @@ import { AccountStateService } from '../../../shared/service/state/account-state
 
 interface PartnerCardGroupView {
   data: PartnerCardGroup;
+  title: string;
   pageIndex: number;
   pageSize: number;
   pageSizeOptions: number[];
@@ -55,7 +57,7 @@ export const PartnerCardHeader: HeaderData = {
 @Component({
   selector: 'app-partner-card',
   standalone: true,
-  imports: [AutomHeaderComponent, CommonModule, SpinnerComponent, RsdCurrencyPipe, TableFlatComponent],
+  imports: [AutomHeaderComponent, CommonModule, SpinnerComponent, RsdCurrencyPipe, TableFlatComponent, DividerComponent],
   providers: [CurrencyPipe],
   templateUrl: './partner-card.component.html',
   styleUrl: './partner-card.component.scss',
@@ -91,7 +93,7 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
   }
 
   trackByGroup = (_index: number, view: PartnerCardGroupView): string =>
-    `${view.data.tip}-${_index}`;
+    `${view.title}-${_index}`;
 
   trackBySummaryCard = (_index: number, card: SummaryCard): string =>
     `${card.label}-${card.isCurrency ? card.amount : card.value}`;
@@ -108,7 +110,9 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (response: PartnerCardResponse) => {
-          this.groups = this.normalizeGroups(response?.groups ?? []);
+          this.groups = this.splitDocumentGroups(
+            this.normalizeGroups(response?.groups ?? [])
+          );
           this.buildGroupViews();
           this.errorMessage = '';
         },
@@ -137,15 +141,57 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
       const totalDuguje = this.firstValidNumber(group.totalDuguje, this.sum(items, 'duguje'));
       const totalPotrazuje = this.firstValidNumber(group.totalPotrazuje, this.sum(items, 'potrazuje'));
       const totalStanje = this.firstValidNumber(group.totalStanje, this.sum(items, 'stanje'));
+      const normalizedGroupTip = this.normalizeString(group.tip) ?? this.findFirstType(items) ?? '';
 
       return {
-        tip: group.tip ?? this.findFirstType(items),
+        tip: normalizedGroupTip,
+        displayTip: this.normalizeString(group.tip) ?? normalizedGroupTip,
         totalDuguje,
         totalPotrazuje,
         totalStanje,
         stavke: items
       };
     });
+  }
+
+  private splitDocumentGroups(groups: PartnerCardGroup[]): PartnerCardGroup[] {
+    const result: PartnerCardGroup[] = [];
+
+    groups.forEach((group) => {
+      if (!this.isDocumentGroup(group.tip)) {
+        result.push(group);
+        return;
+      }
+
+      const items = group.stavke ?? [];
+      if (!items.length) {
+        result.push(group);
+        return;
+      }
+
+      const itemsByDocument = new Map<string, PartnerCardItem[]>();
+
+      items.forEach((item) => {
+        const documentName = this.normalizeString(item.nazivDok) ?? 'Bez naziva';
+        if (!itemsByDocument.has(documentName)) {
+          itemsByDocument.set(documentName, []);
+        }
+        itemsByDocument.get(documentName)!.push(item);
+      });
+
+      itemsByDocument.forEach((documentItems, documentName) => {
+        result.push({
+          tip: group.tip,
+          displayTip: documentName,
+          totalDuguje: this.sum(documentItems, 'duguje'),
+          totalPotrazuje: this.sum(documentItems, 'potrazuje'),
+          totalStanje: this.sum(documentItems, 'stanje'),
+          stavke: documentItems
+        });
+      });
+    });
+
+    return result;
   }
 
   onGroupPageChange(view: PartnerCardGroupView, event: PageEvent): void {
@@ -200,6 +246,7 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
 
     return {
       data: group,
+      title: group.displayTip ?? group.tip ?? 'N/A',
       pageIndex: 0,
       pageSize: this.defaultPageSize,
       pageSizeOptions: this.pageSizeOptions,
@@ -241,7 +288,10 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
           return priorityDiff;
         }
 
-        return (a.tip ?? '').localeCompare(b.tip ?? '', undefined, {
+        const labelA = a.displayTip ?? a.tip ?? '';
+        const labelB = b.displayTip ?? b.tip ?? '';
+
+        return labelA.localeCompare(labelB, undefined, {
           sensitivity: 'base'
         });
       });

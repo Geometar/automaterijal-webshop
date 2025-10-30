@@ -11,6 +11,7 @@ export interface PartnerCardItem {
 
 export interface PartnerCardGroup {
   tip: string;
+  displayTip?: string;
   totalDuguje: number;
   totalPotrazuje: number;
   totalStanje: number;

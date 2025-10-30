@@ -154,20 +154,19 @@
                 <div class="email">
                   <span class="span">{{ account?.email }}</span>
                 </div>
-
               </div>
 
               <mat-divider></mat-divider>
               <button mat-menu-item routerLink="/partner-card">
                 <div class="menu-item-align">
                   <autom-icon [source]="iconEnum.CREDIT_CARD"></autom-icon>
-                  <span>Kartica partnera</span>
+                  <span>Kartica dokumenata</span>
                 </div>
               </button>
               <button mat-menu-item routerLink="/invoices">
                 <div class="menu-item-align">
                   <autom-icon [source]="iconEnum.BOOK"></autom-icon>
-                  <span>Porudzbenice</span>
+                  <span>Web Porudzbenice</span>
                 </div>
               </button>
 
@@ -278,9 +277,24 @@
     <span class="action-label">Korpa</span>
   </a>
 
-  <!-- Porudžbenice / Login -->
+  <!-- Dokumenta / Login -->
   <a
-    *ngIf="loggedIn"
+    *ngIf="loggedIn && !isAdmin"
+    class="action-btn"
+    routerLink="/partner-card"
+    href="/partner-card"
+    aria-label="Dokumenta"
+    [attr.aria-current]="currentUrl.includes('/partner-card') ? 'page' : null"
+  >
+    <autom-icon
+      [ngClass]="currentUrl.includes('/partner-card') ? 'icon-active' : null"
+      [color]="colorEnum.RICH_BLACK"
+      [source]="iconEnum.CREDIT_CARD"
+    ></autom-icon>
+    <span class="action-label">Dokumenta</span>
+  </a>
+  <a
+    *ngIf="loggedIn && isAdmin"
     class="action-btn"
     routerLink="/invoices"
     href="/invoices"
@@ -407,13 +421,24 @@
     </li>
     <li class="menu-category" *ngIf="loggedIn">
       <a
+        routerLink="/partner-card"
+        href="/partner-card"
+        [ngClass]="currentUrl.includes('/partner-card') ? 'nav-active' : null"
+        class="menu-title"
+        (click)="closeMobileSidebar()"
+      >
+        Kartica dokumenata
+      </a>
+    </li>
+    <li class="menu-category" *ngIf="loggedIn">
+      <a
         routerLink="/invoices"
         href="/invoices"
         [ngClass]="currentUrl.includes('/invoices') ? 'nav-active' : null"
         class="menu-title"
         (click)="closeMobileSidebar()"
       >
-        Porudžbenice
+        Web Porudžbenice
       </a>
     </li>
     <li class="menu-category" *ngIf="loggedIn">

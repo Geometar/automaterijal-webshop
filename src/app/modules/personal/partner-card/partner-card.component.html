@@ -4,10 +4,7 @@
     [headingLevel]="headingLevelEnum.H2"
   ></autom-header>
 
-  <div
-    *ngIf="summaryCards.length"
-    class="partner-card__summary"
-  >
+  <div *ngIf="summaryCards.length" class="partner-card__summary">
     <div
       class="partner-card__summary-card"
       *ngFor="let card of summaryCards; trackBy: trackBySummaryCard"
@@ -20,12 +17,9 @@
       <span
         class="value"
         [ngClass]="{ negative: card.isCurrency && (card.amount ?? 0) < 0 }"
-        >
-        {{ card.isCurrency
-          ? ((card.amount ?? 0) | rsdCurrency)
-          : card.value }}
-      </span
       >
+        {{ card.isCurrency ? (card.amount ?? 0 | rsdCurrency) : card.value }}
+      </span>
     </div>
   </div>
 
@@ -38,6 +32,7 @@
   </div>
 
   <ng-container *ngIf="!loading && !errorMessage">
+    <autom-divider></autom-divider>
     <div
       *ngIf="groupViews.length; else partnerCardEmpty"
       class="partner-card__groups"
@@ -51,7 +46,7 @@
       >
         <div class="partner-card__group-header">
           <div class="partner-card__group-title">
-            <h3>{{ groupView.data.tip || 'N/A' }}</h3>
+            <h3>{{ groupView.title }}</h3>
           </div>
         </div>
 

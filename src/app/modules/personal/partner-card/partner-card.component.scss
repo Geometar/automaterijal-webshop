@@ -159,8 +159,38 @@
     gap: 24px;
 
     &__summary {
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
       align-items: stretch;
+      padding: 8px 0;
+      background: transparent;
+      box-shadow: none;
+      gap: 12px;
+    }
+
+    &__summary-card {
+      min-width: unset;
+      width: 100%;
+      padding: 14px 16px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+      gap: 6px;
+      border-radius: 12px;
+
+      .label {
+        font-size: 11px;
+      }
+
+      .value {
+        font-size: 16px;
+
+        &.negative {
+          font-size: 16px;
+        }
+      }
+
+      &:first-child {
+        grid-column: 1 / -1;
+      }
     }
 
     &__group-header {
