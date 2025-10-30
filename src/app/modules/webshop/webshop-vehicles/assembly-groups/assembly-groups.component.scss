@@ -8,16 +8,51 @@
 
   .filter-icons {
     display: flex;
-    gap: 12px;
+    gap: 16px;
+
+    autom-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      border: 1px solid rgba(15, 23, 42, 0.12);
+      background: #ffffff;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease,
+        border-color 0.2s ease, background 0.2s ease;
+
+      .autom-icon {
+        width: 26px;
+        height: 26px;
+      }
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+      }
+    }
 
     autom-icon[aria-pressed='true'] {
-      filter: drop-shadow(0 6px 16px rgba(255, 168, 0, 0.35));
+      border-color: rgba(255, 168, 0, 0.65);
+      background: rgba(255, 168, 0, 0.12);
+      box-shadow: 0 8px 16px rgba(255, 168, 0, 0.22);
+
+      .autom-icon {
+        filter: drop-shadow(0 6px 16px rgba(255, 168, 0, 0.35));
+      }
     }
   }
 
   .filter-groups {
     flex: 1 1 340px;
     max-width: 480px;
+
+    .pre-icon {
+      transform: scale(1.12);
+      transform-origin: center;
+    }
   }
 }
 
