@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import {
   FormsModule,
   ReactiveFormsModule,
@@ -7,6 +7,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { catchError, finalize, Subject, takeUntil, throwError } from 'rxjs';
+import { CommonModule } from '@angular/common';
 
 // Automaterijal import
 import { AutomIconComponent } from '../../../shared/components/autom-icon/autom-icon.component';
@@ -31,11 +32,17 @@ import { Kontakt } from '../../../shared/data-models/model';
 // Service
 import { EmailService } from '../../../shared/service/email.service';
 import { SeoService } from '../../../shared/service/seo.service';
+import {
+  SnackbarHorizontalPosition,
+  SnackbarPosition,
+  SnackbarService
+} from '../../../shared/service/utils/snackbar.service';
 
 @Component({
   selector: 'app-kontakt',
   standalone: true,
   imports: [
+    CommonModule,
     AutomIconComponent,
     ButtonComponent,
     FormsModule,
@@ -53,8 +60,8 @@ export class KontaktComponent implements OnDestroy, OnInit {
   inputType = InputTypeEnum;
 
   // Misc
-  porukaJePoslata = false;
   ucitavanje = false;
+  renderForm = true;
 
   // Enums
   buttonThemes = ButtonThemes;
@@ -69,7 +76,9 @@ export class KontaktComponent implements OnDestroy, OnInit {
   constructor(
     private emailService: EmailService,
     private fb: UntypedFormBuilder,
-    private seoService: SeoService
+    private seoService: SeoService,
+    private snackbarService: SnackbarService,
+    private cdr: ChangeDetectorRef
   ) {
     this.kontaktForma = this.fb.group({
       ime: ['', Validators.required],
@@ -100,26 +109,52 @@ export class KontaktComponent implements OnDestroy, OnInit {
   }
 
   posaljiPoruku(): void {
+    if (this.ucitavanje || this.kontaktForma.invalid) {
+      return;
+    }
+
     this.ucitavanje = true;
 
     this.emailService
       .posaljiPoruku(this.napraviPoruku())
       .pipe(
         takeUntil(this.destroy$),
-        catchError((error: Response) => throwError(error)),
-        finalize(() => (this.ucitavanje = false))
+        finalize(() => {
+          this.ucitavanje = false;
+        }),
+        catchError((error: Response) => {
+          this.snackbarService.showError('Došlo je do greške. Pokušajte ponovo.');
+          return throwError(error);
+        })
       )
-      .subscribe((res) => { });
+      .subscribe(() => {
+        this.kontaktForma.reset();
+        this.kontaktForma.markAsPristine();
+        this.kontaktForma.markAsUntouched();
+        this.renderForm = false;
+        this.cdr.detectChanges();
+        setTimeout(() => {
+          this.renderForm = true;
+          this.cdr.detectChanges();
+        });
+        this.snackbarService.showAutoClose(
+          'Poruka je uspešno poslata.',
+          SnackbarPosition.TOP,
+          'U redu',
+          3500,
+          SnackbarHorizontalPosition.CENTER
+        );
+      });
   }
 
   private napraviPoruku(): Kontakt {
     return {
-      ime: this.kontaktForma.controls['ime'].value,
-      prezime: this.kontaktForma.controls['prezime'].value,
       firma: this.kontaktForma.controls['firma'].value,
-      tel: this.kontaktForma.controls['tel'].value,
-      email: this.kontaktForma.controls['email'].value,
+      ime: this.kontaktForma.controls['ime'].value,
       poruka: this.kontaktForma.controls['poruka'].value,
+      posta: this.kontaktForma.controls['email'].value,
+      prezime: this.kontaktForma.controls['prezime'].value,
+      telefon: this.kontaktForma.controls['tel'].value,
     } as Kontakt;
   }
 
