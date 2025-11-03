@@ -316,14 +316,10 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
       { key: 'nazivDok', header: 'Naziv dokumenta', type: CellType.TEXT },
       { key: 'brojDokumenta', header: 'Broj dokumenta', type: CellType.TEXT },
       { key: 'datum', header: 'Datum', type: CellType.DATE, dateFormat: 'dd.MM.yyyy' },
-      { key: 'datumRoka', header: 'Datum roka', type: CellType.DATE, dateFormat: 'dd.MM.yyyy' }
+      { key: 'datumRoka', header: 'Datum roka', type: CellType.DATE, dateFormat: 'dd.MM.yyyy' },
+      { key: 'duguje', header: 'Zaduženje', type: CellType.CURRENCY },
+      { key: 'potrazuje', header: 'Razduženje', type: CellType.CURRENCY }
     ];
-
-    if (isDocument) {
-      columns.push({ key: 'duguje', header: 'Iznos fakture', type: CellType.CURRENCY });
-    } else {
-      columns.push({ key: 'potrazuje', header: 'Uplata', type: CellType.CURRENCY });
-    }
 
     return {
       data: group,
