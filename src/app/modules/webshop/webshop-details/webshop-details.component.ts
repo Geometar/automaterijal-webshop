@@ -37,6 +37,7 @@ import {
   RobaBrojevi,
   RobaTehnickiOpis,
   TecDocDokumentacija,
+  TecDocLinkedManufacturer,
 } from '../../../shared/data-models/model/roba';
 import { Slika } from '../../../shared/data-models/model/slika';
 import { TooltipModel } from '../../../shared/data-models/interface';
@@ -141,6 +142,8 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   // Data
   documentKeys: string[] = [];
   oeNumbers: Map<string, string[]> = new Map();
+  linkedManufacturers: TecDocLinkedManufacturer[] = [];
+  private expandedManufacturers = new Set<number>();
   showcaseDataCategories: ShowcaseSection[] = [];
   showcaseDataManufactures: ShowcaseSection[] = [];
   youTubeIds: string[] = [];
@@ -268,6 +271,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     this.fillDocumentation();
     this.fillOeNumbers();
     this.prepareSpecs(this.data);
+    this.prepareLinkedManufacturers(this.data);
     this.setSanitizedText();
 
     const { idParam, url } = this.buildCanonical(this.data);
@@ -566,6 +570,33 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
+  prepareLinkedManufacturers(roba: Roba): void {
+    const dedup = new Map<number, TecDocLinkedManufacturer>();
+    this.expandedManufacturers.clear();
+
+    if (Array.isArray(roba?.linkedManufacturers)) {
+      roba.linkedManufacturers.forEach((candidate) => {
+        const rawId = Number((candidate as any)?.linkingTargetId);
+        const name = this.normalizeWhitespace((candidate as any)?.name);
+        if (!Number.isFinite(rawId) || !name) {
+          return;
+        }
+        if (!dedup.has(rawId)) {
+          dedup.set(rawId, { linkingTargetId: rawId, name });
+        }
+      });
+    }
+
+    const collator =
+      typeof Intl !== 'undefined'
+        ? new Intl.Collator('sr', { sensitivity: 'base' })
+        : null;
+
+    this.linkedManufacturers = Array.from(dedup.values()).sort((a, b) =>
+      collator ? collator.compare(a.name, b.name) : a.name.localeCompare(b.name)
+    );
+  }
+
   prepareSpecs(roba: Roba): void {
     const linkage = this.mapSpecs(roba.tdLinkageCriteria, 'linkage');
     const tehnicki = this.mapSpecs(roba.tehnickiOpis, 'tehnicki');
@@ -605,6 +636,23 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
 
   trackSpec(_: number, spec: SpecEntry): string {
     return spec.id;
+  }
+
+  trackManufacturer(_: number, manufacturer: TecDocLinkedManufacturer): number {
+    return manufacturer.linkingTargetId;
+  }
+
+  isManufacturerExpanded(manufacturer: TecDocLinkedManufacturer): boolean {
+    return this.expandedManufacturers.has(manufacturer.linkingTargetId);
+  }
+
+  toggleManufacturer(manufacturer: TecDocLinkedManufacturer): void {
+    const id = manufacturer.linkingTargetId;
+    if (this.expandedManufacturers.has(id)) {
+      this.expandedManufacturers.delete(id);
+    } else {
+      this.expandedManufacturers.add(id);
+    }
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -694,6 +742,35 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
 
   private normalizeWhitespace(v: string | undefined | null): string {
     return (v ?? '').replace(/\s+/g, ' ').trim();
+  }
+
+  private getLinkedManufacturersSnippet(limit: number = 6): string {
+    if (!this.linkedManufacturers?.length) {
+      return '';
+    }
+
+    const uniqueNames: string[] = [];
+    const seen = new Set<string>();
+    this.linkedManufacturers.forEach((manufacturer) => {
+      const name = this.normalizeWhitespace(manufacturer?.name);
+      if (!name) return;
+      const key = name.toLowerCase();
+      if (seen.has(key)) return;
+      seen.add(key);
+      uniqueNames.push(name);
+    });
+
+    if (!uniqueNames.length) {
+      return '';
+    }
+
+    const displayed = uniqueNames.slice(0, limit);
+    const remainder = uniqueNames.length - displayed.length;
+    let snippet = displayed.join(', ');
+    if (remainder > 0) {
+      snippet += ` i još ${remainder}`;
+    }
+    return snippet;
   }
 
   private copyShareLink(url: string, showMessage: boolean = true): void {
@@ -945,6 +1022,20 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
         value: joined.slice(0, 5000), // safety cutoff
       });
     }
+
+    if (this.linkedManufacturers.length > 0) {
+      const manufacturerList = this.linkedManufacturers
+        .map((m) => this.normalizeWhitespace(m.name))
+        .filter(Boolean)
+        .join(', ');
+      if (manufacturerList) {
+        props.push({
+          '@type': 'PropertyValue',
+          name: 'Kompatibilni proizvođači',
+          value: manufacturerList.slice(0, 5000),
+        });
+      }
+    }
     return props;
   }
 
@@ -1132,7 +1223,23 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       specsSnippet,
       `${brand} ${name} — rezervni deo. Brza isporuka i podrška.`,
     ].filter(Boolean) as string[];
-    const description = (descCandidates[0] || '').slice(0, 158);
+    let description =
+      descCandidates[0] ||
+      descCandidates[1] ||
+      descCandidates[2] ||
+      descCandidates[3] ||
+      '';
+    description = this.normalizeWhitespace(description);
+
+    const manufacturerSnippet = this.getLinkedManufacturersSnippet();
+    if (manufacturerSnippet) {
+      if (!description) {
+        description = `Kompatibilni proizvođači: ${manufacturerSnippet}.`;
+      } else if (description.length < 120) {
+        description = `${description.replace(/[.?!]+$/, '')}. Kompatibilni proizvođači: ${manufacturerSnippet}.`;
+      }
+    }
+    description = description.slice(0, 158);
 
     const { url } = this.buildCanonical(roba);
 

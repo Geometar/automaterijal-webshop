@@ -54,6 +54,11 @@ export interface TecDocDokumentacija {
   saniraniUrl?: string;
 }
 
+export interface TecDocLinkedManufacturer {
+  linkingTargetId: number;
+  name: string;
+}
+
 export class Magacin {
   categories?: object;
   proizvodjaci?: Manufacture[];
@@ -92,6 +97,7 @@ export class Roba {
   tehnickiOpis?: RobaTehnickiOpis[];
   tekst?: string;
   uKorpi = false;
+  linkedManufacturers?: TecDocLinkedManufacturer[];
 }
 
 export class CartItem {

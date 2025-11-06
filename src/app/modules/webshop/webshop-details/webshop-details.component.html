@@ -177,6 +177,62 @@
           </aside>
         </div>
       </article>
+
+      <section
+        *ngIf="linkedManufacturers.length"
+        class="manufacturer-section card"
+        aria-label="Kompatibilni proizvođači vozila"
+      >
+        <header class="manufacturer-header">
+          <div class="manufacturer-title-wrap">
+            <autom-icon
+              class="manufacturer-icon"
+              [source]="iconEnum.CAR"
+              aria-hidden="true"
+            ></autom-icon>
+            <div>
+              <h2 class="manufacturer-title">Kompatibilnost sa putničkim vozilima</h2>
+              <p class="manufacturer-subtitle">
+                TecDoc navodi sledeće proizvođače za koje je artikal kompatibilan.
+              </p>
+            </div>
+          </div>
+        </header>
+
+        <div class="manufacturer-accordion" role="list">
+          <article
+            class="manufacturer-panel"
+            *ngFor="let manufacturer of linkedManufacturers; trackBy: trackManufacturer"
+            role="listitem"
+            [class.expanded]="isManufacturerExpanded(manufacturer)"
+          >
+            <button
+              type="button"
+              class="manufacturer-toggle"
+              (click)="toggleManufacturer(manufacturer)"
+              [attr.aria-expanded]="isManufacturerExpanded(manufacturer)"
+              [attr.aria-controls]="'manufacturer-' + manufacturer.linkingTargetId"
+            >
+              <span class="manufacturer-toggle__indicator">
+                <span class="indicator-bar indicator-bar--vertical"></span>
+                <span class="indicator-bar indicator-bar--horizontal"></span>
+              </span>
+              <span class="manufacturer-toggle__label">
+                {{ manufacturer.name }}
+              </span>
+            </button>
+            <div
+              class="manufacturer-body"
+              *ngIf="isManufacturerExpanded(manufacturer)"
+              [id]="'manufacturer-' + manufacturer.linkingTargetId"
+            >
+              <p class="manufacturer-placeholder">
+                Modeli i motori za proizvođača <strong>{{ manufacturer.name }}</strong> dolaze u sledećem koraku.
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
     </div>
     <div
       *ngIf="documentKeys && documentKeys.length !== 0"
