@@ -1,0 +1,18 @@
+<section *ngIf="entries.length" class="product-container documentation">
+  <h3 class="oe-title">OE brojevi</h3>
+  <p class="oe-subtitle">
+    OE referentni brojevi koji su uporedivi sa originalnim brojem rezervnog dela:
+  </p>
+  <ul class="oe-grid" role="list">
+    <li *ngFor="let entry of entries">
+      <a
+        class="oe-item"
+        [routerLink]="['/webshop']"
+        [queryParams]="{ searchTerm: entry.code, filterBy: 'searchTerm' }"
+        [attr.href]="'/webshop?searchTerm=' + entry.code + '&filterBy=searchTerm'"
+      >
+        {{ entry.code }} - {{ entry.labels.join(', ') }}
+      </a>
+    </li>
+  </ul>
+</section>

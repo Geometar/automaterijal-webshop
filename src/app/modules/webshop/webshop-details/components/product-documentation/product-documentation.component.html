@@ -1,0 +1,67 @@
+<section
+  *ngIf="groups.length"
+  class="product-container documentation documentation--section"
+  aria-label="Dokumentacija proizvoda"
+>
+  <div *ngFor="let group of groups; trackBy: trackByTitle">
+    <h3 class="product-title">{{ group.title }}</h3>
+    <div class="util__flex--center autom-flex-wrap--column">
+      <ng-container *ngFor="let document of group.documents">
+        <div
+          class="documentation--section-padding"
+          *ngIf="document.docFileTypeName!.toUpperCase().indexOf('PDF') > -1"
+        >
+          <span (click)="openPdf.emit(document)">
+            <autom-icon
+              [tooltip]="pdfTooltip"
+              [source]="iconEnum.FILE_SEARCH"
+            ></autom-icon>
+          </span>
+        </div>
+      </ng-container>
+    </div>
+    <div class="util__flex--center autom-flex-wrap--column">
+      <ng-container *ngFor="let document of group.documents">
+        <div
+          class="youtube-wrapper documentation--section-padding"
+          *ngIf="
+            document.docFileTypeName!.toUpperCase().indexOf('URL') > -1 &&
+            document.docUrl?.includes('youtube')
+          "
+        >
+          <youtube-player [videoId]="document.saniraniUrl"></youtube-player>
+        </div>
+        <div
+          class="documentation--section-padding"
+          *ngIf="
+            document.docFileTypeName!.toUpperCase().indexOf('URL') > -1 &&
+            (document.docTypeId === 6 || document.docTypeId === 17)
+          "
+        >
+          <span (click)="openLink.emit(document)">
+            <autom-icon
+              [tooltip]="{ tooltipText: 'Link: ' + document.docUrl }"
+              [source]="iconEnum.LINK"
+            ></autom-icon>
+          </span>
+        </div>
+      </ng-container>
+    </div>
+    <div class="util__flex--center autom-flex-wrap--column">
+      <ng-container *ngFor="let document of group.documents">
+        <div
+          class="documentation--section-padding"
+          *ngIf="document.docFileTypeName!.toUpperCase().indexOf('JPEG') > -1"
+        >
+          <img
+            class="document-image"
+            [src]="document.dokument"
+            [attr.alt]="document.docFileTypeName || 'Dokumentacija'"
+            decoding="async"
+            loading="lazy"
+          />
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</section>
