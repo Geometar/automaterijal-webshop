@@ -38,6 +38,9 @@ import {
   RobaTehnickiOpis,
   TecDocDokumentacija,
   TecDocLinkedManufacturer,
+  TecDocLinkedManufacturerTargets,
+  TecDocLinkedModel,
+  TecDocLinkedVariant,
 } from '../../../shared/data-models/model/roba';
 import { Slika } from '../../../shared/data-models/model/slika';
 import { TooltipModel } from '../../../shared/data-models/interface';
@@ -142,8 +145,19 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   // Data
   documentKeys: string[] = [];
   oeNumbers: Map<string, string[]> = new Map();
-  linkedManufacturers: TecDocLinkedManufacturer[] = [];
+  flatManufacturers: TecDocLinkedManufacturer[] = [];
+  linkedTargets: TecDocLinkedManufacturerTargets[] = [];
+  linkedTargetsLoading = false;
+  private readonly collator: Intl.Collator | null =
+    typeof Intl !== 'undefined' ? new Intl.Collator('sr', { sensitivity: 'base' }) : null;
+  private manufacturerDetails = new Map<number, TecDocLinkedManufacturerTargets>();
+  private filteredDetails = new Map<number, TecDocLinkedManufacturerTargets>();
   private expandedManufacturers = new Set<number>();
+  private expandedModels = new Set<string>();
+  private detailedTargetsLoaded = false;
+  private requestedDetailedTargets = false;
+  compatibilitySearchTerm = '';
+  private displayedManufacturers: TecDocLinkedManufacturer[] = [];
   showcaseDataCategories: ShowcaseSection[] = [];
   showcaseDataManufactures: ShowcaseSection[] = [];
   youTubeIds: string[] = [];
@@ -265,13 +279,21 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   private handleProductLoad(response: Roba): void {
     this.pictureService.convertByteToImage(response);
 
+    this.manufacturerDetails.clear();
+    this.expandedManufacturers.clear();
+    this.expandedModels.clear();
+    this.detailedTargetsLoaded = false;
+    this.compatibilitySearchTerm = '';
+    this.requestedDetailedTargets = false;
+
     this.data = response;
     this.shareLink = this.buildShareLink(response);
     this.shareTitle = this.buildShareTitle(response);
     this.fillDocumentation();
     this.fillOeNumbers();
     this.prepareSpecs(this.data);
-    this.prepareLinkedManufacturers(this.data);
+    this.prepareLinkedTargets(this.data);
+    this.fetchLinkedTargets(this.data);
     this.setSanitizedText();
 
     const { idParam, url } = this.buildCanonical(this.data);
@@ -413,6 +435,41 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
             );
           }
         }
+      });
+  }
+
+  private fetchLinkedTargets(roba: Roba): void {
+    if (!Number.isFinite(Number(roba?.robaid)) || this.requestedDetailedTargets) {
+      return;
+    }
+
+    const id = Number(roba.robaid);
+    this.requestedDetailedTargets = true;
+    this.linkedTargetsLoading = true;
+
+    this.tecDocService
+      .getArticleLinkedTargets(id, 'VOLB')
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.linkedTargetsLoading = false;
+          this.requestedDetailedTargets = false;
+        })
+      )
+      .subscribe({
+        next: (targets: TecDocLinkedManufacturerTargets[]) => {
+          if (Array.isArray(targets) && targets.length) {
+            this.applyDetailedTargets(targets);
+            this.detailedTargetsLoaded = true;
+            this.updateSeoTags(this.data);
+          } else {
+            this.detailedTargetsLoaded = true;
+          }
+        },
+        error: (err) => {
+          console.error('getArticleLinkedTargets error', err);
+          this.detailedTargetsLoaded = false;
+        },
       });
   }
 
@@ -570,31 +627,411 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
-  prepareLinkedManufacturers(roba: Roba): void {
-    const dedup = new Map<number, TecDocLinkedManufacturer>();
-    this.expandedManufacturers.clear();
+  prepareLinkedTargets(roba: Roba): void {
+    const raw = Array.isArray(roba?.linkedManufacturers)
+      ? (roba.linkedManufacturers as TecDocLinkedManufacturer[])
+      : [];
 
-    if (Array.isArray(roba?.linkedManufacturers)) {
-      roba.linkedManufacturers.forEach((candidate) => {
-        const rawId = Number((candidate as any)?.linkingTargetId);
-        const name = this.normalizeWhitespace((candidate as any)?.name);
-        if (!Number.isFinite(rawId) || !name) {
-          return;
+    const collator = this.getCollator();
+
+    const unique = new Map<number, TecDocLinkedManufacturer>();
+    raw
+      .map((manufacturer) => {
+        const id = Number((manufacturer as any)?.linkingTargetId ?? Number.NaN);
+        const name = this.normalizeWhitespace((manufacturer as any)?.name ?? '');
+        if (!Number.isFinite(id) || !name) {
+          return null;
         }
-        if (!dedup.has(rawId)) {
-          dedup.set(rawId, { linkingTargetId: rawId, name });
-        }
-      });
+        return { linkingTargetId: id, name };
+      })
+      .filter((item): item is TecDocLinkedManufacturer => !!item)
+      .forEach((item) => unique.set(item.linkingTargetId, item));
+
+    this.flatManufacturers = Array.from(unique.values()).sort((a, b) => {
+      if (collator) {
+        return collator.compare(a.name, b.name);
+      }
+      return a.name.localeCompare(b.name);
+    });
+
+    this.filteredDetails.clear();
+    this.rebuildLinkedTargets();
+    this.handleSearchFilters(false);
+  }
+
+  get filteredManufacturers(): TecDocLinkedManufacturer[] {
+    return this.displayedManufacturers;
+  }
+
+  get manufacturerSearchSummary(): string {
+    return this.compatibilitySearchTerm.trim();
+  }
+
+  setCompatibilitySearch(term: any): void {
+    this.compatibilitySearchTerm =
+      typeof term === 'string' ? term : term != null ? String(term) : '';
+    this.handleSearchFilters();
+  }
+
+  onCompatibilityInput(raw: any): void {
+    if (raw && typeof raw === 'object' && 'target' in raw) {
+      const value = (raw.target as HTMLInputElement | null)?.value ?? '';
+      this.setCompatibilitySearch(value);
+    } else {
+      this.setCompatibilitySearch(raw);
+    }
+  }
+
+  private filterManufacturers(term: string): TecDocLinkedManufacturer[] {
+    const tokens = this.buildSearchTokens(term);
+    this.filteredDetails.clear();
+
+    if (!tokens.length) {
+      return this.flatManufacturers;
     }
 
-    const collator =
-      typeof Intl !== 'undefined'
-        ? new Intl.Collator('sr', { sensitivity: 'base' })
-        : null;
+    const result: TecDocLinkedManufacturer[] = [];
 
-    this.linkedManufacturers = Array.from(dedup.values()).sort((a, b) =>
-      collator ? collator.compare(a.name, b.name) : a.name.localeCompare(b.name)
+    this.flatManufacturers.forEach((manufacturer) => {
+      const id = Number(manufacturer.linkingTargetId ?? Number.NaN);
+      const detail = Number.isFinite(id) ? this.manufacturerDetails.get(id) : undefined;
+
+      if (detail) {
+        const filteredDetail = this.filterDetail(detail, tokens, manufacturer.name, id);
+        if (filteredDetail) {
+          const resolvedId = Number.isFinite(filteredDetail.manufacturerId ?? Number.NaN)
+            ? (filteredDetail.manufacturerId as number)
+            : id;
+          this.filteredDetails.set(resolvedId, {
+            ...filteredDetail,
+            manufacturerId: resolvedId,
+          });
+          result.push(manufacturer);
+        }
+      } else {
+        if (!tokens.length) {
+          result.push(manufacturer);
+          return;
+        }
+
+        const brandName = this.normalizeWhitespace(manufacturer.name).toLowerCase();
+        const canMatchBrand = tokens.every((token) => brandName.includes(token));
+
+        if (canMatchBrand || !this.detailedTargetsLoaded) {
+          result.push(manufacturer);
+        }
+      }
+    });
+
+    return result;
+  }
+
+  private handleSearchFilters(requestDetails: boolean = true): void {
+    const tokens = this.buildSearchTokens(this.compatibilitySearchTerm);
+
+    if (
+      requestDetails &&
+      tokens.length &&
+      !this.detailedTargetsLoaded &&
+      !this.requestedDetailedTargets
+    ) {
+      this.fetchLinkedTargets(this.data);
+    }
+
+    const filtered = tokens.length ? this.filterManufacturers(this.compatibilitySearchTerm) : this.flatManufacturers;
+    this.displayedManufacturers = filtered;
+    const hasFilter = tokens.length > 0;
+
+    if (hasFilter) {
+      const ids = new Set<number>();
+      const expandedModelKeys = new Set<string>();
+
+      filtered.forEach((item) => {
+        const id = Number(item.linkingTargetId ?? Number.NaN);
+        if (!Number.isFinite(id)) return;
+        ids.add(id);
+
+        const detail =
+          this.filteredDetails.get(id) ??
+          (this.manufacturerDetails.has(id)
+            ? this.filterDetail(this.manufacturerDetails.get(id)!, tokens, item.name, id)
+            : null);
+
+        if (!detail?.models) return;
+        detail.models.forEach((model) => {
+          const key = this.buildModelKey(id, model);
+          if (key) {
+            expandedModelKeys.add(key);
+          }
+        });
+      });
+
+      this.expandedManufacturers = ids;
+      this.expandedModels = expandedModelKeys;
+    } else {
+      this.filteredDetails.clear();
+      this.expandedManufacturers = new Set<number>();
+      this.expandedModels = new Set<string>();
+    }
+  }
+
+  private getCollator(): Intl.Collator | null {
+    return this.collator;
+  }
+
+  private filterDetail(
+    detail: TecDocLinkedManufacturerTargets | null,
+    tokens: string[],
+    manufacturerName: string,
+    manufacturerId?: number
+  ): TecDocLinkedManufacturerTargets | null {
+    if (!detail) {
+      return null;
+    }
+    if (!tokens.length) {
+      return detail;
+    }
+
+    const filteredModels: TecDocLinkedModel[] = [];
+    const models = Array.isArray(detail.models) ? detail.models : [];
+
+    models.forEach((model) => {
+      const variants = Array.isArray(model.variants) ? model.variants : [];
+      const filteredVariants = variants.filter((variant) =>
+        this.variantMatchesTokens(manufacturerName, model, variant, tokens)
+      );
+
+      if (filteredVariants.length) {
+        filteredModels.push({
+          ...model,
+          variants: filteredVariants,
+        });
+      }
+    });
+
+    if (!filteredModels.length) {
+      return null;
+    }
+
+    const resolvedIdCandidate = Number(detail.manufacturerId ?? manufacturerId ?? Number.NaN);
+    const resolvedId = Number.isFinite(resolvedIdCandidate) ? resolvedIdCandidate : manufacturerId;
+
+    return {
+      ...detail,
+      manufacturerId: resolvedId,
+      manufacturerName: detail.manufacturerName ?? manufacturerName,
+      models: filteredModels,
+    };
+  }
+
+  private variantMatchesTokens(
+    manufacturerName: string,
+    model: TecDocLinkedModel,
+    variant: TecDocLinkedVariant,
+    tokens: string[]
+  ): boolean {
+    const combined = [
+      this.normalizeWhitespace(manufacturerName).toLowerCase(),
+      this.normalizeWhitespace(model.modelName).toLowerCase(),
+      this.normalizeWhitespace(variant.engine).toLowerCase(),
+      this.normalizeWhitespace(variant.constructionType).toLowerCase(),
+      String(variant.cylinderCapacity ?? '').toLowerCase(),
+      this.formatCylinderCapacity(variant.cylinderCapacity).toLowerCase(),
+      this.formatNumericRange(variant.powerKwFrom, variant.powerKwTo, 'kW').toLowerCase(),
+      this.formatNumericRange(variant.powerHpFrom, variant.powerHpTo, 'KS').toLowerCase(),
+      this.formatProductionPeriod(variant).toLowerCase(),
+    ].join(' ');
+
+    return tokens.every((token) => combined.includes(token));
+  }
+
+  public getManufacturerDetailForDisplay(
+    manufacturer: TecDocLinkedManufacturer
+  ): TecDocLinkedManufacturerTargets | undefined {
+    const id = Number(manufacturer?.linkingTargetId ?? Number.NaN);
+    if (!Number.isFinite(id)) return undefined;
+    return this.filteredDetails.get(id) ?? this.manufacturerDetails.get(id);
+  }
+
+  private buildSearchTokens(term: string): string[] {
+    return term
+      .toLowerCase()
+      .split(/[\s,]+/)
+      .map((token) => token.trim())
+      .filter(Boolean);
+  }
+
+  private rebuildLinkedTargets(): void {
+    const ordered: TecDocLinkedManufacturerTargets[] = [];
+    const seen = new Set<number>();
+
+    this.flatManufacturers.forEach((manufacturer) => {
+      const id = Number(manufacturer.linkingTargetId ?? Number.NaN);
+      if (!Number.isFinite(id)) {
+        return;
+      }
+      seen.add(id);
+      const detailed = this.manufacturerDetails.get(id);
+      if (detailed) {
+        const ensured =
+          detailed.manufacturerName && detailed.manufacturerName.trim().length
+            ? detailed
+            : {
+                ...detailed,
+                manufacturerName: manufacturer.name,
+              };
+        if (ensured !== detailed) {
+          this.manufacturerDetails.set(id, ensured);
+        }
+        ordered.push(ensured);
+      } else {
+        ordered.push({
+          manufacturerId: id,
+          manufacturerName: manufacturer.name,
+          models: [],
+        });
+      }
+    });
+
+    const extras: TecDocLinkedManufacturerTargets[] = [];
+    this.manufacturerDetails.forEach((detail, id) => {
+      if (!seen.has(id)) {
+        const name = this.normalizeWhitespace(detail.manufacturerName);
+        if (!name) {
+          return;
+        }
+        extras.push({
+          ...detail,
+          manufacturerName: name,
+        });
+      }
+    });
+
+    if (extras.length) {
+      extras.sort((a, b) => {
+        const nameA = this.normalizeWhitespace(a.manufacturerName);
+        const nameB = this.normalizeWhitespace(b.manufacturerName);
+        if (this.collator) {
+          return this.collator.compare(nameA, nameB);
+        }
+        return nameA.localeCompare(nameB);
+      });
+      ordered.push(...extras);
+    }
+
+    this.linkedTargets = ordered;
+    this.handleSearchFilters(false);
+  }
+
+  private applyDetailedTargets(targets: TecDocLinkedManufacturerTargets[]): void {
+    targets.forEach((target) => {
+      const normalized = this.normalizeDetailedTarget(target);
+      if (!normalized || !Number.isFinite(normalized.manufacturerId ?? Number.NaN)) {
+        return;
+      }
+      this.manufacturerDetails.set(normalized.manufacturerId as number, normalized);
+    });
+
+    this.rebuildLinkedTargets();
+    this.handleSearchFilters(false);
+  }
+
+  private normalizeDetailedTarget(
+    target: TecDocLinkedManufacturerTargets | undefined | null
+  ): TecDocLinkedManufacturerTargets | null {
+    if (!target) {
+      return null;
+    }
+    const manufacturerId = Number(
+      (target as any)?.manufacturerId ?? (target as any)?.linkingTargetId ?? Number.NaN
     );
+    const manufacturerName = this.normalizeWhitespace(
+      (target as any)?.manufacturerName ?? (target as any)?.name ?? ''
+    );
+    if (!Number.isFinite(manufacturerId) || !manufacturerName) {
+      return null;
+    }
+
+    const models = Array.isArray(target.models) ? target.models : [];
+    const normalizedModels: TecDocLinkedModel[] = models
+      .map((model) => {
+        const modelName = this.normalizeWhitespace((model as any)?.modelName ?? '');
+        if (!modelName) {
+          return null;
+        }
+        const modelId = Number((model as any)?.modelId ?? Number.NaN);
+        const variants = Array.isArray(model.variants) ? model.variants : [];
+        const normalizedVariants = variants
+          .map((variant) => this.normalizeVariant(variant))
+          .filter((variant): variant is TecDocLinkedVariant => !!variant)
+          .sort((a, b) => {
+            const fromA = Number(a.productionYearFrom ?? 0);
+            const fromB = Number(b.productionYearFrom ?? 0);
+            if (fromA && fromB && fromA !== fromB) {
+              return fromA - fromB;
+            }
+            const engineA = this.normalizeWhitespace(a.engine);
+            const engineB = this.normalizeWhitespace(b.engine);
+            if (!engineA && !engineB) return 0;
+            if (!engineA) return 1;
+            if (!engineB) return -1;
+            if (this.collator) {
+              return this.collator.compare(engineA, engineB);
+            }
+            return engineA.localeCompare(engineB);
+          });
+
+        return {
+          modelId: Number.isFinite(modelId) ? modelId : undefined,
+          modelName,
+          variants: normalizedVariants,
+        } as TecDocLinkedModel;
+      })
+      .filter((model): model is TecDocLinkedModel => !!model)
+      .sort((a, b) => {
+        const nameA = this.normalizeWhitespace(a.modelName ?? '');
+        const nameB = this.normalizeWhitespace(b.modelName ?? '');
+        if (this.collator) {
+          return this.collator.compare(nameA, nameB);
+        }
+        return nameA.localeCompare(nameB);
+      });
+
+    return {
+      manufacturerId,
+      manufacturerName,
+      models: normalizedModels,
+    };
+  }
+
+  private normalizeVariant(
+    variant: TecDocLinkedVariant | undefined | null
+  ): TecDocLinkedVariant | null {
+    if (!variant) {
+      return null;
+    }
+    const engine = this.normalizeWhitespace((variant as any)?.engine ?? '');
+    const constructionType = this.normalizeWhitespace((variant as any)?.constructionType ?? '');
+    const hasEngine = !!engine;
+    const hasYears =
+      Number.isFinite(variant?.productionYearFrom) || Number.isFinite(variant?.productionYearTo);
+    const hasCapacity = Number.isFinite(variant?.cylinderCapacity);
+    const hasPower =
+      Number.isFinite(variant?.powerKwFrom) ||
+      Number.isFinite(variant?.powerKwTo) ||
+      Number.isFinite(variant?.powerHpFrom) ||
+      Number.isFinite(variant?.powerHpTo);
+    const hasBody = !!constructionType;
+
+    if (!(hasEngine || hasYears || hasCapacity || hasPower || hasBody)) {
+      return null;
+    }
+
+    return {
+      ...variant,
+      engine: engine || undefined,
+      constructionType: constructionType || undefined,
+    };
   }
 
   prepareSpecs(roba: Roba): void {
@@ -638,22 +1075,85 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     return spec.id;
   }
 
-  trackManufacturer(_: number, manufacturer: TecDocLinkedManufacturer): number {
-    return manufacturer.linkingTargetId;
-  }
+  public trackManufacturer = (_: number, manufacturer: TecDocLinkedManufacturer): number => {
+    return Number(manufacturer?.linkingTargetId ?? 0);
+  };
 
-  isManufacturerExpanded(manufacturer: TecDocLinkedManufacturer): boolean {
-    return this.expandedManufacturers.has(manufacturer.linkingTargetId);
-  }
+  public trackModel = (_: number, model: TecDocLinkedModel): string | number => {
+    const id = Number(model?.modelId ?? Number.NaN);
+    if (Number.isFinite(id)) {
+      return id;
+    }
+    return this.normalizeWhitespace(model?.modelName ?? '');
+  };
 
-  toggleManufacturer(manufacturer: TecDocLinkedManufacturer): void {
-    const id = manufacturer.linkingTargetId;
+  public isManufacturerExpanded = (manufacturer: TecDocLinkedManufacturer): boolean => {
+    const id = Number(manufacturer?.linkingTargetId ?? Number.NaN);
+    return Number.isFinite(id) && this.expandedManufacturers.has(id);
+  };
+
+  public toggleManufacturer = (manufacturer: TecDocLinkedManufacturer): void => {
+    const id = Number(manufacturer?.linkingTargetId ?? Number.NaN);
+    if (!Number.isFinite(id)) return;
     if (this.expandedManufacturers.has(id)) {
       this.expandedManufacturers.delete(id);
+      this.collapseModelsForManufacturer(id);
     } else {
       this.expandedManufacturers.add(id);
+      if (!this.detailedTargetsLoaded && !this.linkedTargetsLoading && !this.requestedDetailedTargets) {
+        this.fetchLinkedTargets(this.data);
+      }
     }
+  };
+
+  public isModelExpanded = (manufacturerId: number, model: TecDocLinkedModel): boolean => {
+    const key = this.buildModelKey(manufacturerId, model);
+    return key ? this.expandedModels.has(key) : false;
+  };
+
+  public toggleModel = (manufacturerId: number, model: TecDocLinkedModel): void => {
+    const key = this.buildModelKey(manufacturerId, model);
+    if (!key) return;
+    if (this.expandedModels.has(key)) {
+      this.expandedModels.delete(key);
+    } else {
+      this.expandedModels.add(key);
+    }
+  };
+
+  private buildModelKey(manufacturerId: number, model: TecDocLinkedModel): string {
+    if (!Number.isFinite(manufacturerId)) return '';
+    const modelId = Number(model?.modelId ?? Number.NaN);
+    if (Number.isFinite(modelId)) {
+      return `${manufacturerId}:model-${modelId}`;
+    }
+    const modelName = this.normalizeWhitespace(model?.modelName);
+    return modelName ? `${manufacturerId}:model-${modelName.toLowerCase()}` : '';
   }
+
+  private collapseModelsForManufacturer(manufacturerId: number): void {
+    const prefix = `${manufacturerId}:model-`;
+    Array.from(this.expandedModels)
+      .filter((key) => key.startsWith(prefix))
+      .forEach((key) => this.expandedModels.delete(key));
+  }
+
+  public getManufacturerPanelId = (manufacturer: TecDocLinkedManufacturer, index: number): string => {
+    const id = Number(manufacturer?.linkingTargetId ?? Number.NaN);
+    if (Number.isFinite(id)) {
+      return `manufacturer-${id}`;
+    }
+    const name = this.normalizeWhitespace(manufacturer?.name);
+    return name ? `manufacturer-${name.toLowerCase().replace(/[^a-z0-9_-]/g, '-')}` : `manufacturer-${index}`;
+  };
+
+  public getModelPanelId = (manufacturerId: number, model: TecDocLinkedModel, index: number): string => {
+    const rawKey = this.buildModelKey(manufacturerId, model);
+    if (rawKey) {
+      return rawKey.replace(/[^a-zA-Z0-9_-]/g, '-');
+    }
+    return `model-panel-${manufacturerId}-${index}`;
+  };
 
   // ─────────────────────────────────────────────────────────────────────────────
   // Cart / quantity
@@ -745,14 +1245,14 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   }
 
   private getLinkedManufacturersSnippet(limit: number = 6): string {
-    if (!this.linkedManufacturers?.length) {
+    if (!this.linkedTargets?.length) {
       return '';
     }
 
     const uniqueNames: string[] = [];
     const seen = new Set<string>();
-    this.linkedManufacturers.forEach((manufacturer) => {
-      const name = this.normalizeWhitespace(manufacturer?.name);
+    this.linkedTargets.forEach((manufacturer) => {
+      const name = this.normalizeWhitespace(manufacturer?.manufacturerName);
       if (!name) return;
       const key = name.toLowerCase();
       if (seen.has(key)) return;
@@ -771,6 +1271,74 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       snippet += ` i još ${remainder}`;
     }
     return snippet;
+  }
+
+  public formatVariantPower(variant: TecDocLinkedVariant): string {
+    const kw = this.formatNumericRange(variant.powerKwFrom, variant.powerKwTo, 'kW');
+    const hp = this.formatNumericRange(variant.powerHpFrom, variant.powerHpTo, 'KS');
+    if (kw && hp) {
+      return `${kw} / ${hp}`;
+    }
+    return kw || hp || '—';
+  }
+
+  public formatCylinderCapacity(value?: number | null): string {
+    if (!Number.isFinite(value ?? NaN)) return '—';
+    const formatter =
+      typeof Intl !== 'undefined'
+        ? new Intl.NumberFormat('sr-RS')
+        : { format: (v: number) => String(v) };
+    return `${formatter.format(Number(value))} cm³`;
+  }
+
+  public formatProductionPeriod(variant: TecDocLinkedVariant): string {
+    const from = this.formatYearMonth(variant.productionYearFrom);
+    const to = this.formatYearMonth(variant.productionYearTo);
+    if (from && to) {
+      if (from === to) return from;
+      return `${from} – ${to}`;
+    }
+    if (from) return `od ${from}`;
+    if (to) return `do ${to}`;
+    return '—';
+  }
+
+  private formatYearMonth(value?: number | null): string {
+    if (!Number.isFinite(value ?? NaN)) return '';
+    const raw = String(value ?? '').trim();
+    if (!raw) return '';
+    if (raw.length === 4) {
+      return raw;
+    }
+    const padded = raw.padStart(6, '0');
+    const year = padded.slice(0, 4);
+    const month = padded.slice(4, 6);
+    if (month === '00') {
+      return year;
+    }
+    return `${month}/${year}`;
+  }
+
+  private formatNumericRange(
+    from?: number | null,
+    to?: number | null,
+    unit?: string
+  ): string {
+    const start = Number(from ?? NaN);
+    const end = Number(to ?? NaN);
+    const hasStart = Number.isFinite(start);
+    const hasEnd = Number.isFinite(end);
+    if (!hasStart && !hasEnd) return '';
+    const unitSuffix = unit ? ` ${unit}` : '';
+    if (hasStart && hasEnd) {
+      if (start === end) {
+        return `${start}${unitSuffix}`;
+      }
+      return `${Math.min(start, end)} – ${Math.max(start, end)}${unitSuffix}`;
+    }
+    if (hasStart) return `od ${start}${unitSuffix}`;
+    if (hasEnd) return `do ${end}${unitSuffix}`;
+    return '';
   }
 
   private copyShareLink(url: string, showMessage: boolean = true): void {
@@ -1023,9 +1591,9 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       });
     }
 
-    if (this.linkedManufacturers.length > 0) {
-      const manufacturerList = this.linkedManufacturers
-        .map((m) => this.normalizeWhitespace(m.name))
+    if (this.linkedTargets.length > 0) {
+      const manufacturerList = this.linkedTargets
+        .map((m) => this.normalizeWhitespace(m.manufacturerName))
         .filter(Boolean)
         .join(', ');
       if (manufacturerList) {

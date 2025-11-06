@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
 
 // Data models
 import { AssemblyGroupDetails, TDManufacture, TDModels, TDVehicleDetails } from '../data-models/model/tecdoc';
-import { Filter, Magacin } from '../data-models/model/roba';
+import { Filter, Magacin, TecDocLinkedManufacturerTargets } from '../data-models/model/roba';
 
 // Services
 import { ServiceHelpersService } from './utils/service-helpers.service';
@@ -110,6 +110,20 @@ export class TecdocService {
 
     return this.http
       .get<Magacin>(fullUrl + parametersString)
+      .pipe(catchError((error: any) => throwError(() => new Error(error))));
+  }
+
+  public getArticleLinkedTargets(
+    robaId: number,
+    linkingTargetType: string = 'VOLB'
+  ): Observable<TecDocLinkedManufacturerTargets[]> {
+    const url = `${DOMAIN_URL}/articles/${robaId}/linked-targets`;
+    const parameterObject: Record<string, unknown> = {
+      linkingTargetType,
+    };
+    const parametersString = this.helperService.formatQueryParameters(parameterObject);
+    return this.http
+      .get<TecDocLinkedManufacturerTargets[]>(url + parametersString)
       .pipe(catchError((error: any) => throwError(() => new Error(error))));
   }
 }

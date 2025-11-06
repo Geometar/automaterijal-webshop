@@ -53,10 +53,36 @@ export interface TecDocDokumentacija {
   dokument?: string | null;
   saniraniUrl?: string;
 }
-
 export interface TecDocLinkedManufacturer {
   linkingTargetId: number;
   name: string;
+}
+
+export interface TecDocLinkedVariant {
+  articleLinkId?: number;
+  linkingTargetId?: number;
+  carId?: number;
+  engine?: string;
+  constructionType?: string;
+  powerKwFrom?: number;
+  powerKwTo?: number;
+  powerHpFrom?: number;
+  powerHpTo?: number;
+  cylinderCapacity?: number;
+  productionYearFrom?: number;
+  productionYearTo?: number;
+}
+
+export interface TecDocLinkedModel {
+  modelId?: number;
+  modelName?: string;
+  variants?: TecDocLinkedVariant[];
+}
+
+export interface TecDocLinkedManufacturerTargets {
+  manufacturerId?: number;
+  manufacturerName?: string;
+  models?: TecDocLinkedModel[];
 }
 
 export class Magacin {
