@@ -248,6 +248,27 @@
     color: var(--text-800, #1f2937);
   }
 
+  .variant-action {
+    text-align: right;
+
+    .variant-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      color: var(--bittersweet);
+      text-decoration: none;
+      transition: color 0.2s ease;
+
+      &:hover,
+      &:focus-visible {
+        color: var(--text-900);
+        text-decoration: underline;
+        outline: none;
+      }
+    }
+  }
+
   .model-placeholder {
     margin: 12px 0 0;
     font-size: 13px;
@@ -285,6 +306,11 @@
       padding: 10px 14px;
       position: relative;
       padding-left: 110px;
+    }
+
+    .variant-action {
+      text-align: left;
+      padding-left: 14px;
     }
 
     .variant-table td:last-child {

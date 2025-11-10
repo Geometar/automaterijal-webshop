@@ -9,9 +9,13 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { Subject, finalize, takeUntil } from 'rxjs';
+import { RouterModule } from '@angular/router';
+
+// Autom imports
 import { InputFieldsComponent } from '../../../../../shared/components/input-fields/input-fields.component';
 import { AutomIconComponent } from '../../../../../shared/components/autom-icon/autom-icon.component';
-import { InputTypeEnum } from '../../../../../shared/data-models/enums';
+
+// Data Models
 import {
   TecDocLinkedManufacturer,
   TecDocLinkedManufacturerTargets,
@@ -19,13 +23,18 @@ import {
   TecDocLinkedVariant,
   Roba,
 } from '../../../../../shared/data-models/model/roba';
-import { TecdocService } from '../../../../../shared/service/tecdoc.service';
+
+// Enums
 import { IconsEnum } from '../../../../../shared/data-models/enums/icons.enum';
+import { InputTypeEnum } from '../../../../../shared/data-models/enums';
+
+// Service
+import { TecdocService } from '../../../../../shared/service/tecdoc.service';
 
 @Component({
   selector: 'app-vehicle-compatibility',
   standalone: true,
-  imports: [CommonModule, InputFieldsComponent, AutomIconComponent],
+  imports: [CommonModule, RouterModule, InputFieldsComponent, AutomIconComponent],
   templateUrl: './vehicle-compatibility.component.html',
   styleUrls: ['./vehicle-compatibility.component.scss'],
 })
@@ -613,6 +622,27 @@ export class VehicleCompatibilityComponent implements OnChanges, OnDestroy {
     if (hasStart) return `od ${start}${unitSuffix}`;
     if (hasEnd) return `do ${end}${unitSuffix}`;
     return '';
+  }
+
+  getVehicleQueryParams(variant: TecDocLinkedVariant | undefined | null): {
+    tecdocType: string;
+    tecdocId: number;
+  } | null {
+    if (!variant) {
+      return null;
+    }
+    const tecdocId = Number(
+      (variant as any)?.linkingTargetId ??
+      (variant as any)?.carId ??
+      Number.NaN
+    );
+    if (!Number.isFinite(tecdocId)) {
+      return null;
+    }
+    return {
+      tecdocType: 'P',
+      tecdocId,
+    };
   }
 
   private buildModelKey(manufacturerId: number, model: TecDocLinkedModel): string {

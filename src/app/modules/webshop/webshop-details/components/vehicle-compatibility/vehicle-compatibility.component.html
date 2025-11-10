@@ -107,6 +107,7 @@
                         <th scope="col">Snaga</th>
                         <th scope="col">Zapremina</th>
                         <th scope="col">Proizvodnja</th>
+                        <th scope="col">Pronađi</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -123,6 +124,17 @@
                         </td>
                         <td data-title="Proizvodnja">
                           {{ formatProductionPeriod(variant) }}
+                        </td>
+                        <td data-title="Pronađi" class="variant-action">
+                          <ng-container *ngIf="getVehicleQueryParams(variant) as query; else vehicleNoLink">
+                            <a
+                              class="variant-link"
+                              [routerLink]="['/webshop']"
+                              [queryParams]="query"
+                            >
+                              Pogledaj
+                            </a>
+                          </ng-container>
                         </td>
                       </tr>
                     </tbody>
@@ -189,3 +201,7 @@
     </ng-template>
   </ng-template>
 </section>
+
+<ng-template #vehicleNoLink>
+  <span>—</span>
+</ng-template>
