@@ -105,11 +105,12 @@
       align-items: center;
       gap: 8px;
       margin: 0;
-      font-size: 1.05rem;
-      font-weight: 700;
+      font-size: 1.15rem !important;
+      font-weight: 700 !important;
       color: var(--figma-grey-900);
       cursor: pointer;
       transition: color 0.2s ease;
+      line-height: 1.35;
 
       &:hover {
         color: var(--figma-accent-yellow-700);
@@ -123,7 +124,7 @@
 
   .card-body {
     flex: 1 1 auto;
-    font-size: 0.97rem;
+    font-size: 0.9rem;
     color: var(--figma-grey-800);
   }
 
