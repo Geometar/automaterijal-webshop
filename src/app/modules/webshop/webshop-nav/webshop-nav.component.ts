@@ -128,25 +128,14 @@ export class WebshopNavComponent implements OnChanges {
     this.searchTerm = searchTerm?.value ? searchTerm?.value.trim() : '';
 
     if (this.searchTerm) {
-      const hasGroups = this.urlHelperService.hasQueryParam('grupe');
-      const hasManufacturers = this.urlHelperService.hasQueryParam('mandatoryproid');
-      const hasSubgroups = this.urlHelperService.hasQueryParam('podgrupe');
-      if (
-        !hasManufacturers &&
-        !hasGroups &&
-        !hasSubgroups
-      ) {
-        this.urlHelperService.setQueryParams({
+      this.urlHelperService.navigateTo(['/webshop'], {
+        queryParams: {
           searchTerm: this.searchTerm,
           filterBy: WebshopPrimaryFilter.SearchTerm,
-        });
-      } else {
-        this.urlHelperService.addOrUpdateQueryParams({
-          searchTerm: this.searchTerm,
-        });
-      }
+        },
+      });
     } else {
-      this.urlHelperService.clearQueryParams();
+      this.urlHelperService.clearWebshopFilters();
     }
   }
 

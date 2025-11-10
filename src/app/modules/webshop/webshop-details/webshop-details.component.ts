@@ -37,10 +37,14 @@ import {
   RobaBrojevi,
   RobaTehnickiOpis,
   TecDocDokumentacija,
+  TecDocLinkedManufacturerTargets,
 } from '../../../shared/data-models/model/roba';
 import { Slika } from '../../../shared/data-models/model/slika';
 import { TooltipModel } from '../../../shared/data-models/interface';
 import { ShowcaseComponent, ShowcaseSection } from '../../../shared/components/showcase/showcase.component';
+import { VehicleCompatibilityComponent } from './components/vehicle-compatibility/vehicle-compatibility.component';
+import { ProductDocumentationComponent, DocumentationGroup } from './components/product-documentation/product-documentation.component';
+import { ProductOeNumbersComponent, OeNumberEntry } from './components/product-oe-numbers/product-oe-numbers.component';
 
 // Autom Components
 import { AddAttributesComponent } from './add-atributes/add-atributes.component';
@@ -53,7 +57,6 @@ import { PopupComponent } from '../../../shared/components/popup/popup.component
 import { RsdCurrencyPipe } from '../../../shared/pipe/rsd-currency.pipe';
 import { SpinnerComponent } from '../../../shared/components/spinner/spinner.component';
 import { TextAreaComponent } from '../../../shared/components/text-area/text-area.component';
-import { YouTubePlayer } from '@angular/youtube-player';
 
 // Services
 import { AccountStateService } from '../../../shared/service/state/account-state.service';
@@ -63,8 +66,8 @@ import { environment } from '../../../../environment/environment';
 import { PictureService, ProductImageMeta } from '../../../shared/service/utils/picture.service';
 import { RobaService } from '../../../shared/service/roba.service';
 import { SeoService } from '../../../shared/service/seo.service';
-import { SnackbarService } from '../../../shared/service/utils/snackbar.service';
 import { TecdocService } from '../../../shared/service/tecdoc.service';
+import { SnackbarService } from '../../../shared/service/utils/snackbar.service';
 import { UrlHelperService } from '../../../shared/service/utils/url-helper.service';
 
 // Utils
@@ -88,13 +91,15 @@ interface SpecEntry {
     AutomIconComponent,
     ButtonComponent,
     CommonModule,
+    VehicleCompatibilityComponent,
+    ProductDocumentationComponent,
+    ProductOeNumbersComponent,
     InputFieldsComponent,
     PopupComponent,
     RouterLink,
     RsdCurrencyPipe,
     SpinnerComponent,
     TextAreaComponent,
-    YouTubePlayer,
     DividerComponent,
     ShowcaseComponent
   ],
@@ -130,7 +135,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   readonly skeletonRows = Array.from({ length: 5 });
 
   // Tooltip
-  pdfToolTip: TooltipModel = {
+  pdfTooltip: TooltipModel = {
     position: TooltipPositionEnum.TOP,
     subPosition: TooltipSubPositionsEnum.SUB_CENTER,
     theme: TooltipThemeEnum.DARK,
@@ -139,8 +144,9 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   };
 
   // Data
-  documentKeys: string[] = [];
-  oeNumbers: Map<string, string[]> = new Map();
+  documentationGroups: DocumentationGroup[] = [];
+  oeNumberEntries: OeNumberEntry[] = [];
+  linkedTargets: TecDocLinkedManufacturerTargets[] = [];
   showcaseDataCategories: ShowcaseSection[] = [];
   showcaseDataManufactures: ShowcaseSection[] = [];
   youTubeIds: string[] = [];
@@ -187,9 +193,9 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private sanitizer: DomSanitizer,
     private seoService: SeoService,
+    private tecDocService: TecdocService,
     private transferState: TransferState,
     private snackbarService: SnackbarService,
-    private tecDocService: TecdocService,
     private urlHelperService: UrlHelperService,
     private analytics: AnalyticsService,
     @Inject(PLATFORM_ID) private platformId: Object,
@@ -268,6 +274,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     this.fillDocumentation();
     this.fillOeNumbers();
     this.prepareSpecs(this.data);
+    this.initializeLinkedTargets(this.data);
     this.setSanitizedText();
 
     const { idParam, url } = this.buildCanonical(this.data);
@@ -522,48 +529,107 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   // Mappers
   // ─────────────────────────────────────────────────────────────────────────────
 
-  fillDocumentation() {
-    this.documentKeys = [];
+  fillDocumentation(): void {
+    this.documentationGroups = [];
     this.youTubeIds = [];
 
-    if (!this.data.dokumentacija) return;
+    if (!this.data.dokumentacija) {
+      return;
+    }
 
-    for (const [key, docs] of Object.entries(this.data.dokumentacija)) {
-      this.documentKeys.push(key);
-      (docs as TecDocDokumentacija[]).forEach((value) => {
-        // capture YouTube IDs for VideoObject
-        if (
-          value.docFileTypeName?.toUpperCase().includes('URL') &&
-          value.docUrl
-        ) {
+    const groups: DocumentationGroup[] = [];
+
+    for (const [title, docs] of Object.entries(this.data.dokumentacija)) {
+      const documents = (docs as TecDocDokumentacija[]).map((value) => {
+        if (value.docFileTypeName?.toUpperCase().includes('URL') && value.docUrl) {
           const m = value.docUrl.match(
             /(?:youtube(?:-nocookie)?\.com\/embed\/|youtube\.com\/watch\?v=|youtu\.be\/)([^&?]+)/
           );
           if (m && m[1]) {
             this.youTubeIds.push(m[1]);
             value.saniraniUrl = m[1];
-          };
+          }
         }
-        // convert JPEG bytes for inline display
-        if (
-          value.docFileTypeName?.toUpperCase().includes('JPEG') &&
-          value.dokument
-        ) {
+
+        if (value.docFileTypeName?.toUpperCase().includes('JPEG') && value.dokument) {
           value.dokument = this.pictureService.toDataUrl(value.dokument, 'image/jpeg') ?? undefined;
         }
+
+        return value;
       });
+
+      groups.push({ title, documents });
     }
+
+    this.documentationGroups = groups;
   }
 
   fillOeNumbers(): void {
-    this.oeNumbers.clear();
-    if (!this.data.tdBrojevi?.length) return;
+    this.oeNumberEntries = [];
+    if (!this.data.tdBrojevi?.length) {
+      return;
+    }
+
+    const map = new Map<string, Set<string>>();
 
     this.data.tdBrojevi.forEach((v: RobaBrojevi) => {
-      const list = this.oeNumbers.get(v.fabrBroj!) ?? [];
-      list.push(v.proizvodjac!);
-      this.oeNumbers.set(v.fabrBroj!, list);
+      const code = v.fabrBroj;
+      const producer = v.proizvodjac;
+      if (!code || !producer) return;
+      const set = map.get(code) ?? new Set<string>();
+      set.add(producer);
+      map.set(code, set);
     });
+
+    this.oeNumberEntries = Array.from(map.entries()).map(([code, producers]) => ({
+      code,
+      labels: Array.from(producers.values()),
+    }));
+  }
+
+  private initializeLinkedTargets(roba: Roba): void {
+    const raw = Array.isArray(roba?.linkedManufacturers) ? roba.linkedManufacturers : [];
+    const byId = new Map<number, TecDocLinkedManufacturerTargets>();
+    const byName = new Map<string, TecDocLinkedManufacturerTargets>();
+
+    raw.forEach((manufacturer: any) => {
+      const id = Number(manufacturer?.linkingTargetId ?? Number.NaN);
+      const name = this.normalizeWhitespace(manufacturer?.name);
+      if (!name) return;
+
+      if (Number.isFinite(id)) {
+        if (!byId.has(id)) {
+          byId.set(id, {
+            manufacturerId: id,
+            manufacturerName: name,
+            models: [],
+          });
+        }
+        return;
+      }
+
+      const key = name.toLowerCase();
+      if (!byName.has(key)) {
+        byName.set(key, {
+          manufacturerId: undefined,
+          manufacturerName: name,
+          models: [],
+        });
+      }
+    });
+
+    const compare = (a: TecDocLinkedManufacturerTargets, b: TecDocLinkedManufacturerTargets) =>
+      (a.manufacturerName || '').localeCompare(b.manufacturerName || '', 'sr', { sensitivity: 'base' });
+
+    this.linkedTargets = [
+      ...Array.from(byId.values()).sort(compare),
+      ...Array.from(byName.values()).sort(compare),
+    ];
+  }
+
+  onCompatibilityTargetsChange(targets: TecDocLinkedManufacturerTargets[]): void {
+    this.linkedTargets = Array.isArray(targets) ? targets : [];
+    this.updateSeoTags(this.data);
   }
 
   prepareSpecs(roba: Roba): void {
@@ -694,6 +760,35 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
 
   private normalizeWhitespace(v: string | undefined | null): string {
     return (v ?? '').replace(/\s+/g, ' ').trim();
+  }
+
+  private getLinkedManufacturersSnippet(limit: number = 6): string {
+    if (!this.linkedTargets?.length) {
+      return '';
+    }
+
+    const uniqueNames: string[] = [];
+    const seen = new Set<string>();
+    this.linkedTargets.forEach((manufacturer) => {
+      const name = this.normalizeWhitespace(manufacturer?.manufacturerName);
+      if (!name) return;
+      const key = name.toLowerCase();
+      if (seen.has(key)) return;
+      seen.add(key);
+      uniqueNames.push(name);
+    });
+
+    if (!uniqueNames.length) {
+      return '';
+    }
+
+    const displayed = uniqueNames.slice(0, limit);
+    const remainder = uniqueNames.length - displayed.length;
+    let snippet = displayed.join(', ');
+    if (remainder > 0) {
+      snippet += ` i još ${remainder}`;
+    }
+    return snippet;
   }
 
   private copyShareLink(url: string, showMessage: boolean = true): void {
@@ -935,15 +1030,32 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     }
 
     // OE brojevi kao jedan property (ili više, ali ovde grupujemo)
-    if (this.oeNumbers.size > 0) {
-      const joined = Array.from(this.oeNumbers.entries())
-        .map(([oe, prozv]) => `${oe} (${prozv.join(', ')})`)
+    if (this.oeNumberEntries.length > 0) {
+      const joined = this.oeNumberEntries
+        .map((entry) => {
+          const labels = entry.labels.length ? ` (${entry.labels.join(', ')})` : '';
+          return `${entry.code}${labels}`;
+        })
         .join(' | ');
       props.push({
         '@type': 'PropertyValue',
         name: 'OE / OEM brojevi',
         value: joined.slice(0, 5000), // safety cutoff
       });
+    }
+
+    if (this.linkedTargets.length > 0) {
+      const manufacturerList = this.linkedTargets
+        .map((m) => this.normalizeWhitespace(m.manufacturerName))
+        .filter(Boolean)
+        .join(', ');
+      if (manufacturerList) {
+        props.push({
+          '@type': 'PropertyValue',
+          name: 'Kompatibilni proizvođači',
+          value: manufacturerList.slice(0, 5000),
+        });
+      }
     }
     return props;
   }
@@ -1132,7 +1244,23 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       specsSnippet,
       `${brand} ${name} — rezervni deo. Brza isporuka i podrška.`,
     ].filter(Boolean) as string[];
-    const description = (descCandidates[0] || '').slice(0, 158);
+    let description =
+      descCandidates[0] ||
+      descCandidates[1] ||
+      descCandidates[2] ||
+      descCandidates[3] ||
+      '';
+    description = this.normalizeWhitespace(description);
+
+    const manufacturerSnippet = this.getLinkedManufacturersSnippet();
+    if (manufacturerSnippet) {
+      if (!description) {
+        description = `Kompatibilni proizvođači: ${manufacturerSnippet}.`;
+      } else if (description.length < 120) {
+        description = `${description.replace(/[.?!]+$/, '')}. Kompatibilni proizvođači: ${manufacturerSnippet}.`;
+      }
+    }
+    description = description.slice(0, 158);
 
     const { url } = this.buildCanonical(roba);
 

@@ -177,102 +177,23 @@
           </aside>
         </div>
       </article>
-    </div>
-    <div
-      *ngIf="documentKeys && documentKeys.length !== 0"
-      class="product-container documentation documentation--section"
-      aria-label="Dokumentacija proizvoda"
-    >
-      <div *ngFor="let key of documentKeys">
-        <h3 class="product-title">{{ key }}</h3>
-        <div class="util__flex--center autom-flex-wrap--column">
-          <!-- PDF -->
-          <ng-container *ngFor="let document of getDocumentByKey(key)">
-            <div
-              class="documentation--section-padding"
-              *ngIf="
-                document.docFileTypeName!.toUpperCase().indexOf('PDF') > -1
-              "
-            >
-              <ng-container>
-                <span (click)="openPdf(document)">
-                  <autom-icon
-                    [tooltip]="pdfToolTip"
-                    [source]="iconEnum.FILE_SEARCH"
-                  ></autom-icon>
-                </span>
-              </ng-container>
-            </div>
-          </ng-container>
-        </div>
-        <div class="util__flex--center autom-flex-wrap--column">
-          <!-- Youtube -->
-          <ng-container *ngFor="let document of getDocumentByKey(key)">
-            <div
-              class="youtube-wrapper documentation--section-padding"
-              *ngIf="
-                document.docFileTypeName!.toUpperCase().indexOf('URL') > -1 &&
-                document.docUrl?.includes('youtube')
-              "
-            >
-              <youtube-player [videoId]="document.saniraniUrl"></youtube-player>
-            </div>
-            <div
-              class="documentation--section-padding"
-              *ngIf="
-                document.docFileTypeName!.toUpperCase().indexOf('URL') > -1 &&
-                (document.docTypeId === 6 || document.docTypeId === 17)
-              "
-            >
-              <span (click)="openLink(document)">
-                <autom-icon
-                  [tooltip]="{ tooltipText: 'Link: ' + document.docUrl }"
-                  [source]="iconEnum.LINK"
-                ></autom-icon>
-              </span>
-            </div>
-          </ng-container>
-        </div>
-        <div class="util__flex--center autom-flex-wrap--column">
-          <!-- JPEG -->
-          <ng-container *ngFor="let document of getDocumentByKey(key)">
-            <div
-              class="documentation--section-padding"
-              *ngIf="
-                document.docFileTypeName!.toUpperCase().indexOf('JPEG') > -1
-              "
-            >
-              <img
-                class="document-image"
-                [src]="document.dokument"
-                [attr.alt]="document.docFileTypeName || 'Dokumentacija'"
-                decoding="async"
-                loading="lazy"
-              />
-            </div>
-          </ng-container>
-        </div>
-      </div>
-    </div>
-    <div *ngIf="oeNumbers.size > 0" class="product-container documentation">
-      <h3 class="oe-title">OE brojevi</h3>
-      <p class="oe-subtitle">
-        OE referentni brojevi koji su uporedivi sa originalnim brojem rezervnog
-        dela:
-      </p>
-      <ul class="oe-grid" role="list">
-        <li *ngFor="let oe of oeNumbers | keyvalue">
-          <a
-            class="oe-item"
-            [routerLink]="['/webshop']"
-            [queryParams]="{ searchTerm: oe.key, filterBy: 'searchTerm' }"
-            [attr.href]="'/webshop?searchTerm=' + oe.key + '&filterBy=searchTerm'"
-          >
-            {{ oe.key }} - {{ oe.value }}
-          </a>
-        </li>
-      </ul>
-    </div>
+
+      <app-vehicle-compatibility
+        *ngIf="data?.linkedManufacturers?.length"
+        [product]="data"
+        (targetsChange)="onCompatibilityTargetsChange($event)"
+      ></app-vehicle-compatibility>
+
+      <app-product-documentation
+        [groups]="documentationGroups"
+        [pdfTooltip]="pdfTooltip"
+        (openPdf)="openPdf($event)"
+        (openLink)="openLink($event)"
+      ></app-product-documentation>
+
+      <app-product-oe-numbers
+        [entries]="oeNumberEntries"
+      ></app-product-oe-numbers>
 
     <div *ngIf="!editingText" class="product-container documentation">
       <h3 class="oe-title" *ngIf="data.tekst || !data.tehnickiOpis?.length">
@@ -405,6 +326,7 @@
         hidden
       />
     </div>
+  </div>
   </ng-container>
 </section>
 

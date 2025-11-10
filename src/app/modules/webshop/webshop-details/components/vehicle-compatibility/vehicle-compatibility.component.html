@@ -1,0 +1,207 @@
+<section
+  class="manufacturer-section card"
+  aria-label="Kompatibilni proizvođači vozila"
+>
+  <header class="manufacturer-header">
+    <div class="manufacturer-title-wrap">
+      <autom-icon
+        class="manufacturer-icon"
+        [source]="iconEnum.CAR"
+        aria-hidden="true"
+      ></autom-icon>
+      <div>
+        <h2 class="manufacturer-title">Kompatibilnost sa putničkim vozilima</h2>
+        <p class="manufacturer-subtitle">
+          TecDoc navodi sledeće proizvođače za koje je artikal kompatibilan.
+        </p>
+      </div>
+    </div>
+    <div class="manufacturer-search">
+      <span class="search-label">Pretraga</span>
+      <autom-input-fields
+        [type]="inputTypeEnum.TEXT"
+        [placeholder]="'npr. Audi Q3 2.0 TDI'"
+        [value]="compatibilitySearchTerm"
+        [allowFreeTextInput]="true"
+        [clearBtn]="true"
+        (emitSelected)="onCompatibilityInput($event ?? '')"
+        (input)="onCompatibilityInput($event)"
+        [customClass]="'manufacturer-search__input'"
+      ></autom-input-fields>
+    </div>
+  </header>
+
+  <div class="manufacturer-accordion" role="list">
+    <ng-container *ngIf="displayedManufacturers.length; else manufacturerListFallback">
+      <article
+        class="manufacturer-panel"
+        *ngFor="
+          let manufacturer of displayedManufacturers;
+          let manufacturerIndex = index;
+          trackBy: trackManufacturer
+        "
+        role="listitem"
+        [class.expanded]="isManufacturerExpanded(manufacturer)"
+      >
+        <button
+          type="button"
+          class="manufacturer-toggle"
+          (click)="toggleManufacturer(manufacturer)"
+          [attr.aria-expanded]="isManufacturerExpanded(manufacturer)"
+          [attr.aria-controls]="'manufacturer-' + manufacturer.linkingTargetId"
+        >
+          <span class="manufacturer-toggle__indicator">
+            <span class="indicator-bar indicator-bar--vertical"></span>
+            <span class="indicator-bar indicator-bar--horizontal"></span>
+          </span>
+          <span class="manufacturer-toggle__label">
+            {{ manufacturer.name }}
+          </span>
+        </button>
+        <div
+          class="manufacturer-body"
+          *ngIf="isManufacturerExpanded(manufacturer)"
+          [id]="'manufacturer-' + manufacturer.linkingTargetId"
+        >
+          <ng-container *ngIf="getManufacturerDetailForDisplay(manufacturer) as detail; else manufacturerPending">
+            <div
+              class="manufacturer-models"
+              *ngIf="detail.models?.length; else manufacturerEmpty"
+            >
+              <article
+                class="model-panel"
+                *ngFor="
+                  let model of detail.models;
+                  let modelIndex = index;
+                  trackBy: trackModel
+                "
+                [class.expanded]="isModelExpanded(detail.manufacturerId ?? manufacturer.linkingTargetId, model)"
+              >
+                <button
+                  type="button"
+                  class="model-toggle"
+                  (click)="toggleModel(detail.manufacturerId ?? manufacturer.linkingTargetId, model)"
+                  [attr.aria-expanded]="isModelExpanded(detail.manufacturerId ?? manufacturer.linkingTargetId, model)"
+                  [attr.aria-controls]="'model-' + (detail.manufacturerId ?? manufacturer.linkingTargetId) + '-' + modelIndex"
+                >
+                  <span class="model-toggle__label">
+                    {{ model.modelName }}
+                  </span>
+                  <span class="model-toggle__count" *ngIf="model.variants?.length">
+                    {{ model.variants?.length || 0 }}
+                  </span>
+                </button>
+                <div
+                  class="model-body"
+                  *ngIf="isModelExpanded(detail.manufacturerId ?? manufacturer.linkingTargetId, model)"
+                  [id]="'model-' + (detail.manufacturerId ?? manufacturer.linkingTargetId) + '-' + modelIndex"
+                >
+                  <table
+                    class="variant-table"
+                    *ngIf="model.variants?.length; else variantsLoadingOrEmpty"
+                  >
+                    <thead>
+                      <tr>
+                        <th scope="col">Motor</th>
+                        <th scope="col">Karoserija</th>
+                        <th scope="col">Snaga</th>
+                        <th scope="col">Zapremina</th>
+                        <th scope="col">Proizvodnja</th>
+                        <th scope="col">Pronađi</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let variant of model.variants">
+                        <td data-title="Motor">{{ variant.engine || '—' }}</td>
+                        <td data-title="Karoserija">
+                          {{ variant.constructionType || '—' }}
+                        </td>
+                        <td data-title="Snaga">
+                          {{ formatVariantPower(variant) }}
+                        </td>
+                        <td data-title="Zapremina">
+                          {{ formatCylinderCapacity(variant.cylinderCapacity) }}
+                        </td>
+                        <td data-title="Proizvodnja">
+                          {{ formatProductionPeriod(variant) }}
+                        </td>
+                        <td data-title="Pronađi" class="variant-action">
+                          <ng-container *ngIf="getVehicleQueryParams(variant) as query; else vehicleNoLink">
+                            <a
+                              class="variant-link"
+                              [routerLink]="['/webshop']"
+                              [queryParams]="query"
+                            >
+                              Pogledaj
+                            </a>
+                          </ng-container>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <ng-template #variantsLoadingOrEmpty>
+                    <p class="model-placeholder" *ngIf="linkedTargetsLoading">
+                      Učitavanje varijanti...
+                    </p>
+                    <ng-container *ngIf="!linkedTargetsLoading">
+                      <p class="model-placeholder">
+                        Trenutno nema varijanti za ovaj model.
+                      </p>
+                    </ng-container>
+                  </ng-template>
+                </div>
+              </article>
+            </div>
+            <ng-template #manufacturerEmpty>
+              <p class="manufacturer-placeholder">
+                Trenutno nema modela dostupnih za proizvođača
+                <strong>{{ detail.manufacturerName }}</strong>.
+              </p>
+            </ng-template>
+          </ng-container>
+          <ng-template #manufacturerPending>
+            <p class="manufacturer-placeholder" *ngIf="linkedTargetsLoading">
+              Učitavanje modela
+              <ng-container *ngIf="manufacturerSearchSummary">
+                za "{{ manufacturerSearchSummary }}"
+              </ng-container>
+              za <strong>{{ manufacturer.name }}</strong>...
+            </p>
+            <p class="manufacturer-placeholder" *ngIf="!linkedTargetsLoading">
+              Podaci o modelima će biti učitani uskoro.
+            </p>
+          </ng-template>
+        </div>
+      </article>
+    </ng-container>
+  </div>
+  <ng-template #manufacturerListFallback>
+    <ng-container *ngIf="manufacturerSearchSummary; else manufacturerNoSearchFallback">
+      <p class="manufacturer-placeholder" *ngIf="linkedTargetsLoading">
+        Učitavanje rezultata za "{{ manufacturerSearchSummary }}"...
+      </p>
+      <p class="manufacturer-placeholder" *ngIf="!linkedTargetsLoading">
+        Nema rezultata za "{{ manufacturerSearchSummary }}".
+      </p>
+    </ng-container>
+    <ng-template #manufacturerNoSearchFallback>
+      <ng-container *ngIf="flatManufacturers.length; else manufacturerListEmpty">
+        <p class="manufacturer-placeholder" *ngIf="linkedTargetsLoading">
+          Učitavanje proizvođača...
+        </p>
+        <p class="manufacturer-placeholder" *ngIf="!linkedTargetsLoading">
+          Trenutno nema kompatibilnih proizvođača za ovaj artikal.
+        </p>
+      </ng-container>
+    </ng-template>
+    <ng-template #manufacturerListEmpty>
+      <p class="manufacturer-placeholder">
+        Nema dostupnih proizvođača za ovaj artikal.
+      </p>
+    </ng-template>
+  </ng-template>
+</section>
+
+<ng-template #vehicleNoLink>
+  <span>—</span>
+</ng-template>
