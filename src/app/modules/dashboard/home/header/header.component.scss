@@ -1,5 +1,6 @@
 .header {
   &--background {
+    position: relative;
     background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.4)),
       url("/images/navigation/main-header.webp") center/cover no-repeat;
   }
@@ -13,5 +14,11 @@
     height: 100%;
     background-color: hsl(222, 44%, 18%, 0.47); /* Poluprozirni overlay */
     z-index: 1;
+  }
+
+  &--background .hero-content,
+  &--background .hero-banner {
+    position: relative;
+    z-index: 2;
   }
 }

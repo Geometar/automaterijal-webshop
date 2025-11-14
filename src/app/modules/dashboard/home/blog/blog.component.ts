@@ -1,6 +1,7 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 import { YouTubePlayer } from '@angular/youtube-player';
 import { CommonModule } from '@angular/common';
+import { take } from 'rxjs';
 
 // Data models
 
@@ -20,7 +21,7 @@ export class BlogComponent {
   videos: YoutubeLink[] = [];
 
   constructor(private configService: ConfigService) {
-    this.configService.getConfig().subscribe(config => {
+    this.configService.getConfig().pipe(take(1)).subscribe(config => {
       this.videos = config.youtubeLinks.filter(v => v.visible !== false);
     });
   }

@@ -1,4 +1,94 @@
 .o-nama {
-  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.4)),
-      url("/images/navigation/about-banner.png") center/cover no-repeat;
+  position: relative;
+  background: radial-gradient(circle at 18% 32%, #18376b 0%, #0a1733 45%, #040817 100%);
+  color: #f3f6ff;
+
+  &::before {
+    content: none !important;
+  }
+
+  .about-wrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: clamp(2rem, 3vw, 4rem);
+    align-items: stretch;
+  }
+
+  .about-banner {
+    position: relative;
+    margin: 0;
+    min-height: 280px;
+    border-radius: 1.25rem;
+    overflow: hidden;
+    box-shadow: 0 25px 45px rgba(0, 0, 0, 0.35);
+  }
+
+  .about-banner__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .about-card {
+    background: linear-gradient(145deg, rgba(3, 10, 24, 0.8), rgba(4, 9, 20, 0.95));
+    border-radius: 1.25rem;
+    padding: clamp(1.5rem, 3vw, 3rem);
+    box-shadow: 0 25px 45px rgba(0, 0, 0, 0.35);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .section-subtitle {
+    letter-spacing: 0.25rem;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  .about-title {
+    margin: 0;
+    font-size: clamp(1.75rem, 2.7vw, 2.75rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #f7c35f;
+    letter-spacing: 0.05em;
+  }
+
+  .section-text {
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0;
+  }
+
+  .stats-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+  }
+
+  .stats-card {
+    background: rgba(7, 17, 40, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .stats-value {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .stats-label {
+    margin: 0.35rem 0 0;
+    color: rgba(255, 255, 255, 0.72);
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+  }
 }
