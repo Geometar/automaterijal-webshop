@@ -5,36 +5,73 @@
   <div class="container">
     <p class="section-subtitle :light" id="blog-label">Naš Blog</p>
 
-    <div class="youtube-list">
-      <div class="blog-wrapper" *ngFor="let video of videos">
-        <div class="blog-card">
-          <div class="card-banner" style="--width: 354; --height: 243">
-            <youtube-player
-              [videoId]="video.videoId"
-              width="354"
-              height="243"
-            ></youtube-player>
+    <div class="blog-layout">
+      <div class="blog-articles" *ngIf="latestPosts.length">
+        <div class="blog-articles__header">
+          <div>
+            <h3 class="blog-articles__title">Poslednje objave</h3>
           </div>
+          <a routerLink="/blog" class="blog-articles__cta"
+            >Pogledaj sve objave</a
+          >
+        </div>
 
-          <div class="card-content">
-            <h3 class="h3">
-              <a
-                [href]="'https://www.youtube.com/watch?v=' + video.videoId"
-                class="card-title"
-                [attr.aria-label]="'Pogledaj blog: ' + video.title"
-                target="_blank"
-                rel="noopener noreferrer"
-                >{{ video.title }}</a
-              >
-            </h3>
+        <div class="blog-articles__list">
+          <article class="blog-articles__item" *ngFor="let post of latestPosts">
+            <p class="blog-articles__date">
+              {{ post.publishedAt | date : "dd.MM.yyyy." }}
+            </p>
+            <a class="blog-articles__name" [routerLink]="['/blog', post.slug]">
+              {{ post.title }}
+            </a>
+            <p class="blog-articles__excerpt">{{ post.excerpt }}</p>
+          </article>
+        </div>
+      </div>
 
-            <ul class="card-meta-list">
-              <li class="card-meta-item">
-                <time class="card-meta-text">
-                  {{ video.publishedAt }}
-                </time>
-              </li>
-            </ul>
+      <div class="blog-media-row">
+        <div class="blog-media-row__header">
+          <span>Video blog</span>
+          <a
+            href="https://www.youtube.com/@Automaterijal"
+            class="blog-media-row__cta"
+            target="_blank"
+            rel="noopener noreferrer"
+            >YouTube kanal</a
+          >
+        </div>
+        <div class="youtube-list">
+          <div class="blog-wrapper" *ngFor="let video of videos">
+            <div class="blog-card">
+              <div class="card-banner" style="--width: 354; --height: 243">
+                <youtube-player
+                  [videoId]="video.videoId"
+                  width="354"
+                  height="243"
+                ></youtube-player>
+              </div>
+
+              <div class="card-content">
+                <h3 class="h3">
+                  <a
+                    [href]="'https://www.youtube.com/watch?v=' + video.videoId"
+                    class="card-title"
+                    [attr.aria-label]="'Pogledaj blog: ' + video.title"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    >{{ video.title }}</a
+                  >
+                </h3>
+
+                <ul class="card-meta-list">
+                  <li class="card-meta-item">
+                    <time class="card-meta-text">
+                      {{ video.publishedAt }}
+                    </time>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </div>

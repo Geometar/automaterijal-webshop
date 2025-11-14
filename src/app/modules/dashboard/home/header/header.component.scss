@@ -15,10 +15,4 @@
     background-color: hsl(222, 44%, 18%, 0.47); /* Poluprozirni overlay */
     z-index: 1;
   }
-
-  &--background .hero-content,
-  &--background .hero-banner {
-    position: relative;
-    z-index: 2;
-  }
 }
