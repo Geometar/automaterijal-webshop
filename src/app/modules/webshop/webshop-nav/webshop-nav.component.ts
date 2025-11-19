@@ -32,9 +32,10 @@ import {
 } from '../../../shared/data-models/enums';
 
 // Service
+import { CategoryPick } from '../../../shared/data-models/model';
 import { ConfigService } from '../../../shared/service/config.service';
 import { UrlHelperService } from '../../../shared/service/utils/url-helper.service';
-import { CategoryPick } from '../../../shared/data-models/model';
+import { VehicleUrlService } from '../../../shared/service/utils/vehicle-url.service';
 import { WebshopPrimaryFilter } from '../../../shared/data-models/enums/webshop-primary-filter.enum';
 
 export class NavTitles {
@@ -92,6 +93,7 @@ export class WebshopNavComponent implements OnChanges {
   constructor(
     private configService: ConfigService,
     private urlHelperService: UrlHelperService,
+    private vehicleUrlService: VehicleUrlService,
   ) {
     this.configService.getConfig().subscribe(config => {
       this.categories = config.categories;
@@ -155,12 +157,7 @@ export class WebshopNavComponent implements OnChanges {
   }
 
   handleSelectedVehicle(vehicleDetails: TDVehicleDetails): void {
-    this.urlHelperService.navigateTo(['/webshop'], {
-      queryParams: {
-        tecdocType: vehicleDetails.linkageTargetType,
-        tecdocId: vehicleDetails.linkageTargetId,
-      },
-    });
+    this.vehicleUrlService.navigateToVehicle(vehicleDetails);
 
     if (!vehicleDetails.description) {
       return;
@@ -204,6 +201,10 @@ export class WebshopNavComponent implements OnChanges {
   }
 
   goToSecondPage(): void {
+    if (this.selectedVehicle?.linkageTargetId) {
+      this.vehicleUrlService.navigateToVehicle(this.selectedVehicle);
+      return;
+    }
     this.urlHelperService.retainOnlyQueryParams(['tecdocType', 'tecdocId']);
   }
 

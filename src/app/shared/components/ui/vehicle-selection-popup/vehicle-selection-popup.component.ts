@@ -9,7 +9,7 @@ import {
   PLATFORM_ID,
   ViewEncapsulation,
 } from '@angular/core';
-import { finalize, Subject, takeUntil } from 'rxjs';
+import { finalize, Subject, take, takeUntil } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 
@@ -401,10 +401,28 @@ export class VehicleSelectionPopupComponent implements OnInit, OnDestroy {
       );
 
       if (selectedFromHistory) {
-        this.emitVehicleEvent({
-          linkageTargetId: selectedFromHistory.id,
-          linkageTargetType: selectedFromHistory.type
-        });
+        this.tecdocService
+          .getLinkageTargets(selectedFromHistory.id, selectedFromHistory.type)
+          .pipe(take(1))
+          .subscribe({
+            next: (vehicles: TDVehicleDetails[]) => {
+              const vehicle = vehicles?.[0];
+              if (vehicle) {
+                this.emitVehicleEvent(vehicle);
+                return;
+              }
+              this.emitVehicleEvent({
+                linkageTargetId: selectedFromHistory.id,
+                linkageTargetType: selectedFromHistory.type,
+              } as TDVehicleDetails);
+            },
+            error: () => {
+              this.emitVehicleEvent({
+                linkageTargetId: selectedFromHistory.id,
+                linkageTargetType: selectedFromHistory.type,
+              } as TDVehicleDetails);
+            },
+          });
         return; // Ensure we don't proceed further if history selection is used
       }
     }

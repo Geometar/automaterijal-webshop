@@ -26,6 +26,7 @@ import { IconsEnum } from '../../../shared/data-models/enums';
 import { ConfigService } from '../../../shared/service/config.service';
 import { RobaService } from '../../../shared/service/roba.service';
 import { UrlHelperService } from '../../../shared/service/utils/url-helper.service';
+import { VehicleUrlService } from '../../../shared/service/utils/vehicle-url.service';
 
 @Component({
   selector: 'webshop-empty',
@@ -51,6 +52,7 @@ export class WebshopEmptyComponent implements OnInit {
     private configService: ConfigService,
     private robaService: RobaService,
     private urlHelperService: UrlHelperService,
+    private vehicleUrlService: VehicleUrlService,
   ) { }
 
   ngOnInit(): void {
@@ -64,14 +66,7 @@ export class WebshopEmptyComponent implements OnInit {
   }
 
   handleSelectedVehicle(vehicleDetails: TDVehicleDetails): void {
-    this.urlHelperService.navigateTo([
-      '/webshop'
-    ], {
-      queryParams: {
-        tecdocType: vehicleDetails.linkageTargetType,
-        tecdocId: vehicleDetails.linkageTargetId,
-      },
-    });
+    this.vehicleUrlService.navigateToVehicle(vehicleDetails);
 
     if (!vehicleDetails.description) {
       return;

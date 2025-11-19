@@ -154,7 +154,6 @@ export class UrlHelperService {
     this.navigateTo(parts);
   }
 
-
   buildCategoryUrl(groupName?: string, subGroupName?: string | null): string {
     const parts = ['/webshop'];
 
@@ -190,6 +189,8 @@ export class UrlHelperService {
     if (currentPath.includes('/webshop/manufacturers')) {
       this.navigateTo(['/webshop']);
     } else if (currentPath.includes('/webshop/category')) {
+      this.navigateTo(['/webshop']);
+    } else if (currentPath.includes('/webshop/vozila')) {
       this.navigateTo(['/webshop']);
     } else {
       this.clearQueryParams();

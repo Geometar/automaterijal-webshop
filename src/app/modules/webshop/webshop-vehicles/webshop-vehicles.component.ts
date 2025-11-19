@@ -27,7 +27,7 @@ import { Magacin } from '../../../shared/data-models/model/roba';
 
 // Service
 import { TecdocService } from '../../../shared/service/tecdoc.service';
-import { UrlHelperService } from '../../../shared/service/utils/url-helper.service';
+import { VehicleUrlService } from '../../../shared/service/utils/vehicle-url.service';
 
 @Component({
   selector: 'webshop-vehicles',
@@ -59,7 +59,7 @@ export class WebshopVehiclesComponent implements OnInit, OnDestroy, OnChanges {
 
   constructor(
     private tecdocService: TecdocService,
-    private urlHelperService: UrlHelperService
+    private vehicleUrlService: VehicleUrlService
   ) { }
 
   /** Start of: Angular lifecycle hooks */
@@ -112,6 +112,9 @@ export class WebshopVehiclesComponent implements OnInit, OnDestroy, OnChanges {
   // End of: Events
 
   getArticlesByAssembleGroup(assemblyGroup: AssemblyGroup): void {
-    this.urlHelperService.addOrUpdateQueryParams({ assembleGroupId: assemblyGroup.assemblyGroupNodeId, assemblyGroupName: assemblyGroup.assemblyGroupName })
+    if (!this.vehicleDetails) {
+      return;
+    }
+    this.vehicleUrlService.navigateToVehicleGroup(this.vehicleDetails, assemblyGroup);
   }
 }

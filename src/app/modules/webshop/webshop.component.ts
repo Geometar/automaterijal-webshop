@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { combineLatest, finalize, Subject, takeUntil } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute, ParamMap, Params } from '@angular/router';
 import { debounceTime, take } from 'rxjs/operators';
 
 // Components imports
@@ -31,6 +31,7 @@ import { RobaService } from '../../shared/service/roba.service';
 import { SeoService } from '../../shared/service/seo.service';
 import { TecdocService } from '../../shared/service/tecdoc.service';
 import { UrlHelperService } from '../../shared/service/utils/url-helper.service';
+import { VehicleUrlService } from '../../shared/service/utils/vehicle-url.service';
 import { WebshopConfig } from '../../shared/data-models/interface';
 import { WebshopLogicService } from '../../shared/service/utils/webshop-logic.service';
 import { WebshopStateService } from '../../shared/service/state/webshop-state.service';
@@ -41,6 +42,7 @@ import {
   hasActiveFilterQuery,
   normalizeRobotsTag,
 } from '../../shared/utils/seo-utils';
+import { StringUtils } from '../../shared/utils/string-utils';
 
 export enum WebShopState {
   SHOW_ARTICLES_WITH_VEHICLE_DETAILS,
@@ -103,7 +105,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
   // Misc
   activeRequests = 0;
   internalLoading = false;
-  loading = false;
+  loading = true;
 
   private selectedBrandName: string | null = null;
   private config: WebshopConfig | null = null;
@@ -116,7 +118,9 @@ export class WebshopComponent implements OnDestroy, OnInit {
   private pendingSubgroupSelection: string[] | undefined;
 
   constructor(
+    private accountStateService: AccountStateService,
     private activatedRoute: ActivatedRoute,
+    private analytics: AnalyticsService,
     private cartStateService: CartStateService,
     private categoriesState: CategoriesStateService,
     private configService: ConfigService,
@@ -128,8 +132,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
     private stateService: WebshopStateService,
     private tecdocService: TecdocService,
     private urlHelperService: UrlHelperService,
-    private analytics: AnalyticsService,
-    private accountStateService: AccountStateService
+    private vehicleUrlService: VehicleUrlService,
   ) { }
 
   /** Angular lifecycle hooks start */
@@ -152,6 +155,13 @@ export class WebshopComponent implements OnDestroy, OnInit {
       .subscribe(([paramMap, p]) => {
         const currentPath = this.activatedRoute.routeConfig?.path;
         const slug = paramMap.get('name');
+        const vehicleSlug = paramMap.get('vehicleSlug');
+
+        if (vehicleSlug) {
+          const groupSlug = paramMap.get('groupSlug');
+          this.handleVehicleSlugRoute(paramMap, p, groupSlug);
+          return;
+        }
 
         if (currentPath === 'webshop/manufacturers/:name' && slug) {
           this.handleManufactureSlug(slug, p);
@@ -317,6 +327,8 @@ export class WebshopComponent implements OnDestroy, OnInit {
 
   private handleWebshopParams(p: Params): void {
     this.selectedBrandName = null;
+    this.internalLoading = false;
+    this.loading = true;
     const trimmedSearch = ((p['searchTerm'] || '') as string).trim();
     const params = {
       ...p,
@@ -441,6 +453,80 @@ export class WebshopComponent implements OnDestroy, OnInit {
       });
   }
 
+  private handleVehicleSlugRoute(
+    paramMap: ParamMap,
+    p: Params,
+    groupSlug?: string | null
+  ): void {
+    if (this.currentState !== WebShopState.SHOW_EMPTY_CONTAINER) {
+      this.loading = true;
+      this.internalLoading = false;
+    }
+
+    const slug = (paramMap.get('vehicleSlug') || '').trim();
+    const segments = slug.split('-').filter(Boolean);
+
+    let tecdocType = '';
+    let tecdocId = '';
+
+    if (segments.length >= 2 && /^[a-zA-Z]$/.test(segments[0]) && /^\d+$/.test(segments[1])) {
+      tecdocType = segments[0].toUpperCase();
+      tecdocId = segments[1];
+    } else if (segments.length) {
+      const identifier = segments[0];
+      const match = identifier.match(/^([a-zA-Z])(\d+)$/);
+
+      if (match) {
+        tecdocType = match[1].toUpperCase();
+        tecdocId = match[2];
+      } else if (/^\d+$/.test(identifier)) {
+        tecdocType = 'V';
+        tecdocId = identifier;
+      }
+    }
+
+    const params: QueryParams = {
+      ...p,
+    };
+
+    if (tecdocType) {
+      params.tecdocType = tecdocType;
+    }
+
+    if (tecdocId) {
+      params.tecdocId = tecdocId;
+    }
+
+    if (groupSlug) {
+      const group = this.parseAssemblyGroupSlug(groupSlug);
+      if (group) {
+        params.assembleGroupId = group.id;
+        params.assemblyGroupName = group.name;
+      }
+    }
+
+    this.handleWebshopParams(params);
+  }
+
+  private parseAssemblyGroupSlug(slug: string): { id: string; name: string } | null {
+    if (!slug) {
+      return null;
+    }
+    const match = slug.match(/-(\d+)$/);
+    if (!match) {
+      return null;
+    }
+
+    const id = match[1];
+    const namePart = slug.slice(0, slug.length - (id.length + 1));
+    const name = namePart ? StringUtils.deslugify(namePart) : '';
+
+    return {
+      id,
+      name,
+    };
+  }
+
   private normalizeFilterBy(value: unknown): WebshopPrimaryFilter | undefined {
     if (!value) {
       return undefined;
@@ -524,6 +610,8 @@ export class WebshopComponent implements OnDestroy, OnInit {
       }
       this.lastRoutePageIndex = this.pageIndex;
       this.lastRouteRowsPerPage = this.rowsPerPage;
+      this.internalLoading = false;
+      this.loading = false;
       this.updateSeoTagsForState();
       return;
     }
@@ -877,6 +965,31 @@ export class WebshopComponent implements OnDestroy, OnInit {
   }
 
   private buildCanonicalUrlForContext(ctx: any): string {
+    if (ctx.isVehicle) {
+      const currentPath = this.urlHelperService.getCurrentPath();
+      if (currentPath?.includes('/webshop/vozila/')) {
+        return buildCanonicalFromPath(currentPath);
+      }
+
+      if (this.selectedVehicleDetails) {
+        if (ctx.isGroup && this.assembleGroupId) {
+          const path = this.vehicleUrlService.buildVehicleGroupPath(
+            this.selectedVehicleDetails,
+            {
+              assemblyGroupName: this.assemblyGroupName,
+              assemblyGroupNodeId: this.assembleGroupId,
+            }
+          );
+          return buildCanonicalFromPath(path);
+        }
+
+        const path = this.vehicleUrlService.buildVehiclePath(
+          this.selectedVehicleDetails
+        );
+        return buildCanonicalFromPath(path);
+      }
+    }
+
     // 1) Brand page
     if (ctx.isManufacturePage) {
       return `https://automaterijal.com${ctx.currentManufactureSlug}`;
@@ -938,11 +1051,13 @@ export class WebshopComponent implements OnDestroy, OnInit {
       },
       about: ctx.searchTerm
         ? `Rezultati pretrage za: ${ctx.searchTerm}`
-        : ctx.isVehicle
-          ? 'Lista artikala za vozilo'
-          : ctx.isGroup
-            ? `Kategorija: ${this.assemblyGroupName}`
-            : 'Lista artikala',
+        : ctx.isVehicle && ctx.isGroup
+          ? `Lista artikala - ${this.assemblyGroupName}`
+          : ctx.isVehicle
+            ? 'Lista artikala za vozilo'
+            : ctx.isGroup
+              ? `Kategorija: ${this.assemblyGroupName}`
+              : 'Lista artikala',
       url: canonical,
       numberOfItems: ctx.resultCount,
     };
