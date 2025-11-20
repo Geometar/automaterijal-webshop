@@ -1,0 +1,177 @@
+<section class="vehicle-page-shell header-margin--top">
+  <webshop-nav
+    [filter]="filter"
+    [searchTerm]="searchTerm"
+    [selectedVehicle]="selectedVehicle"
+    [customBreadcrumbs]="customBreadcrumbs"
+    (selectedVehicleDetailsEmit)="handleNavVehicleSelected($event)"
+  >
+  </webshop-nav>
+
+  <section class="vehicle-catalog-page">
+  <header class="catalog-hero">
+    <div class="catalog-hero__content">
+      <p class="catalog-eyebrow">Vodič kroz vozila</p>
+      <h1>Pronađite delove po tipu vozila</h1>
+      <p class="catalog-subtitle">
+        Izaberite vozilo u par klikova, a mi ćemo prikazati samo delove koji
+        odgovaraju vašem motoru. Nema više lutanja po generičkim filtrima.
+      </p>
+      <div class="catalog-hero__cta">
+        <button class="btn primary" (click)="chooseVehicleVisible = true">
+          Brzi izbor (popup)
+        </button>
+        <a class="btn ghost" routerLink="/webshop">Idi u katalog delova</a>
+      </div>
+      <ul class="catalog-hero__trust">
+        <li>
+          <span>80k+</span>
+          artikala spremnih za isporuku
+        </li>
+        <li>
+          <span>1 klik</span>
+          pamti poslednje vozilo i ponude
+        </li>
+        <li>
+          <span>24/7</span>
+          korisnička podrška i savet
+        </li>
+      </ul>
+    </div>
+    <div class="catalog-hero__panel">
+      <div class="panel-card">
+        <p class="panel-eyebrow">Zašto je drugačije?</p>
+        <h3>Delovi koji zaista odgovaraju vašem vozilu</h3>
+        <p>
+          Sve dok ne potvrdite motor i godinu, ne prikazujemo delove. Tako jasno
+          znate da svaka stavka odgovara baš vašem vozilu – bez lutanja i
+          nepotrebnog povrata.
+        </p>
+        <ul class="panel-list">
+          <li>Automatski čuvamo poslednje izabrano vozilo.</li>
+          <li>Brzi prelaz na delove po kategorijama (filteri, trap...).</li>
+          <li>Svaki brend ima sopstvenu stranicu sa popularnim modelima.</li>
+        </ul>
+      </div>
+    </div>
+  </header>
+
+  <section class="garage-section" *ngIf="garageVehicles.length">
+    <div>
+      <p class="garage-eyebrow">Tvoja garaža</p>
+      <h3>Poslednje izabrana vozila</h3>
+      <p class="garage-subtitle">Klikni i nastavi na motore/delove za taj izbor.</p>
+    </div>
+    <div class="garage-list">
+      <button
+        type="button"
+        class="garage-entry"
+        *ngFor="let entry of garageVehicles"
+        (click)="handleGarageSelect(entry)"
+      >
+        <span class="garage-title">{{ entry.description }}</span>
+      </button>
+    </div>
+  </section>
+
+  <section class="workflow-section">
+    <div class="section-headline">
+      <p>Kako funkcioniše</p>
+      <h2>Poručite delove u 4 jasna koraka</h2>
+    </div>
+    <div class="workflow-grid">
+      <article class="workflow-card" *ngFor="let step of workflowSteps; let i = index">
+        <div class="workflow-index">{{ i + 1 }}</div>
+        <p class="workflow-step">{{ step.step }}</p>
+        <h3>{{ step.title }}</h3>
+        <p class="workflow-desc">{{ step.description }}</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="vehicle-types">
+    <div class="section-headline">
+      <p>Korak 1</p>
+      <h2>Izaberite tip vozila</h2>
+    </div>
+
+    <div class="type-grid">
+      <button
+        *ngFor="let type of vehicleTypes"
+        class="type-card"
+        [class.is-active]="type.code === selectedType"
+        (click)="selectType(type.code)"
+      >
+        <span class="type-title">{{ type.label }}</span>
+        <small>{{ type.description }}</small>
+      </button>
+    </div>
+  </section>
+
+  <section class="manufacturer-section">
+    <div class="section-headline">
+      <p>Korak 2</p>
+      <h2>Proizvođači za {{ selectedTypeDefinition?.label || 'vozila' }}</h2>
+      <p class="section-subtitle">
+        Pronađite svoj brend i model. Popularni modeli se nalaze odmah na vrhu
+        i vode vas do liste motora.
+      </p>
+    </div>
+
+    <div class="manufacturer-search">
+      <autom-input-fields
+        class="manufacturer-search__field"
+        [type]="inputTypeEnum.TEXT"
+        [placeholder]="'Pretraži proizvođače...'"
+        name="manufacturerSearch"
+        autocomplete="off"
+        aria-label="Pretraži proizvođače"
+        [value]="manufacturerSearchTerm"
+        (emitSelected)="handleManufacturerSearch($event)"
+      >
+     </autom-input-fields>
+      <small *ngIf="manufacturerSearchTerm.trim().length">
+        Prikazano {{ visibleManufacturers.length }} rezultata
+      </small>
+    </div>
+
+    <div class="manufacturer-grid" *ngIf="!loadingManufacturers; else loading">
+      <a
+        *ngFor="let manufacturer of visibleManufacturers"
+        class="manufacturer-card"
+        [routerLink]="['/webshop', 'vozila', manufacturer.slug]"
+      >
+        <span class="manufacturer-title">{{ manufacturer.name }}</span>
+        <span class="manufacturer-meta">
+          {{ selectedTypeDefinition?.label }}
+        </span>
+      </a>
+      <p class="manufacturer-empty" *ngIf="!visibleManufacturers.length">
+        Nije pronađen ni jedan proizvođač za zadati pojam.
+      </p>
+    </div>
+    <ng-template #loading>
+      <div class="loading-state">Učitavanje proizvođača...</div>
+    </ng-template>
+  </section>
+
+  <div class="catalog-note">
+    <strong>Šta dobijate</strong>
+    <ul>
+      <li>Personalizovanu listu delova za vaše vozilo.</li>
+      <li>Sigurnost da deo odgovara motoru i godini proizvodnje.</li>
+      <li>Brzu podršku i isporuku gde god da ste u Srbiji.</li>
+    </ul>
+    <a routerLink="/webshop" class="link-example">
+      Pogledajte ponudu delova
+    </a>
+  </div>
+  </section>
+</section>
+
+<vehicle-selection-popup
+  *ngIf="chooseVehicleVisible"
+  (closePopupModal)="chooseVehicleVisible = false"
+  (emitVehicle)="handleVehicleSelection($event)"
+>
+</vehicle-selection-popup>

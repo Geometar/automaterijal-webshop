@@ -1,0 +1,141 @@
+<section class="vehicle-page-shell header-margin--top">
+  <webshop-nav
+    [filter]="filter"
+    [searchTerm]="searchTerm"
+    [selectedVehicle]="selectedVehicle"
+    [customBreadcrumbs]="customBreadcrumbs"
+    (selectedVehicleDetailsEmit)="handleNavVehicleSelected($event)"
+  >
+  </webshop-nav>
+
+  <section class="vehicle-manufacturer-page">
+
+    <header
+      class="manufacturer-hero"
+      *ngIf="manufacturer as m; else notFoundBlock"
+    >
+      <p class="hero-eyebrow">
+        {{ getVehicleTypeLabel(m.vehicleType) }}
+      </p>
+      <h1>{{ m.name }} modeli – delovi koji sigurno odgovaraju</h1>
+      <p>
+        Izaberi seriju (A, B, Q...) i u nekoliko klikova dolaziš do motora, godina proizvodnje i delova koje imamo na stanju:
+        filteri, ulja, kočnice, trap, elektrika i još mnogo toga.
+      </p>
+      <div class="hero-stats">
+        <div class="stat">
+          <strong>{{ baseFamilies.length }}</strong>
+          <span>serija</span>
+        </div>
+        <div class="stat">
+          <strong>{{ models.length }}</strong>
+          <span>modela u bazi</span>
+        </div>
+        <div class="stat">
+          <strong>24/7</strong>
+          <span>online porudžbine</span>
+        </div>
+      </div>
+    </header>
+
+    <section *ngIf="manufacturer as m" class="manufacturer-models">
+      <div *ngIf="loading" class="loading-state" aria-live="polite">
+        Učitavamo modele i dostupne delove za {{ m.name }}...
+      </div>
+
+      <div class="family-grid" *ngIf="!loading && baseFamilies.length">
+        <button
+          type="button"
+          class="family-card"
+          *ngFor="let family of baseFamilies"
+          [class.is-active]="family.base === activeFamily"
+          (click)="selectFamily(family.base)"
+          [attr.aria-pressed]="family.base === activeFamily"
+        >
+          <span class="family-title">{{ family.base }}</span>
+          <small>{{ family.count }} modela</small>
+        </button>
+      </div>
+
+      <section
+        class="model-group"
+        *ngFor="let family of familyGroups"
+        [class.is-hidden]="activeFamily && family.base !== activeFamily"
+        [attr.id]="familyAnchor(family.base)"
+      >
+        <div class="model-group__header">
+          <div class="model-group__badge">{{ family.base }}</div>
+          <div>
+            <p class="model-group__eyebrow">{{ m.name }} porodica</p>
+            <h3>{{ family.base }} serija</h3>
+            <p>
+              Izaberi generaciju {{ family.base }} i otvori listu motora sa tačnim delovima za tvoj auto.
+            </p>
+          </div>
+        </div>
+        <div class="variant-grid">
+          <article
+            class="variant-card"
+            *ngFor="let variant of family.variants; trackBy: trackVariant"
+          >
+            <div class="variant-card__head">
+              <span
+                class="variant-pill"
+                *ngIf="variant.variant !== family.base"
+              >
+                {{ formatVariantBadge(family.base, variant.variant) }}
+              </span>
+              <div>
+                <p class="variant-eyebrow">Generacija</p>
+                <h4>
+                  {{
+                    variant.variant !== family.base
+                      ? formatVariantTitle(family.base, variant.variant)
+                      : 'Sve karoserije i motori ove serije'
+                  }}
+                </h4>
+                <small
+                  class="variant-sub"
+                  *ngIf="variant.variant === family.base"
+                >
+                  Uključen svaki stil karoserije; prilagodićemo deo prema motoru koji izabereš.
+                </small>
+              </div>
+            </div>
+            <div class="variant-card__models">
+              <a
+                class="variant-model"
+                *ngFor="let model of variant.models"
+                [routerLink]="['/webshop', 'vozila', m.slug, model.slug]"
+                [attr.aria-label]="m.name + ' ' + formatModelName(model, family.base) + ' - motori i delovi'"
+                [attr.title]="m.name + ' ' + formatModelName(model, family.base)"
+              >
+                <div>
+                  <span class="variant-model__name">{{ formatModelName(model, family.base) }}</span>
+                  <small class="variant-model__years">
+                    {{ formatModelConstructionRange(model) }}
+                  </small>
+                </div>
+                <span class="variant-model__cta">Vidi motore i delove</span>
+              </a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <p *ngIf="!loading && !familyGroups.length" class="empty-state">
+        Trenutno nemamo dostupne modele za ovog proizvođača. Javi nam se i pronaći ćemo deo koji ti treba.
+      </p>
+    </section>
+
+  <ng-template #notFoundBlock>
+    <div class="not-found">
+      <h1>Proizvođač nije pronađen</h1>
+      <p>
+        Nismo pronašli proizvođača. Vrati se na listu vozila ili nas pozovi da zajedno nađemo pravi deo.
+      </p>
+      <a routerLink="/webshop/vozila" class="btn ghost">Nazad na vodič</a>
+    </div>
+  </ng-template>
+  </section>
+</section>

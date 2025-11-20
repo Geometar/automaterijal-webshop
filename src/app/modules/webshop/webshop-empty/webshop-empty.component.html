@@ -6,9 +6,14 @@
       <p>
         Preko <strong>80.000 delova</strong> spremnih za isporuku širom Srbije
       </p>
-      <button class="cta-button" (click)="chooseVehicleVisible = true">
-        Odaberi vozilo
-      </button>
+      <div class="hero-actions">
+        <button class="cta-button" (click)="chooseVehicleVisible = true">
+          Odaberi vozilo (popup)
+        </button>
+        <a class="cta-link" routerLink="/webshop/vozila">
+          Otvori stranicu za izbor vozila
+        </a>
+      </div>
     </div>
   </section>
 
