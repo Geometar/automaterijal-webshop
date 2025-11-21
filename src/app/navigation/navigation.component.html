@@ -157,7 +157,11 @@
               </div>
 
               <mat-divider></mat-divider>
-              <button mat-menu-item routerLink="/partner-card">
+              <button
+                *ngIf="showDocumentCard"
+                mat-menu-item
+                routerLink="/partner-card"
+              >
                 <div class="menu-item-align">
                   <autom-icon [source]="iconEnum.CREDIT_CARD"></autom-icon>
                   <span>Kartica dokumenata</span>
@@ -419,7 +423,7 @@
         >Login</a
       >
     </li>
-    <li class="menu-category" *ngIf="loggedIn">
+    <li class="menu-category" *ngIf="loggedIn && showDocumentCard">
       <a
         routerLink="/partner-card"
         href="/partner-card"
