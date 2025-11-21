@@ -1,0 +1,98 @@
+<section class="vehicle-page-shell header-margin--top">
+  <webshop-nav
+    [filter]="filter"
+    [searchTerm]="searchTerm"
+    [selectedVehicle]="selectedVehicle"
+    [customBreadcrumbs]="customBreadcrumbs"
+    (selectedVehicleDetailsEmit)="handleNavVehicleSelected($event)"
+  >
+  </webshop-nav>
+
+  <section class="vehicle-model-page">
+    <header
+      class="model-hero"
+      *ngIf="manufacturer && model; else modelNotFound"
+    >
+      <p class="hero-eyebrow">{{ manufacturer.name }}</p>
+      <h1>Motori i karoserije: {{ model.name }}</h1>
+      <p>
+        Odaberite motor/karoseriju da biste otvorili poslednji korak: stranicu
+        sa assembly grupama (filteri, kočnice, trap...) i svim delovima za
+        konkretan motor.
+      </p>
+    </header>
+
+    <section *ngIf="manufacturer && model" class="vehicle-list">
+      <div *ngIf="loading" class="loading-state">Učitavanje motora...</div>
+
+      <div class="vehicle-filter" *ngIf="!loading && vehicles.length">
+        <div class="vehicle-filter__copy">
+          <p class="filter-eyebrow">Motori i karoserije</p>
+          <h3>Nađi tačan motor ili karoseriju</h3>
+          <p>
+            Upiši šifru motora (npr. B47), snagu (140kw), karoseriju (karavan,
+            sedan) ili godinu.
+          </p>
+        </div>
+        <div class="vehicle-filter__control">
+          <label for="vehicleSearch">Pretraži listu motora</label>
+          <input
+            id="vehicleSearch"
+            type="search"
+            name="vehicleSearch"
+            [value]="vehicleSearchTerm"
+            (input)="handleVehicleSearch($event)"
+            placeholder="npr. 2.0 TDI, 140kw, karavan, 2017, B47"
+            autocomplete="off"
+          />
+        </div>
+        <div class="vehicle-filter__count">
+          <strong>{{ filteredVehicles.length }}</strong>
+          <span>rezultata</span>
+        </div>
+      </div>
+
+      <div class="vehicle-grid" *ngIf="!loading">
+        <a
+          *ngFor="let vehicle of filteredVehicles"
+          class="vehicle-card"
+          [routerLink]="
+            vehicleUrlService.buildVehicleNavigationCommands(vehicle)
+          "
+          [attr.href]="vehicleUrlService.buildVehiclePath(vehicle)"
+          (click)="handleVehicleClick(vehicle)"
+        >
+          <span class="vehicle-title">
+            {{ vehicle.description || "Tip vozila" }}
+          </span>
+          <span class="vehicle-meta">{{ formatVehiclePower(vehicle) }}</span>
+          <span class="vehicle-meta">{{ formatVehicleYears(vehicle) }}</span>
+        </a>
+      </div>
+
+      <p *ngIf="!loading && !vehicles.length" class="empty-state">
+        Trenutno nemamo motore za ovaj model. Proveri drugi model ili tip vozila
+        ili nas kontaktiraj za pomoć.
+      </p>
+
+      <p
+        *ngIf="!loading && vehicles.length && !filteredVehicles.length"
+        class="empty-state"
+      >
+        Nema rezultata za "{{ vehicleSearchTerm }}". Promeni izraz ili izbriši
+        filter da vidiš sve motore i karoserije.
+      </p>
+    </section>
+  </section>
+
+  <ng-template #modelNotFound>
+    <div class="not-found">
+      <h1>Model nije pronađen</h1>
+      <p>
+        Vratite se na listu proizvođača i ponovo izaberite model, ili otvorite
+        brzi izbor vozila u zaglavlju webshopa.
+      </p>
+      <a routerLink="/webshop/vozila" class="btn ghost">Nazad na vodič</a>
+    </div>
+  </ng-template>
+</section>

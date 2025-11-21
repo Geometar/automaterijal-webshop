@@ -85,6 +85,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
   mobileSidebarClosing = false;
   mobileSidebarOpen = false;
   showLogoutPopup = false;
+  showDocumentCard = false; // hide document card entry until ready
 
   private destroy$ = new Subject<void>();
 

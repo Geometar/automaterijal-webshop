@@ -1,3 +1,5 @@
+import { VehicleCategoryType } from '../enums/vehicle-category-type.enum';
+
 export class AssemblyGroup {
   assemblyGroupNodeId?: number;
   assemblyGroupName?: string;
@@ -135,6 +137,7 @@ export class TecdocSearchHistory {
   constructor(
     public id: number,
     public type: string,
-    public description: string
+    public description: string,
+    public vehicleType?: VehicleCategoryType
   ) { }
 }

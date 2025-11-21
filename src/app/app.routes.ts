@@ -69,6 +69,21 @@ export const routes: Routes = [
       import('./modules/webshop/webshop.component').then((m) => m.WebshopComponent)
   },
   {
+    path: 'webshop/vozila',
+    loadComponent: () =>
+      import('./modules/webshop/vehicle-pages/catalog-landing/vehicle-catalog-landing.component').then((m) => m.VehicleCatalogLandingComponent)
+  },
+  {
+    path: 'webshop/vozila/:manufacturerSlug',
+    loadComponent: () =>
+      import('./modules/webshop/vehicle-pages/manufacturer/vehicle-manufacturer-page.component').then((m) => m.VehicleManufacturerPageComponent)
+  },
+  {
+    path: 'webshop/vozila/:manufacturerSlug/:modelSlug',
+    loadComponent: () =>
+      import('./modules/webshop/vehicle-pages/model/vehicle-model-page.component').then((m) => m.VehicleModelPageComponent)
+  },
+  {
     path: 'webshop/vozila/:manufacturerSlug/:modelSlug/:vehicleSlug/:groupSlug',
     loadComponent: () =>
       import('./modules/webshop/webshop.component').then((m) => m.WebshopComponent)

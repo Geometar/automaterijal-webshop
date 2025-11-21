@@ -36,6 +36,14 @@
       strong { color: #1b455e; }
     }
 
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
     .cta-button {
       background-color: #ffd600;
       color: #1b455e;
@@ -48,6 +56,21 @@
       transition: background-color .2s;
 
       &:hover { background-color: #ffc107; }
+    }
+
+    .cta-link {
+      border: 1px solid rgba(27, 69, 94, 0.3);
+      color: #1b455e;
+      font-weight: 600;
+      padding: 14px 32px;
+      border-radius: 10px;
+      text-decoration: none;
+      background: rgba(255, 255, 255, 0.8);
+      transition: border-color 0.2s ease;
+
+      &:hover {
+        border-color: #1b455e;
+      }
     }
   }
 

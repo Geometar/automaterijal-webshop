@@ -9,6 +9,7 @@ import {
   ViewEncapsulation
 } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { Location } from '@angular/common';
 
 // Component imported
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
@@ -54,7 +55,8 @@ export class AssemblyGroupsComponent implements OnInit, OnChanges {
 
   constructor(
     private urlHelperService: UrlHelperService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private location: Location
   ) { }
 
   // Start of: Angular lifecycle
@@ -77,7 +79,7 @@ export class AssemblyGroupsComponent implements OnInit, OnChanges {
       return;
     }
     this.viewMode = 'grid';
-    this.urlHelperService.removeQueryParam('listView');
+    this.syncListViewParam(false);
   }
 
   activateListView(): void {
@@ -85,7 +87,7 @@ export class AssemblyGroupsComponent implements OnInit, OnChanges {
       return;
     }
     this.viewMode = 'list';
-    this.urlHelperService.addOrUpdateQueryParams({ listView: true });
+    this.syncListViewParam(true);
   }
 
   isGridView(): boolean {
@@ -322,5 +324,25 @@ export class AssemblyGroupsComponent implements OnInit, OnChanges {
 
   private escapeRegExp(value: string): string {
     return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  private syncListViewParam(enabled: boolean): void {
+    const query = { ...this.urlHelperService.readQueryParams() };
+    if (enabled) {
+      query['listView'] = 'true';
+    } else {
+      delete query['listView'];
+    }
+
+    const path = this.urlHelperService.getCurrentPath();
+    const searchParams = new URLSearchParams();
+    Object.entries(query).forEach(([key, value]) => {
+      if (value !== null && value !== undefined && `${value}`.trim() !== '') {
+        searchParams.set(key, `${value}`);
+      }
+    });
+    const queryString = searchParams.toString();
+    const newUrl = queryString ? `${path}?${queryString}` : path;
+    this.location.replaceState(newUrl);
   }
 }

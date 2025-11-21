@@ -43,20 +43,13 @@ import {
   TooltipThemeEnum,
   TooltipTypesEnum,
 } from '../../../data-models/enums';
+import { VehicleCategoryType } from '../../../data-models/enums/vehicle-category-type.enum';
 
 // Service
 import { TecdocService } from '../../../service/tecdoc.service';
 import { TecdocSearchHistoryService } from '../../../service/utils/tecdoc-search-history.service';
 import { SelectComponent } from '../../select/select.component';
 import { SelectModel } from '../../../data-models/interface';
-
-enum VehicleCategoryType {
-  PASSENGER = 'V',         // Putničko vozilo
-  LIGHT_COMMERCIAL = 'L',  // Kombi
-  TRUCK = 'C',  // Kombi
-  MOTORCYCLE = 'B',        // Motor,
-  TRACTOR = 'T',        // Motor
-}
 
 @Component({
   selector: 'vehicle-selection-popup',
@@ -459,6 +452,7 @@ export class VehicleSelectionPopupComponent implements OnInit, OnDestroy {
       id: linkageTargetId!,
       type: subLinkageTargetType!,
       description: vehicleDescription,
+      vehicleType: this.selectedVehicleCategory,
     } as TecdocSearchHistory);
   }
 }

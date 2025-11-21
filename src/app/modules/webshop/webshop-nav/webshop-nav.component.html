@@ -14,8 +14,9 @@
           [iconColor]="colorEnum.INFO_25_FILL"
           [type]="buttonType.PRIMARY"
           [theme]="buttonTheme.LIGHT_ORANGE"
-          [label]="'Izaberi vozilo'"
-          (clickEvent)="openVehicleSelection()"
+          [label]="'Izbor vozila'"
+          [routerLink]="['/webshop/vozila']"
+          [attr.href]="'/webshop/vozila'"
         >
         </autom-button>
 
@@ -82,7 +83,8 @@
             <a
               *ngIf="thirdNavigation; else secondActive"
               itemprop="item"
-              (click)="goToSecondPage()"
+              [routerLink]="secondBreadcrumbLink"
+              (click)="handleSecondBreadcrumbClick($event)"
               role="link"
               tabindex="0"
             >
@@ -101,7 +103,14 @@
             itemscope
             itemtype="https://schema.org/ListItem"
           >
-            <span itemprop="name">{{ thirdNavigation }}</span>
+            <ng-container *ngIf="thirdBreadcrumbLink; else thirdLabel">
+              <a itemprop="item" [routerLink]="thirdBreadcrumbLink">
+                <span itemprop="name">{{ thirdNavigation }}</span>
+              </a>
+            </ng-container>
+            <ng-template #thirdLabel>
+              <span itemprop="name">{{ thirdNavigation }}</span>
+            </ng-template>
             <meta itemprop="position" content="3" />
           </li>
         </ol>

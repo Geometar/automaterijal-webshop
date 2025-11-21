@@ -47,6 +47,14 @@ export class TecdocSearchHistoryService {
       return [];
     }
     const data = this.localStorage.retrieve(this.storageKey) || [];
-    return data.map((v: any) => new TecdocSearchHistory(v.id, v.type, v.description));
+    return data.map(
+      (v: any) =>
+        new TecdocSearchHistory(
+          v.id,
+          v.type,
+          v.description,
+          v.vehicleType
+        )
+    );
   }
 }

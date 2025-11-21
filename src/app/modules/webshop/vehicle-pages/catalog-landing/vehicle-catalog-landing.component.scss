@@ -1,0 +1,429 @@
+.vehicle-page-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  webshop-nav {
+    width: 100%;
+  }
+}
+
+  .vehicle-catalog-page {
+    padding: 3rem 1.5rem 4rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    color: #1a1a1a;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+
+  .catalog-hero {
+    background: linear-gradient(135deg, #fff6ef 0%, #fffdfa 70%);
+    border-radius: 1.5rem;
+    padding: 2.5rem;
+    margin-bottom: 3rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+
+    &__content {
+      display: flex;
+      flex-direction: column;
+    }
+
+    &__panel {
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+    }
+
+    .panel-card {
+      background: #fff;
+      border-radius: 1.25rem;
+      padding: 1.5rem;
+      box-shadow: 0 15px 40px rgba(255, 138, 0, 0.15);
+      border: 1px solid rgba(255, 138, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+
+      h3 {
+        margin: 0;
+        font-size: 1.2rem;
+      }
+
+      .panel-list {
+        list-style: disc;
+        margin-left: 1.1rem;
+        color: #444;
+      }
+
+      .panel-eyebrow {
+        text-transform: uppercase;
+        font-size: 0.7rem;
+        letter-spacing: 0.12em;
+        color: #ff8a00;
+      }
+    }
+
+    .catalog-eyebrow {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #ff8a00;
+      margin-bottom: 0.5rem;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .catalog-subtitle {
+      font-size: 1.05rem;
+      max-width: 720px;
+      line-height: 1.4;
+      margin-bottom: 1.25rem;
+    }
+
+    .catalog-hero__cta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .catalog-hero__trust {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+
+      li {
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 1rem;
+        padding: 0.9rem 1rem;
+        border: 1px solid rgba(255, 138, 0, 0.2);
+        font-size: 0.85rem;
+        color: #555;
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+
+        span {
+          font-weight: 700;
+          font-size: 1.2rem;
+          color: #ff5400;
+        }
+      }
+    }
+  }
+
+  .btn {
+    border-radius: 999px;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    font-weight: 600;
+    text-align: center;
+
+    &.primary {
+      background: linear-gradient(120deg, #ff9900, #ff5400);
+      color: #fff;
+    }
+
+    &.ghost {
+      background: transparent;
+      color: #ff5400;
+      border: 1px solid rgba(255, 84, 0, 0.4);
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+
+  .vehicle-types,
+  .manufacturer-section,
+  .workflow-section,
+  .garage-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .garage-section {
+    border: 1px solid #ffe0cc;
+    background: linear-gradient(90deg, #fff9f3, #fffdfb);
+    border-radius: 1.25rem;
+    padding: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.75rem 1rem;
+
+    .garage-header {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .garage-actions {
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-end;
+    }
+
+    .garage-eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #ff7a00;
+      margin: 0 0 0.15rem;
+      font-size: 0.8rem;
+    }
+
+    h3 {
+      margin: 0 0 0.2rem;
+    }
+
+    .garage-subtitle {
+      margin: 0 0 0.75rem;
+      color: #4a5568;
+    }
+
+    .garage-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.6rem;
+    }
+
+    .garage-entry {
+      border: 1px solid #ffd1af;
+      background: #fff;
+      border-radius: 0.9rem;
+      padding: 0.85rem 1rem;
+      text-align: left;
+      cursor: pointer;
+      font-weight: 600;
+      color: #b74200;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 26px rgba(255, 122, 0, 0.12);
+        border-color: #ff8a00;
+      }
+
+      &:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(255, 138, 0, 0.25);
+        border-color: #ff8a00;
+      }
+    }
+  }
+
+  .workflow-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+  }
+
+  .workflow-card {
+    border-radius: 1.25rem;
+    border: 1px solid #ede7ff;
+    background: #fcfbff;
+    padding: 1.25rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 12px 24px rgba(14, 31, 53, 0.05);
+
+    .workflow-index {
+      position: absolute;
+      top: 0.75rem;
+      right: 1rem;
+      font-weight: 700;
+      font-size: 3rem;
+      color: rgba(117, 99, 255, 0.1);
+    }
+
+    .workflow-step {
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      color: #7a5af8;
+      margin-bottom: 0.35rem;
+    }
+
+    h3 {
+      margin-bottom: 0.35rem;
+    }
+
+    .workflow-desc {
+      color: #4a5568;
+      font-size: 0.92rem;
+    }
+  }
+
+  .manufacturer-search {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-bottom: 1.25rem;
+
+    &__field {
+      max-width: 360px;
+
+      ::ng-deep .mdc-text-field {
+        border-radius: 999px !important;
+        background: #fff;
+        border: 1px solid #d9d9d9;
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      ::ng-deep .mat-mdc-form-field-infix {
+        min-height: 44px;
+      }
+
+      ::ng-deep .mdc-text-field--focused {
+        border-color: #ff8a00;
+        box-shadow: 0 8px 18px rgba(255, 138, 0, 0.12);
+      }
+
+      ::ng-deep input::placeholder {
+        color: #a8a8a8;
+      }
+    }
+
+    small {
+      color: #777;
+    }
+  }
+
+  .section-headline {
+    margin-bottom: 1rem;
+
+    p {
+      text-transform: uppercase;
+      color: #888;
+      letter-spacing: 0.08em;
+      font-size: 0.8rem;
+      margin-bottom: 0.35rem;
+    }
+
+    h2 {
+      margin-bottom: 0.25rem;
+      font-size: 1.4rem;
+    }
+
+    .section-subtitle {
+      color: #555;
+    }
+  }
+
+  .type-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+  }
+
+  .type-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 1rem;
+    padding: 1.25rem;
+    text-align: left;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    .type-title {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    small {
+      color: #666;
+      line-height: 1.3;
+      display: block;
+    }
+
+    &.is-active {
+      border-color: #ff8a00;
+      box-shadow: 0 10px 25px rgba(255, 138, 0, 0.15);
+    }
+  }
+
+  .manufacturer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+  }
+
+  .manufacturer-card {
+    border: 1px solid #e7e7e7;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    background: #fff;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+
+    .manufacturer-title {
+      font-weight: 600;
+    }
+
+    .manufacturer-meta {
+      font-size: 0.85rem;
+      color: #777;
+    }
+
+    &:hover {
+      border-color: #ff8a00;
+      transform: translateY(-2px);
+    }
+  }
+
+  .manufacturer-empty {
+    grid-column: 1 / -1;
+    margin: 1rem 0 0;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    background: #fff7f0;
+    color: #c05621;
+  }
+
+  .loading-state {
+    padding: 1rem;
+    border-radius: 0.75rem;
+    background: #f6f6f6;
+  }
+
+  .catalog-note {
+    padding: 1.5rem;
+    border: 1px solid #f1f1f1;
+    border-radius: 1rem;
+    background: #fafafa;
+    color: #555;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    .link-example {
+      color: #0c63ff;
+      font-weight: 600;
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 2rem 1rem 3rem;
+
+    .catalog-hero {
+      padding: 1.75rem;
+      grid-template-columns: 1fr;
+    }
+  }
+}

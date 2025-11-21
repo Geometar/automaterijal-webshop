@@ -43,6 +43,13 @@ export class NavTitles {
   svg: IconsEnum = IconsEnum.SEARCH;
 }
 
+export interface WebshopNavBreadcrumbs {
+  second: string;
+  secondLink?: string | any[];
+  third?: string;
+  thirdLink?: string | any[];
+}
+
 @Component({
   selector: 'webshop-nav',
   standalone: true,
@@ -63,6 +70,7 @@ export class WebshopNavComponent implements OnChanges {
   @Input() filter = new Filter();
   @Input() searchTerm = '';
   @Input() selectedVehicle: TDVehicleDetails | null = null;
+  @Input() customBreadcrumbs: WebshopNavBreadcrumbs | null = null;
   @Output() selectedVehicleDetailsEmit = new EventEmitter<TDVehicleDetails>();
 
   // Enums
@@ -74,6 +82,8 @@ export class WebshopNavComponent implements OnChanges {
 
   secondNavigation: string = '';
   thirdNavigation: string = '';
+  secondBreadcrumbLink: string | any[] | null = null;
+  thirdBreadcrumbLink: string | any[] | null = null;
 
   // Misc
   scrolled = false;
@@ -104,6 +114,8 @@ export class WebshopNavComponent implements OnChanges {
   /** Angular lifecycle hooks start */
 
   ngOnChanges(changes: SimpleChanges): void {
+    this.secondBreadcrumbLink = null;
+    this.thirdBreadcrumbLink = null;
     this.thirdNavigation = this.assemblyGroupName || '';
 
     let navigationSet = false;
@@ -119,7 +131,12 @@ export class WebshopNavComponent implements OnChanges {
     }
 
     // Reset to empty string if nothing was set
-    if (!navigationSet) {
+    if (this.customBreadcrumbs) {
+      this.secondNavigation = this.customBreadcrumbs.second || '';
+      this.secondBreadcrumbLink = this.customBreadcrumbs.secondLink || null;
+      this.thirdNavigation = this.customBreadcrumbs.third || this.thirdNavigation;
+      this.thirdBreadcrumbLink = this.customBreadcrumbs.thirdLink || null;
+    } else if (!navigationSet) {
       this.secondNavigation = '';
     }
   }
@@ -139,11 +156,6 @@ export class WebshopNavComponent implements OnChanges {
     } else {
       this.urlHelperService.clearWebshopFilters();
     }
-  }
-
-  openVehicleSelection(): void {
-    this.chooseVehicleVisible = true;
-    this.chooseCategoryVisible = false;
   }
 
   openCategories(): void {
@@ -201,11 +213,22 @@ export class WebshopNavComponent implements OnChanges {
   }
 
   goToSecondPage(): void {
+    if (this.secondBreadcrumbLink) {
+      return;
+    }
     if (this.selectedVehicle?.linkageTargetId) {
       this.vehicleUrlService.navigateToVehicle(this.selectedVehicle);
       return;
     }
     this.urlHelperService.retainOnlyQueryParams(['tecdocType', 'tecdocId']);
+  }
+
+  handleSecondBreadcrumbClick(event: Event): void {
+    if (this.secondBreadcrumbLink) {
+      return;
+    }
+    event.preventDefault();
+    this.goToSecondPage();
   }
 
   /**

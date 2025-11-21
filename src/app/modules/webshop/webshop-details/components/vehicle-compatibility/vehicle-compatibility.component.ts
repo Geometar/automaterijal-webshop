@@ -23,6 +23,7 @@ import {
   TecDocLinkedVariant,
   Roba,
 } from '../../../../../shared/data-models/model/roba';
+import { TDVehicleDetails } from '../../../../../shared/data-models/model/tecdoc';
 
 // Enums
 import { IconsEnum } from '../../../../../shared/data-models/enums/icons.enum';
@@ -30,6 +31,7 @@ import { InputTypeEnum } from '../../../../../shared/data-models/enums';
 
 // Service
 import { TecdocService } from '../../../../../shared/service/tecdoc.service';
+import { VehicleUrlService } from '../../../../../shared/service/utils/vehicle-url.service';
 
 @Component({
   selector: 'app-vehicle-compatibility',
@@ -58,11 +60,16 @@ export class VehicleCompatibilityComponent implements OnChanges, OnDestroy {
 
   private expandedManufacturers = new Set<number>();
   private expandedModels = new Set<string>();
+  private vehicleDetailsCache = new Map<string, TDVehicleDetails>();
+  private pendingVehicleDetailRequests = new Set<string>();
 
   private destroy$ = new Subject<void>();
   private destroyed = false;
 
-  constructor(private tecDocService: TecdocService) { }
+  constructor(
+    private tecDocService: TecdocService,
+    private vehicleUrlService: VehicleUrlService,
+  ) { }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['product']) {
@@ -193,6 +200,8 @@ export class VehicleCompatibilityComponent implements OnChanges, OnDestroy {
     this.detailedTargetsLoaded = false;
     this.requestedDetailedTargets = false;
     this.linkedTargetsLoading = false;
+    this.vehicleDetailsCache.clear();
+    this.pendingVehicleDetailRequests.clear();
   }
 
   private fetchLinkedTargets(): void {
@@ -624,25 +633,36 @@ export class VehicleCompatibilityComponent implements OnChanges, OnDestroy {
     return '';
   }
 
-  getVehicleQueryParams(variant: TecDocLinkedVariant | undefined | null): {
-    tecdocType: string;
-    tecdocId: number;
-  } | null {
-    if (!variant) {
+  getVehicleLink(
+    manufacturer: TecDocLinkedManufacturerTargets,
+    model: TecDocLinkedModel,
+    variant: TecDocLinkedVariant | undefined | null
+  ): string | null {
+    const tecdocId = this.extractTecdocId(variant);
+    if (!tecdocId) {
       return null;
     }
-    const tecdocId = Number(
-      (variant as any)?.linkingTargetId ??
-      (variant as any)?.carId ??
-      Number.NaN
-    );
-    if (!Number.isFinite(tecdocId)) {
-      return null;
+
+    const tecdocType = this.getVariantTecdocType(variant);
+    const key = this.buildVehicleKey(tecdocId, tecdocType);
+
+    const cached = this.vehicleDetailsCache.get(key);
+    if (cached) {
+      return this.vehicleUrlService.buildVehiclePath(cached);
     }
-    return {
-      tecdocType: 'P',
+
+    this.fetchVehicleDetail(tecdocId, tecdocType, key);
+
+    const fallbackDetails = this.buildFallbackVehicleDetails(
       tecdocId,
-    };
+      tecdocType,
+      manufacturer,
+      model,
+      variant
+    );
+    return fallbackDetails
+      ? this.vehicleUrlService.buildVehiclePath(fallbackDetails)
+      : null;
   }
 
   private buildModelKey(manufacturerId: number, model: TecDocLinkedModel): string {
@@ -664,5 +684,96 @@ export class VehicleCompatibilityComponent implements OnChanges, OnDestroy {
 
   private normalizeWhitespace(value: string | undefined | null): string {
     return (value ?? '').replace(/\s+/g, ' ').trim();
+  }
+
+  private extractTecdocId(variant: TecDocLinkedVariant | undefined | null): number | null {
+    const tecdocId = Number(
+      (variant as any)?.carId ??
+      (variant as any)?.linkageTargetId ??
+      (variant as any)?.vehicleId ??
+      (variant as any)?.articleLinkId ??
+      (variant as any)?.linkingTargetId ??
+      Number.NaN
+    );
+    return Number.isFinite(tecdocId) ? tecdocId : null;
+  }
+
+  private getVariantTecdocType(variant: TecDocLinkedVariant | undefined | null): string {
+    const rawType = (variant as any)?.linkingTargetType;
+    if (typeof rawType === 'string' && rawType.trim()) {
+      return rawType.trim().toUpperCase();
+    }
+    return 'P';
+  }
+
+  private buildVariantDescription(
+    variant: TecDocLinkedVariant | undefined | null
+  ): string | undefined {
+    const engine = this.normalizeWhitespace(variant?.engine);
+    if (engine) {
+      return engine;
+    }
+    const body = this.normalizeWhitespace(variant?.constructionType);
+    return body || undefined;
+  }
+
+  private toYearMonthString(value?: number | null): string | undefined {
+    if (!Number.isFinite(value ?? NaN)) {
+      return undefined;
+    }
+    const raw = String(value);
+    if (raw.length === 6) {
+      return `${raw.slice(0, 4)}-${raw.slice(4, 6)}`;
+    }
+    return raw;
+  }
+
+  private buildVehicleKey(tecdocId: number, tecdocType: string): string {
+    return `${tecdocType.toUpperCase()}-${tecdocId}`;
+  }
+
+  private fetchVehicleDetail(tecdocId: number, tecdocType: string, key: string): void {
+    if (this.pendingVehicleDetailRequests.has(key)) {
+      return;
+    }
+    this.pendingVehicleDetailRequests.add(key);
+    this.tecDocService
+      .getLinkageTargets(tecdocId, tecdocType)
+      .pipe(takeUntil(this.destroy$), finalize(() => this.pendingVehicleDetailRequests.delete(key)))
+      .subscribe({
+        next: (details) => {
+          const detail = Array.isArray(details) && details.length ? details[0] : null;
+          if (!detail) {
+            return;
+          }
+          this.vehicleDetailsCache.set(key, detail);
+        },
+        error: () => { },
+      });
+  }
+
+  private buildFallbackVehicleDetails(
+    tecdocId: number,
+    tecdocType: string,
+    manufacturer: TecDocLinkedManufacturerTargets,
+    model: TecDocLinkedModel,
+    variant: TecDocLinkedVariant | undefined | null
+  ): TDVehicleDetails | null {
+    return {
+      linkageTargetId: tecdocId,
+      linkageTargetType: tecdocType,
+      mfrName: this.normalizeWhitespace(manufacturer?.manufacturerName),
+      vehicleModelSeriesName: this.normalizeWhitespace(model?.modelName),
+      description: this.buildVariantDescription(variant),
+      kiloWattsFrom: variant?.powerKwFrom,
+      kiloWattsTo: variant?.powerKwTo,
+      horsePowerFrom: variant?.powerHpFrom,
+      horsePowerTo: variant?.powerHpTo,
+      beginYearMonth: this.toYearMonthString(variant?.productionYearFrom),
+      endYearMonth: this.toYearMonthString(variant?.productionYearTo),
+      fuelType: undefined,
+      engineType: undefined,
+      engines: [],
+    };
   }
 }
