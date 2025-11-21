@@ -14,8 +14,9 @@
           [iconColor]="colorEnum.INFO_25_FILL"
           [type]="buttonType.PRIMARY"
           [theme]="buttonTheme.LIGHT_ORANGE"
-          [label]="'Izaberi vozilo'"
-          (clickEvent)="openVehicleSelection()"
+          [label]="'Izbor vozila'"
+          [routerLink]="['/webshop/vozila']"
+          [attr.href]="'/webshop/vozila'"
         >
         </autom-button>
 

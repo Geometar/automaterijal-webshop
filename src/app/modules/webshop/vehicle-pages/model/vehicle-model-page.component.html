@@ -59,6 +59,7 @@
           [routerLink]="
             vehicleUrlService.buildVehicleNavigationCommands(vehicle)
           "
+          [attr.href]="vehicleUrlService.buildVehiclePath(vehicle)"
           (click)="handleVehicleClick(vehicle)"
         >
           <span class="vehicle-title">

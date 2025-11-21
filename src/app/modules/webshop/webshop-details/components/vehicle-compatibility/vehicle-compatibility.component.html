@@ -126,11 +126,11 @@
                           {{ formatProductionPeriod(variant) }}
                         </td>
                         <td data-title="Pronađi" class="variant-action">
-                          <ng-container *ngIf="getVehicleQueryParams(variant) as query; else vehicleNoLink">
+                          <ng-container *ngIf="getVehicleLink(detail, model, variant) as link; else vehicleNoLink">
                             <a
                               class="variant-link"
-                              [routerLink]="['/webshop']"
-                              [queryParams]="query"
+                              [routerLink]="link"
+                              [attr.href]="link"
                             >
                               Pogledaj
                             </a>

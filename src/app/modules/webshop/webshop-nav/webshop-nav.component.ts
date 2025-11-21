@@ -158,11 +158,6 @@ export class WebshopNavComponent implements OnChanges {
     }
   }
 
-  openVehicleSelection(): void {
-    this.chooseVehicleVisible = true;
-    this.chooseCategoryVisible = false;
-  }
-
   openCategories(): void {
     this.chooseCategoryVisible = true;
     this.chooseVehicleVisible = false;

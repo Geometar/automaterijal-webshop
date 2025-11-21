@@ -19,7 +19,7 @@
       </p>
       <div class="catalog-hero__cta">
         <button class="btn primary" (click)="chooseVehicleVisible = true">
-          Brzi izbor (popup)
+          Brzi odabir vozila
         </button>
         <a class="btn ghost" routerLink="/webshop">Idi u katalog delova</a>
       </div>
@@ -57,10 +57,15 @@
   </header>
 
   <section class="garage-section" *ngIf="garageVehicles.length">
-    <div>
+    <div class="garage-header">
       <p class="garage-eyebrow">Tvoja garaža</p>
       <h3>Poslednje izabrana vozila</h3>
       <p class="garage-subtitle">Klikni i nastavi na motore/delove za taj izbor.</p>
+    </div>
+    <div class="garage-actions">
+      <button type="button" class="btn ghost" (click)="openQuickChoose()">
+        Brzi izbor vozila
+      </button>
     </div>
     <div class="garage-list">
       <button

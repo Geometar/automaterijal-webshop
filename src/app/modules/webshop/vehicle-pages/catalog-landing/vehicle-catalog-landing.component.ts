@@ -170,7 +170,11 @@ export class VehicleCatalogLandingComponent implements OnInit, OnDestroy {
     this.visibleManufacturers = this.manufacturers.filter((manufacturer) => {
       const normalizedName = (manufacturer.name || '').toLowerCase();
       return normalizedName.includes(term);
-    });
+      });
+  }
+
+  openQuickChoose(): void {
+    this.chooseVehicleVisible = true;
   }
 
   handleManufacturerSearch(rawValue: unknown): void {
