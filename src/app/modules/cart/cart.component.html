@@ -203,14 +203,14 @@
         "
         (clickEvent)="submitInvoice()"
       ></autom-button>
-      <div *ngIf="!loggedIn && total < 6000" class="free-shipping-info warning">
+      <div *ngIf="!loggedIn && total < 4000" class="free-shipping-info warning">
         <autom-icon [source]="iconsEnum.INFO" class="info-icon"></autom-icon>
-        Porudžbine preko 6.000 RSD imaju besplatnu dostavu. Još
-        {{ 6000 - total | rsdCurrency }} i vaša dostava će biti besplatna!
+        Porudžbine preko 4.000 RSD imaju besplatnu dostavu. Još
+        {{ 4000 - total | rsdCurrency }} i vaša dostava će biti besplatna!
       </div>
 
       <div
-        *ngIf="!loggedIn && total >= 6000"
+        *ngIf="!loggedIn && total >= 4000"
         class="free-shipping-info success"
       >
         <autom-icon

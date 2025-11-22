@@ -22,9 +22,8 @@ export class TecdocSearchHistoryService {
   saveVehicle(vehicle: TecdocSearchHistory): void {
     let vehicles = this.getVehiclesArray();
 
-    // Prevent duplicates
-    const alreadyExists = vehicles.some(v => v.id === vehicle.id && v.type === vehicle.type);
-    if (alreadyExists) return;
+    // Move existing entry to the end so last picked is shown first in UI
+    vehicles = vehicles.filter(v => !(v.id === vehicle.id && v.type === vehicle.type));
 
     // Add new vehicle
     vehicles.push(vehicle);
