@@ -42,6 +42,14 @@ export class CartStateService {
   }
 
   addToCart(roba: any, quantity: number = 1): void {
+    const unitPrice = Number(roba?.cena) || 0;
+    const currentStock = Number(roba?.stanje) || 0;
+
+    // Block adding items without a valid price or stock
+    if (unitPrice <= 0 || currentStock <= 0) {
+      return;
+    }
+
     let cart = this.getAll();
     const existingItem = cart.find((item) => item.robaId === roba.robaid);
     let trackedItem: CartItem;

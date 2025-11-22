@@ -114,7 +114,7 @@
                     >› {{ data.podGrupaNaziv }}</span
                   >
                 </li>
-                <li *ngIf="data.stanje > 0">
+                <li *ngIf="availableStock > 0">
                   <i class="dot"></i>Na stanju — spremno za brzu isporuku
                 </li>
                 <li *ngIf="data.katbr">
@@ -128,11 +128,11 @@
           <aside class="buy-card card">
             <div
               class="stock"
-              [class.ok]="data.stanje > 0"
-              [class.nope]="!data.stanje"
+              [class.ok]="availableStock > 0"
+              [class.nope]="isOutOfStock"
             >
               <span class="led"></span
-              >{{ data.stanje > 0 ? "Na stanju" : "Nema na stanju" }}
+              >{{ !isOutOfStock ? "Na stanju" : "Nema na stanju" }}
             </div>
 
             <div class="price-wrap">
@@ -143,15 +143,15 @@
             <div class="actions">
               <autom-input-fields
                 [clearBtn]="false"
-                [disableInput]="!data.stanje"
+                [disableInput]="isOutOfStock"
                 [customClass]="'qty'"
-                [max]="data!.stanje!"
+                [max]="availableStock || 1"
                 [min]="1"
                 [roundOff]="true"
                 [size]="sizeEnum.MEDIUM"
                 [type]="inputTypeEnum.QUANTITY"
                 [validators]="[
-                  { name: 'max', value: data.stanje },
+                  { name: 'max', value: availableStock || 1 },
                   { name: 'min', value: 1 }
                 ]"
                 [step]="1"
@@ -161,7 +161,7 @@
               ></autom-input-fields>
 
               <autom-button
-                [disabled]="!data.stanje"
+                [disabled]="isOutOfStock"
                 [iconPrefix]="true"
                 [iconSource]="iconEnum.SHOPPING_CART"
                 [iconColor]="colorEnum.INFO_25_FILL"

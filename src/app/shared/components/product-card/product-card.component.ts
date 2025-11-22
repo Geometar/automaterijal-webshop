@@ -93,6 +93,10 @@ export class AutomProductCardComponent implements OnInit {
   handleAddToCart(event?: Event): void {
     event?.stopPropagation();
     if (this.roba && this.quantity > 0) {
+      if (!this.hasValidPrice || this.isOutOfStock) {
+        this.snackbarService.showError('Artikal trenutno nije dostupan za poručivanje');
+        return;
+      }
       this.cartStateService.addToCart(this.roba, this.quantity);
       this.snackbarService.showSuccess('Artikal je dodat u korpu');
     }
@@ -102,9 +106,17 @@ export class AutomProductCardComponent implements OnInit {
     this.quantity = this.clampQuantity(value);
   }
 
+  private get hasValidPrice(): boolean {
+    return this.getPriceValue() > 0;
+  }
+
+  get availableStock(): number {
+    return this.hasValidPrice ? this.roba?.stanje ?? 0 : 0;
+  }
+
   private clampQuantity(value: number): number {
     const min = 1;
-    const max = this.roba?.stanje ?? 1;
+    const max = this.availableStock || 1;
     if (!Number.isFinite(value)) return min;
     if (value < min) return min;
     if (value > max) return max;
@@ -153,13 +165,13 @@ export class AutomProductCardComponent implements OnInit {
   get isOutOfStock(): boolean {
     // TecDoc-only is not treated as "out of stock" for the CTA visibility
     if (this.isTecDocOnly) return false;
-    const stanje = this.roba?.stanje ?? 0;
-    return stanje <= 0;
+    return !this.hasValidPrice || this.availableStock <= 0;
   }
 
   get stockLabel(): string {
     if (this.isTecDocOnly) return 'TecDoc artikal';
-    const stanje = this.roba?.stanje ?? 0;
+    if (!this.hasValidPrice) return 'Nema na stanju';
+    const stanje = this.availableStock;
     if (stanje >= 5) return 'Na stanju';
     if (stanje > 0) return 'Ograničene količine';
     return 'Nema na stanju';

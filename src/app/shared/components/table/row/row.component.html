@@ -143,15 +143,15 @@
     <div
       [ngClass]="{
         'item-status': true,
-        green: data.podGrupa !== 1000000 && data.stanje! > 0,
-        red: data.podGrupa !== 1000000 && data.stanje! === 0,
+        green: data.podGrupa !== 1000000 && !isUnavailable,
+        red: data.podGrupa !== 1000000 && isUnavailable,
         yellow: data.podGrupa === 1000000
       }"
     >
       {{
         data.podGrupa === 1000000
           ? "TecDoc artikal"
-          : data.stanje! > 0
+          : !isUnavailable
           ? "Ima na stanju"
           : "Nema na stanju"
       }}
@@ -188,15 +188,15 @@
       <autom-input-fields
         *ngIf="data.podGrupa !== 1000000"
         [clearBtn]="false"
-        [disableInput]="!data.stanje"
+        [disableInput]="isUnavailable"
         [customClass]="'quantity-size'"
-        [max]="data!.stanje"
+        [max]="effectiveStock || 1"
         [min]="1"
         [roundOff]="true"
         [size]="sizeEnum.MEDIUM"
         [type]="inputTypeEnum.QUANTITY"
         [validators]="[
-          { name: 'max', value: data.stanje },
+          { name: 'max', value: effectiveStock || 1 },
           { name: 'min', value: 1 }
         ]"
         [step]="1"
@@ -209,7 +209,7 @@
         *ngIf="data.podGrupa !== 1000000"
         mat-raised-button
         color="primary"
-        [disabled]="!data.stanje"
+        [disabled]="isUnavailable"
         [iconColor]="colorEnum.INFO_25"
         [iconPrefix]="true"
         [iconSource]="iconEnum.SHOPPING_CART"
@@ -257,15 +257,15 @@
     <div class="util__flex--center">
       <autom-input-fields
         [clearBtn]="false"
-        [disableInput]="!data.stanje"
+        [disableInput]="isUnavailable"
         [customClass]="'quantity-size'"
-        [max]="data!.stanje"
+        [max]="effectiveStock || 1"
         [min]="1"
         [roundOff]="true"
         [size]="sizeEnum.MEDIUM"
         [type]="inputTypeEnum.QUANTITY"
         [validators]="[
-          { name: 'max', value: data.stanje },
+          { name: 'max', value: effectiveStock || 1 },
           { name: 'min', value: 1 }
         ]"
         [step]="1"

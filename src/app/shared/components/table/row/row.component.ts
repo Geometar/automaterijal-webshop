@@ -58,6 +58,7 @@ export class RowComponent implements OnInit, OnChanges {
   @Output() removeEvent = new EventEmitter<number>();
 
   quantity: number = 1;
+  private readonly minQuantity = 1;
 
   // Enums
   buttonTheme = ButtonThemes;
@@ -112,12 +113,13 @@ export class RowComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['data']) {
       this.computeCategoryLink();
+      this.quantity = this.clampQuantity(this.data?.kolicina ?? this.quantity);
     }
   }
 
   ngOnInit() {
     this.isEmployee = this.accountStateService.isEmployee();
-    this.quantity = this.data.kolicina ?? this.quantity;
+    this.quantity = this.clampQuantity(this.data.kolicina ?? this.quantity);
     this.updateDisplayedSpecs();
     this.computeCategoryLink();
   }
@@ -151,22 +153,26 @@ export class RowComponent implements OnInit, OnChanges {
   }
 
   modifyQuantity(quantity: number): void {
-    if (this.data.kolicina === quantity) {
+    if (this.isUnavailable) {
+      this.quantity = this.minQuantity;
       return;
     }
 
-    if (quantity < 1) {
-      this.quantity = 1;
-    } else if (quantity > this.data.stanje!) {
-      this.quantity = this.data.stanje!;
-    } else {
-      this.quantity = quantity;
+    const next = this.clampQuantity(quantity);
+    if (this.quantity === next) {
+      return;
     }
 
+    this.quantity = next;
     this.cartStateService.updateQuantity(this.data.robaid!, this.quantity);
   }
 
   addToShoppingCart(data: Roba): void {
+    if (this.isUnavailable || !this.hasValidPrice) {
+      this.snackbarService.showError('Artikal trenutno nije dostupan za poručivanje');
+      return;
+    }
+
     this.cartStateService.addToCart(data, this.quantity);
     this.snackbarService.showSuccess('Artikal je dodat u korpu');
   }
@@ -223,6 +229,14 @@ export class RowComponent implements OnInit, OnChanges {
     return `Prikaži kategoriju ${groupName ?? subName}`;
   }
 
+  get effectiveStock(): number {
+    return this.hasValidPrice ? this.data?.stanje ?? 0 : 0;
+  }
+
+  get isUnavailable(): boolean {
+    return this.data.podGrupa !== 1000000 && this.effectiveStock <= 0;
+  }
+
   private computeCategoryLink(): void {
     const groupName = this.data?.grupaNaziv?.trim();
     const subName = this.data?.podGrupaNaziv?.trim();
@@ -241,5 +255,18 @@ export class RowComponent implements OnInit, OnChanges {
 
     this.categoryLinkSegments = segments;
     this.categoryHref = segments.join('/');
+  }
+
+  private get hasValidPrice(): boolean {
+    const price = Number(this.data?.cena) || 0;
+    return price > 0;
+  }
+
+  private clampQuantity(value: number): number {
+    if (!Number.isFinite(value)) return this.minQuantity;
+    if (value < this.minQuantity) return this.minQuantity;
+    const max = this.effectiveStock || this.minQuantity;
+    if (value > max) return max;
+    return Math.floor(value);
   }
 }

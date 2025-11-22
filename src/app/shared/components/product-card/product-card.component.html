@@ -82,19 +82,19 @@
 
   <!-- Količina i korpa (sakriveno za TecDoc-only) -->
   <div class="product-actions" *ngIf="!isTecDocOnly">
-    <autom-input-fields
-      [clearBtn]="false"
-      [disableInput]="isOutOfStock"
-      [customClass]="'quantity-size'"
-      [max]="roba.stanje || 1"
-      [min]="1"
-      [roundOff]="true"
-      [size]="sizeEnum.MEDIUM"
-      [type]="inputTypeEnum.QUANTITY"
-      [validators]="[
-        { name: 'max', value: roba.stanje || 1 },
-        { name: 'min', value: 1 }
-      ]"
+      <autom-input-fields
+        [clearBtn]="false"
+        [disableInput]="isOutOfStock"
+        [customClass]="'quantity-size'"
+        [max]="availableStock || 1"
+        [min]="1"
+        [roundOff]="true"
+        [size]="sizeEnum.MEDIUM"
+        [type]="inputTypeEnum.QUANTITY"
+        [validators]="[
+          { name: 'max', value: availableStock || 1 },
+          { name: 'min', value: 1 }
+        ]"
       [step]="1"
       [value]="quantity"
       (emitSelected)="modifyQuantity($event)"

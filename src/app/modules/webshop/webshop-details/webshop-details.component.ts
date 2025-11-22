@@ -678,15 +678,33 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   // ─────────────────────────────────────────────────────────────────────────────
 
   modifyQuantity(quantity: number): void {
+    const max = this.availableStock || 1;
     if (quantity < 1) this.quantity = 1;
-    else if (this.data.stanje && quantity > this.data.stanje)
-      this.quantity = this.data.stanje;
+    else if (quantity > max) this.quantity = max;
     else this.quantity = quantity;
   }
 
   addToShopingCart(): void {
+    if (this.isOutOfStock) {
+      this.snackbarService.showError('Artikal trenutno nije dostupan za poručivanje');
+      return;
+    }
+
     this.cartStateService.addToCart(this.data, this.quantity);
     this.snackbarService.showSuccess('Artikal je dodat u korpu');
+  }
+
+  get hasValidPrice(): boolean {
+    const price = Number(this.data?.cena) || 0;
+    return price > 0;
+  }
+
+  get availableStock(): number {
+    return this.hasValidPrice ? this.data?.stanje ?? 0 : 0;
+  }
+
+  get isOutOfStock(): boolean {
+    return this.availableStock <= 0;
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
