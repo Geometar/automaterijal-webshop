@@ -205,8 +205,53 @@
       ></autom-button>
       <div *ngIf="!loggedIn && total < 3000" class="free-shipping-info warning">
         <autom-icon [source]="iconsEnum.INFO" class="info-icon"></autom-icon>
-        Porudžbine preko 3.000 RSD imaju besplatnu dostavu. Još
-        {{ 3000 - total | rsdCurrency }} i vaša dostava će biti besplatna!
+        Porudžbine preko 3.000 RSD (kupci bez ugovora) imaju besplatnu
+        dostavu. Još {{ 3000 - total | rsdCurrency }} i vaša dostava će biti
+        besplatna!
+      </div>
+      <div *ngIf="!loggedIn" class="checkout-info">
+        <p class="checkout-info__title">Dostava i plaćanje</p>
+        <ul class="checkout-info__list">
+          <li>
+            Sve što je u korpi je na stanju → predajemo kuriru u roku 24h
+            (Aks/Bex dostava 1–2 radna dana).
+          </li>
+          <li>
+            Plaćanje pouzećem (gotovina ili kartica kod kurira gde je
+            omogućeno).
+          </li>
+          <li>Fiskalni račun stiže u paketu.</li>
+          <li>
+            Ako ste na ruti našeg vozila tog dana, javljamo se ili pozovite za
+            direktnu isporuku.
+          </li>
+          <li>
+            Besplatna dostava za maloprodajne online porudžbine (bez ugovora)
+            iznad 3.000 RSD.
+          </li>
+        </ul>
+        <div class="checkout-info__links">
+          <a
+            routerLink="/uslovi-kupovine"
+            fragment="dostava"
+            href="/uslovi-kupovine#dostava"
+            >Dostava</a
+          >
+          <span aria-hidden="true">•</span>
+          <a
+            routerLink="/uslovi-kupovine"
+            fragment="placanje"
+            href="/uslovi-kupovine#placanje"
+            >Plaćanje</a
+          >
+          <span aria-hidden="true">•</span>
+          <a
+            routerLink="/uslovi-kupovine"
+            fragment="povrat"
+            href="/uslovi-kupovine#povrat"
+            >Povrat i garancija</a
+          >
+        </div>
       </div>
 
       <div

@@ -81,6 +81,50 @@
     font-size: 13px;
     color: var(--figma-neutral-600);
   }
+
+  .checkout-info {
+    margin-top: 16px;
+    padding: 10px 12px;
+    border: 1px solid #e5e7eb;
+    border-left: 3px solid var(--figma-info-700);
+    border-radius: 10px;
+    background: #f9fafb;
+    color: var(--text-600, #4b5563);
+    font-size: 12.5px;
+    line-height: 1.55;
+
+    &__title {
+      margin: 0 0 6px;
+      font-weight: 700;
+      color: var(--text-800, #1f2937);
+      font-size: 13px;
+    }
+
+    &__list {
+      margin: 0 0 8px;
+      padding-left: 14px;
+      display: grid;
+      gap: 5px;
+      list-style: disc;
+    }
+
+    &__links {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+
+      a {
+        color: var(--figma-info-700);
+        text-decoration: none;
+        font-weight: 600;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
 }
 
 @media (max-width: 991px) {

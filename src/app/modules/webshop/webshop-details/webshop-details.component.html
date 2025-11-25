@@ -170,10 +170,22 @@
               ></autom-button>
             </div>
 
-            <ul class="trust">
-              <li><i class="shield"></i> Sigurno plaćanje</li>
-              <li><i class="truck"></i> Brza isporuka</li>
-            </ul>
+            <div *ngIf="!loggedIn" class="delivery-hint">
+              <p class="delivery-hint__title">Dostava i plaćanje</p>
+              <ul class="delivery-hint__list">
+                <li>Sve na stanju → kuriru u 24h, Aks/Bex isporuka 1–2 radna dana.</li>
+                <li>Plaćanje pouzećem (gotovina/kartica gde je omogućeno); fiskalni račun je u paketu.</li>
+                <li>Na ruti smo tog dana? Javljamo se ili pozovite za direktnu isporuku.</li>
+                <li>Besplatna dostava za maloprodajne porudžbine (bez ugovora) iznad 3.000 RSD.</li>
+              </ul>
+              <div class="delivery-hint__links">
+                <a routerLink="/uslovi-kupovine" fragment="dostava" href="/uslovi-kupovine#dostava">Detalji dostave</a>
+                <span aria-hidden="true">•</span>
+                <a routerLink="/uslovi-kupovine" fragment="placanje" href="/uslovi-kupovine#placanje">Plaćanje</a>
+                <span aria-hidden="true">•</span>
+                <a routerLink="/uslovi-kupovine" fragment="povrat" href="/uslovi-kupovine#povrat">Povrat i garancija</a>
+              </div>
+            </div>
           </aside>
         </div>
       </article>

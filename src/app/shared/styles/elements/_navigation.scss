@@ -894,8 +894,9 @@ body {
 }
 
 .footer-link:is(:hover, :focus-visible) {
-  cursor: pointer;
   color: var(--international-orange-engineering);
+  cursor: pointer;
+  text-decoration: none !important;
 }
 
 .footer-link .material-symbols-rounded {

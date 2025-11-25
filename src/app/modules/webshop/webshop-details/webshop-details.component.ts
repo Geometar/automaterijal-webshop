@@ -124,6 +124,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   // Misc
   editingText = false;
   isAdmin = false;
+  loggedIn = false;
   loading = true;
   quantity: number = 1;
   sanitizedText: SafeHtml = '';
@@ -227,6 +228,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       });
 
     this.isAdmin = this.accountStateService.isAdmin();
+    this.loggedIn = this.accountStateService.isUserLoggedIn();
   }
 
   ngOnDestroy(): void {

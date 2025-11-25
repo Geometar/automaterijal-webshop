@@ -1,0 +1,49 @@
+/* Footer tweaks for policies */
+.footer-list--policies {
+  margin-top: 10px;
+
+  .h3 {
+    margin-bottom: 4px;
+  }
+
+  &__inline {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .footer-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    border: none;
+    color: #e5e7eb;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-decoration-color: rgba(255, 255, 255, 0.4);
+    font-weight: 600;
+
+    &:hover {
+      color: #fff;
+      text-decoration-color: #fff;
+    }
+  }
+}
+
+.footer-terms {
+  margin-top: 6px;
+
+  .footer-link {
+    padding-left: 0;
+    text-decoration: underline;
+    text-decoration-color: rgba(255, 255, 255, 0.4);
+    text-decoration-thickness: 1px;
+
+    &:hover {
+      text-decoration-color: #fff;
+    }
+  }
+}

@@ -31,6 +31,26 @@ export const routes: Routes = [
       import('./modules/dashboard/kontakt/kontakt.component').then((m) => m.KontaktComponent)
   },
   {
+    path: 'uslovi-kupovine',
+    loadComponent: () =>
+      import('./modules/policies/purchase-terms/purchase-terms.component').then((m) => m.PurchaseTermsComponent)
+  },
+  {
+    path: 'dostava',
+    loadComponent: () =>
+      import('./modules/policies/shipping-policy/shipping-policy.component').then((m) => m.ShippingPolicyComponent)
+  },
+  {
+    path: 'placanje',
+    loadComponent: () =>
+      import('./modules/policies/payment-policy/payment-policy.component').then((m) => m.PaymentPolicyComponent)
+  },
+  {
+    path: 'povrat-garancija',
+    loadComponent: () =>
+      import('./modules/policies/return-policy/return-policy.component').then((m) => m.ReturnPolicyComponent)
+  },
+  {
     path: 'blog',
     loadComponent: () =>
       import('./modules/blog/blog-list.component').then((m) => m.BlogListComponent)

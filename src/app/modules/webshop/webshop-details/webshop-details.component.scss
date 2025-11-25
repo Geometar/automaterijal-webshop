@@ -491,36 +491,47 @@
     }
   }
 
-  .trust {
-    margin: 14px 2px 2px;
-    padding: 0;
-    list-style: none;
-    display: grid;
-    gap: 8px;
+  .delivery-hint {
+    margin-top: 12px;
+    padding: 10px 12px;
+    border: 1px solid #e5e7eb;
+    border-left: 3px solid var(--primary-600, #ea580c);
+    border-radius: 10px;
+    background: #f9fafb;
+    color: var(--text-600, #4b5563);
+    font-size: 12.5px;
+    line-height: 1.55;
 
-    li {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--text-500);
+    &__title {
+      margin: 0 0 6px;
+      font-weight: 700;
+      color: var(--text-800, #1f2937);
       font-size: 13px;
     }
 
-    i {
-      width: 18px;
-      height: 18px;
-      border-radius: 4px;
-      background: var(--bg-soft);
-      border: 1px solid var(--stroke);
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: 14px;
+    &__list {
+      margin: 0 0 8px;
+      padding-left: 14px;
+      display: grid;
+      gap: 5px;
+      list-style: disc;
     }
-    .shield {
-      background-image: url("/images/icons/shield.svg");
-    }
-    .truck {
-      background-image: url("/images/icons/truck.svg");
+
+    &__links {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+
+      a {
+        color: var(--primary-600, #ea580c);
+        font-weight: 700;
+        text-decoration: none;
+        font-size: 12.5px;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
     }
   }
 }
