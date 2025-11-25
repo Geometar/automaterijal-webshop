@@ -1264,7 +1264,8 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   private buildOgImageAlt(roba: Roba): string {
     const brand = this.normalizeWhitespace(roba.proizvodjac?.naziv);
     const name = this.normalizeWhitespace(roba.naziv);
-    const base = [brand, name].filter(Boolean).join(' ');
+    const sku = this.normalizeWhitespace(roba.katbr);
+    const base = [brand, name, sku ? `(kat. ${sku})` : ''].filter(Boolean).join(' ');
     return base || 'Automaterijal proizvod';
   }
 
@@ -1294,35 +1295,17 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     const baseTitle = [brand, name].filter(Boolean).join(' ');
     const title = sku ? `${baseTitle} (${sku}) | Automaterijal` : `${baseTitle} | Automaterijal`;
 
-    // Description — robust fallback kad nema teksta
-    const specsSnippet = (roba.tehnickiOpis || [])
-      .slice(0, 4)
-      .map((s) => [s.oznaka, s.vrednost, s.jedinica ? `(${s.jedinica})` : ''].filter(Boolean).join(' '))
-      .join(' · ');
-    const groupLine = [group, subgroup].filter(Boolean).join(' › ');
-    const descCandidates = [
-      roba.tekst?.trim(),
-      `Kupite ${brand} ${name}${sku ? ` (${sku})` : ''} online. Dostupnost: ${inStock ? 'Na stanju' : 'Nema na stanju'}, brza dostava.${groupLine ? ' Kategorija: ' + groupLine + '.' : ''}`,
-      specsSnippet,
-      `${brand} ${name} — rezervni deo. Brza isporuka i podrška.`,
-    ].filter(Boolean) as string[];
-    let description =
-      descCandidates[0] ||
-      descCandidates[1] ||
-      descCandidates[2] ||
-      descCandidates[3] ||
-      '';
-    description = this.normalizeWhitespace(description);
-
-    const manufacturerSnippet = this.getLinkedManufacturersSnippet();
-    if (manufacturerSnippet) {
-      if (!description) {
-        description = `Kompatibilni proizvođači: ${manufacturerSnippet}.`;
-      } else if (description.length < 120) {
-        description = `${description.replace(/[.?!]+$/, '')}. Kompatibilni proizvođači: ${manufacturerSnippet}.`;
-      }
-    }
-    description = description.slice(0, 158);
+    const description = this.buildMetaDescription({
+      brand,
+      name,
+      sku,
+      group,
+      subgroup,
+      inStock,
+      tekst: roba.tekst,
+      specs: roba.tehnickiOpis || [],
+      linkedManufacturers: this.getLinkedManufacturersSnippet(),
+    });
 
     const { url } = this.buildCanonical(roba);
 
@@ -1490,5 +1473,73 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     if (!raw) return null;
     const m = raw.match(/^\d+/);     // uzmi početne cifre pre prvog '-'
     return m ? Number(m[0]) : null;
+  }
+
+
+
+  private buildMetaDescription(input: {
+    brand?: string;
+    name?: string;
+    sku?: string;
+    group?: string;
+    subgroup?: string;
+    inStock: boolean;
+    tekst?: string | null;
+    specs: { oznaka?: string | null; vrednost?: string | null; jedinica?: string | null }[];
+    linkedManufacturers?: string;
+  }): string {
+    const { brand, name, sku, group, subgroup, inStock, tekst, specs, linkedManufacturers } = input;
+    const groupLine = [group, subgroup].filter(Boolean).join(' › ');
+
+    const specsSnippet = (specs || [])
+      .slice(0, 3)
+      .map((s) =>
+        [s.oznaka, s.vrednost, s.jedinica ? `(${s.jedinica})` : '']
+          .filter(Boolean)
+          .join(' ')
+      )
+      .filter(Boolean)
+      .join(' · ');
+
+    const base = [brand, name].filter(Boolean).join(' ');
+    const skuPart = sku ? ` (${sku})` : '';
+    const stockPart = inStock ? 'Na stanju, isporuka 1–2 dana.' : 'Proverite dostupnost.';
+
+    // Kompatibilnost: uzmi prva 3 brenda i skrati
+    let compat = '';
+    if (linkedManufacturers) {
+      const parts = linkedManufacturers
+        .split(',')
+        .map((p) => p.trim())
+        .filter(Boolean);
+      const unique = Array.from(new Set(parts)).sort((a, b) => a.localeCompare(b));
+      if (unique.length) {
+        const limit = 4;
+        const sliced = unique.slice(0, limit);
+        const shortList = unique.length > limit ? `${sliced.join(', ')} i dr.` : sliced.join(', ');
+        compat = `Kompatibilno: ${shortList}.`;
+      }
+    }
+
+    const descCandidates = [
+      tekst?.trim(),
+      `${base || name || 'Proizvod'}${skuPart}. ${stockPart} ${groupLine ? groupLine + '. ' : ''}${compat}`,
+      `${base}${skuPart} — ${groupLine || 'auto deo'}. ${stockPart}`,
+      specsSnippet,
+    ].filter(Boolean) as string[];
+
+    let description =
+      descCandidates[0] ||
+      descCandidates[1] ||
+      descCandidates[2] ||
+      descCandidates[3] ||
+      '';
+
+    if (linkedManufacturers && description.length < 140) {
+      description = `${description.replace(/[.?!]+$/, '')}. Kompatibilno: ${linkedManufacturers}.`;
+    }
+
+    description = this.normalizeWhitespace(description).slice(0, 158);
+    return description;
   }
 }
