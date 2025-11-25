@@ -469,10 +469,37 @@
 
   .price-wrap {
     margin: 14px 0 12px;
+
+    .price-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+    .old-price {
+      color: var(--text-400, #9ca3af);
+      text-decoration: line-through;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .discount-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #fef2f2;
+      color: #b91c1c;
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: 0.01em;
+      border: 1px solid #fecdd3;
+      box-shadow: 0 6px 18px rgba(249, 113, 113, 0.18);
+    }
   }
   .price {
     color: var(--text-900);
-    font-size: clamp(22px, 4vw, 28px);
+    font-size: clamp(22px, 4vw, 30px);
     font-weight: 800;
     letter-spacing: -0.02em;
     font-variant-numeric: tabular-nums;
@@ -480,6 +507,13 @@
   .note {
     font-size: 12px;
     color: var(--text-500);
+  }
+
+  .saving {
+    margin-top: 6px;
+    color: var(--success, #16a34a);
+    font-size: 13.5px;
+    font-weight: 800;
   }
 
   .actions {

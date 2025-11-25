@@ -237,10 +237,11 @@
     text-align: left;
 
     .sub-price {
-      font-size: 16px;
-      margin-bottom: 0;
+      font-size: 15px;
+      margin-bottom: 2px;
       text-align: right;
-      color: var(--figma-grey-700);
+      color: var(--figma-grey-600);
+      font-weight: 600;
     }
     .old-price {
       color: var(--figma-grey-500);
@@ -256,17 +257,17 @@
     }
 
     .price {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 0;
+      font-size: 21px;
+      font-weight: 800;
+      margin-bottom: 2px;
       text-align: right;
-      color: var(--figma-grey-800);
+      color: var(--figma-grey-900);
     }
 
     /* diskretno istaknuta ušteda */
     .saving {
-      font-size: 0.9rem;
-      font-weight: 600;
+      font-size: 14.5px;
+      font-weight: 800;
       color: var(--figma-success-700);
       text-align: right;
       margin-top: 2px;

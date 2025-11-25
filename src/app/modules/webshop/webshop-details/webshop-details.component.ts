@@ -158,6 +158,48 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     return isPlatformBrowser(this.platformId);
   }
 
+  get hasDiscount(): boolean {
+    const rabat = this.getDiscountValue();
+    return rabat > 0 && rabat < 100;
+  }
+
+  get discountValue(): number {
+    return this.getDiscountValue();
+  }
+
+  get oldPrice(): number | null {
+    if (!this.hasDiscount) return null;
+    const price = this.getPrice();
+    const rabat = this.getDiscountValue();
+    const denom = 1 - rabat / 100;
+    if (price <= 0 || denom <= 0) {
+      return null;
+    }
+    return price / denom;
+  }
+
+  get savings(): number | null {
+    if (!this.hasDiscount) return null;
+    const price = this.getPrice();
+    const oldPrice = this.oldPrice;
+    if (!oldPrice || price <= 0) {
+      return null;
+    }
+    return oldPrice - price;
+  }
+
+  private getPrice(): number {
+    const raw = (this.data as any)?.cena;
+    const n = Number(raw);
+    return Number.isFinite(n) ? n : 0;
+  }
+
+  private getDiscountValue(): number {
+    const raw = (this.data as any)?.rabat;
+    const n = Number(raw);
+    return Number.isFinite(n) ? n : 0;
+  }
+
   // Specs
   displayedSpecs: SpecEntry[] = [];
   private allSpecs: SpecEntry[] = [];

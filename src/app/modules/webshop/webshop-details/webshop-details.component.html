@@ -136,8 +136,15 @@
             </div>
 
             <div class="price-wrap">
+              <div class="price-row" *ngIf="hasDiscount">
+                <span class="old-price">{{ oldPrice! | rsdCurrency }}</span>
+                <span class="discount-badge">-{{ discountValue }}%</span>
+              </div>
               <div class="price">{{ data.cena! | rsdCurrency }}</div>
               <div class="note">cena sa PDV-om</div>
+              <div *ngIf="hasDiscount && savings" class="saving">
+                Ušteda {{ savings! | rsdCurrency }}
+              </div>
             </div>
 
             <div class="actions">
