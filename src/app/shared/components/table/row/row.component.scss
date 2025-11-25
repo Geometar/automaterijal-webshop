@@ -67,20 +67,21 @@
     /* Popust badge (kao na product cardu) */
     .discount-badge {
       position: absolute;
-      top: 0.5rem;
-      right: 0.5rem;
-      background: var(--figma-error-600);
-      color: var(--figma-base-white);
-      font-size: 0.9rem;
-      font-weight: 700;
-      min-width: 2.2rem;
-      min-height: 2.2rem;
+      top: 0.4rem;
+      right: 0.4rem;
+      background: #fef2f2;
+      color: #b91c1c;
+      font-size: 0.95rem;
+      font-weight: 800;
+      min-width: 2.6rem;
+      min-height: 2.6rem;
       border-radius: 9999px;
       display: flex;
       align-items: center;
       justify-content: center;
       line-height: 1;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      border: 1px solid #fecdd3;
+      box-shadow: 0 6px 16px rgba(185, 28, 28, 0.18);
       z-index: 1;
     }
 
