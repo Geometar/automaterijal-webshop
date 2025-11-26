@@ -2,7 +2,7 @@
   class="add-attributes-popup"
   [rounded]="true"
   [overlay]="true"
-  [width]="sizeEnum.MEDIUM"
+  [width]="sizeEnum.EXTRA_LARGE"
   [height]="sizeEnum.AUTO"
   [position]="positionEnum.CENTER"
   [subPosition]="positionEnum.CENTER"
@@ -101,15 +101,15 @@
         class="add-attributes-buttons"
         [theme]="buttonThemes.DARK_RED"
         [iconPrefix]="true"
-        [iconSource]="iconsEnum.SUNSET"
-        [iconColor]="colorEnum.INFO_25_FILL"
+        [iconSource]="iconsEnum.X_CIRCLE"
+        [iconColor]="colorEnum.INFO_25"
         [label]="'Cancel'"
         (clickEvent)="cancel()"
       >
       </autom-button>
       <autom-button
         class="add-attributes-buttons"
-        [iconSource]="iconsEnum.COMPLETE_WHEEL"
+        [iconSource]="iconsEnum.PLUS_CIRCLE"
         [iconPrefix]="true"
         [iconColor]="colorEnum.INFO_25"
         [theme]="buttonThemes.DEFAULT"
@@ -120,8 +120,8 @@
       <autom-button
         class="add-attributes-buttons"
         [iconPrefix]="true"
-        [iconSource]="iconsEnum.COFFEE"
-        [iconColor]="colorEnum.INFO_25_FILL"
+        [iconSource]="iconsEnum.SAVE"
+        [iconColor]="colorEnum.INFO_25"
         [theme]="buttonThemes.DEFAULT"
         [label]="'Save'"
         (clickEvent)="submit()"
