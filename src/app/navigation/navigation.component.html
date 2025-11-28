@@ -283,7 +283,22 @@
 
   <!-- Dokumenta / Login -->
   <a
-    *ngIf="loggedIn"
+    *ngIf="loggedIn && !isAdmin"
+    class="action-btn"
+    routerLink="/partner-card"
+    href="/partner-card"
+    aria-label="Dokumenta"
+    [attr.aria-current]="currentUrl.includes('/partner-card') ? 'page' : null"
+  >
+    <autom-icon
+      [ngClass]="currentUrl.includes('/partner-card') ? 'icon-active' : null"
+      [color]="colorEnum.RICH_BLACK"
+      [source]="iconEnum.CREDIT_CARD"
+    ></autom-icon>
+    <span class="action-label">Dokumenta</span>
+  </a>
+  <a
+    *ngIf="loggedIn && isAdmin"
     class="action-btn"
     routerLink="/invoices"
     href="/invoices"

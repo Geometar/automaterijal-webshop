@@ -1,0 +1,132 @@
+<section class="header-margin--top doc-page">
+  <header class="doc-page__header">
+    <div class="doc-page__topbar">
+      <autom-button
+        class="doc-page__back"
+        [iconPrefix]="true"
+        [iconSource]="iconsEnum.ARROW_LEFT"
+        [label]="'Nazad na karticu'"
+        [theme]="buttonThemes.LIGHT_GREY"
+        [type]="buttonTypes.SECONDARY"
+        (clickEvent)="onBack()"
+      ></autom-button>
+      <div class="doc-page__header-actions">
+        <autom-button
+          [iconPrefix]="true"
+          [iconSource]="iconsEnum.DOWNLOAD_CLOUD"
+          [label]="'PDF · moje cene'"
+          [theme]="buttonThemes.DEFAULT"
+          [type]="buttonTypes.PRIMARY"
+          [disabled]="true"
+        ></autom-button>
+        <autom-button
+          [iconPrefix]="true"
+          [iconSource]="iconsEnum.PRINTER"
+          [label]="'PDF · pune cene'"
+          [theme]="buttonThemes.LIGHT_GREY"
+          [type]="buttonTypes.SECONDARY"
+          [disabled]="true"
+        ></autom-button>
+      </div>
+    </div>
+    <div class="doc-page__title">
+      <div class="doc-page__title-line">
+        <h2>#{{ brdok }}</h2>
+        <span class="pill pill--label" *ngIf="docTypeLabel">
+          <autom-icon [source]="iconsEnum.FILE_TEXT"></autom-icon>
+          {{ docTypeLabel }}
+        </span>
+        <span class="pill soft" *ngIf="partnerPpid !== null && isAdmin">
+          <autom-icon [source]="iconsEnum.USER"></autom-icon>
+          Partner #{{ partnerPpid }}
+        </span>
+        <span class="pill ghost" *ngIf="isAdmin && partnerPpid === null">
+          <autom-icon [source]="iconsEnum.EYE"></autom-icon>
+          Admin pogled
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <div class="doc-page__body">
+    <div class="doc-page__summary" *ngIf="!loading">
+      <div class="summary-card">
+        <span class="label">Ukupno za plaćanje</span>
+        <strong>{{ displayTotal | rsdCurrency }}</strong>
+      </div>
+      <div class="summary-card">
+        <span class="label">Datum dokumenta</span>
+        <strong>{{ documentDate || '-' }}</strong>
+      </div>
+      <div class="summary-card highlight">
+        <span class="label">Valuta / rok</span>
+        <strong>{{ documentDueDate || '-' }}</strong>
+      </div>
+    </div>
+
+    <div *ngIf="loading" class="doc-page__loading">
+      <spinner></spinner>
+    </div>
+
+    <div *ngIf="!loading && error" class="doc-page__error">
+      <div>{{ error }}</div>
+      <autom-button
+        [label]="'Pokušaj ponovo'"
+        [theme]="buttonThemes.DEFAULT"
+        [type]="buttonTypes.PRIMARY"
+        (clickEvent)="onReload()"
+      ></autom-button>
+    </div>
+
+    <div
+      *ngIf="!loading && !error"
+      class="doc-page__rows"
+      [class.empty]="!items.length"
+    >
+      <div *ngIf="!items.length" class="doc-page__empty">
+        Nema stavki za prikaz.
+      </div>
+
+     <article class="doc-row" *ngFor="let item of items; trackBy: trackByRow">
+        <div class="doc-row__media">
+          <div class="image">
+            <img [src]="item.image" [alt]="item.title" />
+          </div>
+        </div>
+
+        <div class="doc-row__info">
+        <div class="doc-row__title">
+          <div class="codes">
+            <span class="pill" *ngIf="item.code"># {{ item.code }}</span>
+            <span class="pill danger" *ngIf="item.rabatLabel">
+              -{{ item.rabatLabel }}
+            </span>
+          </div>
+          <h3>{{ item.title }}</h3>
+        </div>
+        <div class="doc-row__meta">
+          <span class="pill soft">Količina: {{ item.quantity }}</span>
+        </div>
+        </div>
+
+        <div class="doc-row__pricing-table">
+          <div class="price-cell">
+            <span class="label">Bez PDV (kom)</span>
+            <strong>{{ item.partnerNet | rsdCurrency }}</strong>
+            <small>Ukupno {{ item.partnerNetTotal | rsdCurrency }}</small>
+          </div>
+          <div class="price-cell" *ngIf="item.partnerVatTotal > 0.009">
+            <span class="label">PDV (kom)</span>
+            <strong>{{ item.partnerVat | rsdCurrency }}</strong>
+            <small>Ukupno {{ item.partnerVatTotal | rsdCurrency }}</small>
+          </div>
+          <div class="price-cell">
+            <span class="label">Sa PDV (kom)</span>
+            <strong>{{ item.partnerGross | rsdCurrency }}</strong>
+            <small>Ukupno {{ item.partnerGrossTotal | rsdCurrency }}</small>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>

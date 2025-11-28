@@ -7,6 +7,7 @@ export interface PartnerCardItem {
   duguje: number;
   potrazuje: number;
   stanje: number;
+  vrdok?: string | null;
 }
 
 export interface PartnerCardGroup {
@@ -23,4 +24,39 @@ export interface PartnerCardResponse {
   ukupnoDuguje: number;
   ukupnoPotrazuje: number;
   ukupnoStanje: number;
+}
+
+export interface PartnerCardDetailsImage {
+  slikeUrl: string | null;
+  robaSlika: string | null;
+  url: boolean | null;
+}
+
+export interface PartnerCardDetailsItem {
+  id?: number | null;
+  stavkaId?: number | null;
+  robaId?: number | null;
+  kolicina?: number | string | null;
+  nabavnaCena?: number | string | null; // admin only
+  prodajnaCena?: number | string | null;
+  prodajnaCenaBezPdv?: number | string | null;
+  prodajnaCenaSaPdv?: number | string | null;
+  rabat?: number | string | null;
+  porez?: number | string | null;
+  naziv?: string | null;
+  robaNaziv?: string | null;
+  katbr?: string | null;
+  katbrPro?: string | null;
+  barkod?: string | null;
+  slika?: PartnerCardDetailsImage | null;
+  cenaPartnera?: number | string | null;
+  cenaPartneraUkupno?: number | string | null;
+  punaCena?: number | string | null;
+  punaCenaUkupno?: number | string | null;
+}
+
+export interface PartnerCardDetailsResponse {
+  errorCode: number;
+  errorMessage: string;
+  stavke: PartnerCardDetailsItem[];
 }

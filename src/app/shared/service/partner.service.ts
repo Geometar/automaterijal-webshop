@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { catchError, Observable, throwError } from 'rxjs';
 
 // Data models
-import { Partner, PasswordChange, PartnerCardResponse } from '../data-models/model';
+import { Partner, PasswordChange, PartnerCardDetailsResponse, PartnerCardResponse } from '../data-models/model';
 
 // Env
 import { environment } from '../../../environment/environment';
@@ -15,6 +15,8 @@ const DOMAIN_URL = environment.apiUrl + '/api/partner';
 const KOMERCIJALISTI_URL = '/komercijalsti';
 const PARTNER_CARD_URL = '/kartica';
 const PARTNER_CARD_ADMIN_URL = '/kartica-admin';
+const PARTNER_CARD_DETAILS_URL = '/kartica/detalji';
+const PARTNER_CARD_ADMIN_DETAILS_URL = '/kartica-admin/detalji';
 const PARTNER_SEARCH_URL = '/pretraga';
 const PASSWORD_CHANGE_URL = '/promena-sifre';
 
@@ -47,6 +49,24 @@ export class PartnerService {
     const fullUrl = `${DOMAIN_URL}/${partnerPpid}${PARTNER_CARD_ADMIN_URL}`;
     return this.http
       .get<PartnerCardResponse>(fullUrl)
+      .pipe(
+        catchError((error: any) => throwError(error))
+      );
+  }
+
+  public getPartnerCardDetails(
+    vrdok: string,
+    brdok: string | number,
+    partnerPpid?: number
+  ): Observable<PartnerCardDetailsResponse> {
+    const params = this.serviceHelpersService.formatQueryParameters({ vrdok, brdok });
+    const baseUrl = partnerPpid !== undefined
+      ? `${DOMAIN_URL}/${partnerPpid}${PARTNER_CARD_ADMIN_DETAILS_URL}`
+      : DOMAIN_URL + PARTNER_CARD_DETAILS_URL;
+    const fullUrl = `${baseUrl}${params}`;
+
+    return this.http
+      .get<PartnerCardDetailsResponse>(fullUrl)
       .pipe(
         catchError((error: any) => throwError(error))
       );

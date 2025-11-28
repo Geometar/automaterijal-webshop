@@ -2,13 +2,11 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 
 // Data models
-import { Partner } from '../../../shared/data-models/model';
+import { Partner } from '../data-models/model';
+import { TypeaheadItem } from '../components/typeahead/typeahead.component';
 
 // Service
-import { PartnerService } from '../../../shared/service/partner.service';
-
-// Components
-import { TypeaheadItem } from '../../../shared/components/typeahead/typeahead.component';
+import { PartnerService } from './partner.service';
 
 export interface PartnerCardAdminSelectionResult {
   partner: Partner | null;

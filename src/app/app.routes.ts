@@ -142,6 +142,12 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'partner-card/dokument/:vrdok/:brdok',
+    loadComponent: () =>
+      import('./modules/personal/partner-card/details/partner-card-document.component').then((m) => m.PartnerCardDocumentComponent),
+    canActivate: [authGuard]
+  },
+  {
     path: 'invoices',
     loadComponent: () =>
       import('./modules/personal/invoices/invoices.component').then((m) => m.InvoicesComponent),
