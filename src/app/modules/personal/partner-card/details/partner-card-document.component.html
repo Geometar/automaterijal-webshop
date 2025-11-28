@@ -17,7 +17,8 @@
           [label]="'PDF · moje cene'"
           [theme]="buttonThemes.DEFAULT"
           [type]="buttonTypes.PRIMARY"
-          [disabled]="true"
+          [disabled]="!items.length"
+          (clickEvent)="print('partner')"
         ></autom-button>
         <autom-button
           [iconPrefix]="true"
@@ -25,7 +26,8 @@
           [label]="'PDF · pune cene'"
           [theme]="buttonThemes.LIGHT_GREY"
           [type]="buttonTypes.SECONDARY"
-          [disabled]="true"
+          [disabled]="!items.length"
+          (clickEvent)="print('full')"
         ></autom-button>
       </div>
     </div>
@@ -53,6 +55,10 @@
       <div class="summary-card">
         <span class="label">Ukupno za plaćanje</span>
         <strong>{{ displayTotal | rsdCurrency }}</strong>
+      </div>
+      <div class="summary-card">
+        <span class="label">PDV</span>
+        <strong>{{ totals.partnerVat | rsdCurrency }}</strong>
       </div>
       <div class="summary-card">
         <span class="label">Datum dokumenta</span>

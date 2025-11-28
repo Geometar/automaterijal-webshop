@@ -34,6 +34,7 @@ import { RsdCurrencyPipe } from '../../../shared/pipe/rsd-currency.pipe';
 
 // Services
 import { AccountStateService } from '../../../shared/service/state/account-state.service';
+import { PartnerCardCacheService } from '../../../shared/service/state/partner-card-cache.service';
 import { PartnerService } from '../../../shared/service/partner.service';
 import { PictureService } from '../../../shared/service/utils/picture.service';
 import { PartnerCardAdminSelectionResult, PartnerCardAdminService } from '../../../shared/service/partner-card-admin.service';
@@ -137,11 +138,13 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
   private readonly pageSizeOptions = [5, 10, 25, 50];
   private readonly allowedVrdokCodes = new Set(['4', '04', '13', '15', '32']);
   private readonly printFormatter = new Intl.NumberFormat('sr-RS', { style: 'currency', currency: 'RSD' });
+  private cacheKey = 'self';
 
   constructor(
     private accountStateService: AccountStateService,
     private partnerService: PartnerService,
     private pictureService: PictureService,
+    private partnerCardCache: PartnerCardCacheService,
     private router: Router,
     public admin: PartnerCardAdminService
   ) { }
@@ -209,6 +212,13 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
   }
 
   private loadPartnerCard(partnerPpid?: number): void {
+    this.cacheKey = this.buildCacheKey(partnerPpid);
+    const cached = this.partnerCardCache.get(this.cacheKey);
+    if (cached) {
+      this.handlePartnerCardResponse(cached);
+      return;
+    }
+
     this.loading = true;
     this.errorMessage = '';
     if (partnerPpid !== undefined) {
@@ -225,6 +235,7 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
         .subscribe({
           next: (response: PartnerCardResponse) => {
             this.handlePartnerCardResponse(response);
+            this.partnerCardCache.set(this.cacheKey, response);
           },
           error: () => {
             this.handlePartnerCardError();
@@ -242,7 +253,10 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
         })
       )
       .subscribe({
-        next: (response: PartnerCardResponse) => this.handlePartnerCardResponse(response),
+        next: (response: PartnerCardResponse) => {
+          this.handlePartnerCardResponse(response);
+          this.partnerCardCache.set(this.cacheKey, response);
+        },
         error: () => this.handlePartnerCardError()
       });
   }
@@ -733,5 +747,12 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
+  }
+
+  private buildCacheKey(partnerPpid?: number): string {
+    if (this.isAdmin) {
+      return partnerPpid !== undefined ? `admin-${partnerPpid}` : 'admin-none';
+    }
+    return 'self';
   }
 }

@@ -229,7 +229,7 @@
 
 .doc-row__pricing-table {
   display: grid;
-  grid-template-columns: repeat(4, minmax(160px, 1fr));
+  grid-template-columns: repeat(3, minmax(160px, 1fr));
   gap: 8px;
   width: min(640px, 100%);
   align-items: stretch;
