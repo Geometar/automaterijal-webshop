@@ -177,12 +177,19 @@
     align-items: center;
     justify-content: center;
     max-height: 120px;
+    cursor: zoom-in;
+    outline: none;
 
     img {
       width: 100%;
       height: 100%;
       object-fit: contain;
       max-height: 120px;
+    }
+
+    &:focus-visible {
+      box-shadow: 0 0 0 2px #0f62fe33;
+      border-color: #0f62fe55;
     }
   }
 
@@ -191,33 +198,64 @@
 .doc-row__info {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 
   h3 {
     margin: 0 !important;
     font-size: 16px !important;
     font-weight: 800 !important;
     color: var(--figma-grey-900);
-    line-height: 1.2 !important;
-    max-width: 520px !important;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    line-height: 1.3 !important;
+    max-width: none !important;
+    white-space: normal;
+    overflow: visible;
+  }
+
+  .doc-row__link {
+    color: #0f62fe;
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-decoration-color: transparent;
+    transition: color 140ms ease, text-decoration-color 140ms ease;
+
+    &:hover {
+      color: #0b4dcc;
+      text-decoration-color: currentColor;
+    }
   }
 }
 
 .doc-row__title .codes {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 2px;
+  gap: 8px;
+  margin-bottom: 4px;
 }
 
 .doc-row__meta {
   display: flex;
   flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.doc-row__meta--details {
+  margin-top: 4px;
+}
+
+.doc-row__tags {
+  display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   align-items: center;
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #5b6475;
+
+  .dot {
+    color: #c0c6d1;
+  }
 }
 
 .doc-row__pricing {
@@ -284,13 +322,13 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 9px;
-  border-radius: 12px;
-  background: var(--figma-grey-50);
-  border: 1px solid var(--figma-grey-100);
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--figma-grey-700);
+  padding: 3px 7px;
+  border-radius: 8px;
+  background: #f9fafc;
+  border: 1px solid #e7ebf3;
+  font-size: 11px;
+  font-weight: 600;
+  color: #606a7c;
 
   &.ghost {
     background: rgba(15, 23, 42, 0.02);
@@ -314,6 +352,36 @@
     color: #b91c1c;
     border-color: rgba(239, 68, 68, 0.2);
     font-weight: 800;
+  }
+}
+
+.meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 12px;
+  background: #f7f8fb;
+  border: 1px solid #e5e9f2;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--figma-grey-800);
+
+  strong {
+    font-weight: 800;
+    color: #0f172a;
+  }
+
+  &.meta-chip--accent {
+    background: #ecf5ff;
+    border-color: #d6e8ff;
+    color: #0f62fe;
+  }
+
+  &.meta-chip--muted {
+    background: #f9fafb;
+    border-color: #e5e7eb;
+    color: #475569;
   }
 }
 
@@ -373,6 +441,28 @@
       color: #1d4ed8;
     }
   }
+}
+
+/* ---------- Image Zoom Overlay ---------- */
+.image-zoom-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  cursor: zoom-out;
+}
+
+.zoomed-image {
+  max-width: 90%;
+  max-height: 90%;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.45);
+  cursor: auto;
 }
 
 @media (max-width: 1024px) {

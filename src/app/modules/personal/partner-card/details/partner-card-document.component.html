@@ -95,7 +95,15 @@
 
      <article class="doc-row" *ngFor="let item of items; trackBy: trackByRow">
         <div class="doc-row__media">
-          <div class="image">
+          <div
+            class="image"
+            tabindex="0"
+            role="button"
+            (click)="onImageZoom(item.image)"
+            (keydown.enter)="onImageZoom(item.image)"
+            (keydown.space)="onImageZoom(item.image); $event.preventDefault()"
+            aria-label="Uvećaj sliku"
+          >
             <img [src]="item.image" [alt]="item.title" />
           </div>
         </div>
@@ -104,14 +112,31 @@
         <div class="doc-row__title">
           <div class="codes">
             <span class="pill" *ngIf="item.code"># {{ item.code }}</span>
+            <span class="meta-chip" *ngIf="item.manufacturer">
+              Proizvođač: <strong>{{ item.manufacturer }}</strong>
+            </span>
+            <span class="meta-chip meta-chip--accent">
+              Količina: <strong>{{ item.quantity }}</strong>
+            </span>
             <span class="pill danger" *ngIf="item.rabatLabel">
               -{{ item.rabatLabel }}
             </span>
           </div>
-          <h3>{{ item.title }}</h3>
+          <h3>
+            <a
+              *ngIf="item.routeParam; else plainTitle"
+              class="doc-row__link"
+              [routerLink]="['/webshop', item.routeParam]"
+            >
+              {{ item.title }}
+            </a>
+            <ng-template #plainTitle>{{ item.title }}</ng-template>
+          </h3>
         </div>
-        <div class="doc-row__meta">
-          <span class="pill soft">Količina: {{ item.quantity }}</span>
+        <div class="doc-row__tags" *ngIf="item.groupLabel || item.subgroupLabel">
+          <span *ngIf="item.groupLabel">{{ item.groupLabel }}</span>
+          <span class="dot" *ngIf="item.groupLabel && item.subgroupLabel">•</span>
+          <span *ngIf="item.subgroupLabel">{{ item.subgroupLabel }}</span>
         </div>
         </div>
 
@@ -134,5 +159,24 @@
         </div>
       </article>
     </div>
+  </div>
+
+  <!-- Overlay za zoom -->
+  <div
+    class="image-zoom-overlay"
+    *ngIf="zoomedImageUrl"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Uvećana slika artikla"
+    (click)="zoomedImageUrl = null"
+    (keydown.escape)="zoomedImageUrl = null"
+    tabindex="0"
+  >
+    <img
+      class="zoomed-image"
+      [src]="zoomedImageUrl"
+      alt="Uvećana slika artikla"
+      (click)="$event.stopPropagation()"
+    />
   </div>
 </section>

@@ -48,6 +48,11 @@ export interface PartnerCardDetailsItem {
   katbr?: string | null;
   katbrPro?: string | null;
   barkod?: string | null;
+  proizvodjacNaziv?: string | null;
+  grupa?: string | null;
+  grupaNaziv?: string | null;
+  podgrupa?: string | null;
+  podgrupaNaziv?: string | null;
   slika?: PartnerCardDetailsImage | null;
   cenaPartnera?: number | string | null;
   cenaPartneraUkupno?: number | string | null;

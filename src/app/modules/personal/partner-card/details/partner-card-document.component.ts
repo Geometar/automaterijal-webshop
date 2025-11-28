@@ -2,6 +2,7 @@ import { CommonModule, CurrencyPipe } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { finalize, Subject, takeUntil } from 'rxjs';
+import { RouterModule } from '@angular/router';
 
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { SpinnerComponent } from '../../../../shared/components/spinner/spinner.component';
@@ -14,6 +15,7 @@ import { AccountStateService } from '../../../../shared/service/state/account-st
 import { PartnerService } from '../../../../shared/service/partner.service';
 import { PictureService } from '../../../../shared/service/utils/picture.service';
 import { DocumentRowView, DocumentTotals } from './partner-card-document.models';
+import { StringUtils } from '../../../../shared/utils/string-utils';
 
 const VRDOK_LABELS: Record<string, string> = {
   '4': 'Profaktura',
@@ -30,6 +32,7 @@ const VRDOK_LABELS: Record<string, string> = {
     AutomIconComponent,
     ButtonComponent,
     CommonModule,
+    RouterModule,
     SpinnerComponent,
     RsdCurrencyPipe
   ],
@@ -55,6 +58,7 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
   documentDate: string | null = null;
   documentDueDate: string | null = null;
   documentTotal: number | null = null;
+  zoomedImageUrl: string | null = null;
 
   private readonly destroy$ = new Subject<void>();
   private readonly allowedVrdokCodes = new Set(['4', '04', '13', '15', '32']);
@@ -114,6 +118,7 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
             <td>${index + 1}</td>
             <td>${this.escapeHtml(item.code ?? '')}</td>
             <td>${this.escapeHtml(item.title)}</td>
+            <td>${this.escapeHtml(item.manufacturer ?? '')}</td>
             <td style="text-align:right;">${item.quantity}</td>
             <td style="text-align:right;">${this.formatCurrency(unit)}</td>
             <td style="text-align:right;">${this.formatCurrency(sum)}</td>
@@ -156,6 +161,7 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
                 <th>#</th>
                 <th>Šifra</th>
                 <th>Naziv</th>
+                <th>Proizvođač</th>
                 <th style="text-align:right;">Kol.</th>
                 <th style="text-align:right;">Cena (sa PDV)</th>
                 <th style="text-align:right;">Ukupno</th>
@@ -166,7 +172,7 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
             </tbody>
             <tfoot>
               <tr>
-                <td colspan="5" style="text-align:right;">Ukupno</td>
+                <td colspan="6" style="text-align:right;">Ukupno</td>
                 <td style="text-align:right;">${this.formatCurrency(total)}</td>
               </tr>
             </tfoot>
@@ -241,9 +247,20 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
       });
   }
 
+  onImageZoom(url: string | null | undefined): void {
+    if (!url) {
+      return;
+    }
+    this.zoomedImageUrl = url;
+  }
+
   private normalizeDetailItems(items: PartnerCardDetailsItem[]): DocumentRowView[] {
     return (items ?? []).map((item, index) => {
       const quantity = this.pickNumber([item.kolicina], 1);
+      const manufacturer = this.normalizeString(item.proizvodjacNaziv);
+      const groupLabel = this.normalizeString(item.grupaNaziv) ?? this.normalizeString(item.grupa);
+      const subgroupLabel = this.normalizeString(item.podgrupaNaziv) ?? this.normalizeString(item.podgrupa);
+      const title = item.naziv ?? item.robaNaziv ?? 'Artikal';
       const vatRate = this.toOptionalNumber(item.porez);
       const vatFactor = vatRate && vatRate > 0 ? 1 + vatRate / 100 : null;
 
@@ -283,9 +300,13 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
       const fullGrossTotal = this.round2(this.pickNumber([item.punaCenaUkupno], fullGrossUnit * quantity));
       return {
         id: item.id ?? item.stavkaId ?? item.robaId ?? index,
-        title: item.naziv ?? item.robaNaziv ?? 'Artikal',
+        title,
         code: item.katbr ?? item.katbrPro ?? null,
         barkod: item.barkod ?? null,
+        manufacturer,
+        groupLabel,
+        subgroupLabel,
+        routeParam: this.buildRouteParam(item, manufacturer, title),
         quantity,
         rabat: rabat ?? undefined,
         rabatLabel: rabat !== null && Math.abs(rabat) > 0.01 ? `${rabat.toFixed(1)}%` : null,
@@ -344,12 +365,28 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  private normalizeString(value: string | null): string | null {
-    if (!value) {
+  private normalizeString(value: string | number | null | undefined): string | null {
+    if (value === null || value === undefined) {
       return null;
     }
-    const trimmed = value.trim();
+    const trimmed = String(value).trim();
     return trimmed || null;
+  }
+
+  private buildRouteParam(
+    item: PartnerCardDetailsItem,
+    manufacturer: string | null,
+    title: string
+  ): string | null {
+    const productId = this.toNumber(item.robaId ?? item.id);
+    if (!Number.isFinite(productId)) {
+      return null;
+    }
+
+    const code = this.normalizeString(item.katbr ?? item.katbrPro);
+    const slug = StringUtils.productSlug(manufacturer ?? undefined, title, code ?? undefined);
+    const idPart = Math.abs(productId);
+    return slug ? `${idPart}-${slug}` : `${idPart}`;
   }
 
   private pickNumber(values: Array<number | string | null | undefined>, fallback = 0): number {

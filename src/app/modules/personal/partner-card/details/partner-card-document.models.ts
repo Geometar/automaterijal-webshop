@@ -5,6 +5,9 @@ export interface DocumentRowView {
   title: string;
   code?: string | null;
   barkod?: string | null;
+  manufacturer?: string | null;
+  groupLabel?: string | null;
+  subgroupLabel?: string | null;
   quantity: number;
   rabat?: number | null;
   rabatLabel?: string | null;
@@ -18,6 +21,7 @@ export interface DocumentRowView {
   fullGrossTotal: number;
   image: string;
   costPrice?: number;
+  routeParam?: string | null;
 }
 
 export interface DocumentTotals {
