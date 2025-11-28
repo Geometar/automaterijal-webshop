@@ -1,8 +1,7 @@
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { finalize, Subject, takeUntil } from 'rxjs';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { catchError, EMPTY, finalize, map, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { SpinnerComponent } from '../../../../shared/components/spinner/spinner.component';
@@ -10,10 +9,11 @@ import { AutomIconComponent } from '../../../../shared/components/autom-icon/aut
 import { RsdCurrencyPipe } from '../../../../shared/pipe/rsd-currency.pipe';
 
 import { ButtonThemes, ButtonTypes, ColorEnum, IconsEnum } from '../../../../shared/data-models/enums';
-import { PartnerCardDetailsItem, PartnerCardDetailsResponse } from '../../../../shared/data-models/model';
+import { PartnerCardDetailsItem, PartnerCardDetailsResponse, PartnerCardGroup } from '../../../../shared/data-models/model';
 import { AccountStateService } from '../../../../shared/service/state/account-state.service';
 import { PartnerService } from '../../../../shared/service/partner.service';
 import { PictureService } from '../../../../shared/service/utils/picture.service';
+import { PartnerCardCacheService } from '../../../../shared/service/state/partner-card-cache.service';
 import { DocumentRowView, DocumentTotals } from './partner-card-document.models';
 import { StringUtils } from '../../../../shared/utils/string-utils';
 
@@ -24,6 +24,17 @@ const VRDOK_LABELS: Record<string, string> = {
   '15': 'MP račun',
   '32': 'Proračun'
 };
+
+interface DocumentMeta {
+  documentDate: string | null;
+  documentDueDate: string | null;
+  documentTotal: number | null;
+}
+
+interface DocumentAccessResult {
+  allowed: boolean;
+  meta: DocumentMeta | null;
+}
 
 @Component({
   selector: 'app-partner-card-document',
@@ -68,7 +79,8 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
     private readonly router: Router,
     private readonly partnerService: PartnerService,
     private readonly accountStateService: AccountStateService,
-    private readonly pictureService: PictureService
+    private readonly pictureService: PictureService,
+    private readonly partnerCardCache: PartnerCardCacheService
   ) { }
 
   ngOnInit(): void {
@@ -189,20 +201,18 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
 
   private readRoute(): void {
     const params = this.route.snapshot.paramMap;
-    const query = this.route.snapshot.queryParamMap;
-
     const rawVrdok = params.get('vrdok');
     const rawBrdok = params.get('brdok');
     const normalizedVrdok = this.normalizeVrdok(rawVrdok);
     const normalizedBrdok = this.normalizeString(rawBrdok);
 
+    const query = this.route.snapshot.queryParamMap;
     const ppidParam = query.get('ppid');
     const parsedPpid = ppidParam ? Number(ppidParam) : Number.NaN;
     this.partnerPpid = Number.isFinite(parsedPpid) ? parsedPpid : null;
-    this.documentDate = query.get('datum');
-    this.documentDueDate = query.get('datumRoka');
-    const rawTotal = this.toNumber(query.get('total'));
-    this.documentTotal = Number.isFinite(rawTotal) ? rawTotal : null;
+    this.documentDate = null;
+    this.documentDueDate = null;
+    this.documentTotal = null;
 
     if (!normalizedVrdok || !normalizedBrdok) {
       this.error = 'Nedostaje vrdok ili broj dokumenta.';
@@ -223,10 +233,19 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
     this.items = [];
     this.totals = { partnerVat: 0, partnerGross: 0, fullGross: 0 };
 
-    this.partnerService
-      .getPartnerCardDetails(this.vrdok, this.brdok, partnerPpid)
+    const access$ = this.isAdmin ? of({ allowed: true, meta: null }) : this.enforceDocumentAccess();
+
+    access$
       .pipe(
         takeUntil(this.destroy$),
+        switchMap((result) => {
+          if (!result.allowed) {
+            this.error = 'Dokument nije dostupan za ovog partnera.';
+            return EMPTY;
+          }
+          this.applyDocumentMeta(result.meta);
+          return this.partnerService.getPartnerCardDetails(this.vrdok, this.brdok, partnerPpid);
+        }),
         finalize(() => {
           this.loading = false;
         })
@@ -347,11 +366,11 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
     };
   }
 
-  private normalizeVrdok(value: string | null): string | null {
-    if (!value) {
+  private normalizeVrdok(value: string | number | null | undefined): string | null {
+    if (value === null || value === undefined) {
       return null;
     }
-    const trimmed = value.trim();
+    const trimmed = String(value).trim();
     if (this.allowedVrdokCodes.has(trimmed)) {
       return trimmed;
     }
@@ -387,6 +406,63 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
     const slug = StringUtils.productSlug(manufacturer ?? undefined, title, code ?? undefined);
     const idPart = Math.abs(productId);
     return slug ? `${idPart}-${slug}` : `${idPart}`;
+  }
+
+  private applyDocumentMeta(meta: DocumentMeta | null): void {
+    if (!meta) {
+      this.documentDate = null;
+      this.documentDueDate = null;
+      this.documentTotal = null;
+      return;
+    }
+
+    this.documentDate = meta.documentDate ?? null;
+    this.documentDueDate = meta.documentDueDate ?? null;
+    this.documentTotal = Number.isFinite(meta.documentTotal ?? Number.NaN) ? meta.documentTotal : null;
+  }
+
+  private enforceDocumentAccess() {
+    const cached = this.partnerCardCache.get('self');
+    if (cached) {
+      return of(this.resolveAccessFromGroups(cached.groups));
+    }
+
+    return this.partnerService.getPartnerCard().pipe(
+      tap((response) => this.partnerCardCache.set('self', response)),
+      map((response) => this.resolveAccessFromGroups(response?.groups)),
+      catchError(() => of({ allowed: false, meta: null }))
+    );
+  }
+
+  private resolveAccessFromGroups(groups: PartnerCardGroup[] | null | undefined): DocumentAccessResult {
+    const broj = this.brdok;
+    const vrdok = this.vrdok;
+    if (!broj || !vrdok) {
+      return { allowed: false, meta: null };
+    }
+
+    for (const group of groups ?? []) {
+      for (const item of group?.stavke ?? []) {
+        const brojDokumenta = this.normalizeString(
+          (item as any)?.brojDokumenta ?? (item as any)?.brdok ?? item.brojDokumenta
+        );
+        const itemVrdok = this.normalizeVrdok((item as any)?.vrdok ?? (item as any)?.vrDok ?? item.vrdok);
+        if (brojDokumenta === broj && itemVrdok === vrdok) {
+          return { allowed: true, meta: this.extractDocumentMeta(item) };
+        }
+      }
+    }
+
+    return { allowed: false, meta: null };
+  }
+
+  private extractDocumentMeta(item: any): DocumentMeta {
+    const documentDate = this.normalizeString(item?.datum);
+    const documentDueDate = this.normalizeString(item?.datumRoka);
+    const totalRaw = this.toNumber(item?.duguje);
+    const documentTotal = Number.isFinite(totalRaw) ? totalRaw : null;
+
+    return { documentDate, documentDueDate, documentTotal };
   }
 
   private pickNumber(values: Array<number | string | null | undefined>, fallback = 0): number {

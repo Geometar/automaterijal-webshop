@@ -447,15 +447,6 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
     if (this.isAdmin && this.admin.partner?.ppid) {
       queryParams.ppid = this.admin.partner.ppid;
     }
-    if (item.datum) {
-      queryParams.datum = item.datum;
-    }
-    if (item.datumRoka) {
-      queryParams.datumRoka = item.datumRoka;
-    }
-    if (this.toNumber(item.duguje)) {
-      queryParams.total = this.toNumber(item.duguje);
-    }
 
     this.router.navigate(['/partner-card/dokument', vrdok, brdok], {
       queryParams: Object.keys(queryParams).length ? queryParams : undefined
