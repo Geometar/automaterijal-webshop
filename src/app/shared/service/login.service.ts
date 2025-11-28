@@ -10,6 +10,7 @@ import { Account, Credentials } from '../data-models/model';
 import { AccountService } from '../auth/service/account.service';
 import { CartStateService } from './state/cart-state.service';
 import { AccountStateService } from './state/account-state.service';
+import { PartnerCardCacheService } from './state/partner-card-cache.service';
 
 @Injectable({
   providedIn: 'root',
@@ -21,6 +22,7 @@ export class LoginService {
     private accountStateService: AccountStateService,
     private authServerProvider: AuthServerProvider,
     private cartStateService: CartStateService,
+    private partnerCardCache: PartnerCardCacheService,
     private router: Router
   ) { }
 
@@ -39,6 +41,7 @@ export class LoginService {
     sessionStorage.clear();
     this.accountService.authenticate(null);
     this.cartStateService.resetCart();
+    this.partnerCardCache.clear();
     this.accountStateService.remove();
     this.router.navigate(['/']);
     this.authServerProvider.logout().subscribe({
