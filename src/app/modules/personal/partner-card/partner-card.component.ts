@@ -1,6 +1,6 @@
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatTableDataSource } from '@angular/material/table';
 import { PageEvent } from '@angular/material/paginator';
 import { finalize, Subject, takeUntil } from 'rxjs';
@@ -111,7 +111,7 @@ export const PartnerCardHeader: HeaderData = {
     DividerComponent,
     TypeaheadComponent
   ],
-  providers: [CurrencyPipe, PartnerCardAdminService],
+  providers: [CurrencyPipe],
   templateUrl: './partner-card.component.html',
   styleUrl: './partner-card.component.scss',
   encapsulation: ViewEncapsulation.None
@@ -137,6 +137,7 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
   private readonly defaultPageSize = 10;
   private readonly pageSizeOptions = [5, 10, 25, 50];
   private readonly allowedVrdokCodes = new Set(['4', '04', '13', '15', '32']);
+  private readonly hideDueDateVrdok = new Set(['4', '04', '15', '32']);
   private readonly printFormatter = new Intl.NumberFormat('sr-RS', { style: 'currency', currency: 'RSD' });
   private cacheKey = 'self';
 
@@ -146,6 +147,7 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
     private pictureService: PictureService,
     private partnerCardCache: PartnerCardCacheService,
     private router: Router,
+    private route: ActivatedRoute,
     public admin: PartnerCardAdminService
   ) { }
 
@@ -153,7 +155,22 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
     this.isAdmin = this.accountStateService.isAdmin();
 
     if (this.isAdmin) {
-      this.summaryCards = [];
+      const cachedPartnerId = this.admin.partner?.ppid ?? null;
+      const queryPartnerId = this.readAdminPartnerIdFromQuery();
+      const partnerId = cachedPartnerId ?? queryPartnerId;
+
+      if (this.admin.partner) {
+        this.setupBalanceCards(this.admin.partner);
+      } else {
+        this.summaryCards = [];
+      }
+
+      if (partnerId !== null && partnerId !== undefined) {
+        if (!this.admin.partner || this.admin.partner.ppid !== partnerId) {
+          this.admin.partner = { ...(this.admin.partner ?? {}), ppid: partnerId } as Partner;
+        }
+        this.loadPartnerCard(partnerId);
+      }
       return;
     }
 
@@ -209,6 +226,12 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
 
     this.errorMessage = '';
     this.loadPartnerCard(result.partnerId);
+  }
+
+  private readAdminPartnerIdFromQuery(): number | null {
+    const param = this.route.snapshot.queryParamMap.get('ppid');
+    const parsed = param ? Number(param) : Number.NaN;
+    return Number.isFinite(parsed) ? parsed : null;
   }
 
   private loadPartnerCard(partnerPpid?: number): void {
@@ -283,13 +306,14 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
         );
         const vrdok = this.normalizeVrdok((item as any)?.vrdok ?? (item as any)?.vrDok) ??
           this.extractVrdokFromBroj(brojDokumenta);
+        const hideDueDate = this.shouldHideDueDate(vrdok);
 
         return {
           tip: this.normalizeString(item.tip) ?? group.tip ?? '',
           nazivDok: this.normalizeString(item.nazivDok) ?? '',
           brojDokumenta,
           datum: this.normalizeString(item.datum),
-          datumRoka: this.normalizeString(item.datumRoka),
+          datumRoka: hideDueDate ? null : this.normalizeString(item.datumRoka),
           duguje: this.asNumber(item.duguje),
           potrazuje: this.asNumber(item.potrazuje),
           stanje: this.asNumber(item.stanje),
@@ -655,6 +679,14 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
     }
 
     return this.normalizeVrdok(tokens[0]);
+  }
+
+  private shouldHideDueDate(vrdok: string | number | null | undefined): boolean {
+    const normalized = this.normalizeVrdok(vrdok);
+    if (!normalized) {
+      return false;
+    }
+    return this.hideDueDateVrdok.has(normalized);
   }
 
   private extractVrdokFromNaziv(naziv: string | null | undefined): string | null {

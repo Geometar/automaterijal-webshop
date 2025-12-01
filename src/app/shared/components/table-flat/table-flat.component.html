@@ -37,13 +37,15 @@
               <ng-container *ngSwitchCase="CellType.DATE">
                 {{
                   getNestedValue(row, column.key)
-                    | date : column.dateFormat || "dd-MMM-yyyy HH:mm"
+                    ? (getNestedValue(row, column.key) | date : column.dateFormat || "dd-MMM-yyyy HH:mm")
+                    : "-"
                 }}
               </ng-container>
               <ng-container *ngSwitchCase="CellType.DATE_ONLY">
                 {{
                   getNestedValue(row, column.key)
-                    | date : column.dateFormat || "dd-MMM-yyyy"
+                    ? (getNestedValue(row, column.key) | date : column.dateFormat || "dd-MMM-yyyy")
+                    : "-"
                 }}
               </ng-container>
               <ng-container *ngSwitchCase="CellType.PERCENTAGE">
@@ -109,13 +111,15 @@
               <ng-container *ngSwitchCase="CellType.DATE">
                 {{
                   getNestedValue(row, column.key)
-                    | date : column.dateFormat || "dd-MMM-yyyy HH:mm"
+                    ? (getNestedValue(row, column.key) | date : column.dateFormat || "dd-MMM-yyyy HH:mm")
+                    : "-"
                 }}
               </ng-container>
               <ng-container *ngSwitchCase="CellType.DATE_ONLY">
                 {{
                   getNestedValue(row, column.key)
-                    | date : column.dateFormat || "dd-MMM-yyyy"
+                    ? (getNestedValue(row, column.key) | date : column.dateFormat || "dd-MMM-yyyy")
+                    : "-"
                 }}
               </ng-container>
               <ng-container *ngSwitchCase="CellType.PERCENTAGE">

@@ -73,6 +73,7 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
 
   private readonly destroy$ = new Subject<void>();
   private readonly allowedVrdokCodes = new Set(['4', '04', '13', '15', '32']);
+  private readonly hideDueDateVrdok = new Set(['4', '04', '15', '32']);
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -97,7 +98,10 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
     `${item.id ?? _index}-${item.title}`;
 
   onBack(): void {
-    this.router.navigate(['/partner-card']);
+    const queryParams = this.isAdmin && this.partnerPpid
+      ? { ppid: this.partnerPpid }
+      : undefined;
+    this.router.navigate(['/partner-card'], { queryParams });
   }
 
   onReload(): void {
@@ -227,13 +231,14 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
 
   private fetchDetails(): void {
     const partnerPpid = this.isAdmin ? this.partnerPpid ?? undefined : undefined;
+    const cachedMeta = this.isAdmin ? this.tryGetDocumentMetaFromCache(partnerPpid ?? null) : null;
 
     this.loading = true;
     this.error = '';
     this.items = [];
     this.totals = { partnerVat: 0, partnerGross: 0, fullGross: 0 };
 
-    const access$ = this.isAdmin ? of({ allowed: true, meta: null }) : this.enforceDocumentAccess();
+    const access$ = this.isAdmin ? of({ allowed: true, meta: cachedMeta }) : this.enforceDocumentAccess();
 
     access$
       .pipe(
@@ -417,8 +422,18 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
     }
 
     this.documentDate = meta.documentDate ?? null;
-    this.documentDueDate = meta.documentDueDate ?? null;
+    this.documentDueDate = this.shouldHideDueDate(this.vrdok) ? null : meta.documentDueDate ?? null;
     this.documentTotal = Number.isFinite(meta.documentTotal ?? Number.NaN) ? meta.documentTotal : null;
+  }
+
+  private tryGetDocumentMetaFromCache(partnerPpid: number | null): DocumentMeta | null {
+    const key = this.buildCacheKey(partnerPpid);
+    const cached = this.partnerCardCache.get(key);
+    if (!cached) {
+      return null;
+    }
+    const result = this.resolveAccessFromGroups(cached.groups);
+    return result.meta;
   }
 
   private enforceDocumentAccess() {
@@ -458,11 +473,28 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
 
   private extractDocumentMeta(item: any): DocumentMeta {
     const documentDate = this.normalizeString(item?.datum);
-    const documentDueDate = this.normalizeString(item?.datumRoka);
+    const documentDueDate = this.shouldHideDueDate(this.vrdok)
+      ? null
+      : this.normalizeString(item?.datumRoka);
     const totalRaw = this.toNumber(item?.duguje);
     const documentTotal = Number.isFinite(totalRaw) ? totalRaw : null;
 
     return { documentDate, documentDueDate, documentTotal };
+  }
+
+  private shouldHideDueDate(vrdok: string | number | null | undefined): boolean {
+    const normalized = this.normalizeVrdok(vrdok);
+    if (!normalized) {
+      return false;
+    }
+    return this.hideDueDateVrdok.has(normalized);
+  }
+
+  private buildCacheKey(partnerPpid: number | null): string {
+    if (this.isAdmin) {
+      return partnerPpid !== null && partnerPpid !== undefined ? `admin-${partnerPpid}` : 'admin-none';
+    }
+    return 'self';
   }
 
   private pickNumber(values: Array<number | string | null | undefined>, fallback = 0): number {

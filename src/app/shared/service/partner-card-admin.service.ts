@@ -14,7 +14,7 @@ export interface PartnerCardAdminSelectionResult {
   error?: string;
 }
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class PartnerCardAdminService implements OnDestroy {
   items: TypeaheadItem[] = [];
   loading = false;
