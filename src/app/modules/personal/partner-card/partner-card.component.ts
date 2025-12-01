@@ -394,8 +394,7 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
       },
       { key: 'datum', header: 'Datum', type: CellType.DATE, dateFormat: 'dd.MM.yyyy' },
       { key: 'datumRoka', header: 'Datum roka', type: CellType.DATE, dateFormat: 'dd.MM.yyyy' },
-      { key: 'duguje', header: 'Zaduženje', type: CellType.CURRENCY },
-      { key: 'potrazuje', header: 'Razduženje', type: CellType.CURRENCY }
+      { key: 'duguje', header: 'Vrednost', type: CellType.CURRENCY }
     ];
 
     return {
@@ -572,12 +571,35 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
       return 1;
     };
 
+    const documentLabelPriority = (label: string | undefined) => {
+      const normalized = this.normalizeTipValue(label);
+      if (!normalized) {
+        return 99;
+      }
+      if (normalized.includes('profaktura') || normalized.includes('proracun')) {
+        return 0;
+      }
+      if (normalized.includes('maloprodajni') || normalized.includes('faktur')) {
+        return 1;
+      }
+      return 2;
+    };
+
     return groups
       .slice()
       .sort((a, b) => {
         const priorityDiff = priority(a.tip) - priority(b.tip);
         if (priorityDiff !== 0) {
           return priorityDiff;
+        }
+
+        if (this.isDocumentGroup(a.tip) && this.isDocumentGroup(b.tip)) {
+          const labelPriorityDiff =
+            documentLabelPriority(a.displayTip ?? a.tip) -
+            documentLabelPriority(b.displayTip ?? b.tip);
+          if (labelPriorityDiff !== 0) {
+            return labelPriorityDiff;
+          }
         }
 
         const labelA = a.displayTip ?? a.tip ?? '';
