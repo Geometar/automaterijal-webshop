@@ -27,9 +27,7 @@
         [routerLink]="['/webshop', data.robaid + '-' + getProductSlug(data)]"
         [attr.href]="'/webshop/' + (data.robaid + '-' + getProductSlug(data))"
       >
-        <span class="product-link__brand">
-          {{ data.proizvodjac?.naziv }}</span
-        >
+        <span class="product-link__brand"> {{ data.proizvodjac?.naziv }}</span>
         <span class="product-name-fragment">{{ nameWithoutManufacturer }}</span>
         <span class="product-link__chev" aria-hidden="true">›</span>
       </a>
@@ -55,7 +53,9 @@
           [suffix]="categorySuffix"
           [ariaLabel]="categoryAriaLabel"
         >
-          <span class="category-pill__group" *ngIf="data?.grupaNaziv">{{ data.grupaNaziv }}</span>
+          <span class="category-pill__group" *ngIf="data?.grupaNaziv">{{
+            data.grupaNaziv
+          }}</span>
           <span
             class="category-pill__separator"
             *ngIf="data?.grupaNaziv && data?.podGrupaNaziv"
@@ -63,7 +63,9 @@
           >
             /
           </span>
-          <span class="category-pill__sub" *ngIf="data?.podGrupaNaziv">{{ data.podGrupaNaziv }}</span>
+          <span class="category-pill__sub" *ngIf="data?.podGrupaNaziv">{{
+            data.podGrupaNaziv
+          }}</span>
         </autom-meta-pill>
       </ng-container>
       <ng-template #plainCategory>
@@ -135,10 +137,7 @@
   </div>
 
   <!-- Add to basket Section -->
-  <div
-    class="pricing-container"
-    *ngIf="showAddToBasket"
-  >
+  <div class="pricing-container" *ngIf="showAddToBasket">
     <!-- Status -->
     <div
       [ngClass]="{
@@ -179,14 +178,11 @@
       {{ data.cena! / (1 - data.rabat / 100) - data.cena! | rsdCurrency }}
     </p>
 
-    <div class="mobile-quantity-cart util__flex--center">
-      <div *ngIf="data.podGrupa === 1000000" class="helper-article">
-        <span>Ovaj artikal se nalazi u TecDoc katalogu.</span><br />
-        <span>Za dostupnost, molimo vas da nas kontaktirate.</span>
-      </div>
-
+    <div
+      class="mobile-quantity-cart util__flex--center"
+      *ngIf="data.podGrupa !== 1000000 && !isUnavailable"
+    >
       <autom-input-fields
-        *ngIf="data.podGrupa !== 1000000"
         [clearBtn]="false"
         [disableInput]="isUnavailable"
         [customClass]="'quantity-size'"
@@ -206,7 +202,6 @@
       ></autom-input-fields>
 
       <autom-button
-        *ngIf="data.podGrupa !== 1000000"
         mat-raised-button
         color="primary"
         [disabled]="isUnavailable"
@@ -217,6 +212,26 @@
         (clickEvent)="addToShoppingCart(data)"
       />
     </div>
+
+    <div *ngIf="shouldShowInquiry" class="inquiry-trigger">
+      <autom-button
+        [iconPrefix]="true"
+        [iconSource]="iconEnum.MAIL"
+        [label]="inquirySent ? 'Upit poslat' : 'Pošalji upit za nabavku'"
+        [disabled]="inquirySent"
+        [theme]="buttonTheme.LIGHT_GREY"
+        [type]="buttonType.SECONDARY"
+        (clickEvent)="openInquiryPopup()"
+      ></autom-button>
+      <span class="inquiry-trigger__hint" [class.sent]="inquirySent">
+        {{
+          inquirySent
+            ? 'Upit poslat — odgovorićemo na tvoj email.'
+            : 'Artikal nije na stanju — pošaljite upit.'
+        }}
+      </span>
+    </div>
+
     <div
       *ngIf="isInCart(data.robaid ?? 0)"
       class="util__flex--center"
@@ -234,11 +249,7 @@
   </div>
 
   <!-- Pricing-only Section -->
-  <div
-    class="pricing-container"
-    *ngIf="showPriceOnly"
-  >
-
+  <div class="pricing-container" *ngIf="showPriceOnly">
     <p *ngIf="data.rabat" class="sub-price old-price">
       {{ data.cena! / (1 - data.rabat / 100) | rsdCurrency }}
     </p>
@@ -292,6 +303,18 @@
     ></autom-icon>
   </div>
 </article>
+
+<app-inquiry-dialog
+  [open]="inquiryPopupOpen"
+  [productName]="data.naziv || ''"
+  [manufacturer]="data.proizvodjac?.naziv"
+  [katbr]="data.katbr"
+  [robaId]="data.robaid"
+  [prefilledEmail]="loggedIn ? inquiryContact : null"
+  [loggedIn]="loggedIn"
+  (closed)="closeInquiryPopup()"
+  (sent)="inquirySent = true; inquiryPopupOpen = false"
+></app-inquiry-dialog>
 
 <!-- Overlay za zoom -->
 <div

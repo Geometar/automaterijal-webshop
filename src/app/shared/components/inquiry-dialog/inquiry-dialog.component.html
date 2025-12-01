@@ -1,0 +1,109 @@
+<autom-popup
+  *ngIf="open"
+  class="inquiry-popup-modal"
+  [height]="sizeEnum.AUTO"
+  [position]="positionEnum.CENTER"
+  [subPosition]="positionEnum.CENTER"
+  [rounded]="true"
+  [width]="sizeEnum.MEDIUM"
+  (overlayEvent)="close()"
+>
+  <div custom-body class="confirmation-container inquiry-popup">
+    <button type="button" class="inquiry-popup__close" (click)="close()">
+      <autom-icon [source]="iconEnum.X"></autom-icon>
+    </button>
+    <div class="confirmation-container__icon">
+      <div class="confirmation-container__icon--circle inquiry-popup__icon">
+        <autom-icon [source]="iconEnum.MAIL"></autom-icon>
+      </div>
+    </div>
+    <div class="confirmation-container__main">
+      <div class="confirmation-container__header">
+        <h3 class="inquiry-popup__title">Upit za nabavku</h3>
+        <p class="inquiry-popup__subtitle">
+          {{ productName }}<span *ngIf="katbr"> · {{ katbr }}</span>
+        </p>
+      </div>
+
+      <p class="inquiry-popup__meta">
+        <span *ngIf="manufacturer">
+          <strong>Proizvođač:</strong> {{ manufacturer }}
+        </span>
+        <span *ngIf="katbr">
+          <strong>Kat.br:</strong> {{ katbr }}
+        </span>
+      </p>
+
+      <ng-container *ngIf="!inquirySent; else inquiryPopupSuccess">
+        <autom-input-fields
+          *ngIf="!loggedIn"
+          [label]="'Email (obavezno)'"
+          [placeholder]="'Unesi email da ti odgovorimo'"
+          [value]="inquiryContact"
+          [size]="sizeEnum.FULL"
+          [type]="inputTypeEnum.EMAIL"
+          [maxLength]="120"
+          [required]="true"
+          (emitSelected)="onInquiryContactChange($event)"
+          ngDefaultControl
+        ></autom-input-fields>
+
+        <autom-input-fields
+          *ngIf="!loggedIn"
+          [label]="'Telefon (opciono)'"
+          [placeholder]="'Unesi telefon za brži kontakt'"
+          [value]="inquiryPhone"
+          [size]="sizeEnum.FULL"
+          [type]="inputTypeEnum.TEXT"
+          [maxLength]="30"
+          (emitSelected)="onInquiryPhoneChange($event)"
+          ngDefaultControl
+        ></autom-input-fields>
+
+        <autom-text-area
+          [label]="'Napomena (opciono)'"
+          [rows]="3"
+          [maxLength]="300"
+          [value]="inquiryNote"
+          [placeholder]="'Npr. treba mi rok isporuke ili količina...'"
+          (emitSelected)="onInquiryNoteChange($event)"
+        ></autom-text-area>
+
+        <div class="confirmation-container__footer inquiry-popup__actions">
+          <autom-button
+            [iconPrefix]="true"
+            [iconSource]="iconEnum.X"
+            [label]="'Otkaži'"
+            [theme]="buttonTheme.LIGHT_GREY"
+            [type]="buttonType.SECONDARY"
+            (clickEvent)="close()"
+          ></autom-button>
+          <autom-button
+            [iconPrefix]="true"
+            [iconSource]="iconEnum.MAIL"
+            [label]="'Pošalji upit'"
+            [disabled]="inquirySending || !inquiryContactTrim"
+            [theme]="buttonTheme.DEFAULT"
+            [type]="buttonType.PRIMARY"
+            (clickEvent)="sendInquiry()"
+          ></autom-button>
+        </div>
+      </ng-container>
+
+      <ng-template #inquiryPopupSuccess>
+        <div class="inquiry__sent-note">
+          <autom-icon [source]="iconEnum.CHECK_CIRCLE" class="ok-icon"></autom-icon>
+          Upit je primljen. Bićeš kontaktiran na {{ inquiryContact || 'email sa naloga' }}.
+        </div>
+        <div class="confirmation-container__footer inquiry-popup__actions">
+          <autom-button
+            [label]="'Zatvori'"
+            [theme]="buttonTheme.DEFAULT"
+            [type]="buttonType.PRIMARY"
+            (clickEvent)="close()"
+          ></autom-button>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</autom-popup>

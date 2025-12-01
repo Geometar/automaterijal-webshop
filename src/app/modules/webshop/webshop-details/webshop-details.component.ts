@@ -57,6 +57,7 @@ import { PopupComponent } from '../../../shared/components/popup/popup.component
 import { RsdCurrencyPipe } from '../../../shared/pipe/rsd-currency.pipe';
 import { SpinnerComponent } from '../../../shared/components/spinner/spinner.component';
 import { TextAreaComponent } from '../../../shared/components/text-area/text-area.component';
+import { EmailService } from '../../../shared/service/email.service';
 
 // Services
 import { AccountStateService } from '../../../shared/service/state/account-state.service';
@@ -120,6 +121,12 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   inputTypeEnum = InputTypeEnum;
   positionEnum = PositionEnum;
   sizeEnum = SizeEnum;
+
+  inquiryContact = '';
+  inquiryNote = '';
+  inquiryPhone = '';
+  inquirySending = false;
+  inquirySent = false;
 
   // Misc
   editingText = false;
@@ -231,6 +238,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   constructor(
     private accountStateService: AccountStateService,
     private cartStateService: CartStateService,
+    private emailService: EmailService,
     private pictureService: PictureService,
     private robaService: RobaService,
     private route: ActivatedRoute,
@@ -334,6 +342,8 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       this.data,
       this.accountStateService.get()
     );
+    this.prefillInquiryFields();
+    this.inquirySent = false;
   }
 
   fetchData(id: number): void {
@@ -749,6 +759,113 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
 
   get isOutOfStock(): boolean {
     return this.availableStock <= 0;
+  }
+
+  get inquiryContactTrim(): string {
+    return (this.inquiryContact ?? '').trim();
+  }
+
+  onInquiryContactChange(value: string): void {
+    this.inquiryContact = (value ?? '').trimStart();
+  }
+
+  onInquiryNoteChange(value: string): void {
+    this.inquiryNote = value ?? '';
+  }
+
+  onInquiryPhoneChange(value: string): void {
+    this.inquiryPhone = (value ?? '').trim();
+  }
+
+  sendInquiry(): void {
+    const account = this.accountStateService.get();
+    const contact = this.inquiryContactTrim || account?.email || '';
+    if (!contact) {
+      this.snackbarService.showError('Unesi email da bismo te kontaktirali.');
+      return;
+    }
+    if (!this.isValidEmail(contact)) {
+      this.snackbarService.showError('Unesi ispravan email.');
+      return;
+    }
+
+    this.inquirySending = true;
+    const payload = this.buildInquiryPayload(contact);
+
+    this.emailService
+      .posaljiPoruku(payload)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => (this.inquirySending = false))
+      )
+      .subscribe({
+        next: () => {
+          this.inquirySent = true;
+          this.snackbarService.showSuccess('Upit je poslat. Javićemo ti se uskoro.');
+        },
+        error: () => {
+          this.snackbarService.showError('Slanje upita nije uspelo. Pokušaj ponovo.');
+        }
+      });
+  }
+
+  private prefillInquiryFields(): void {
+    const account = this.accountStateService.get();
+    if (!this.inquiryContact && account?.email) {
+      this.inquiryContact = account.email;
+    }
+    if (!this.inquiryNote) {
+      const name = this.data?.naziv ?? 'artikal';
+      const kat = this.data?.katbr ? ` (kat.br. ${this.data.katbr})` : '';
+      const manufacturer = this.data?.proizvodjac?.naziv ? ` | Proizvođač: ${this.data.proizvodjac.naziv}` : '';
+      const idPart = this.data?.robaid ? ` | ID: ${this.data.robaid}` : '';
+      this.inquiryNote = `Zanima me dostupnost / nabavka za ${name}${kat}${manufacturer}${idPart}.`;
+    }
+  }
+
+  private buildInquiryPayload(contact: string) {
+    const account = this.accountStateService.get();
+    const note = this.inquiryNote?.trim();
+    const phone = this.inquiryPhone?.trim();
+    const message = this.buildInquiryMessage(note, contact, account, phone);
+
+    return {
+      ime: account?.naziv || 'Web kupac',
+      prezime: '',
+      firma: account?.naziv || undefined,
+      posta: contact,
+      telefon: phone || undefined,
+      poruka: message
+    };
+  }
+
+  private buildInquiryMessage(
+    note: string | undefined,
+    contact: string,
+    account: any,
+    phone?: string | null
+  ): string {
+    const parts = [
+      'Upit za nabavku artikla',
+      this.data?.naziv ? `${this.data.naziv}` : null,
+      this.data?.proizvodjac?.naziv ? `Proizvođač: ${this.data.proizvodjac.naziv}` : null,
+      this.data?.katbr ? `Kat.br: ${this.data.katbr}` : null,
+      this.data?.robaid ? `ID: ${this.data.robaid}` : null,
+      account?.naziv ? `Korisnik: ${account.naziv}` : null,
+      contact ? `Email za odgovor: ${contact}` : null,
+      phone ? `Telefon: ${phone}` : null,
+      note ? `Napomena: ${note}` : null
+    ].filter(Boolean);
+
+    return parts.join(' | ');
+  }
+
+  private isValidEmail(value: string): boolean {
+    const email = value?.trim();
+    if (!email) {
+      return false;
+    }
+    return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
   }
 
   // ─────────────────────────────────────────────────────────────────────────────

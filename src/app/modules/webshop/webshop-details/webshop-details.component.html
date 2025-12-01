@@ -177,20 +177,113 @@
               ></autom-button>
             </div>
 
+            <div *ngIf="isOutOfStock" class="inquiry">
+              <p class="inquiry__title" *ngIf="!inquirySent">
+                Nema na stanju? Pošalji upit za nabavku
+              </p>
+              <p class="inquiry__title success" *ngIf="inquirySent">
+                Upit poslat. Javićemo se uskoro.
+              </p>
+
+              <ng-container *ngIf="!inquirySent; else inquirySentBlock">
+                <autom-input-fields
+                  *ngIf="!loggedIn || !inquiryContact"
+                  [label]="'Email (obavezno)'"
+                  [placeholder]="'Unesi email da ti odgovorimo'"
+                  [value]="inquiryContact"
+                  [size]="sizeEnum.FULL"
+                  [type]="inputTypeEnum.EMAIL"
+                  [maxLength]="120"
+                  [required]="true"
+                  (emitSelected)="onInquiryContactChange($event)"
+                  ngDefaultControl
+                ></autom-input-fields>
+
+                <autom-input-fields
+                  *ngIf="!loggedIn"
+                  [label]="'Telefon (opciono)'"
+                  [placeholder]="'Unesi telefon za brži kontakt'"
+                  [value]="inquiryPhone"
+                  [size]="sizeEnum.FULL"
+                  [type]="inputTypeEnum.TEXT"
+                  [maxLength]="30"
+                  (emitSelected)="onInquiryPhoneChange($event)"
+                  ngDefaultControl
+                ></autom-input-fields>
+
+                <autom-text-area
+                  [label]="'Napomena (opciono)'"
+                  [rows]="3"
+                  [maxLength]="300"
+                  [value]="inquiryNote"
+                  [placeholder]="'Npr. treba mi rok isporuke ili količina...'"
+                  (emitSelected)="onInquiryNoteChange($event)"
+                ></autom-text-area>
+
+                <div class="inquiry__actions">
+                  <autom-button
+                    [iconPrefix]="true"
+                    [iconSource]="iconEnum.MAIL"
+                    [label]="'Pošalji upit'"
+                    [disabled]="inquirySending || !inquiryContactTrim"
+                    [theme]="buttonTheme.DEFAULT"
+                    [type]="buttonType.PRIMARY"
+                  (clickEvent)="sendInquiry()"
+                ></autom-button>
+                <span class="inquiry__hint">
+                    Odgovaramo na {{ loggedIn && inquiryContact ? 'email sa naloga' : 'email koji ostaviš' }}.
+                  </span>
+                </div>
+              </ng-container>
+
+              <ng-template #inquirySentBlock>
+                <div class="inquiry__sent-note">
+                  <autom-icon [source]="iconEnum.CHECK_CIRCLE" class="ok-icon"></autom-icon>
+                  Upit je primljen. Bićeš kontaktiran na {{ inquiryContact }}.
+                </div>
+              </ng-template>
+            </div>
+
             <div *ngIf="!loggedIn" class="delivery-hint">
               <p class="delivery-hint__title">Dostava i plaćanje</p>
               <ul class="delivery-hint__list">
-                <li>Sve na stanju → kuriru u 24h, Aks/Bex isporuka 1–2 radna dana.</li>
-                <li>Plaćanje pouzećem (gotovina/kartica gde je omogućeno); fiskalni račun je u paketu.</li>
-                <li>Na ruti smo tog dana? Javljamo se ili pozovite za direktnu isporuku.</li>
-                <li>Besplatna dostava za maloprodajne porudžbine (bez ugovora) iznad 3.000 RSD.</li>
+                <li>
+                  Sve na stanju → kuriru u 24h, Aks/Bex isporuka 1–2 radna dana.
+                </li>
+                <li>
+                  Plaćanje pouzećem (gotovina/kartica gde je omogućeno);
+                  fiskalni račun je u paketu.
+                </li>
+                <li>
+                  Na ruti smo tog dana? Javljamo se ili pozovite za direktnu
+                  isporuku.
+                </li>
+                <li>
+                  Besplatna dostava za maloprodajne porudžbine (bez ugovora)
+                  iznad 3.000 RSD.
+                </li>
               </ul>
               <div class="delivery-hint__links">
-                <a routerLink="/uslovi-kupovine" fragment="dostava" href="/uslovi-kupovine#dostava">Detalji dostave</a>
+                <a
+                  routerLink="/uslovi-kupovine"
+                  fragment="dostava"
+                  href="/uslovi-kupovine#dostava"
+                  >Detalji dostave</a
+                >
                 <span aria-hidden="true">•</span>
-                <a routerLink="/uslovi-kupovine" fragment="placanje" href="/uslovi-kupovine#placanje">Plaćanje</a>
+                <a
+                  routerLink="/uslovi-kupovine"
+                  fragment="placanje"
+                  href="/uslovi-kupovine#placanje"
+                  >Plaćanje</a
+                >
                 <span aria-hidden="true">•</span>
-                <a routerLink="/uslovi-kupovine" fragment="povrat" href="/uslovi-kupovine#povrat">Povrat i garancija</a>
+                <a
+                  routerLink="/uslovi-kupovine"
+                  fragment="povrat"
+                  href="/uslovi-kupovine#povrat"
+                  >Povrat i garancija</a
+                >
               </div>
             </div>
           </aside>
@@ -214,138 +307,138 @@
         [entries]="oeNumberEntries"
       ></app-product-oe-numbers>
 
-    <div *ngIf="!editingText" class="product-container documentation">
-      <h3 class="oe-title" *ngIf="data.tekst || !data.tehnickiOpis?.length">
-        Informacije o proizvodu
-      </h3>
+      <div *ngIf="!editingText" class="product-container documentation">
+        <h3 class="oe-title" *ngIf="data.tekst || !data.tehnickiOpis?.length">
+          Informacije o proizvodu
+        </h3>
 
-      <!-- Ako postoji tekst -->
-      <div
-        *ngIf="data.tekst; else checkSpecs"
-        class="product-rich-text"
-        [innerHTML]="sanitizedText"
-        aria-label="Detaljan opis proizvoda"
-      ></div>
+        <!-- Ako postoji tekst -->
+        <div
+          *ngIf="data.tekst; else checkSpecs"
+          class="product-rich-text"
+          [innerHTML]="sanitizedText"
+          aria-label="Detaljan opis proizvoda"
+        ></div>
 
-      <!-- Ako nema tekst, proveri specifikacije -->
-      <ng-template #checkSpecs>
-        <!-- Ako postoje specifikacije, ne prikazujemo ništa -->
-        <ng-container
-          *ngIf="data.tehnickiOpis?.length; else noDescription"
-        ></ng-container>
-      </ng-template>
+        <!-- Ako nema tekst, proveri specifikacije -->
+        <ng-template #checkSpecs>
+          <!-- Ako postoje specifikacije, ne prikazujemo ništa -->
+          <ng-container
+            *ngIf="data.tehnickiOpis?.length; else noDescription"
+          ></ng-container>
+        </ng-template>
 
-      <!-- Ako nema ni tekst ni specifikacije -->
-      <ng-template #noDescription>
-        <p class="product-fallback">
-          Detaljan opis trenutno nije dostupan za ovaj proizvod. Kontaktirajte
-          nas za dodatne informacije ili tehničke detalje.
-        </p>
-      </ng-template>
-    </div>
-
-    <autom-divider *ngIf="showcaseDataCategories.length"></autom-divider>
-
-    <autom-showcase
-      *ngIf="showcaseDataCategories.length"
-      [showcase]="showcaseDataCategories"
-      [loading]="loading"
-    ></autom-showcase>
-
-    <autom-showcase
-      *ngIf="showcaseDataManufactures.length"
-      [showcase]="showcaseDataManufactures"
-      [loading]="loading"
-    ></autom-showcase>
-
-    <div *ngIf="editingText" class="product-container documentation">
-      <h3 class="oe-title">Informacije o proizvodu</h3>
-      <autom-text-area
-        [placeholder]="'Unesite vas opis ovde'"
-        [value]="data.tekst!"
-        [maxLength]="2000"
-        [editable]="true"
-        (emitSelected)="textChanged($event)"
-      ></autom-text-area>
-      <div *ngIf="editingText" class="edit-description-actions">
-        <autom-button
-          [label]="'Otkaži'"
-          [theme]="buttonTheme.LIGHT_GREY"
-          [type]="buttonType.TERNARY"
-          (clickEvent)="cancelTextEdit()"
-        ></autom-button>
-        <autom-button
-          [label]="'Sačuvaj opis'"
-          [theme]="buttonTheme.DEFAULT"
-          [type]="buttonType.PRIMARY"
-          (clickEvent)="saveTextDescription()"
-        ></autom-button>
-      </div>
-    </div>
-    <div *ngIf="isAdmin" class="admin-edit-footer">
-      <h3 class="admin-edit-title">Admin tools</h3>
-      <div class="admin-edit-actions">
-        <autom-button
-          [label]="'Upload image'"
-          [iconSource]="iconEnum.IMAGE"
-          [iconColor]="colorEnum.INFO_25"
-          [iconPrefix]="true"
-          [theme]="buttonTheme.LIGHT_ORANGE"
-          [type]="buttonType.PRIMARY"
-          (clickEvent)="triggerImageUpload()"
-        ></autom-button>
-
-        <autom-button
-          [label]="'Edit attributes'"
-          [iconSource]="iconEnum.SETTINGS"
-          [iconColor]="colorEnum.INFO_25"
-          [iconPrefix]="true"
-          [theme]="buttonTheme.LIGHT_ORANGE"
-          [type]="buttonType.PRIMARY"
-          (clickEvent)="editAttributes()"
-        ></autom-button>
-
-        <autom-button
-          [label]="'Edit description'"
-          [iconSource]="iconEnum.EDIT"
-          [iconColor]="colorEnum.INFO_25"
-          [iconPrefix]="true"
-          [theme]="buttonTheme.LIGHT_ORANGE"
-          [type]="buttonType.PRIMARY"
-          (clickEvent)="editDescription()"
-        ></autom-button>
-
-        <autom-button
-          [label]="'Izbrisi svu dokumentaciju'"
-          [iconSource]="iconEnum.DELETE"
-          [iconColor]="colorEnum.INFO_25"
-          [iconPrefix]="true"
-          [theme]="buttonTheme.DARK_RED"
-          [type]="buttonType.PRIMARY"
-          (clickEvent)="showDeleteWarningPopup = true"
-        ></autom-button>
-
-        <autom-button
-          [label]="'Izbrisi sliku'"
-          [iconSource]="iconEnum.DELETE"
-          [iconColor]="colorEnum.INFO_25"
-          [iconPrefix]="true"
-          [theme]="buttonTheme.DARK_RED"
-          [type]="buttonType.PRIMARY"
-          (clickEvent)="showImageDeleteWarningPopup = true"
-        ></autom-button>
+        <!-- Ako nema ni tekst ni specifikacije -->
+        <ng-template #noDescription>
+          <p class="product-fallback">
+            Detaljan opis trenutno nije dostupan za ovaj proizvod. Kontaktirajte
+            nas za dodatne informacije ili tehničke detalje.
+          </p>
+        </ng-template>
       </div>
 
-      <!-- Hidden file input for image upload -->
-      <input
-        type="file"
-        id="imageUpload"
-        accept="image/*"
-        (change)="onImageSelected($event)"
-        hidden
-      />
+      <autom-divider *ngIf="showcaseDataCategories.length"></autom-divider>
+
+      <autom-showcase
+        *ngIf="showcaseDataCategories.length"
+        [showcase]="showcaseDataCategories"
+        [loading]="loading"
+      ></autom-showcase>
+
+      <autom-showcase
+        *ngIf="showcaseDataManufactures.length"
+        [showcase]="showcaseDataManufactures"
+        [loading]="loading"
+      ></autom-showcase>
+
+      <div *ngIf="editingText" class="product-container documentation">
+        <h3 class="oe-title">Informacije o proizvodu</h3>
+        <autom-text-area
+          [placeholder]="'Unesite vas opis ovde'"
+          [value]="data.tekst!"
+          [maxLength]="2000"
+          [editable]="true"
+          (emitSelected)="textChanged($event)"
+        ></autom-text-area>
+        <div *ngIf="editingText" class="edit-description-actions">
+          <autom-button
+            [label]="'Otkaži'"
+            [theme]="buttonTheme.LIGHT_GREY"
+            [type]="buttonType.TERNARY"
+            (clickEvent)="cancelTextEdit()"
+          ></autom-button>
+          <autom-button
+            [label]="'Sačuvaj opis'"
+            [theme]="buttonTheme.DEFAULT"
+            [type]="buttonType.PRIMARY"
+            (clickEvent)="saveTextDescription()"
+          ></autom-button>
+        </div>
+      </div>
+      <div *ngIf="isAdmin" class="admin-edit-footer">
+        <h3 class="admin-edit-title">Admin tools</h3>
+        <div class="admin-edit-actions">
+          <autom-button
+            [label]="'Upload image'"
+            [iconSource]="iconEnum.IMAGE"
+            [iconColor]="colorEnum.INFO_25"
+            [iconPrefix]="true"
+            [theme]="buttonTheme.LIGHT_ORANGE"
+            [type]="buttonType.PRIMARY"
+            (clickEvent)="triggerImageUpload()"
+          ></autom-button>
+
+          <autom-button
+            [label]="'Edit attributes'"
+            [iconSource]="iconEnum.SETTINGS"
+            [iconColor]="colorEnum.INFO_25"
+            [iconPrefix]="true"
+            [theme]="buttonTheme.LIGHT_ORANGE"
+            [type]="buttonType.PRIMARY"
+            (clickEvent)="editAttributes()"
+          ></autom-button>
+
+          <autom-button
+            [label]="'Edit description'"
+            [iconSource]="iconEnum.EDIT"
+            [iconColor]="colorEnum.INFO_25"
+            [iconPrefix]="true"
+            [theme]="buttonTheme.LIGHT_ORANGE"
+            [type]="buttonType.PRIMARY"
+            (clickEvent)="editDescription()"
+          ></autom-button>
+
+          <autom-button
+            [label]="'Izbrisi svu dokumentaciju'"
+            [iconSource]="iconEnum.DELETE"
+            [iconColor]="colorEnum.INFO_25"
+            [iconPrefix]="true"
+            [theme]="buttonTheme.DARK_RED"
+            [type]="buttonType.PRIMARY"
+            (clickEvent)="showDeleteWarningPopup = true"
+          ></autom-button>
+
+          <autom-button
+            [label]="'Izbrisi sliku'"
+            [iconSource]="iconEnum.DELETE"
+            [iconColor]="colorEnum.INFO_25"
+            [iconPrefix]="true"
+            [theme]="buttonTheme.DARK_RED"
+            [type]="buttonType.PRIMARY"
+            (clickEvent)="showImageDeleteWarningPopup = true"
+          ></autom-button>
+        </div>
+
+        <!-- Hidden file input for image upload -->
+        <input
+          type="file"
+          id="imageUpload"
+          accept="image/*"
+          (change)="onImageSelected($event)"
+          hidden
+        />
+      </div>
     </div>
-  </div>
   </ng-container>
 </section>
 

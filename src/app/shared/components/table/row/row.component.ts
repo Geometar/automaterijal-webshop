@@ -8,6 +8,7 @@ import { ButtonComponent } from '../../button/button.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { InputFieldsComponent } from '../../input-fields/input-fields.component';
 import { MetaPillComponent } from '../../meta-pill/meta-pill.component';
+import { InquiryDialogComponent } from '../../inquiry-dialog/inquiry-dialog.component';
 
 // Data models
 import { Roba } from '../../../data-models/model/roba';
@@ -42,6 +43,7 @@ import { PictureService, ProductImageMeta } from '../../../service/utils/picture
     FormsModule,
     InputFieldsComponent,
     MetaPillComponent,
+    InquiryDialogComponent,
     ReactiveFormsModule,
     RouterModule,
     RsdCurrencyPipe,
@@ -76,8 +78,12 @@ export class RowComponent implements OnInit, OnChanges {
   readonly categorySuffix = '›';
 
   // Misc
+  inquiryContact = '';
+  inquiryPopupOpen = false;
+  inquirySent = false;
   hasMoreThanFiveSpecs = false;
   isEmployee = false;
+  loggedIn = false;
   showAllSpecs = false;
   categoryHref: string | null = null;
   categoryLinkSegments: string[] | null = null;
@@ -101,6 +107,7 @@ export class RowComponent implements OnInit, OnChanges {
   @HostListener('document:keydown.escape', ['$event'])
   onEscape() {
     this.zoomedImageUrl = null;
+    this.inquiryPopupOpen = false;
   }
 
   constructor(
@@ -114,14 +121,18 @@ export class RowComponent implements OnInit, OnChanges {
     if (changes['data']) {
       this.computeCategoryLink();
       this.quantity = this.clampQuantity(this.data?.kolicina ?? this.quantity);
+      this.inquirySent = false;
+      this.prefillInquiryFields();
     }
   }
 
   ngOnInit() {
     this.isEmployee = this.accountStateService.isEmployee();
+    this.loggedIn = this.accountStateService.isUserLoggedIn();
     this.quantity = this.clampQuantity(this.data.kolicina ?? this.quantity);
     this.updateDisplayedSpecs();
     this.computeCategoryLink();
+    this.prefillInquiryFields();
   }
 
   updateDisplayedSpecs() {
@@ -237,6 +248,23 @@ export class RowComponent implements OnInit, OnChanges {
     return this.data.podGrupa !== 1000000 && this.effectiveStock <= 0;
   }
 
+  get shouldShowInquiry(): boolean {
+    return this.isUnavailable || this.data.podGrupa === 1000000;
+  }
+
+  openInquiryPopup(): void {
+    this.inquiryPopupOpen = true;
+  }
+
+  closeInquiryPopup(): void {
+    this.inquiryPopupOpen = false;
+  }
+  private prefillInquiryFields(): void {
+    const account = this.accountStateService.get();
+    if (!this.inquiryContact && account?.email) {
+      this.inquiryContact = account.email;
+    }
+  }
   private computeCategoryLink(): void {
     const groupName = this.data?.grupaNaziv?.trim();
     const subName = this.data?.podGrupaNaziv?.trim();
