@@ -82,7 +82,7 @@
             [iconPrefix]="true"
             [iconSource]="iconEnum.MAIL"
             [label]="'Pošalji upit'"
-            [disabled]="inquirySending || !inquiryContactTrim"
+            [disabled]="inquirySending || (!loggedIn && !inquiryContactTrim)"
             [theme]="buttonTheme.DEFAULT"
             [type]="buttonType.PRIMARY"
             (clickEvent)="sendInquiry()"

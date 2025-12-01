@@ -187,7 +187,7 @@
 
               <ng-container *ngIf="!inquirySent; else inquirySentBlock">
                 <autom-input-fields
-                  *ngIf="!loggedIn || !inquiryContact"
+                  *ngIf="!loggedIn"
                   [label]="'Email (obavezno)'"
                   [placeholder]="'Unesi email da ti odgovorimo'"
                   [value]="inquiryContact"
@@ -225,7 +225,7 @@
                     [iconPrefix]="true"
                     [iconSource]="iconEnum.MAIL"
                     [label]="'Pošalji upit'"
-                    [disabled]="inquirySending || !inquiryContactTrim"
+                    [disabled]="inquirySending || (!loggedIn && !inquiryContactTrim)"
                     [theme]="buttonTheme.DEFAULT"
                     [type]="buttonType.PRIMARY"
                   (clickEvent)="sendInquiry()"

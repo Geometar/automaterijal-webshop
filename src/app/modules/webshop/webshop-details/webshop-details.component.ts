@@ -780,17 +780,17 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   sendInquiry(): void {
     const account = this.accountStateService.get();
     const contact = this.inquiryContactTrim || account?.email || '';
-    if (!contact) {
+    if (!contact && !this.loggedIn) {
       this.snackbarService.showError('Unesi email da bismo te kontaktirali.');
       return;
     }
-    if (!this.isValidEmail(contact)) {
+    if (contact && !this.isValidEmail(contact)) {
       this.snackbarService.showError('Unesi ispravan email.');
       return;
     }
 
     this.inquirySending = true;
-    const payload = this.buildInquiryPayload(contact);
+    const payload = this.buildInquiryPayload(contact || null);
 
     this.emailService
       .posaljiPoruku(payload)
@@ -823,17 +823,17 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-  private buildInquiryPayload(contact: string) {
+  private buildInquiryPayload(contact: string | null) {
     const account = this.accountStateService.get();
     const note = this.inquiryNote?.trim();
-    const phone = this.inquiryPhone?.trim();
+    const phone = this.loggedIn ? undefined : this.inquiryPhone?.trim();
     const message = this.buildInquiryMessage(note, contact, account, phone);
 
     return {
       ime: account?.naziv || 'Web kupac',
       prezime: '',
       firma: account?.naziv || undefined,
-      posta: contact,
+      posta: contact || undefined,
       telefon: phone || undefined,
       poruka: message
     };
@@ -841,10 +841,16 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
 
   private buildInquiryMessage(
     note: string | undefined,
-    contact: string,
+    contact: string | null,
     account: any,
     phone?: string | null
   ): string {
+    const contactLine = contact
+      ? `Email za odgovor: ${contact}`
+      : this.loggedIn && account?.ppid
+        ? `Email nije na nalogu (PPID: ${account.ppid})`
+        : null;
+
     const parts = [
       'Upit za nabavku artikla',
       this.data?.naziv ? `${this.data.naziv}` : null,
@@ -852,7 +858,8 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       this.data?.katbr ? `Kat.br: ${this.data.katbr}` : null,
       this.data?.robaid ? `ID: ${this.data.robaid}` : null,
       account?.naziv ? `Korisnik: ${account.naziv}` : null,
-      contact ? `Email za odgovor: ${contact}` : null,
+      account?.ppid ? `PPID: ${account.ppid}` : null,
+      contactLine,
       phone ? `Telefon: ${phone}` : null,
       note ? `Napomena: ${note}` : null
     ].filter(Boolean);
