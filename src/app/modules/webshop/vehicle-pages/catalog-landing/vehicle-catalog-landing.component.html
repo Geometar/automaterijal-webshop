@@ -107,8 +107,13 @@
         [class.is-active]="type.code === selectedType"
         (click)="selectType(type.code)"
       >
-        <span class="type-title">{{ type.label }}</span>
-        <small>{{ type.description }}</small>
+        <span class="type-icon" aria-hidden="true">
+          <img [src]="type.icon" alt="" loading="lazy" />
+        </span>
+        <span class="type-copy">
+          <span class="type-title">{{ type.label }}</span>
+          <small>{{ type.description }}</small>
+        </span>
       </button>
     </div>
   </section>

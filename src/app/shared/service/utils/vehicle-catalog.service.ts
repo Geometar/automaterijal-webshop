@@ -14,6 +14,7 @@ export interface VehicleTypeDefinition {
   code: VehicleCategoryType;
   label: string;
   description: string;
+  icon: string;
 }
 
 export interface VehicleManufacturerSummary {
@@ -41,28 +42,33 @@ export class VehicleCatalogService {
       label: 'Putnička vozila',
       description:
         'Limuzine, hečbek i SUV vozila za svakodnevnu vožnju i putovanja.',
+      icon: '/images/icons/car-tab.svg',
     },
     {
       code: VehicleCategoryType.LIGHT_COMMERCIAL,
       label: 'Kombi i dostavna vozila',
       description:
         'Za mala preduzeća i kurirske službe kojima je potreban pouzdan kombi.',
+      icon: '/images/icons/light-comercial-tab.svg',
     },
     {
       code: VehicleCategoryType.TRUCK,
       label: 'Kamioni i teška vozila',
       description: 'Transportna i teška vozila za profesionalnu upotrebu.',
+      icon: '/images/icons/truck-tab.svg',
     },
     {
       code: VehicleCategoryType.MOTORCYCLE,
       label: 'Motocikli',
       description: 'Dva točka, bilo da je reč o gradskim ili touring modelima.',
+      icon: '/images/icons/motorcycle-tab.svg',
     },
     {
       code: VehicleCategoryType.TRACTOR,
       label: 'Poljoprivredne mašine',
       description:
         'Traktori i mehanizacija za građevinu i poljoprivredu.',
+      icon: '/images/icons/tractor-tab.svg',
     },
   ];
 
