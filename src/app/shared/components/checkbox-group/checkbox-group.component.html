@@ -1,5 +1,3 @@
-<autom-label *ngIf="label" [label]="label" class="gc-title"></autom-label>
-
 <div class="gc-summary" *ngIf="selectedChips().length">
   <span class="gc-summary__label">Aktivni filteri</span>
   <div class="gc-summary__chips">
@@ -43,7 +41,12 @@
         </mat-checkbox>
 
         <div class="gc-h__tools">
-          <span class="gc-badge" *ngIf="task.subtasks?.length">
+          <span
+            class="gc-badge"
+            *ngIf="task.subtasks?.length"
+            [attr.aria-label]="badgeAria(task)"
+            [matTooltip]="badgeAria(task)"
+          >
             {{ countSelected(task) }}/{{ countTotal(task) }}
           </span>
 

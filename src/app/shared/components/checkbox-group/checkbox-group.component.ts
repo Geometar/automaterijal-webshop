@@ -48,6 +48,7 @@ export class CheckboxGroupComponent {
   @Input() scrollThreshold = 7;
   @Input() scrollBodyMaxHeight = 220;
   @Input() pinActiveGroups = true;
+  @Input() rememberExpansion = true;
   @Output() clickEvent = new EventEmitter<Task[]>();
 
   // Enums
@@ -68,7 +69,7 @@ export class CheckboxGroupComponent {
 
     const next = this.items.map((item) => ({
       ...item,
-      expanded: currentExpandedMap.get(item.id) ?? true,
+      expanded: this.resolveInitialExpand(item, currentExpandedMap),
     }));
 
     this.tasks.set(this.sortTasks(next));
@@ -107,6 +108,7 @@ export class CheckboxGroupComponent {
         ...draft[taskIndex],
         expanded: !draft[taskIndex].expanded,
       };
+      this.persistExpansion(draft);
       return draft;
     });
   }
@@ -179,5 +181,68 @@ export class CheckboxGroupComponent {
     });
 
     return entries;
+  }
+
+  badgeAria(task: Task): string {
+    const selected = this.countSelected(task);
+    const total = this.countTotal(task);
+    return `Izabrano ${selected} od ${total}`;
+  }
+
+  private resolveInitialExpand(item: Task, currentMap: Map<Task['id'], boolean>): boolean {
+    const fromCurrent = currentMap.get(item.id);
+    if (fromCurrent !== undefined) {
+      return fromCurrent;
+    }
+
+    const persisted = this.readPersisted();
+    if (persisted.has(item.id)) {
+      return persisted.get(item.id) ?? false;
+    }
+
+    // Default: open groups; user can collapse and it will be remembered
+    return true;
+  }
+
+  private persistExpansion(tasks: Task[]): void {
+    if (!this.rememberExpansion) {
+      return;
+    }
+    if (typeof sessionStorage === 'undefined') {
+      return;
+    }
+    try {
+      const map: Record<string, boolean> = {};
+      tasks.forEach((t) => {
+        map[String(t.id)] = !!t.expanded;
+      });
+      sessionStorage.setItem(this.buildStorageKey(), JSON.stringify(map));
+    } catch {
+      // ignore persistence errors (SSR / private mode)
+    }
+  }
+
+  private readPersisted(): Map<Task['id'], boolean> {
+    if (!this.rememberExpansion) {
+      return new Map();
+    }
+    if (typeof sessionStorage === 'undefined') {
+      return new Map();
+    }
+    try {
+      const raw = sessionStorage.getItem(this.buildStorageKey());
+      if (!raw) {
+        return new Map();
+      }
+      const parsed = JSON.parse(raw) as Record<string, boolean>;
+      return new Map(Object.entries(parsed));
+    } catch {
+      return new Map();
+    }
+  }
+
+  private buildStorageKey(): string {
+    const safeLabel = this.label?.toLowerCase().replace(/\s+/g, '-').slice(0, 40) || 'checkbox-group';
+    return `cb-group-expanded-${safeLabel}`;
   }
 }

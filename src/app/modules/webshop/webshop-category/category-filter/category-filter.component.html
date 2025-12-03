@@ -4,6 +4,7 @@
     class="filter-selection grouped-checkbox"
     [items]="tasks"
     [label]="'Kategorije'"
+    [rememberExpansion]="false"
     (clickEvent)="emitSelectedSubgroups($event)"
   >
   </checkbox-group>
