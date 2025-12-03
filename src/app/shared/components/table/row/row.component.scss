@@ -254,6 +254,16 @@
     .product-meta autom-meta-pill {
       display: inline-flex;
       max-width: 100%;
+      &.clickable-placeholder {
+        transition: transform 0.12s ease, box-shadow 0.12s ease;
+        cursor: pointer;
+        @media (hover: hover) and (pointer: fine) {
+          &:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+          }
+        }
+      }
     }
 
     .product-meta__sku .meta-pill__value {

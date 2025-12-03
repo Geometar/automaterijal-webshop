@@ -152,12 +152,13 @@ export class AutomProductCardComponent implements OnInit {
 
   // TecDoc-only article recognition (by business rule)
   get isTecDocOnly(): boolean {
-    return this.roba?.podGrupa === 1000000;
+    return this.roba?.robaid == null || this.roba?.podGrupa === 1000000;
   }
 
   // Is in cart indicator
   get isInCart(): boolean {
-    return this.cartStateService.isInCart(this.roba?.robaid!);
+    const id = this.roba?.robaid;
+    return id != null && this.cartStateService.isInCart(id);
 
   }
 

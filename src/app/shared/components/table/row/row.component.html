@@ -2,7 +2,7 @@
   <!-- Image Section -->
   <div class="image-container" [class.image-smaller]="showPriceOnly">
     <!-- Popust badge -->
-    <div class="discount-badge" *ngIf="data.podGrupa !== 1000000 && data.rabat">
+    <div class="discount-badge" *ngIf="!isTecDocOnly && data.rabat">
       -{{ data.rabat }}%
     </div>
 
@@ -21,7 +21,7 @@
 
   <!-- Details Section -->
   <div class="details-container">
-    <h3 class="product-heading" [class.disabled]="data.podGrupa === 1000000">
+    <h3 class="product-heading" [class.disabled]="isTecDocOnly">
       <a
         class="product-link"
         [routerLink]="['/webshop', data.robaid + '-' + getProductSlug(data)]"
@@ -44,7 +44,7 @@
         [ariaLabel]="'Kataloški broj ' + data.katbr"
       ></autom-meta-pill>
 
-      <ng-container *ngIf="categoryHref; else plainCategory">
+      <ng-container *ngIf="categoryHref && !disableCategoryNavigation; else plainCategory">
         <autom-meta-pill
           class="product-meta__category category-pill"
           variant="primary"
@@ -73,6 +73,10 @@
           class="product-meta__category category-pill"
           variant="primary"
           size="md"
+          [style.cursor]="disableCategoryNavigation ? 'pointer' : null"
+          [attr.aria-label]="disableCategoryNavigation ? 'Filtriraj po podgrupi ' + (data!.podGrupaNaziv || data!.grupaNaziv) : null"
+          [ngClass]="{ 'clickable-placeholder': disableCategoryNavigation }"
+          (click)="onCategoryClick($event)"
         >
           {{ data!.podGrupaNaziv || data!.grupaNaziv }}
         </autom-meta-pill>
@@ -142,13 +146,13 @@
     <div
       [ngClass]="{
         'item-status': true,
-        green: data.podGrupa !== 1000000 && !isUnavailable,
-        red: data.podGrupa !== 1000000 && isUnavailable,
-        yellow: data.podGrupa === 1000000
+        green: !isTecDocOnly && !isUnavailable,
+        red: !isTecDocOnly && isUnavailable,
+        yellow: isTecDocOnly
       }"
     >
       {{
-        data.podGrupa === 1000000
+        isTecDocOnly
           ? "TecDoc artikal"
           : !isUnavailable
           ? "Ima na stanju"
@@ -157,30 +161,30 @@
     </div>
     <!-- Stara cena -->
     <p
-      *ngIf="data.podGrupa !== 1000000 && data.rabat"
+      *ngIf="!isTecDocOnly && data.rabat"
       class="sub-price old-price"
     >
       {{ data.cena! / (1 - data.rabat / 100) | rsdCurrency }}
     </p>
 
     <!-- Finalna cena -->
-    <p *ngIf="data.podGrupa !== 1000000" class="price">
+    <p *ngIf="!isTecDocOnly" class="price">
       {{ data.cena ? (data.cena! | rsdCurrency) : (0 | rsdCurrency) }}
     </p>
 
-    <p *ngIf="data.podGrupa !== 1000000" class="mobile-row autom-align__right">
+    <p *ngIf="!isTecDocOnly" class="mobile-row autom-align__right">
       Cena sa PDV-om
     </p>
 
     <!-- Ušteda -->
-    <p *ngIf="data.podGrupa !== 1000000 && data.rabat" class="saving">
+    <p *ngIf="!isTecDocOnly && data.rabat" class="saving">
       Ušteda
       {{ data.cena! / (1 - data.rabat / 100) - data.cena! | rsdCurrency }}
     </p>
 
     <div
       class="mobile-quantity-cart util__flex--center"
-      *ngIf="data.podGrupa !== 1000000 && !isUnavailable"
+      *ngIf="!isTecDocOnly && !isUnavailable"
     >
       <autom-input-fields
         [clearBtn]="false"

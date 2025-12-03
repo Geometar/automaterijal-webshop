@@ -21,6 +21,7 @@ import {
   IconsEnum,
   InputTypeEnum,
   SizeEnum,
+  WebshopPrimaryFilter
 } from '../../../data-models/enums';
 
 // Pipes
@@ -29,9 +30,10 @@ import { RsdCurrencyPipe } from '../../../pipe/rsd-currency.pipe';
 // Services
 import { AccountStateService } from '../../../service/state/account-state.service';
 import { CartStateService } from '../../../service/state/cart-state.service';
+import { PictureService, ProductImageMeta } from '../../../service/utils/picture.service';
 import { SnackbarService } from '../../../service/utils/snackbar.service';
 import { StringUtils } from '../../../utils/string-utils';
-import { PictureService, ProductImageMeta } from '../../../service/utils/picture.service';
+import { UrlHelperService } from '../../../service/utils/url-helper.service';
 
 @Component({
   selector: 'row',
@@ -57,6 +59,7 @@ export class RowComponent implements OnInit, OnChanges {
   @Input() showAddToBasket = false;
   @Input() showCloseBtn = false;
   @Input() showPriceOnly = false;
+  @Input() disableCategoryNavigation = false;
   @Output() removeEvent = new EventEmitter<number>();
 
   quantity: number = 1;
@@ -114,7 +117,8 @@ export class RowComponent implements OnInit, OnChanges {
     private cartStateService: CartStateService,
     private snackbarService: SnackbarService,
     private accountStateService: AccountStateService,
-    private pictureService: PictureService
+    private pictureService: PictureService,
+    private urlHelperService: UrlHelperService
   ) { }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -244,12 +248,16 @@ export class RowComponent implements OnInit, OnChanges {
     return this.hasValidPrice ? this.data?.stanje ?? 0 : 0;
   }
 
+  get isTecDocOnly(): boolean {
+    return this.data?.robaid == null || this.data?.podGrupa === 1000000;
+  }
+
   get isUnavailable(): boolean {
-    return this.data.podGrupa !== 1000000 && this.effectiveStock <= 0;
+    return !this.isTecDocOnly && this.effectiveStock <= 0;
   }
 
   get shouldShowInquiry(): boolean {
-    return this.isUnavailable || this.data.podGrupa === 1000000;
+    return this.isUnavailable || this.isTecDocOnly;
   }
 
   openInquiryPopup(): void {
@@ -269,7 +277,7 @@ export class RowComponent implements OnInit, OnChanges {
     const groupName = this.data?.grupaNaziv?.trim();
     const subName = this.data?.podGrupaNaziv?.trim();
 
-    if (!groupName) {
+    if (!groupName || this.disableCategoryNavigation) {
       this.categoryHref = null;
       this.categoryLinkSegments = null;
       return;
@@ -283,6 +291,24 @@ export class RowComponent implements OnInit, OnChanges {
 
     this.categoryLinkSegments = segments;
     this.categoryHref = segments.join('/');
+  }
+
+  onCategoryClick(event: MouseEvent): void {
+    if (!this.disableCategoryNavigation) {
+      return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+
+    const subGroupId = this.data?.podGrupa;
+    if (!subGroupId) {
+      return;
+    }
+
+    this.urlHelperService.addOrUpdateQueryParams({
+      podgrupe: [subGroupId],
+      filterBy: WebshopPrimaryFilter.Subcategory,
+    });
   }
 
   private get hasValidPrice(): boolean {

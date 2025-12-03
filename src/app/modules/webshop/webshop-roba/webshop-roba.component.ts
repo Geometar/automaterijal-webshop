@@ -35,6 +35,7 @@ export class WebshopRobaComponent {
   @Input() pageSize = 10;
   @Input() searchTerm = '';
   @Input() vehicleDetails: TDVehicleDetails | null = null;
+  @Input() disableCategoryNavigation = false;
   @Output() emitTablePage = new EventEmitter<TablePage>();
 
   // Enums

@@ -51,6 +51,7 @@ export class TableComponent implements OnChanges {
   @Input() filter: Filter = new Filter();
   @Input() pageIndex = 0;
   @Input() pageSize = 10;
+  @Input() disableCategoryNavigation = false;
   @Output() emitTablePage = new EventEmitter<TablePage>();
 
   // Complete data source
@@ -100,6 +101,7 @@ export class TableComponent implements OnChanges {
 
   processFilter(): void {
     this.filterChips = [];
+    const dataArray = this.getDataArray();
     if (this.filter.mandatoryProid?.length) {
       this.filterChips.push({
         label: 'Proizvodjaci',
@@ -117,9 +119,15 @@ export class TableComponent implements OnChanges {
         .filter((data: Categories) => this.filter.grupe!.includes(data.id!))
         .map((data: Categories) => data.label);
       if (!chosenCategories.length) {
-        chosenCategories = this.filter.grupe.map(
-          (g) => this.categoriesState.getCategoryLabelById(g)?.name
-        );
+        chosenCategories = this.filter.grupe.map((g) => {
+          const fromState = this.categoriesState.getCategoryLabelById(g)?.name;
+          if (fromState) {
+            return fromState;
+          }
+          const fromData =
+            dataArray.find((r: any) => String(r?.grupa) === String(g))?.grupaNaziv;
+          return fromData ?? g;
+        });
       }
       this.filterChips.push({
         label: 'Grupe',
@@ -129,9 +137,15 @@ export class TableComponent implements OnChanges {
     if (this.filter.podgrupe?.length) {
       this.filterChips.push({
         label: 'Podgrupe',
-        values: this.filter.podgrupe.map(
-          (p) => this.categoriesState.getCategorySubgroupsLabelById(p)?.name
-        ),
+        values: this.filter.podgrupe.map((p) => {
+          const fromState = this.categoriesState.getCategorySubgroupsLabelById(p)?.name;
+          if (fromState) {
+            return fromState;
+          }
+          const fromData =
+            dataArray.find((r: any) => String(r?.podGrupa) === String(p))?.podGrupaNaziv;
+          return fromData ?? p;
+        }),
       } as Chip);
     }
   }
@@ -167,6 +181,16 @@ export class TableComponent implements OnChanges {
     this.paginatedData = this.isAlreadyPaginated()
       ? (this.data as PaginatedResponse<Roba>).content
       : (this.data as Roba[]).slice(startIndex, endIndex);
+  }
+
+  private getDataArray(): Roba[] {
+    if (!this.data) {
+      return [];
+    }
+    if (this.isAlreadyPaginated()) {
+      return (this.data as PaginatedResponse<Roba>).content ?? [];
+    }
+    return (this.data as Roba[]) ?? [];
   }
 
   private isAlreadyPaginated(): boolean {
