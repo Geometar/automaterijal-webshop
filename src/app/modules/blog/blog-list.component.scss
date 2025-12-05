@@ -1,27 +1,32 @@
 .blog-page {
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 32px 16px 64px;
+  padding: clamp(28px, 4vw, 48px) 16px 72px;
   color: var(--figma-grey-800, #1f2937);
 }
 
 .blog-header {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-bottom: 32px;
+  gap: 18px;
+  margin-bottom: clamp(28px, 4vw, 40px);
+  padding: clamp(20px, 3vw, 32px);
+  border-radius: 28px;
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.08), rgba(59, 130, 246, 0.06));
+  box-shadow: 0 20px 46px rgba(15, 23, 42, 0.06);
 
   &__title h1 {
     margin: 0;
-    font-size: clamp(28px, 4vw, 36px);
-    font-weight: 700;
+    font-size: clamp(30px, 4.4vw, 40px);
+    font-weight: 800;
     letter-spacing: -0.02em;
   }
 
   &__subtitle {
     margin: 4px 0 0;
-    font-size: 16px;
+    font-size: 15px;
     color: var(--figma-grey-500, #6b7280);
+    max-width: 70ch;
   }
 
   &__search {
@@ -29,17 +34,33 @@
 
     input {
       width: 100%;
-      padding: 12px 18px;
-      border-radius: 9999px;
-      border: 1px solid var(--figma-grey-200, #e5e7eb);
+      padding: 14px 18px 14px 46px;
+      border-radius: 18px;
+      border: 1px solid rgba(15, 23, 42, 0.08);
       font-size: 15px;
+      background: #ffffff;
       outline: none;
-      transition: box-shadow 0.2s ease, border-color 0.2s ease;
+      transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 
       &:focus {
         border-color: var(--figma-primary-500, #0ea5e9);
-        box-shadow: 0 6px 16px rgba(14, 165, 233, 0.18);
+        box-shadow: 0 12px 28px rgba(14, 165, 233, 0.2);
+        transform: translateY(-1px);
       }
+    }
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      opacity: 0.7;
+      pointer-events: none;
     }
   }
 }
@@ -57,21 +78,22 @@
 .blog-sidebar {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
 }
 
 .filter-card {
   background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
-  padding: 20px;
-  border: 1px solid var(--figma-grey-100, #f1f5f9);
+  border-radius: 18px;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
+  padding: 18px;
+  border: 1px solid rgba(226, 232, 240, 0.8);
 
   h2 {
-    margin: 0 0 12px;
-    font-size: 16px;
-    font-weight: 700;
+    margin: 0 0 14px;
+    font-size: 15px;
+    font-weight: 800;
     color: var(--figma-grey-700, #374151);
+    letter-spacing: 0.01em;
   }
 
   ul {
@@ -88,17 +110,19 @@
     text-align: left;
     border: none;
     background: transparent;
-    padding: 8px 10px;
-    border-radius: 10px;
+    padding: 9px 12px;
+    border-radius: 12px;
     font-size: 14px;
-    color: var(--figma-grey-600, #4b5563);
+    color: var(--figma-grey-700, #334155);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: background 0.15s ease, color 0.15s ease;
+    gap: 10px;
+    transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
 
     &:hover {
       background: rgba(14, 165, 233, 0.08);
+      transform: translateY(-1px);
     }
 
     &.is-active {
@@ -121,38 +145,52 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  max-height: 240px;
+  overflow: auto;
+  padding-right: 4px;
 }
 
 .tag {
-  border: 1px solid rgba(14, 165, 233, 0.2);
+  border: 1px solid rgba(14, 165, 233, 0.3);
   border-radius: 9999px;
-  padding: 4px 10px;
+  padding: 5px 10px;
   font-size: 13px;
   background: rgba(14, 165, 233, 0.08);
   color: #0369a1;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 
   &.is-active {
     background: #0369a1;
+    border-color: #0369a1;
     color: #fff;
   }
 }
 
 .pagination-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
   .page-actions {
     display: flex;
     justify-content: space-between;
     gap: 12px;
-    margin: 12px 0;
+    margin: 4px 0 8px;
 
     button {
       flex: 1;
-      padding: 8px 12px;
-      border-radius: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
       border: 1px solid var(--figma-grey-200, #e2e8f0);
       background: #f8fafc;
       font-size: 13px;
-      font-weight: 600;
+      font-weight: 700;
+      transition: background 0.15s ease, transform 0.15s ease;
+
+      &:hover:not(:disabled) {
+        background: #e2e8f0;
+        transform: translateY(-1px);
+      }
 
       &:disabled {
         opacity: 0.5;
@@ -181,27 +219,44 @@
 
 .posts-grid {
   display: grid;
-  gap: 24px;
+  gap: 22px;
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+  }
 }
 
 .post-card {
   display: grid;
-  grid-template-columns: minmax(220px, 280px) 1fr;
-  gap: 20px;
+  grid-template-columns: 1fr;
   background: #fff;
-  border-radius: 20px;
-  box-shadow: 0 12px 34px rgba(15, 23, 42, 0.08);
+  border-radius: 22px;
+  box-shadow: 0 14px 36px rgba(15, 23, 42, 0.08);
   overflow: hidden;
-  border: 1px solid rgba(226, 232, 240, 0.8);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
+    border-color: rgba(59, 130, 246, 0.25);
+  }
+
+  @media (min-width: 1024px) {
+    &:first-child {
+      grid-column: span 2;
+      grid-template-columns: minmax(320px, 460px) 1fr;
+      align-items: stretch;
+    }
   }
 
   &__image {
     display: block;
     position: relative;
     overflow: hidden;
+    background: #e2e8f0;
+    aspect-ratio: 16 / 10;
 
     img {
       width: 100%;
@@ -213,19 +268,35 @@
     &:hover img {
       transform: scale(1.05);
     }
+
+    @media (min-width: 1024px) {
+      .post-card:first-child & {
+        height: 100%;
+        aspect-ratio: auto;
+      }
+    }
   }
 
   &__placeholder {
     background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
     width: 100%;
     height: 100%;
+    aspect-ratio: 16 / 10;
   }
 
   &__body {
-    padding: 24px;
+    padding: 22px 22px 18px;
     display: flex;
     flex-direction: column;
     gap: 12px;
+
+    @media (min-width: 1024px) {
+      padding: 26px;
+
+      .post-card:first-child & {
+        padding: 30px;
+      }
+    }
   }
 
   &__meta {
@@ -234,6 +305,7 @@
     display: flex;
     gap: 8px;
     align-items: center;
+    flex-wrap: wrap;
 
     .dot {
       width: 4px;
@@ -246,7 +318,8 @@
 
   &__title {
     margin: 0;
-    font-size: clamp(18px, 2.4vw, 22px);
+    font-size: clamp(19px, 2.6vw, 23px);
+    letter-spacing: -0.01em;
 
     a {
       color: var(--figma-grey-900, #111827);
@@ -264,10 +337,16 @@
     color: var(--figma-grey-600, #4b5563);
     font-size: 15px;
     line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   &__footer {
     margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid rgba(226, 232, 240, 0.9);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -281,18 +360,23 @@
   text-decoration: none;
   font-weight: 600;
   font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.15s ease, transform 0.15s ease;
 
   &:hover {
     text-decoration: underline;
+    transform: translateX(2px);
   }
 }
 
 .tags .tag {
   background: rgba(14, 165, 233, 0.12);
-  border: none;
-  color: #0ea5e9;
+  border: 1px solid rgba(14, 165, 233, 0.3);
+  color: #0369a1;
   font-size: 12px;
-  padding: 2px 8px;
+  padding: 3px 8px;
 }
 
 .skeleton-grid {

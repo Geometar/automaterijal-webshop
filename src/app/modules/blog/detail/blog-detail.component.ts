@@ -295,7 +295,12 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
     if (!html) {
       return '';
     }
-    return html.replace(/&nbsp;|&#160;/gi, ' ').replace(/\u00a0/g, ' ');
+    return html
+      .replace(/&nbsp;|&#160;/gi, ' ')
+      .replace(/\u00a0/g, ' ')
+      .replace(/<p[^>]*>(\s|&nbsp;|&#160;|<br\s*\/?>)*<\/p>/gi, '')
+      .replace(/<h[1-6][^>]*>(\s|&nbsp;|&#160;|<br\s*\/?>)*<\/h[1-6]>/gi, '')
+      .trim();
   }
 
   private loadShowcase(detail: BlogPostDetail): void {
