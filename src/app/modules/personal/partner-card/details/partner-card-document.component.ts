@@ -64,12 +64,16 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
   error = '';
   items: DocumentRowView[] = [];
   totals: DocumentTotals = { partnerVat: 0, partnerGross: 0, fullGross: 0 };
+  printNote = '';
+  customerNameForPrint = '';
+  partnerNameFromQuery: string | null = null;
   isAdmin = false;
   partnerPpid: number | null = null;
   documentDate: string | null = null;
   documentDueDate: string | null = null;
   documentTotal: number | null = null;
   zoomedImageUrl: string | null = null;
+  private printWindow: Window | null = null;
 
   private readonly destroy$ = new Subject<void>();
   private readonly allowedVrdokCodes = new Set(['4', '04', '13', '15', '32']);
@@ -86,12 +90,19 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.isAdmin = this.accountStateService.isAdmin();
+    if (!this.isAdmin) {
+      const accountName = this.accountStateService.get()?.naziv?.trim();
+      if (accountName) {
+        this.customerNameForPrint = accountName;
+      }
+    }
     this.readRoute();
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    this.closePrintWindow();
   }
 
   trackByRow = (_index: number, item: DocumentRowView): string =>
@@ -112,6 +123,20 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
     return VRDOK_LABELS[this.vrdok] ?? null;
   }
 
+  get displayPartnerName(): string | null {
+    if (this.partnerNameFromQuery) {
+      return this.partnerNameFromQuery;
+    }
+    const accountName = this.accountStateService.get()?.naziv?.trim();
+    if (!this.isAdmin && accountName) {
+      return accountName;
+    }
+    if (this.partnerPpid !== null) {
+      return `Partner #${this.partnerPpid}`;
+    }
+    return null;
+  }
+
   get displayTotal(): number {
     if (Number.isFinite(this.documentTotal)) {
       return this.documentTotal as number;
@@ -124,7 +149,24 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.closePrintWindow();
+    this.recalculateTotals();
     const total = mode === 'partner' ? this.totals.partnerGross : this.totals.fullGross || this.totals.partnerGross;
+    const priceLabel = 'Cena (sa PDV)';
+    const totalLabel = 'Ukupno';
+    const buyerLabel = this.escapeHtml(this.customerNameForPrint?.trim() || 'Kupac');
+    const docLabel = this.escapeHtml(this.docTypeLabel || this.vrdok);
+    const noteBlock = this.printNote.trim()
+      ? `<div class="note"><div class="note__label">Napomena</div><div class="note__text">${this.escapeHtml(this.printNote).replace(/\n/g, '<br>')}</div></div>`
+      : '';
+    const contactBlock = `<div class="brand__contact">
+            <div>015/319-000</div>
+            <div>Kralja Milutina 159, 15000 Šabac</div>
+            <div>office@automaterijal.com</div>
+         </div>`;
+    const issuerBlock = `<div><strong>Dokument izdaje:</strong> ${buyerLabel}</div>
+         <div><strong>Robu izdao:</strong> Automaterijal</div>`;
+
     const rows = this.items
       .map((item, index) => {
         const unit = mode === 'partner' ? item.partnerGross : item.fullGross;
@@ -135,9 +177,9 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
             <td>${this.escapeHtml(item.code ?? '')}</td>
             <td>${this.escapeHtml(item.title)}</td>
             <td>${this.escapeHtml(item.manufacturer ?? '')}</td>
-            <td style="text-align:right;">${item.quantity}</td>
-            <td style="text-align:right;">${this.formatCurrency(unit)}</td>
-            <td style="text-align:right;">${this.formatCurrency(sum)}</td>
+            <td class="num">${item.quantity}</td>
+            <td class="num">${this.formatCurrency(unit)}</td>
+            <td class="num">${this.formatCurrency(sum)}</td>
           </tr>
         `;
       })
@@ -147,6 +189,7 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
     if (!win) {
       return;
     }
+    this.printWindow = win;
 
     const html = `
       <!doctype html>
@@ -155,22 +198,51 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
           <meta charset="utf-8" />
           <title>Dokument #${this.escapeHtml(this.brdok)}</title>
           <style>
-            body { font-family: Arial, sans-serif; padding: 16px; color: #000; }
-            h1 { margin: 0 0 8px; font-size: 20px; }
-            .meta { margin: 0 0 12px; font-size: 12px; color: #444; }
-            table { width: 100%; border-collapse: collapse; font-size: 13px; }
+            body { font-family: 'Segoe UI', Arial, sans-serif; padding: 18px; color: #000; background: #fff; }
+            .print-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding-bottom: 10px; border-bottom: 1px solid #000; }
+            .brand__name { font-size: 18px; font-weight: 800; letter-spacing: 0.02em; }
+            .brand__contact { margin-top: 4px; font-size: 12px; color: #000; line-height: 1.4; }
+            .doc-meta { text-align: right; }
+            .doc-meta__title { font-size: 18px; font-weight: 800; margin: 0 0 4px; }
+            .doc-meta__row { display: flex; justify-content: flex-end; gap: 6px; flex-wrap: wrap; margin-bottom: 4px; }
+            .doc-meta__dates { display: flex; justify-content: flex-end; gap: 12px; flex-wrap: wrap; font-size: 12px; color: #000; }
+            .pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px; border-radius: 10px; background: #f5f5f5; color: #000; font-size: 12px; font-weight: 700; border: 1px solid #000; }
+            .issuer-block { margin: 12px 0 8px; padding: 10px 12px; border: 1px dashed #000; background: #fff; border-radius: 8px; display: flex; justify-content: space-between; gap: 12px; font-size: 13px; }
+            .note { margin: 10px 0 12px; padding: 10px 12px; background: #f5f5f5; border: 1px solid #000; border-radius: 8px; }
+            .note__label { text-transform: uppercase; font-size: 11px; font-weight: 800; color: #000; letter-spacing: 0.04em; }
+            .note__text { margin-top: 4px; color: #000; line-height: 1.4; }
+            table { width: 100%; border-collapse: collapse; font-size: 12px; background: #fff; }
             th, td { border: 1px solid #000; padding: 6px 8px; }
-            th { background: #f2f2f2; text-align: left; }
-            tfoot td { font-weight: bold; }
+            th { background: #f5f5f5; text-align: left; font-weight: 800; color: #000; }
+            .num { text-align: right; font-variant-numeric: tabular-nums; }
+            .total { margin-top: 6px; display: flex; justify-content: flex-end; gap: 10px; align-items: center; font-weight: 800; font-size: 14px; }
+            .footer { margin-top: 12px; padding-top: 10px; border-top: 1px solid #000; display: flex; justify-content: space-between; color: #000; font-size: 12px; }
           </style>
         </head>
         <body>
-          <h1>Dokument #${this.escapeHtml(this.brdok)}</h1>
-          <div class="meta">
-            <div>Tip: ${this.escapeHtml(this.docTypeLabel || this.vrdok)}</div>
-            ${this.documentDate ? `<div>Datum: ${this.escapeHtml(this.documentDate)}</div>` : ''}
-            ${this.documentDueDate ? `<div>Valuta/Rok: ${this.escapeHtml(this.documentDueDate)}</div>` : ''}
-          </div>
+          <header class="print-header">
+            <div class="brand">
+              <div class="brand__name">Automaterijal</div>
+              ${contactBlock}
+            </div>
+            <div class="doc-meta">
+              <div class="doc-meta__title">Dokument #${this.escapeHtml(this.brdok)}</div>
+              <div class="doc-meta__row">
+                <span class="pill">${docLabel}</span>
+              </div>
+              <div class="doc-meta__dates">
+                ${this.documentDate ? `<span>Datum: ${this.escapeHtml(this.documentDate)}</span>` : ''}
+                ${this.documentDueDate ? `<span>Valuta/Rok: ${this.escapeHtml(this.documentDueDate)}</span>` : ''}
+              </div>
+            </div>
+          </header>
+
+          <section class="issuer-block">
+            ${issuerBlock}
+          </section>
+
+          ${noteBlock}
+
           <table>
             <thead>
               <tr>
@@ -178,22 +250,25 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
                 <th>Šifra</th>
                 <th>Naziv</th>
                 <th>Proizvođač</th>
-                <th style="text-align:right;">Kol.</th>
-                <th style="text-align:right;">Cena (sa PDV)</th>
-                <th style="text-align:right;">Ukupno</th>
+                <th class="num">Kol.</th>
+                <th class="num">${priceLabel}</th>
+                <th class="num">Ukupno</th>
               </tr>
             </thead>
             <tbody>
               ${rows}
             </tbody>
-            <tfoot>
-              <tr>
-                <td colspan="6" style="text-align:right;">Ukupno</td>
-                <td style="text-align:right;">${this.formatCurrency(total)}</td>
-              </tr>
-            </tfoot>
           </table>
-          <script>window.print();</script>
+
+          <div class="total">
+            <span>${totalLabel}</span>
+            <span class="num">${this.formatCurrency(total)}</span>
+          </div>
+
+          <footer class="footer">
+            <span>Automaterijal</span>
+            <span>#${this.escapeHtml(this.brdok)}</span>
+          </footer>
         </body>
       </html>
     `;
@@ -201,6 +276,29 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
     win.document.open();
     win.document.write(html);
     win.document.close();
+    setTimeout(() => {
+      try {
+        win.focus();
+        win.print();
+        win.close();
+      } catch {
+        // ignore
+      } finally {
+        this.printWindow = null;
+      }
+    }, 50);
+  }
+
+  private closePrintWindow(): void {
+    try {
+      if (this.printWindow && !this.printWindow.closed) {
+        this.printWindow.close();
+      }
+    } catch {
+      // ignore
+    } finally {
+      this.printWindow = null;
+    }
   }
 
   private readRoute(): void {
@@ -212,11 +310,14 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
 
     const query = this.route.snapshot.queryParamMap;
     const ppidParam = query.get('ppid');
+    const partnerNameParam = query.get('pn');
     const parsedPpid = ppidParam ? Number(ppidParam) : Number.NaN;
     this.partnerPpid = Number.isFinite(parsedPpid) ? parsedPpid : null;
+    this.partnerNameFromQuery = partnerNameParam?.trim() || null;
     this.documentDate = null;
     this.documentDueDate = null;
     this.documentTotal = null;
+    this.ensureCustomerName();
 
     if (!normalizedVrdok || !normalizedBrdok) {
       this.error = 'Nedostaje vrdok ili broj dokumenta.';
@@ -227,6 +328,32 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
     this.brdok = normalizedBrdok;
     this.error = '';
     this.fetchDetails();
+  }
+
+  private ensureCustomerName(): void {
+    if (this.customerNameForPrint && this.customerNameForPrint.trim()) {
+      return;
+    }
+
+    if (this.partnerNameFromQuery) {
+      this.customerNameForPrint = this.partnerNameFromQuery;
+      return;
+    }
+
+    if (!this.isAdmin) {
+      const accountName = this.accountStateService.get()?.naziv?.trim();
+      if (accountName) {
+        this.customerNameForPrint = accountName;
+        return;
+      }
+    }
+
+    if (this.partnerPpid) {
+      this.customerNameForPrint = `Partner #${this.partnerPpid}`;
+      return;
+    }
+
+    this.customerNameForPrint = 'Kupac';
   }
 
   private fetchDetails(): void {
@@ -276,6 +403,45 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
       return;
     }
     this.zoomedImageUrl = url;
+  }
+
+  onNoteChange(value: string): void {
+    this.printNote = value ?? '';
+  }
+
+  onFullPriceChange(item: DocumentRowView, value: string | number): void {
+    if (!item) {
+      return;
+    }
+    const parsed = this.toNumber(value);
+    const baseUnit = Number.isFinite(item.fullGrossOriginal ?? Number.NaN)
+      ? item.fullGrossOriginal
+      : item.fullGross;
+    const quantity = Number.isFinite(item.quantity) ? item.quantity : 1;
+    const unit = Number.isFinite(parsed) ? Math.max(0, this.round2(parsed)) : baseUnit;
+
+    item.fullGross = unit;
+    item.fullGrossTotal = this.round2(unit * quantity);
+    item.fullPriceEdited = Number.isFinite(parsed) && Math.abs(unit - baseUnit) > 0.01;
+    this.recalculateTotals();
+  }
+
+  resetFullPrice(item: DocumentRowView): void {
+    if (!item) {
+      return;
+    }
+    const quantity = Number.isFinite(item.quantity) ? item.quantity : 1;
+    const baseUnit = Number.isFinite(item.fullGrossOriginal ?? Number.NaN)
+      ? item.fullGrossOriginal
+      : item.fullGross;
+    const baseTotal = Number.isFinite(item.fullGrossTotalOriginal ?? Number.NaN)
+      ? item.fullGrossTotalOriginal
+      : baseUnit * quantity;
+
+    item.fullGross = baseUnit;
+    item.fullGrossTotal = this.round2(baseTotal);
+    item.fullPriceEdited = false;
+    this.recalculateTotals();
   }
 
   private normalizeDetailItems(items: PartnerCardDetailsItem[]): DocumentRowView[] {
@@ -342,6 +508,9 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
         partnerGrossTotal: grossPartnerTotal,
         fullGross: fullGrossUnit,
         fullGrossTotal,
+        fullGrossOriginal: fullGrossUnit,
+        fullGrossTotalOriginal: fullGrossTotal,
+        fullPriceEdited: false,
         image: this.pictureService.buildImageSrc(
           {
             slikeUrl: item.slika?.slikeUrl ?? null,
@@ -352,6 +521,10 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
         costPrice: costPrice ?? undefined
       };
     });
+  }
+
+  private recalculateTotals(): void {
+    this.totals = this.calculateTotals(this.items);
   }
 
   private calculateTotals(items: DocumentRowView[]): DocumentTotals {

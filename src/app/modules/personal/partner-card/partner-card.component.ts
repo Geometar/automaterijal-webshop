@@ -469,6 +469,9 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
     const queryParams: any = {};
     if (this.isAdmin && this.admin.partner?.ppid) {
       queryParams.ppid = this.admin.partner.ppid;
+      if (this.admin.partner.naziv) {
+        queryParams.pn = this.admin.partner.naziv;
+      }
     }
 
     this.router.navigate(['/partner-card/dokument', vrdok, brdok], {

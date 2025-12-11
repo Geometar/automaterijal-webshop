@@ -13,8 +13,9 @@
       <div class="doc-page__header-actions">
         <autom-button
           [iconPrefix]="true"
-          [iconSource]="iconsEnum.DOWNLOAD_CLOUD"
-          [label]="'PDF · moje cene'"
+          [iconSource]="iconsEnum.PRINTER"
+          [iconColor]="colorEnum.INFO_25"
+          [label]="'PDF za mene'"
           [theme]="buttonThemes.DEFAULT"
           [type]="buttonTypes.PRIMARY"
           [disabled]="!items.length"
@@ -23,7 +24,7 @@
         <autom-button
           [iconPrefix]="true"
           [iconSource]="iconsEnum.PRINTER"
-          [label]="'PDF · pune cene'"
+          [label]="'PDF za kupca'"
           [theme]="buttonThemes.LIGHT_GREY"
           [type]="buttonTypes.SECONDARY"
           [disabled]="!items.length"
@@ -38,9 +39,9 @@
           <autom-icon [source]="iconsEnum.FILE_TEXT"></autom-icon>
           {{ docTypeLabel }}
         </span>
-        <span class="pill soft" *ngIf="partnerPpid !== null && isAdmin">
+        <span class="pill soft" *ngIf="displayPartnerName">
           <autom-icon [source]="iconsEnum.USER"></autom-icon>
-          Partner #{{ partnerPpid }}
+          {{ displayPartnerName }}
         </span>
         <span class="pill ghost" *ngIf="isAdmin && partnerPpid === null">
           <autom-icon [source]="iconsEnum.EYE"></autom-icon>
@@ -53,20 +54,38 @@
   <div class="doc-page__body">
     <div class="doc-page__summary" *ngIf="!loading">
       <div class="summary-card">
-        <span class="label">Ukupno za plaćanje</span>
+        <span class="label">Ukupno (moje cene)</span>
         <strong>{{ displayTotal | rsdCurrency }}</strong>
       </div>
       <div class="summary-card">
         <span class="label">PDV</span>
         <strong>{{ totals.partnerVat | rsdCurrency }}</strong>
       </div>
+      <div class="summary-card accent" *ngIf="items.length">
+        <span class="label">Ukupno (kupcu)</span>
+        <strong>{{ totals.fullGross | rsdCurrency }}</strong>
+      </div>
       <div class="summary-card">
         <span class="label">Datum dokumenta</span>
-        <strong>{{ documentDate || '-' }}</strong>
+        <strong>{{ documentDate || "-" }}</strong>
       </div>
       <div class="summary-card highlight">
         <span class="label">Valuta / rok</span>
-        <strong>{{ documentDueDate || '-' }}</strong>
+        <strong>{{ documentDueDate || "-" }}</strong>
+      </div>
+    </div>
+
+    <div class="doc-page__print-config" *ngIf="!loading && !error">
+      <div class="form-field">
+        <label for="printNote">Napomena za štampu</label>
+        <textarea
+          id="printNote"
+          rows="2"
+          [value]="printNote"
+          (input)="onNoteChange($any($event.target)?.value)"
+          placeholder="Unesite napomenu koja ide na PDF"
+        ></textarea>
+        <small>Prikazujemo napomenu na oba PDF-a.</small>
       </div>
     </div>
 
@@ -93,7 +112,7 @@
         Nema stavki za prikaz.
       </div>
 
-     <article class="doc-row" *ngFor="let item of items; trackBy: trackByRow">
+      <article class="doc-row" *ngFor="let item of items; trackBy: trackByRow">
         <div class="doc-row__media">
           <div
             class="image"
@@ -109,35 +128,40 @@
         </div>
 
         <div class="doc-row__info">
-        <div class="doc-row__title">
-          <div class="codes">
-            <span class="pill" *ngIf="item.code"># {{ item.code }}</span>
-            <span class="meta-chip" *ngIf="item.manufacturer">
-              Proizvođač: <strong>{{ item.manufacturer }}</strong>
-            </span>
-            <span class="meta-chip meta-chip--accent">
-              Količina: <strong>{{ item.quantity }}</strong>
-            </span>
-            <span class="pill danger" *ngIf="item.rabatLabel">
-              -{{ item.rabatLabel }}
-            </span>
+          <div class="doc-row__title">
+            <div class="codes">
+              <span class="pill" *ngIf="item.code"># {{ item.code }}</span>
+              <span class="meta-chip" *ngIf="item.manufacturer">
+                Proizvođač: <strong>{{ item.manufacturer }}</strong>
+              </span>
+              <span class="meta-chip meta-chip--accent">
+                Količina: <strong>{{ item.quantity }}</strong>
+              </span>
+              <span class="pill danger" *ngIf="item.rabatLabel">
+                -{{ item.rabatLabel }}
+              </span>
+            </div>
+            <h3>
+              <a
+                *ngIf="item.routeParam; else plainTitle"
+                class="doc-row__link"
+                [routerLink]="['/webshop', item.routeParam]"
+              >
+                {{ item.title }}
+              </a>
+              <ng-template #plainTitle>{{ item.title }}</ng-template>
+            </h3>
           </div>
-          <h3>
-            <a
-              *ngIf="item.routeParam; else plainTitle"
-              class="doc-row__link"
-              [routerLink]="['/webshop', item.routeParam]"
+          <div
+            class="doc-row__tags"
+            *ngIf="item.groupLabel || item.subgroupLabel"
+          >
+            <span *ngIf="item.groupLabel">{{ item.groupLabel }}</span>
+            <span class="dot" *ngIf="item.groupLabel && item.subgroupLabel"
+              >•</span
             >
-              {{ item.title }}
-            </a>
-            <ng-template #plainTitle>{{ item.title }}</ng-template>
-          </h3>
-        </div>
-        <div class="doc-row__tags" *ngIf="item.groupLabel || item.subgroupLabel">
-          <span *ngIf="item.groupLabel">{{ item.groupLabel }}</span>
-          <span class="dot" *ngIf="item.groupLabel && item.subgroupLabel">•</span>
-          <span *ngIf="item.subgroupLabel">{{ item.subgroupLabel }}</span>
-        </div>
+            <span *ngIf="item.subgroupLabel">{{ item.subgroupLabel }}</span>
+          </div>
         </div>
 
         <div class="doc-row__pricing-table">
@@ -155,6 +179,34 @@
             <span class="label">Sa PDV (kom)</span>
             <strong>{{ item.partnerGross | rsdCurrency }}</strong>
             <small>Ukupno {{ item.partnerGrossTotal | rsdCurrency }}</small>
+          </div>
+          <div class="price-cell editable">
+            <div class="price-cell__header">
+              <span class="label">Cena za kupca (sa PDV)</span>
+              <span class="pill soft" *ngIf="item.fullPriceEdited"
+                >Izmenjeno</span
+              >
+            </div>
+            <div class="price-input">
+              <span class="currency">RSD</span>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                [value]="item.fullGross"
+                (input)="onFullPriceChange(item, $any($event.target)?.value)"
+                aria-label="Prilagođena puna cena"
+              />
+            </div>
+            <small>Ukupno {{ item.fullGrossTotal | rsdCurrency }}</small>
+            <button
+              type="button"
+              class="link-button"
+              *ngIf="item.fullPriceEdited"
+              (click)="resetFullPrice(item)"
+            >
+              Vrati original
+            </button>
           </div>
         </div>
       </article>

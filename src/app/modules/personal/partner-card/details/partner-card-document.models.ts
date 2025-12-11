@@ -19,6 +19,9 @@ export interface DocumentRowView {
   partnerGrossTotal: number;
   fullGross: number;
   fullGrossTotal: number;
+  fullGrossOriginal: number;
+  fullGrossTotalOriginal: number;
+  fullPriceEdited?: boolean;
   image: string;
   costPrice?: number;
   routeParam?: string | null;

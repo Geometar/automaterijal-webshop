@@ -3,7 +3,7 @@
   flex-direction: column;
   gap: 12px;
   padding: 18px 12px 32px;
-  background: #f5f7fa;
+  background: #f7f8fb;
   min-height: 100vh;
   margin-top: 8px;
 }
@@ -122,6 +122,73 @@
       color: var(--figma-error-600);
     }
   }
+
+  &.muted {
+    background: #f9fafc;
+    border-color: var(--figma-grey-100);
+  }
+
+  &.accent {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), #ffffff);
+    border-color: rgba(37, 99, 235, 0.24);
+  }
+}
+
+.doc-page__print-config {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.form-field {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid var(--figma-grey-100);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--figma-grey-600);
+  }
+
+  input,
+  textarea {
+    width: 100%;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 8px 10px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--figma-grey-900);
+    background: #f8fafc;
+    outline: none;
+    transition: border-color 120ms ease, box-shadow 120ms ease, background 120ms ease;
+  }
+
+  input:focus,
+  textarea:focus {
+    border-color: #0f62fe66;
+    box-shadow: 0 0 0 2px #0f62fe22;
+    background: #ffffff;
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 64px;
+  }
+
+  small {
+    color: var(--figma-grey-600);
+    font-weight: 600;
+  }
 }
 
 .doc-page__loading,
@@ -148,14 +215,14 @@
 
 .doc-row {
   display: grid;
-  grid-template-columns: 120px 1fr auto;
-  gap: 14px;
-  align-items: start;
-  padding: 10px;
-  border-radius: 14px;
+  grid-template-columns: 110px 1.5fr 1.1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 12px;
   background: #ffffff;
   border: 1px solid var(--figma-grey-100);
-  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.05);
+  box-shadow: 0 6px 12px rgba(15, 23, 42, 0.04);
   width: 100%;
 }
 
@@ -164,12 +231,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  align-self: stretch;
+  align-self: center;
 
   .image {
-    width: 86px;
-    height: 86px;
-    border-radius: 12px;
+    width: 72px;
+    height: 72px;
+    border-radius: 10px;
     background: var(--figma-grey-25);
     border: 1px solid var(--figma-grey-100);
     overflow: hidden;
@@ -198,7 +265,7 @@
 .doc-row__info {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 
   h3 {
     margin: 0 !important;
@@ -267,28 +334,30 @@
 
 .doc-row__pricing-table {
   display: grid;
-  grid-template-columns: repeat(3, minmax(160px, 1fr));
+  grid-template-columns: repeat(2, minmax(160px, 1fr));
   gap: 8px;
-  width: min(640px, 100%);
+  max-width: 440px;
+  width: 100%;
   align-items: stretch;
   justify-self: end;
   margin-left: auto;
-  justify-items: end;
+  justify-items: stretch;
+  align-self: center;
 }
 
 .price-cell {
   padding: 8px 10px;
   border-radius: 12px;
-  background: #fbfdff;
+  background: #ffffff;
   border: 1px solid var(--figma-grey-100);
   display: flex;
   flex-direction: column;
   gap: 4px;
-  min-height: 78px;
+  min-height: 64px;
   text-align: right;
 
   .label {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -296,7 +365,7 @@
   }
 
   strong {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 800;
     color: var(--figma-grey-900);
     font-variant-numeric: tabular-nums;
@@ -309,6 +378,21 @@
     white-space: nowrap;
   }
 
+  &.editable {
+    background: #fafafa;
+    border: 1px dashed #d0d5dd;
+    align-items: stretch;
+    text-align: left;
+
+    .label {
+      color: #475569;
+    }
+
+    small {
+      text-align: left;
+    }
+  }
+
   &.rabat {
     background: rgba(59, 130, 246, 0.05);
     border: 1px dashed rgba(59, 130, 246, 0.2);
@@ -318,14 +402,71 @@
   }
 }
 
+.price-cell__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.price-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  border: 1px solid var(--figma-grey-100);
+  border-radius: 10px;
+  padding: 8px 10px;
+  width: 100%;
+
+  .currency {
+    font-weight: 800;
+    color: #111827;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+  }
+
+  input {
+    border: none;
+    background: transparent;
+    width: 100%;
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--figma-grey-900);
+    outline: none;
+    text-align: right;
+
+    &:focus {
+      outline: none;
+    }
+  }
+}
+
+.link-button {
+  border: none;
+  background: transparent;
+  color: #0f62fe;
+  font-weight: 700;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  align-self: flex-start;
+  margin-top: 2px;
+
+  &:hover {
+    color: #0b4dcc;
+  }
+}
+
 .pill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 3px 7px;
-  border-radius: 8px;
-  background: #f9fafc;
-  border: 1px solid #e7ebf3;
+  padding: 3px 8px;
+  border-radius: 10px;
+  background: #f1f5f9;
+  border: 1px solid #dce3ed;
   font-size: 11px;
   font-weight: 600;
   color: #606a7c;
@@ -489,18 +630,18 @@
 
   .doc-row__media .image {
     width: 100%;
-    max-width: 280px;
+    max-width: 220px;
     height: auto;
-    max-height: 180px;
+    max-height: 160px;
 
     img {
-      max-height: 180px;
+      max-height: 160px;
       width: auto;
     }
   }
 
   .doc-row__pricing-table {
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-template-columns: repeat(2, minmax(140px, 1fr));
     justify-items: stretch;
     width: 100%;
     margin-left: 0;
