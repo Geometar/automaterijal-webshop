@@ -472,6 +472,9 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
       if (this.admin.partner.naziv) {
         queryParams.pn = this.admin.partner.naziv;
       }
+      if (this.admin.partner.adresa) {
+        queryParams.pa = this.admin.partner.adresa;
+      }
     }
 
     this.router.navigate(['/partner-card/dokument', vrdok, brdok], {

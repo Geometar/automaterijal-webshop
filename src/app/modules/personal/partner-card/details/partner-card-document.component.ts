@@ -1,20 +1,43 @@
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { catchError, EMPTY, finalize, map, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import {
+  catchError,
+  EMPTY,
+  finalize,
+  map,
+  of,
+  Subject,
+  switchMap,
+  takeUntil,
+  tap,
+} from 'rxjs';
 
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { SpinnerComponent } from '../../../../shared/components/spinner/spinner.component';
 import { AutomIconComponent } from '../../../../shared/components/autom-icon/autom-icon.component';
 import { RsdCurrencyPipe } from '../../../../shared/pipe/rsd-currency.pipe';
 
-import { ButtonThemes, ButtonTypes, ColorEnum, IconsEnum } from '../../../../shared/data-models/enums';
-import { PartnerCardDetailsItem, PartnerCardDetailsResponse, PartnerCardGroup } from '../../../../shared/data-models/model';
+import {
+  ButtonThemes,
+  ButtonTypes,
+  ColorEnum,
+  IconsEnum,
+} from '../../../../shared/data-models/enums';
+import {
+  PartnerCardDetailsItem,
+  PartnerCardDetailsResponse,
+  PartnerCardGroup,
+} from '../../../../shared/data-models/model';
 import { AccountStateService } from '../../../../shared/service/state/account-state.service';
 import { PartnerService } from '../../../../shared/service/partner.service';
 import { PictureService } from '../../../../shared/service/utils/picture.service';
 import { PartnerCardCacheService } from '../../../../shared/service/state/partner-card-cache.service';
-import { DocumentRowView, DocumentTotals } from './partner-card-document.models';
+import { PartnerCardAdminService } from '../../../../shared/service/partner-card-admin.service';
+import {
+  DocumentRowView,
+  DocumentTotals,
+} from './partner-card-document.models';
 import { StringUtils } from '../../../../shared/utils/string-utils';
 
 const VRDOK_LABELS: Record<string, string> = {
@@ -22,7 +45,7 @@ const VRDOK_LABELS: Record<string, string> = {
   '04': 'Profaktura',
   '13': 'Faktura',
   '15': 'MP račun',
-  '32': 'Proračun'
+  '32': 'Proračun',
 };
 
 interface DocumentMeta {
@@ -45,12 +68,12 @@ interface DocumentAccessResult {
     CommonModule,
     RouterModule,
     SpinnerComponent,
-    RsdCurrencyPipe
+    RsdCurrencyPipe,
   ],
   providers: [CurrencyPipe],
   templateUrl: './partner-card-document.component.html',
   styleUrl: './partner-card-document.component.scss',
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
 })
 export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
   buttonThemes = ButtonThemes;
@@ -66,7 +89,9 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
   totals: DocumentTotals = { partnerVat: 0, partnerGross: 0, fullGross: 0 };
   printNote = '';
   customerNameForPrint = '';
+  customerAddressForPrint = '';
   partnerNameFromQuery: string | null = null;
+  partnerAddressFromQuery: string | null = null;
   isAdmin = false;
   partnerPpid: number | null = null;
   documentDate: string | null = null;
@@ -85,16 +110,16 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
     private readonly partnerService: PartnerService,
     private readonly accountStateService: AccountStateService,
     private readonly pictureService: PictureService,
-    private readonly partnerCardCache: PartnerCardCacheService
+    private readonly partnerCardCache: PartnerCardCacheService,
+    private readonly partnerCardAdminService: PartnerCardAdminService
   ) { }
 
   ngOnInit(): void {
     this.isAdmin = this.accountStateService.isAdmin();
-    if (!this.isAdmin) {
-      const accountName = this.accountStateService.get()?.naziv?.trim();
-      if (accountName) {
-        this.customerNameForPrint = accountName;
-      }
+    if (this.isAdmin) {
+      this.seedCustomerInfoFromAdminSelection();
+    } else {
+      this.seedCustomerInfoFromAccount();
     }
     this.readRoute();
   }
@@ -109,9 +134,8 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
     `${item.id ?? _index}-${item.title}`;
 
   onBack(): void {
-    const queryParams = this.isAdmin && this.partnerPpid
-      ? { ppid: this.partnerPpid }
-      : undefined;
+    const queryParams =
+      this.isAdmin && this.partnerPpid ? { ppid: this.partnerPpid } : undefined;
     this.router.navigate(['/partner-card'], { queryParams });
   }
 
@@ -151,26 +175,52 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
 
     this.closePrintWindow();
     this.recalculateTotals();
-    const total = mode === 'partner' ? this.totals.partnerGross : this.totals.fullGross || this.totals.partnerGross;
+    const total =
+      mode === 'partner'
+        ? this.totals.partnerGross
+        : this.totals.fullGross || this.totals.partnerGross;
     const priceLabel = 'Cena (sa PDV)';
     const totalLabel = 'Ukupno';
-    const buyerLabel = this.escapeHtml(this.customerNameForPrint?.trim() || 'Kupac');
+    const buyerLabel = this.escapeHtml(
+      this.customerNameForPrint?.trim() || 'Kupac'
+    );
+    const buyerAddressLabel = this.escapeHtml(
+      this.customerAddressForPrint?.trim() || ''
+    );
     const docLabel = this.escapeHtml(this.docTypeLabel || this.vrdok);
     const noteBlock = this.printNote.trim()
-      ? `<div class="note"><div class="note__label">Napomena</div><div class="note__text">${this.escapeHtml(this.printNote).replace(/\n/g, '<br>')}</div></div>`
+      ? `<div class="note"><div class="note__label">Napomena</div><div class="note__text">${this.escapeHtml(
+        this.printNote
+      ).replace(/\n/g, '<br>')}</div></div>`
       : '';
-    const contactBlock = `<div class="brand__contact">
+    const automaterijalContactBlock = `<div class="brand__contact">
             <div>015/319-000</div>
             <div>Kralja Milutina 159, 15000 Šabac</div>
             <div>office@automaterijal.com</div>
          </div>`;
+    const customerContactBlock = buyerAddressLabel
+      ? `<div class="brand__contact"><div>${buyerAddressLabel}</div></div>`
+      : '';
+    const brandBlock =
+      mode === 'partner'
+        ? `<div class="brand">
+            <div class="brand__name">Automaterijal</div>
+            ${automaterijalContactBlock}
+         </div>`
+        : `<div class="brand">
+            <div class="brand__name">${buyerLabel}</div>
+            ${customerContactBlock}
+         </div>`;
     const issuerBlock = `<div><strong>Dokument izdaje:</strong> ${buyerLabel}</div>
          <div><strong>Robu izdao:</strong> Automaterijal</div>`;
+    const footerBrandLabel =
+      mode === 'partner' ? 'Automaterijal' : buyerLabel || 'Partner';
 
     const rows = this.items
       .map((item, index) => {
         const unit = mode === 'partner' ? item.partnerGross : item.fullGross;
-        const sum = mode === 'partner' ? item.partnerGrossTotal : item.fullGrossTotal;
+        const sum =
+          mode === 'partner' ? item.partnerGrossTotal : item.fullGrossTotal;
         return `
           <tr>
             <td>${index + 1}</td>
@@ -221,18 +271,27 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
         </head>
         <body>
           <header class="print-header">
-            <div class="brand">
-              <div class="brand__name">Automaterijal</div>
-              ${contactBlock}
-            </div>
+            ${brandBlock}
             <div class="doc-meta">
-              <div class="doc-meta__title">Dokument #${this.escapeHtml(this.brdok)}</div>
+              <div class="doc-meta__title">Dokument #${this.escapeHtml(
+      this.brdok
+    )}</div>
               <div class="doc-meta__row">
                 <span class="pill">${docLabel}</span>
               </div>
               <div class="doc-meta__dates">
-                ${this.documentDate ? `<span>Datum: ${this.escapeHtml(this.documentDate)}</span>` : ''}
-                ${this.documentDueDate ? `<span>Valuta/Rok: ${this.escapeHtml(this.documentDueDate)}</span>` : ''}
+                ${this.documentDate
+        ? `<span>Datum: ${this.escapeHtml(
+          this.documentDate
+        )}</span>`
+        : ''
+      }
+                ${this.documentDueDate
+        ? `<span>Valuta/Rok: ${this.escapeHtml(
+          this.documentDueDate
+        )}</span>`
+        : ''
+      }
               </div>
             </div>
           </header>
@@ -266,7 +325,7 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
           </div>
 
           <footer class="footer">
-            <span>Automaterijal</span>
+            <span>${footerBrandLabel}</span>
             <span>#${this.escapeHtml(this.brdok)}</span>
           </footer>
         </body>
@@ -311,13 +370,15 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
     const query = this.route.snapshot.queryParamMap;
     const ppidParam = query.get('ppid');
     const partnerNameParam = query.get('pn');
+    const partnerAddressParam = query.get('pa');
     const parsedPpid = ppidParam ? Number(ppidParam) : Number.NaN;
     this.partnerPpid = Number.isFinite(parsedPpid) ? parsedPpid : null;
     this.partnerNameFromQuery = partnerNameParam?.trim() || null;
+    this.partnerAddressFromQuery = partnerAddressParam?.trim() || null;
     this.documentDate = null;
     this.documentDueDate = null;
     this.documentTotal = null;
-    this.ensureCustomerName();
+    this.ensureCustomerInfo();
 
     if (!normalizedVrdok || !normalizedBrdok) {
       this.error = 'Nedostaje vrdok ili broj dokumenta.';
@@ -330,42 +391,70 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
     this.fetchDetails();
   }
 
-  private ensureCustomerName(): void {
-    if (this.customerNameForPrint && this.customerNameForPrint.trim()) {
-      return;
+  private seedCustomerInfoFromAccount(): void {
+    const account = this.accountStateService.get();
+    const accountName = this.normalizeString(account?.naziv);
+    const accountAddress = this.normalizeString(account?.adresa);
+    if (accountName) {
+      this.customerNameForPrint = accountName;
     }
-
-    if (this.partnerNameFromQuery) {
-      this.customerNameForPrint = this.partnerNameFromQuery;
-      return;
+    if (accountAddress) {
+      this.customerAddressForPrint = accountAddress;
     }
+  }
 
-    if (!this.isAdmin) {
-      const accountName = this.accountStateService.get()?.naziv?.trim();
-      if (accountName) {
-        this.customerNameForPrint = accountName;
-        return;
-      }
+  private seedCustomerInfoFromAdminSelection(): void {
+    const partner = this.partnerCardAdminService.partner;
+    const partnerName = this.normalizeString(partner?.naziv);
+    const partnerAddress = this.normalizeString(partner?.adresa);
+    if (partnerName) {
+      this.customerNameForPrint = partnerName;
     }
-
-    if (this.partnerPpid) {
-      this.customerNameForPrint = `Partner #${this.partnerPpid}`;
-      return;
+    if (partnerAddress) {
+      this.customerAddressForPrint = partnerAddress;
     }
+  }
 
-    this.customerNameForPrint = 'Kupac';
+  private ensureCustomerInfo(): void {
+    const account = this.accountStateService.get();
+    const adminPartner = this.partnerCardAdminService.partner;
+
+    this.customerNameForPrint = this.pickFirstString(
+      [
+        this.partnerNameFromQuery,
+        !this.isAdmin ? account?.naziv : null,
+        adminPartner?.naziv,
+        this.partnerPpid ? `Partner #${this.partnerPpid}` : null,
+      ],
+      this.customerNameForPrint || 'Kupac'
+    );
+
+    this.customerAddressForPrint = this.pickFirstString(
+      [
+        this.partnerAddressFromQuery,
+        !this.isAdmin ? account?.adresa : null,
+        adminPartner?.adresa,
+      ],
+      this.customerAddressForPrint || ''
+    );
   }
 
   private fetchDetails(): void {
-    const partnerPpid = this.isAdmin ? this.partnerPpid ?? undefined : undefined;
-    const cachedMeta = this.isAdmin ? this.tryGetDocumentMetaFromCache(partnerPpid ?? null) : null;
+    const partnerPpid = this.isAdmin
+      ? this.partnerPpid ?? undefined
+      : undefined;
+    const cachedMeta = this.isAdmin
+      ? this.tryGetDocumentMetaFromCache(partnerPpid ?? null)
+      : null;
 
     this.loading = true;
     this.error = '';
     this.items = [];
     this.totals = { partnerVat: 0, partnerGross: 0, fullGross: 0 };
 
-    const access$ = this.isAdmin ? of({ allowed: true, meta: cachedMeta }) : this.enforceDocumentAccess();
+    const access$ = this.isAdmin
+      ? of({ allowed: true, meta: cachedMeta })
+      : this.enforceDocumentAccess();
 
     access$
       .pipe(
@@ -376,7 +465,11 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
             return EMPTY;
           }
           this.applyDocumentMeta(result.meta);
-          return this.partnerService.getPartnerCardDetails(this.vrdok, this.brdok, partnerPpid);
+          return this.partnerService.getPartnerCardDetails(
+            this.vrdok,
+            this.brdok,
+            partnerPpid
+          );
         }),
         finalize(() => {
           this.loading = false;
@@ -394,7 +487,7 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
         },
         error: () => {
           this.error = 'Detalji dokumenta trenutno nisu dostupni.';
-        }
+        },
       });
   }
 
@@ -418,11 +511,14 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
       ? item.fullGrossOriginal
       : item.fullGross;
     const quantity = Number.isFinite(item.quantity) ? item.quantity : 1;
-    const unit = Number.isFinite(parsed) ? Math.max(0, this.round2(parsed)) : baseUnit;
+    const unit = Number.isFinite(parsed)
+      ? Math.max(0, this.round2(parsed))
+      : baseUnit;
 
     item.fullGross = unit;
     item.fullGrossTotal = this.round2(unit * quantity);
-    item.fullPriceEdited = Number.isFinite(parsed) && Math.abs(unit - baseUnit) > 0.01;
+    item.fullPriceEdited =
+      Number.isFinite(parsed) && Math.abs(unit - baseUnit) > 0.01;
     this.recalculateTotals();
   }
 
@@ -444,12 +540,18 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
     this.recalculateTotals();
   }
 
-  private normalizeDetailItems(items: PartnerCardDetailsItem[]): DocumentRowView[] {
+  private normalizeDetailItems(
+    items: PartnerCardDetailsItem[]
+  ): DocumentRowView[] {
     return (items ?? []).map((item, index) => {
       const quantity = this.pickNumber([item.kolicina], 1);
       const manufacturer = this.normalizeString(item.proizvodjacNaziv);
-      const groupLabel = this.normalizeString(item.grupaNaziv) ?? this.normalizeString(item.grupa);
-      const subgroupLabel = this.normalizeString(item.podgrupaNaziv) ?? this.normalizeString(item.podgrupa);
+      const groupLabel =
+        this.normalizeString(item.grupaNaziv) ??
+        this.normalizeString(item.grupa);
+      const subgroupLabel =
+        this.normalizeString(item.podgrupaNaziv) ??
+        this.normalizeString(item.podgrupa);
       const title = item.naziv ?? item.robaNaziv ?? 'Artikal';
       const vatRate = this.toOptionalNumber(item.porez);
       const vatFactor = vatRate && vatRate > 0 ? 1 + vatRate / 100 : null;
@@ -487,7 +589,9 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
         [item.punaCena, item.prodajnaCenaSaPdv, item.prodajnaCena],
         grossPartnerUnit
       );
-      const fullGrossTotal = this.round2(this.pickNumber([item.punaCenaUkupno], fullGrossUnit * quantity));
+      const fullGrossTotal = this.round2(
+        this.pickNumber([item.punaCenaUkupno], fullGrossUnit * quantity)
+      );
       return {
         id: item.id ?? item.stavkaId ?? item.robaId ?? index,
         title,
@@ -499,7 +603,10 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
         routeParam: this.buildRouteParam(item, manufacturer, title),
         quantity,
         rabat: rabat ?? undefined,
-        rabatLabel: rabat !== null && Math.abs(rabat) > 0.01 ? `${rabat.toFixed(1)}%` : null,
+        rabatLabel:
+          rabat !== null && Math.abs(rabat) > 0.01
+            ? `${rabat.toFixed(1)}%`
+            : null,
         partnerNet: netPartnerUnit,
         partnerVat: vatPartnerUnit,
         partnerGross: grossPartnerUnit,
@@ -511,14 +618,12 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
         fullGrossOriginal: fullGrossUnit,
         fullGrossTotalOriginal: fullGrossTotal,
         fullPriceEdited: false,
-        image: this.pictureService.buildImageSrc(
-          {
-            slikeUrl: item.slika?.slikeUrl ?? null,
-            isUrl: item.slika?.url ?? undefined,
-            robaSlika: item.slika?.robaSlika ?? undefined
-          } as any
-        ),
-        costPrice: costPrice ?? undefined
+        image: this.pictureService.buildImageSrc({
+          slikeUrl: item.slika?.slikeUrl ?? null,
+          isUrl: item.slika?.url ?? undefined,
+          robaSlika: item.slika?.robaSlika ?? undefined,
+        } as any),
+        costPrice: costPrice ?? undefined,
       };
     });
   }
@@ -540,11 +645,13 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
     return {
       partnerVat: this.round2(acc.partnerVat),
       partnerGross: this.round2(acc.partnerGross),
-      fullGross: this.round2(acc.fullGross)
+      fullGross: this.round2(acc.fullGross),
     };
   }
 
-  private normalizeVrdok(value: string | number | null | undefined): string | null {
+  private normalizeVrdok(
+    value: string | number | null | undefined
+  ): string | null {
     if (value === null || value === undefined) {
       return null;
     }
@@ -562,7 +669,9 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  private normalizeString(value: string | number | null | undefined): string | null {
+  private normalizeString(
+    value: string | number | null | undefined
+  ): string | null {
     if (value === null || value === undefined) {
       return null;
     }
@@ -581,7 +690,11 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
     }
 
     const code = this.normalizeString(item.katbr ?? item.katbrPro);
-    const slug = StringUtils.productSlug(manufacturer ?? undefined, title, code ?? undefined);
+    const slug = StringUtils.productSlug(
+      manufacturer ?? undefined,
+      title,
+      code ?? undefined
+    );
     const idPart = Math.abs(productId);
     return slug ? `${idPart}-${slug}` : `${idPart}`;
   }
@@ -595,11 +708,17 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
     }
 
     this.documentDate = meta.documentDate ?? null;
-    this.documentDueDate = this.shouldHideDueDate(this.vrdok) ? null : meta.documentDueDate ?? null;
-    this.documentTotal = Number.isFinite(meta.documentTotal ?? Number.NaN) ? meta.documentTotal : null;
+    this.documentDueDate = this.shouldHideDueDate(this.vrdok)
+      ? null
+      : meta.documentDueDate ?? null;
+    this.documentTotal = Number.isFinite(meta.documentTotal ?? Number.NaN)
+      ? meta.documentTotal
+      : null;
   }
 
-  private tryGetDocumentMetaFromCache(partnerPpid: number | null): DocumentMeta | null {
+  private tryGetDocumentMetaFromCache(
+    partnerPpid: number | null
+  ): DocumentMeta | null {
     const key = this.buildCacheKey(partnerPpid);
     const cached = this.partnerCardCache.get(key);
     if (!cached) {
@@ -622,7 +741,9 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
     );
   }
 
-  private resolveAccessFromGroups(groups: PartnerCardGroup[] | null | undefined): DocumentAccessResult {
+  private resolveAccessFromGroups(
+    groups: PartnerCardGroup[] | null | undefined
+  ): DocumentAccessResult {
     const broj = this.brdok;
     const vrdok = this.vrdok;
     if (!broj || !vrdok) {
@@ -632,9 +753,13 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
     for (const group of groups ?? []) {
       for (const item of group?.stavke ?? []) {
         const brojDokumenta = this.normalizeString(
-          (item as any)?.brojDokumenta ?? (item as any)?.brdok ?? item.brojDokumenta
+          (item as any)?.brojDokumenta ??
+          (item as any)?.brdok ??
+          item.brojDokumenta
         );
-        const itemVrdok = this.normalizeVrdok((item as any)?.vrdok ?? (item as any)?.vrDok ?? item.vrdok);
+        const itemVrdok = this.normalizeVrdok(
+          (item as any)?.vrdok ?? (item as any)?.vrDok ?? item.vrdok
+        );
         if (brojDokumenta === broj && itemVrdok === vrdok) {
           return { allowed: true, meta: this.extractDocumentMeta(item) };
         }
@@ -655,7 +780,9 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
     return { documentDate, documentDueDate, documentTotal };
   }
 
-  private shouldHideDueDate(vrdok: string | number | null | undefined): boolean {
+  private shouldHideDueDate(
+    vrdok: string | number | null | undefined
+  ): boolean {
     const normalized = this.normalizeVrdok(vrdok);
     if (!normalized) {
       return false;
@@ -665,12 +792,30 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
 
   private buildCacheKey(partnerPpid: number | null): string {
     if (this.isAdmin) {
-      return partnerPpid !== null && partnerPpid !== undefined ? `admin-${partnerPpid}` : 'admin-none';
+      return partnerPpid !== null && partnerPpid !== undefined
+        ? `admin-${partnerPpid}`
+        : 'admin-none';
     }
     return 'self';
   }
 
-  private pickNumber(values: Array<number | string | null | undefined>, fallback = 0): number {
+  private pickFirstString(
+    candidates: Array<string | null | undefined>,
+    fallback = ''
+  ): string {
+    for (const value of candidates) {
+      const normalized = this.normalizeString(value);
+      if (normalized !== null) {
+        return normalized;
+      }
+    }
+    return fallback;
+  }
+
+  private pickNumber(
+    values: Array<number | string | null | undefined>,
+    fallback = 0
+  ): number {
     for (const value of values) {
       const parsed = this.toNumber(value);
       if (Number.isFinite(parsed)) {
@@ -680,7 +825,9 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
     return fallback;
   }
 
-  private toOptionalNumber(value: number | string | null | undefined): number | null {
+  private toOptionalNumber(
+    value: number | string | null | undefined
+  ): number | null {
     const parsed = this.toNumber(value);
     return Number.isFinite(parsed) ? parsed : null;
   }
@@ -690,7 +837,9 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
     priceWithVat?: number | string | null,
     priceWithoutVat?: number | string | null
   ): string {
-    const hasWithVat = Number.isFinite(this.toNumber(withVat)) || Number.isFinite(this.toNumber(priceWithVat));
+    const hasWithVat =
+      Number.isFinite(this.toNumber(withVat)) ||
+      Number.isFinite(this.toNumber(priceWithVat));
     const hasWithoutVat = Number.isFinite(this.toNumber(priceWithoutVat));
 
     if (hasWithVat && !hasWithoutVat) {
@@ -719,7 +868,7 @@ export class PartnerCardDocumentComponent implements OnInit, OnDestroy {
       style: 'currency',
       currency: 'RSD',
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2
+      maximumFractionDigits: 2,
     }).format(value);
   }
 
