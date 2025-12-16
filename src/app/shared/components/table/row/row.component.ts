@@ -34,6 +34,10 @@ import { PictureService, ProductImageMeta } from '../../../service/utils/picture
 import { SnackbarService } from '../../../service/utils/snackbar.service';
 import { StringUtils } from '../../../utils/string-utils';
 import { UrlHelperService } from '../../../service/utils/url-helper.service';
+import {
+  AvailabilityVm,
+  buildAvailabilityVm
+} from '../../../utils/availability-utils';
 
 @Component({
   selector: 'row',
@@ -86,6 +90,7 @@ export class RowComponent implements OnInit, OnChanges {
   inquirySent = false;
   hasMoreThanFiveSpecs = false;
   isEmployee = false;
+  isAdmin = false;
   loggedIn = false;
   showAllSpecs = false;
   categoryHref: string | null = null;
@@ -132,6 +137,7 @@ export class RowComponent implements OnInit, OnChanges {
 
   ngOnInit() {
     this.isEmployee = this.accountStateService.isEmployee();
+    this.isAdmin = this.accountStateService.isAdmin();
     this.loggedIn = this.accountStateService.isUserLoggedIn();
     this.quantity = this.clampQuantity(this.data.kolicina ?? this.quantity);
     this.updateDisplayedSpecs();
@@ -183,7 +189,7 @@ export class RowComponent implements OnInit, OnChanges {
   }
 
   addToShoppingCart(data: Roba): void {
-    if (this.isUnavailable || !this.hasValidPrice) {
+    if (this.isUnavailable || !this.availabilityVm.hasValidPrice) {
       this.snackbarService.showError('Artikal trenutno nije dostupan za poručivanje');
       return;
     }
@@ -245,7 +251,7 @@ export class RowComponent implements OnInit, OnChanges {
   }
 
   get effectiveStock(): number {
-    return this.hasValidPrice ? this.data?.stanje ?? 0 : 0;
+    return this.availabilityVm.purchasableStock;
   }
 
   get isTecDocOnly(): boolean {
@@ -311,16 +317,18 @@ export class RowComponent implements OnInit, OnChanges {
     });
   }
 
-  private get hasValidPrice(): boolean {
-    const price = Number(this.data?.cena) || 0;
-    return price > 0;
-  }
-
   private clampQuantity(value: number): number {
     if (!Number.isFinite(value)) return this.minQuantity;
     if (value < this.minQuantity) return this.minQuantity;
     const max = this.effectiveStock || this.minQuantity;
     if (value > max) return max;
     return Math.floor(value);
+  }
+
+  get availabilityVm(): AvailabilityVm {
+    return buildAvailabilityVm(this.data, {
+      isAdmin: this.isAdmin,
+      isTecDocOnly: this.isTecDocOnly,
+    });
   }
 }

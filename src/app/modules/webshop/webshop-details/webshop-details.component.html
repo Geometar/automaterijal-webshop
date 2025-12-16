@@ -114,8 +114,14 @@
                     >› {{ data.podGrupaNaziv }}</span
                   >
                 </li>
-                <li *ngIf="availableStock > 0">
+                <li *ngIf="availabilityStatus === 'IN_STOCK'">
                   <i class="dot"></i>Na stanju — spremno za brzu isporuku
+                </li>
+                <li *ngIf="availabilityStatus === 'AVAILABLE'">
+                  <i class="dot"></i>Dostupno (eksterni magacin)<span *ngIf="providerDeliveryLabel"> — isporuka {{ providerDeliveryLabel }}</span>
+                </li>
+                <li *ngIf="availabilityStatus === 'OUT_OF_STOCK'">
+                  <i class="dot"></i>Nema na stanju
                 </li>
                 <li *ngIf="data.katbr">
                   <i class="dot"></i>Kat. broj: {{ data.katbr }}
@@ -128,11 +134,29 @@
           <aside class="buy-card card">
             <div
               class="stock"
-              [class.ok]="availableStock > 0"
-              [class.nope]="isOutOfStock"
+              [class.ok]="hasValidPrice && availabilityStatus === 'IN_STOCK'"
+              [class.supplier]="hasValidPrice && availabilityStatus === 'AVAILABLE'"
+              [class.nope]="!hasValidPrice || availabilityStatus === 'OUT_OF_STOCK'"
             >
-              <span class="led"></span
-              >{{ !isOutOfStock ? "Na stanju" : "Nema na stanju" }}
+              {{ availabilityLabel }}<span class="led" aria-hidden="true"></span>
+            </div>
+
+            <div class="provider-availability" *ngIf="showProviderAvailability">
+              <div class="provider-availability__row" *ngIf="providerDeliveryLabel">
+                Isporuka: {{ providerDeliveryLabel }}
+              </div>
+              <div class="provider-availability__row" *ngIf="availabilityVm.provider.admin.isAdmin && providerQuantity">
+                Dostupno: {{ providerQuantity }} kom
+              </div>
+              <div class="provider-availability__row" *ngIf="providerCutoffLabel">
+                Poruči do: {{ providerCutoffLabel }}
+              </div>
+              <div class="provider-availability__row provider-availability__admin" *ngIf="availabilityVm.provider.admin.sourceLabel">
+                Izvor: <span class="provider-availability__value">{{ availabilityVm.provider.admin.sourceLabel }}</span>
+              </div>
+              <div class="provider-availability__row provider-availability__purchase" *ngIf="providerPurchasePriceLabel">
+                Nabavna: <span class="provider-availability__value">{{ providerPurchasePriceLabel }}</span>
+              </div>
             </div>
 
             <div class="price-wrap">
@@ -140,7 +164,7 @@
                 <span class="old-price">{{ oldPrice! | rsdCurrency }}</span>
                 <span class="discount-badge">-{{ discountValue }}%</span>
               </div>
-              <div class="price">{{ data.cena! | rsdCurrency }}</div>
+              <div class="price">{{ displayPrice | rsdCurrency }}</div>
               <div class="note">cena sa PDV-om</div>
               <div *ngIf="hasDiscount && savings" class="saving">
                 Ušteda {{ savings! | rsdCurrency }}
@@ -179,7 +203,11 @@
 
             <div *ngIf="isOutOfStock" class="inquiry">
               <p class="inquiry__title" *ngIf="!inquirySent">
-                Nema na stanju? Pošalji upit za nabavku
+                {{
+                  showProviderAvailability
+                    ? 'Dostupno u eksternom magacinu — pošalji upit za nabavku'
+                    : 'Nema na stanju? Pošalji upit za nabavku'
+                }}
               </p>
               <p class="inquiry__title success" *ngIf="inquirySent">
                 Upit poslat. Javićemo se uskoro.

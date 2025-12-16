@@ -8,7 +8,7 @@
   [attr.aria-disabled]="isTecDocOnly ? 'true' : null"
 >
   <!-- Badge: popust (gore desno) -->
-  <div class="discount-badge" *ngIf="hasDiscount">-{{ discountLabel }}%</div>
+  <div class="discount-badge" *ngIf="showDiscount">-{{ discountLabel }}%</div>
 
   <!-- Ikonica: u korpi (gore levo) -->
   <div
@@ -50,19 +50,19 @@
   <!-- Cene -->
   <div class="product-price" aria-label="Cene">
     <!-- Stara cena (diskretna, siva, precrtana) -->
-    <p *ngIf="hasDiscount && oldPrice" class="old-price">
+    <p *ngIf="showDiscount && oldPrice" class="old-price">
       {{ oldPrice | rsdCurrency }}
     </p>
 
     <!-- Finalna cena (primarna) -->
     <p class="final-price">
-      {{ roba.cena! | rsdCurrency }}
+      {{ availabilityVm.displayPrice | rsdCurrency }}
     </p>
     <!-- Mali tekst: cena sa PDV-om -->
     <p class="price-note">Cena sa PDV-om</p>
 
     <!-- Ušteda (opciono, diskretno) -->
-    <p *ngIf="hasDiscount && savings" class="saving">
+    <p *ngIf="showDiscount && savings" class="saving">
       Ušteda {{ savings | rsdCurrency }}
     </p>
   </div>
@@ -75,9 +75,17 @@
   <!-- Stanje -->
   <div
     class="product-stock"
-    [ngClass]="{ green: !isOutOfStock, red: isOutOfStock }"
+    [ngClass]="{
+      green: availabilityVm.tone === 'green',
+      blue: availabilityVm.tone === 'blue',
+      red: availabilityVm.tone === 'red',
+      yellow: availabilityVm.tone === 'yellow'
+    }"
   >
-    {{ stockLabel }}
+    <div class="product-stock__label">{{ availabilityVm.label }}</div>
+    <div class="product-stock__sub" *ngIf="availabilityVm.showProviderBox">
+      <span *ngIf="availabilityVm.provider.deliveryLabel">Isporuka: {{ availabilityVm.provider.deliveryLabel }}</span>
+    </div>
   </div>
 
   <!-- Količina i korpa (sakriveno za TecDoc-only) -->

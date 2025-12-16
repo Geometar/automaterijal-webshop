@@ -10,6 +10,7 @@ import { CartItem, Roba } from '../../data-models/model/roba';
 // Services
 import { AccountStateService } from './account-state.service';
 import { AnalyticsService } from '../analytics.service';
+import { getAvailabilityStatus, getPurchasableStock, getPurchasableUnitPrice } from '../../utils/availability-utils';
 
 @Injectable({
   providedIn: 'root',
@@ -42,32 +43,42 @@ export class CartStateService {
   }
 
   addToCart(roba: any, quantity: number = 1): void {
-    const unitPrice = Number(roba?.cena) || 0;
-    const currentStock = Number(roba?.stanje) || 0;
+    const status = getAvailabilityStatus(roba);
+    const unitPrice = getPurchasableUnitPrice(roba);
+    const currentStock = getPurchasableStock(roba);
 
-    // Block adding items without a valid price or stock
-    if (unitPrice <= 0 || currentStock <= 0) {
-      return;
-    }
+    const qtyToAdd = Math.min(Math.max(1, Math.floor(quantity || 1)), currentStock || 0);
+    if (unitPrice <= 0 || qtyToAdd <= 0) return;
 
     let cart = this.getAll();
     const existingItem = cart.find((item) => item.robaId === roba.robaid);
     let trackedItem: CartItem;
 
     if (existingItem) {
-      existingItem.quantity! += quantity;
-      existingItem.totalPrice = (existingItem.unitPrice ?? 1) * existingItem.quantity!;
+      const max = Number(existingItem.stock) || (existingItem.quantity ?? 0) + qtyToAdd;
+      existingItem.quantity = Math.min((existingItem.quantity ?? 0) + qtyToAdd, max);
+      existingItem.totalPrice = (existingItem.unitPrice ?? 0) * (existingItem.quantity ?? 0);
       trackedItem = existingItem;
     } else {
       const newItem: CartItem = this.mapToCartItem(roba);
-      newItem.quantity = quantity;
-      newItem.totalPrice = (newItem.unitPrice ?? 1) * quantity;
+      newItem.quantity = qtyToAdd;
+      newItem.totalPrice = (newItem.unitPrice ?? 0) * qtyToAdd;
       cart.push(newItem);
       trackedItem = newItem;
     }
 
-    // ✅ Smanjuje stanje robe
-    roba.stanje = this.calculateNewStock(roba.stanje, quantity);
+    // ✅ Smanjuje stanje (lokalno u UI)
+    if (status === 'IN_STOCK') {
+      roba.stanje = this.calculateNewStock(roba.stanje, qtyToAdd);
+    } else if (status === 'AVAILABLE' && roba?.providerAvailability) {
+      const pa = roba.providerAvailability;
+      if (pa.warehouseQuantity != null) {
+        pa.warehouseQuantity = this.calculateNewStock(pa.warehouseQuantity, qtyToAdd);
+      }
+      if (pa.totalQuantity != null) {
+        pa.totalQuantity = this.calculateNewStock(pa.totalQuantity, qtyToAdd);
+      }
+    }
 
     if (!this.isBrowser) {
       return;
@@ -77,7 +88,7 @@ export class CartStateService {
     this.updateCartSize();
 
     const account = this.accountStateService.get();
-    this.analytics.trackAddToCart(trackedItem, quantity, account);
+    this.analytics.trackAddToCart(trackedItem, qtyToAdd, account);
   }
 
   removeFromCart(itemId: number): void {
@@ -133,7 +144,19 @@ export class CartStateService {
     robaList.forEach((roba) => {
       const cartItem = cart.find((item) => item.robaId === roba.robaid);
       if (cartItem) {
-        roba.stanje = this.calculateNewStock(roba.stanje, cartItem.quantity!);
+        const status = getAvailabilityStatus(roba);
+        const qty = cartItem.quantity ?? 0;
+        if (status === 'AVAILABLE' && roba?.providerAvailability) {
+          const pa = roba.providerAvailability;
+          if (pa.warehouseQuantity != null) {
+            pa.warehouseQuantity = this.calculateNewStock(pa.warehouseQuantity, qty);
+          }
+          if (pa.totalQuantity != null) {
+            pa.totalQuantity = this.calculateNewStock(pa.totalQuantity, qty);
+          }
+        } else {
+          roba.stanje = this.calculateNewStock(roba.stanje, qty);
+        }
       }
     });
   }
@@ -146,7 +169,19 @@ export class CartStateService {
     const cartItem = cart.find((item) => item.robaId === roba.robaid);
 
     if (cartItem) {
-      roba.stanje = this.calculateNewStock(roba.stanje, cartItem.quantity!);
+      const status = getAvailabilityStatus(roba);
+      const qty = cartItem.quantity ?? 0;
+      if (status === 'AVAILABLE' && roba?.providerAvailability) {
+        const pa = roba.providerAvailability;
+        if (pa.warehouseQuantity != null) {
+          pa.warehouseQuantity = this.calculateNewStock(pa.warehouseQuantity, qty);
+        }
+        if (pa.totalQuantity != null) {
+          pa.totalQuantity = this.calculateNewStock(pa.totalQuantity, qty);
+        }
+      } else {
+        roba.stanje = this.calculateNewStock(roba.stanje, qty);
+      }
     }
   }
 
@@ -177,17 +212,32 @@ export class CartStateService {
   }
 
   private mapToCartItem(roba: any): CartItem {
+    const status = getAvailabilityStatus(roba);
+    const provider = roba?.providerAvailability;
+    const isProvider = status === 'AVAILABLE' && !!provider?.available;
+    const unitPrice = getPurchasableUnitPrice(roba);
+    const stock = getPurchasableStock(roba);
+    const isAdmin = this.accountStateService.isAdmin();
+
     return {
-      discount: roba.rabat || 0,
+      discount: isProvider ? 0 : (roba.rabat || 0),
       image: roba.slika,
       manufacturer: roba.proizvodjac?.naziv || '',
       name: roba.naziv || '',
       partNumber: roba.katbr || '',
       quantity: roba.kolicina || 1,
       robaId: roba.robaid || 0,
-      stock: roba.stanje || 0,
-      totalPrice: (roba.cena || 0) * (roba.kolicina || 1),
-      unitPrice: roba.cena || 0,
+      stock: stock || 0,
+      totalPrice: unitPrice * (roba.kolicina || 1),
+      unitPrice,
+      source: isProvider ? 'PROVIDER' : 'STOCK',
+      provider: isProvider ? provider?.provider : undefined,
+      providerArticleNumber: isProvider ? provider?.articleNumber : undefined,
+      providerWarehouse: isProvider ? provider?.warehouse : undefined,
+      providerWarehouseName: isProvider ? provider?.warehouseName : undefined,
+      providerCurrency: isProvider ? provider?.currency : undefined,
+      providerCustomerPrice: isProvider ? provider?.price : undefined,
+      providerPurchasePrice: isProvider && isAdmin ? provider?.purchasePrice : undefined,
       technicalDescription: roba.technicalDescription
     };
   }
@@ -202,7 +252,24 @@ export class CartStateService {
     retVal.rabat = cartItem.discount || 0;
     retVal.robaid = cartItem.robaId;
     retVal.slika = cartItem.image;
-    retVal.stanje = cartItem.stock!;
+    if (cartItem.source === 'PROVIDER') {
+      retVal.stanje = 0;
+      retVal.availabilityStatus = 'AVAILABLE';
+      retVal.providerAvailability = {
+        available: true,
+        provider: cartItem.provider,
+        articleNumber: cartItem.providerArticleNumber,
+        warehouse: cartItem.providerWarehouse,
+        warehouseName: cartItem.providerWarehouseName,
+        warehouseQuantity: cartItem.stock ?? 0,
+        totalQuantity: cartItem.stock ?? 0,
+        price: cartItem.providerCustomerPrice ?? cartItem.unitPrice,
+        purchasePrice: cartItem.providerPurchasePrice,
+        currency: cartItem.providerCurrency ?? 'RSD',
+      };
+    } else {
+      retVal.stanje = cartItem.stock!;
+    }
     retVal.tehnickiOpis = cartItem.technicalDescription;
     return retVal;
   }

@@ -2,6 +2,7 @@ import { Manufacture } from "./proizvodjac";
 import { PaginatedResponse } from "./page";
 import { Slika } from "./slika";
 import { WebshopPrimaryFilter } from "../enums/webshop-primary-filter.enum";
+import { AvailabilityStatus, ProviderAvailabilityDto } from "./availability";
 
 export class Filter {
   grupe?: string[];
@@ -101,6 +102,7 @@ export interface ShowcaseResponse {
 export class Roba {
   aplikacije?: Map<string, RobaAplikacija[]>;
   asociraniArtikli: Roba[] = [];
+  availabilityStatus?: AvailabilityStatus;
   cena?: number;
   dokumentacija?: Object;
   dozvoljenoZaAnonimusa?: boolean;
@@ -114,6 +116,7 @@ export class Roba {
   podGrupaNaziv?: string;
   proizvodjac?: Manufacture;
   proizvodjacLogo?: string | ArrayBuffer;
+  providerAvailability?: ProviderAvailabilityDto;
   rabat: number = 0;
   robaid?: number;
   slika?: Slika;
@@ -137,5 +140,13 @@ export class CartItem {
   stock?: number;
   totalPrice?: number;
   unitPrice?: number;
+  source?: 'STOCK' | 'PROVIDER';
+  provider?: string;
+  providerArticleNumber?: string;
+  providerWarehouse?: string;
+  providerWarehouseName?: string;
+  providerCurrency?: string;
+  providerCustomerPrice?: number;
+  providerPurchasePrice?: number;
   technicalDescription?: RobaTehnickiOpis[];
 }

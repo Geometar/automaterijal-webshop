@@ -360,30 +360,80 @@
 
     /* Status sa tačkicom */
     .item-status {
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
       font-size: 12px;
-      padding-left: 20px;
-      position: relative;
       text-align: right;
       width: 250px;
       color: var(--figma-grey-700);
+      white-space: nowrap;
     }
-    .item-status::before {
-      border-radius: 50%;
-      content: "";
-      height: 18px;
-      left: 130px;
-      position: absolute;
-      top: 2px;
-      width: 18px;
+
+    .item-status__dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: #c4c4c4;
+      flex: 0 0 auto;
     }
-    .item-status.green::before {
+
+    .item-status.green .item-status__dot {
       background: var(--figma-success-600);
     }
-    .item-status.red::before {
+    .item-status.red .item-status__dot {
       background: var(--figma-error-600);
     }
-    .item-status.yellow::before {
+    .item-status.blue .item-status__dot {
+      background: var(--figma-info-500);
+    }
+    .item-status.yellow .item-status__dot {
       background: var(--figma-accent-yellow-500);
+    }
+
+    .provider-availability {
+      margin: 10px 0 6px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--figma-info-100);
+      background: var(--figma-info-25);
+      color: var(--figma-info-700);
+      text-align: right;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.35;
+    }
+
+    .provider-availability__row + .provider-availability__row {
+      margin-top: 4px;
+    }
+
+    .provider-availability__value {
+      font-weight: 800;
+      color: var(--figma-info-700);
+    }
+
+    .provider-availability__admin {
+      margin-top: 8px !important;
+      padding-top: 8px;
+      border-top: 1px dashed var(--figma-info-100);
+      color: var(--figma-grey-700);
+      font-size: 11.5px;
+      font-weight: 700;
+    }
+
+    .provider-availability__purchase {
+      margin-top: 6px;
+      color: var(--figma-grey-800);
+      font-size: 12.5px;
+      font-weight: 800;
+    }
+
+    .provider-availability__purchase .provider-availability__value {
+      font-size: 15px;
+      font-weight: 900;
+      color: var(--figma-grey-900);
     }
 
     button {
@@ -513,17 +563,17 @@
     text-align: center;
     padding: 0 10px;
 
+    .provider-availability {
+      text-align: center;
+    }
+
     .item-status {
       width: auto !important;
       font-size: 12px !important;
       padding: 0 !important;
       text-align: center !important;
       position: relative !important;
-
-      &::before {
-        left: 30% !important;
-        transform: translateX(-50%);
-      }
+      justify-content: center !important;
     }
 
     .price,

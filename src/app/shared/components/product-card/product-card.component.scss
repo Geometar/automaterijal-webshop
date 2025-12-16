@@ -161,15 +161,37 @@
   .product-stock {
     font-size: 0.85rem;
     font-weight: 500;
-    height: 1.25rem; // fixed height to avoid layout shift
     margin-bottom: 1rem;
 
     &.green {
       color: var(--figma-success-700);
     }
 
+    &.blue {
+      color: var(--figma-info-700);
+    }
+
     &.red {
       color: var(--figma-error-600);
+    }
+
+    &.yellow {
+      color: var(--figma-accent-yellow-700);
+    }
+
+    .product-stock__sub {
+      margin-top: 2px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--figma-grey-600);
+    }
+
+    &.blue .product-stock__sub {
+      color: var(--figma-info-700);
+    }
+
+    .product-stock__sep {
+      padding: 0 6px;
     }
   }
 

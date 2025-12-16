@@ -39,6 +39,7 @@ import {
   TecDocDokumentacija,
   TecDocLinkedManufacturerTargets,
 } from '../../../shared/data-models/model/roba';
+import { AvailabilityStatus } from '../../../shared/data-models/model/availability';
 import { Slika } from '../../../shared/data-models/model/slika';
 import { TooltipModel } from '../../../shared/data-models/interface';
 import { ShowcaseComponent, ShowcaseSection } from '../../../shared/components/showcase/showcase.component';
@@ -58,6 +59,10 @@ import { RsdCurrencyPipe } from '../../../shared/pipe/rsd-currency.pipe';
 import { SpinnerComponent } from '../../../shared/components/spinner/spinner.component';
 import { TextAreaComponent } from '../../../shared/components/text-area/text-area.component';
 import { EmailService } from '../../../shared/service/email.service';
+import {
+  AvailabilityVm,
+  buildAvailabilityVm
+} from '../../../shared/utils/availability-utils';
 
 // Services
 import { AccountStateService } from '../../../shared/service/state/account-state.service';
@@ -165,7 +170,12 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     return isPlatformBrowser(this.platformId);
   }
 
+  get availabilityVm(): AvailabilityVm {
+    return buildAvailabilityVm(this.data, { isAdmin: this.isAdmin });
+  }
+
   get hasDiscount(): boolean {
+    if (this.availabilityVm.status !== 'IN_STOCK') return false;
     const rabat = this.getDiscountValue();
     return rabat > 0 && rabat < 100;
   }
@@ -196,9 +206,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   }
 
   private getPrice(): number {
-    const raw = (this.data as any)?.cena;
-    const n = Number(raw);
-    return Number.isFinite(n) ? n : 0;
+    return this.displayPrice;
   }
 
   private getDiscountValue(): number {
@@ -257,6 +265,9 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   // ─────────────────────────────────────────────────────────────────────────────
 
   ngOnInit(): void {
+    this.isAdmin = this.accountStateService.isAdmin();
+    this.loggedIn = this.accountStateService.isUserLoggedIn();
+
     this.route.paramMap
       .pipe(
         takeUntil(this.destroy$),
@@ -276,9 +287,6 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
           console.warn('Nevažeći ID u ruti:', raw);
         }
       });
-
-    this.isAdmin = this.accountStateService.isAdmin();
-    this.loggedIn = this.accountStateService.isUserLoggedIn();
   }
 
   ngOnDestroy(): void {
@@ -749,12 +757,47 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   }
 
   get hasValidPrice(): boolean {
-    const price = Number(this.data?.cena) || 0;
-    return price > 0;
+    return this.availabilityVm.hasValidPrice;
+  }
+
+  get displayPrice(): number {
+    return this.availabilityVm.displayPrice;
+  }
+
+  get providerPurchasePriceLabel(): string | null {
+    return this.availabilityVm.provider.admin.purchasePriceLabel;
+  }
+
+  get availabilityStatus(): AvailabilityStatus {
+    return this.availabilityVm.status;
+  }
+
+  get availabilityLabel(): string {
+    return this.availabilityVm.label;
+  }
+
+  get showProviderAvailability(): boolean {
+    return this.availabilityVm.showProviderBox;
+  }
+
+  get providerPriceLabel(): string | null {
+    return this.availabilityVm.provider.admin.customerPriceLabel;
+  }
+
+  get providerQuantity(): number | null {
+    return this.availabilityVm.provider.quantity;
+  }
+
+  get providerDeliveryLabel(): string | null {
+    return this.availabilityVm.provider.deliveryLabel;
+  }
+
+  get providerCutoffLabel(): string | null {
+    return this.availabilityVm.provider.cutoffLabel;
   }
 
   get availableStock(): number {
-    return this.hasValidPrice ? this.data?.stanje ?? 0 : 0;
+    return this.availabilityVm.purchasableStock;
   }
 
   get isOutOfStock(): boolean {
