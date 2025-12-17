@@ -196,6 +196,7 @@ export class WebshopNavComponent implements OnChanges {
       podgrupe: ev.kind === 'subgroup' ? ev.subGroupId ?? null : null,
       page: 0,
       naStanju: true,
+      dostupno: null,
       searchTerm: null,
       filterBy: ev.groupId
         ? ev.kind === 'subgroup'

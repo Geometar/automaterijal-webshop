@@ -97,6 +97,10 @@ export class AutomProductCardComponent implements OnInit, OnChanges {
     event?.preventDefault();
     event?.stopPropagation();
 
+    if (!this.canNavigateToDetails) {
+      return;
+    }
+
     const targetParam = this.getRouteParam(this.roba);
     if (!targetParam) {
       return;
@@ -107,6 +111,9 @@ export class AutomProductCardComponent implements OnInit, OnChanges {
 
   handleAddToCart(event?: Event): void {
     event?.stopPropagation();
+    if (!this.canAddToCart) {
+      return;
+    }
     if (this.roba && this.quantity > 0) {
       if (!this.hasValidPrice || this.isOutOfStock) {
         this.snackbarService.showError('Artikal trenutno nije dostupan za poručivanje');
@@ -165,15 +172,33 @@ export class AutomProductCardComponent implements OnInit, OnChanges {
 
   /* ----------------------- Derived business flags -------------------- */
 
+  get isExternalOnly(): boolean {
+    return this.roba?.robaid == null && !!this.roba?.providerAvailability?.available;
+  }
+
   // TecDoc-only article recognition (by business rule)
   get isTecDocOnly(): boolean {
-    return this.roba?.robaid == null || this.roba?.podGrupa === 1000000;
+    // Backend no longer guarantees magic `podGrupa===1000000` markers.
+    // Treat items without internal ID and without provider availability as "TecDoc-only" (not purchasable).
+    return this.roba?.robaid == null && !this.roba?.providerAvailability?.available;
+  }
+
+  get canNavigateToDetails(): boolean {
+    return this.roba?.robaid != null;
+  }
+
+  get cartKey(): string | null {
+    return this.roba?.cartKey ?? this.cartStateService.getItemKey(this.roba);
+  }
+
+  get canAddToCart(): boolean {
+    return !this.isTecDocOnly && !!this.cartKey;
   }
 
   // Is in cart indicator
   get isInCart(): boolean {
-    const id = this.roba?.robaid;
-    return id != null && this.cartStateService.isInCart(id);
+    const key = this.cartKey;
+    return key ? this.cartStateService.isInCartKey(key) : false;
 
   }
 

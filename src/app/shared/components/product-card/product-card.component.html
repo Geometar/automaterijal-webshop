@@ -5,7 +5,7 @@
   [attr.aria-label]="
     (roba.proizvodjac?.naziv || '') + ' ' + (roba.naziv || 'Artikal')
   "
-  [attr.aria-disabled]="isTecDocOnly ? 'true' : null"
+  [attr.aria-disabled]="!canNavigateToDetails ? 'true' : null"
 >
   <!-- Badge: popust (gore desno) -->
   <div class="discount-badge" *ngIf="showDiscount">-{{ discountLabel }}%</div>
@@ -36,12 +36,17 @@
   <!-- Detalji -->
   <div class="product-details">
     <h3 class="product-title" (click)="handleClick()">
-      <a
-        [routerLink]="['/webshop', roba.robaid + '-' + getProductSlug(roba)]"
-        [attr.href]="'/webshop/' + (roba.robaid + '-' + getProductSlug(roba))"
-      >
-        {{ roba.proizvodjac?.naziv }} {{ roba.naziv }}
-      </a>
+      <ng-container *ngIf="canNavigateToDetails; else plainTitle">
+        <a
+          [routerLink]="['/webshop', getRouteParam(roba)]"
+          [attr.href]="'/webshop/' + getRouteParam(roba)"
+        >
+          {{ roba.proizvodjac?.naziv }} {{ roba.naziv }}
+        </a>
+      </ng-container>
+      <ng-template #plainTitle>
+        <span>{{ roba.proizvodjac?.naziv }} {{ roba.naziv }}</span>
+      </ng-template>
     </h3>
 
     <p class="product-katbr" *ngIf="roba.katbr">Kat. broj: {{ roba.katbr }}</p>
@@ -84,25 +89,27 @@
   >
     <div class="product-stock__label">{{ availabilityVm.label }}</div>
     <div class="product-stock__sub" *ngIf="availabilityVm.showProviderBox">
-      <span *ngIf="availabilityVm.provider.deliveryLabel">Isporuka: {{ availabilityVm.provider.deliveryLabel }}</span>
+      <span *ngIf="availabilityVm.provider.deliveryLabel"
+        >Isporuka: {{ availabilityVm.provider.deliveryLabel }}</span
+      >
     </div>
   </div>
 
   <!-- Količina i korpa (sakriveno za TecDoc-only) -->
-  <div class="product-actions" *ngIf="!isTecDocOnly">
-      <autom-input-fields
-        [clearBtn]="false"
-        [disableInput]="isOutOfStock"
-        [customClass]="'quantity-size'"
-        [max]="availableStock || 1"
-        [min]="1"
-        [roundOff]="true"
-        [size]="sizeEnum.MEDIUM"
-        [type]="inputTypeEnum.QUANTITY"
-        [validators]="[
-          { name: 'max', value: availableStock || 1 },
-          { name: 'min', value: 1 }
-        ]"
+  <div class="product-actions" *ngIf="canAddToCart">
+    <autom-input-fields
+      [clearBtn]="false"
+      [disableInput]="isOutOfStock"
+      [customClass]="'quantity-size'"
+      [max]="availableStock || 1"
+      [min]="1"
+      [roundOff]="true"
+      [size]="sizeEnum.MEDIUM"
+      [type]="inputTypeEnum.QUANTITY"
+      [validators]="[
+        { name: 'max', value: availableStock || 1 },
+        { name: 'min', value: 1 }
+      ]"
       [step]="1"
       [value]="quantity"
       (emitSelected)="modifyQuantity($event)"

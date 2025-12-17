@@ -243,14 +243,25 @@ export class CartComponent implements OnInit, OnDestroy {
     this.bezPdv = total / 1.2;
   }
 
-  removeFromBasketHandler(robaId: number): void {
-    this.cartStateService.removeFromCart(robaId);
+  get hasProviderOnlyItems(): boolean {
+    return (this.roba ?? []).some((r) => r?.robaid == null);
+  }
 
+  removeFromBasketHandler(cartKey: string): void {
+    this.cartStateService.removeFromCartByKey(cartKey);
   }
 
   /** Basket send: start */
 
   submitInvoice(): void {
+    if (this.roba.some((r) => r?.robaid == null)) {
+      this.snackbarService.showAutoClose(
+        'Korpa sadrži ponude dobavljača. Poručivanje tih stavki još nije podržano.',
+        SnackbarPosition.TOP
+      );
+      return;
+    }
+
     this.invoiceSubmitted = true;
     this.buildInvoiceFromForm();
     const cartItemsSnapshot = this.cartStateService.getAll();

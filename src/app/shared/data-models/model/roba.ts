@@ -8,6 +8,7 @@ export class Filter {
   grupe?: string[];
   mandatoryProid?: string[];
   naStanju?: boolean = false;
+  dostupno?: boolean = false;
   podgrupe?: string[];
   pretrazitiGrupe?: boolean;
   proizvodjaci?: string[];
@@ -18,6 +19,7 @@ export class Filter {
 
   Filter() {
     this.naStanju = false;
+    this.dostupno = false;
     this.raspolozivost = 'Svi artikli';
   }
 }
@@ -103,6 +105,8 @@ export class Roba {
   aplikacije?: Map<string, RobaAplikacija[]>;
   asociraniArtikli: Roba[] = [];
   availabilityStatus?: AvailabilityStatus;
+  /** Internal UI key for cart identification (supports provider-only items). */
+  cartKey?: string;
   cena?: number;
   dokumentacija?: Object;
   dozvoljenoZaAnonimusa?: boolean;
@@ -130,13 +134,16 @@ export class Roba {
 }
 
 export class CartItem {
+  /** Stable cart identifier. For local items: `ROBA:<robaId>`, for provider items: `PROVIDER:<provider>:<proid>:<articleNumber>` */
+  key?: string;
   discount?: number;
   image?: Slika;
-  manufacturer?: Manufacture;
+  manufacturer?: Manufacture | string;
+  manufacturerProid?: string;
   name?: string;
   partNumber?: string;
   quantity?: number;
-  robaId?: number;
+  robaId?: number | null;
   stock?: number;
   totalPrice?: number;
   unitPrice?: number;

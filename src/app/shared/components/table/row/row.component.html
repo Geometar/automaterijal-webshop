@@ -21,16 +21,32 @@
 
   <!-- Details Section -->
   <div class="details-container">
-    <h3 class="product-heading" [class.disabled]="isTecDocOnly">
-      <a
-        class="product-link"
-        [routerLink]="['/webshop', data.robaid + '-' + getProductSlug(data)]"
-        [attr.href]="'/webshop/' + (data.robaid + '-' + getProductSlug(data))"
-      >
-        <span class="product-link__brand"> {{ data.proizvodjac?.naziv }}</span>
-        <span class="product-name-fragment">{{ nameWithoutManufacturer }}</span>
-        <span class="product-link__chev" aria-hidden="true">›</span>
-      </a>
+    <h3 class="product-heading" [class.disabled]="!canNavigateToDetails">
+      <ng-container *ngIf="canNavigateToDetails; else plainHeading">
+        <a
+          class="product-link"
+          [routerLink]="['/webshop', getRouteParam(data)]"
+          [attr.href]="'/webshop/' + getRouteParam(data)"
+        >
+          <span class="product-link__brand">
+            {{ data.proizvodjac?.naziv }}</span
+          >
+          <span class="product-name-fragment">{{
+            nameWithoutManufacturer
+          }}</span>
+          <span class="product-link__chev" aria-hidden="true">›</span>
+        </a>
+      </ng-container>
+      <ng-template #plainHeading>
+        <span class="product-link" role="text">
+          <span class="product-link__brand">
+            {{ data.proizvodjac?.naziv }}</span
+          >
+          <span class="product-name-fragment">{{
+            nameWithoutManufacturer
+          }}</span>
+        </span>
+      </ng-template>
     </h3>
 
     <div class="product-meta">
@@ -44,7 +60,9 @@
         [ariaLabel]="'Kataloški broj ' + data.katbr"
       ></autom-meta-pill>
 
-      <ng-container *ngIf="categoryHref && !disableCategoryNavigation; else plainCategory">
+      <ng-container
+        *ngIf="categoryHref && !disableCategoryNavigation; else plainCategory"
+      >
         <autom-meta-pill
           class="product-meta__category category-pill"
           variant="primary"
@@ -74,7 +92,12 @@
           variant="primary"
           size="md"
           [style.cursor]="disableCategoryNavigation ? 'pointer' : null"
-          [attr.aria-label]="disableCategoryNavigation ? 'Filtriraj po podgrupi ' + (data!.podGrupaNaziv || data!.grupaNaziv) : null"
+          [attr.aria-label]="
+            disableCategoryNavigation
+              ? 'Filtriraj po podgrupi ' +
+                (data!.podGrupaNaziv || data!.grupaNaziv)
+              : null
+          "
           [ngClass]="{ 'clickable-placeholder': disableCategoryNavigation }"
           (click)="onCategoryClick($event)"
         >
@@ -143,29 +166,51 @@
   <!-- Add to basket Section -->
   <div class="pricing-container" *ngIf="showAddToBasket">
     <!-- Status -->
-    <div
-      [ngClass]="['item-status', availabilityVm.tone]"
-    >
+    <div [ngClass]="['item-status', availabilityVm.tone]">
       <span class="item-status__text">{{ availabilityVm.label }}</span>
       <span class="item-status__dot" aria-hidden="true"></span>
     </div>
 
     <!-- Eksterna dostupnost (dobavljač) -->
     <div class="provider-availability" *ngIf="availabilityVm.showProviderBox">
-      <div class="provider-availability__row" *ngIf="availabilityVm.provider.deliveryLabel">
+      <div
+        class="provider-availability__row"
+        *ngIf="availabilityVm.provider.deliveryLabel"
+      >
         Isporuka: {{ availabilityVm.provider.deliveryLabel }}
       </div>
-      <div class="provider-availability__row" *ngIf="availabilityVm.provider.admin.isAdmin && availabilityVm.provider.quantity">
+      <div
+        class="provider-availability__row"
+        *ngIf="
+          availabilityVm.provider.admin.isAdmin &&
+          availabilityVm.provider.quantity
+        "
+      >
         Dostupno: {{ availabilityVm.provider.quantity }} kom
       </div>
-      <div class="provider-availability__row" *ngIf="availabilityVm.provider.cutoffLabel">
+      <div
+        class="provider-availability__row"
+        *ngIf="availabilityVm.provider.cutoffLabel"
+      >
         Poruči do: {{ availabilityVm.provider.cutoffLabel }}
       </div>
-      <div class="provider-availability__row provider-availability__admin" *ngIf="availabilityVm.provider.admin.sourceLabel">
-        Izvor: <span class="provider-availability__value">{{ availabilityVm.provider.admin.sourceLabel }}</span>
+      <div
+        class="provider-availability__row provider-availability__admin"
+        *ngIf="availabilityVm.provider.admin.sourceLabel"
+      >
+        Izvor:
+        <span class="provider-availability__value">{{
+          availabilityVm.provider.admin.sourceLabel
+        }}</span>
       </div>
-      <div class="provider-availability__row provider-availability__purchase" *ngIf="availabilityVm.provider.admin.purchasePriceLabel">
-        Nabavna: <span class="provider-availability__value">{{ availabilityVm.provider.admin.purchasePriceLabel }}</span>
+      <div
+        class="provider-availability__row provider-availability__purchase"
+        *ngIf="availabilityVm.provider.admin.purchasePriceLabel"
+      >
+        Nabavna:
+        <span class="provider-availability__value">{{
+          availabilityVm.provider.admin.purchasePriceLabel
+        }}</span>
       </div>
     </div>
     <!-- Stara cena -->
@@ -175,7 +220,11 @@
 
     <!-- Finalna cena -->
     <p *ngIf="!isTecDocOnly" class="price">
-      {{ availabilityVm.displayPrice ? (availabilityVm.displayPrice | rsdCurrency) : (0 | rsdCurrency) }}
+      {{
+        availabilityVm.displayPrice
+          ? (availabilityVm.displayPrice | rsdCurrency)
+          : (0 | rsdCurrency)
+      }}
     </p>
 
     <p *ngIf="!isTecDocOnly" class="mobile-row autom-align__right">
@@ -190,7 +239,7 @@
 
     <div
       class="mobile-quantity-cart util__flex--center"
-      *ngIf="!isTecDocOnly && !isUnavailable"
+      *ngIf="canAddToCart && !isUnavailable"
     >
       <autom-input-fields
         [clearBtn]="false"
@@ -236,16 +285,16 @@
       <span class="inquiry-trigger__hint" [class.sent]="inquirySent">
         {{
           inquirySent
-            ? 'Upit poslat — odgovorićemo na tvoj email.'
+            ? "Upit poslat — odgovorićemo na tvoj email."
             : availabilityVm.showProviderBox
-            ? 'Dostupno u eksternom magacinu — pošaljite upit za nabavku.'
-            : 'Nema na stanju — pošaljite upit.'
+            ? "Dostupno u eksternom magacinu — pošaljite upit za nabavku."
+            : "Nema na stanju — pošaljite upit."
         }}
       </span>
     </div>
 
     <div
-      *ngIf="isInCart(data.robaid ?? 0)"
+      *ngIf="isInCartItem"
       class="util__flex--center"
       role="status"
       aria-live="polite"
@@ -267,7 +316,11 @@
     </p>
 
     <p class="sub-price final-price">
-      {{ availabilityVm.displayPrice ? (availabilityVm.displayPrice | rsdCurrency) : (0 | rsdCurrency) }}
+      {{
+        availabilityVm.displayPrice
+          ? (availabilityVm.displayPrice | rsdCurrency)
+          : (0 | rsdCurrency)
+      }}
     </p>
 
     <p *ngIf="availabilityVm.showDiscount" class="small-explanation saving">
@@ -299,7 +352,10 @@
 
       <div>
         <p class="price">
-          {{ (availabilityVm.displayPrice || 0) * (data.kolicina || 0) | rsdCurrency }}
+          {{
+            (availabilityVm.displayPrice || 0) * (data.kolicina || 0)
+              | rsdCurrency
+          }}
         </p>
         <p class="autom-align__right autom-margin__none">Ukupno sa pdv-om</p>
       </div>
@@ -311,7 +367,7 @@
     <autom-icon
       [tooltip]="{ tooltipText: 'Izbrisi iz korpe' }"
       [source]="iconEnum.X"
-      (click)="removeEvent.emit(data.robaid)"
+      (click)="cartKey && removeEvent.emit(cartKey)"
     ></autom-icon>
   </div>
 </article>

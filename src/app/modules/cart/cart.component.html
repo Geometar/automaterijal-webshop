@@ -199,10 +199,15 @@
         [theme]="buttonThemes.LIGHT_ORANGE"
         [label]="'Potvrdi porudzbinu'"
         [disabled]="
-          invoiceSubmitted || (loggedIn ? !cartForm.valid : !userForm.valid)
+          hasProviderOnlyItems || invoiceSubmitted || (loggedIn ? !cartForm.valid : !userForm.valid)
         "
         (clickEvent)="submitInvoice()"
       ></autom-button>
+      <div *ngIf="hasProviderOnlyItems" class="free-shipping-info warning">
+        <autom-icon [source]="iconsEnum.INFO" class="info-icon"></autom-icon>
+        Korpa sadrži ponude dobavljača (artikli bez internog ID-ja). Poručivanje
+        tih stavki još nije podržano.
+      </div>
       <div *ngIf="!loggedIn && total < 3000" class="free-shipping-info warning">
         <autom-icon [source]="iconsEnum.INFO" class="info-icon"></autom-icon>
         Porudžbine preko 3.000 RSD (kupci bez ugovora) imaju besplatnu

@@ -88,7 +88,9 @@ export class TecdocService {
     const fullUrl = DOMAIN_URL + '/articles';
     const parameterObject = {} as any;
     parameterObject['assembleGroupId'] = assembleGroupId;
-    parameterObject['naStanju'] = filter.naStanju;
+    // TecDoc /articles is always "dostupno" mode (lager + dobavljači)
+    parameterObject['dostupno'] = true;
+    parameterObject['naStanju'] = null;
     parameterObject['page'] = page;
     parameterObject['pageSize'] = pageSize;
     parameterObject['tecdocTargetId'] = id;

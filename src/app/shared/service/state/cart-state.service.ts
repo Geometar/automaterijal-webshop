@@ -39,10 +39,56 @@ export class CartStateService {
     if (!this.isBrowser) {
       return [];
     }
-    return this.localStorage.retrieve(this.storageKey) || [];
+    const raw = (this.localStorage.retrieve(this.storageKey) || []) as CartItem[];
+    return this.normalizeCart(raw);
+  }
+
+  /** Stable cart key used across local + provider-only items. */
+  getItemKey(roba: any): string | null {
+    const robaId = roba?.robaid;
+    if (robaId !== null && robaId !== undefined && robaId !== '') {
+      const n = Number(robaId);
+      if (Number.isFinite(n) && n > 0) {
+        return `ROBA:${n}`;
+      }
+      return `ROBA:${String(robaId)}`;
+    }
+
+    const provider = (roba?.providerAvailability?.provider ?? '').toString().trim();
+    const proid = (roba?.proizvodjac?.proid ?? '').toString().trim().toUpperCase();
+    const articleNumber = (roba?.providerAvailability?.articleNumber ?? roba?.katbr ?? '')
+      .toString()
+      .trim()
+      .toUpperCase();
+
+    if (!articleNumber) {
+      return null;
+    }
+
+    return `PROVIDER:${provider || 'UNKNOWN'}:${proid || 'UNKNOWN'}:${articleNumber}`;
+  }
+
+  removeFromCartByKey(key: string): void {
+    if (!this.isBrowser) {
+      return;
+    }
+    const cart = this.getAll();
+    const removedItem = cart.find((item) => item.key === key);
+    const updatedCart = cart.filter((item) => item.key !== key);
+    this.localStorage.store(this.storageKey, updatedCart);
+    this.updateCartSize();
+
+    if (removedItem) {
+      const account = this.accountStateService.get();
+      const quantityRemoved = removedItem.quantity ?? 1;
+      this.analytics.trackRemoveFromCart(removedItem, quantityRemoved, account);
+    }
   }
 
   addToCart(roba: any, quantity: number = 1): void {
+    const key = this.getItemKey(roba);
+    if (!key) return;
+
     const status = getAvailabilityStatus(roba);
     const unitPrice = getPurchasableUnitPrice(roba);
     const currentStock = getPurchasableStock(roba);
@@ -51,7 +97,7 @@ export class CartStateService {
     if (unitPrice <= 0 || qtyToAdd <= 0) return;
 
     let cart = this.getAll();
-    const existingItem = cart.find((item) => item.robaId === roba.robaid);
+    const existingItem = cart.find((item) => item.key === key);
     let trackedItem: CartItem;
 
     if (existingItem) {
@@ -92,21 +138,7 @@ export class CartStateService {
   }
 
   removeFromCart(itemId: number): void {
-    if (!this.isBrowser) {
-      return;
-    }
-
-    const cart = this.getAll();
-    const removedItem = cart.find((item) => item.robaId === itemId);
-    const updatedCart = cart.filter((item) => item.robaId !== itemId);
-    this.localStorage.store(this.storageKey, updatedCart);
-    this.updateCartSize();
-
-    if (removedItem) {
-      const account = this.accountStateService.get();
-      const quantityRemoved = removedItem.quantity ?? 1;
-      this.analytics.trackRemoveFromCart(removedItem, quantityRemoved, account);
-    }
+    this.removeFromCartByKey(`ROBA:${itemId}`);
   }
 
   resetCart(): void {
@@ -119,12 +151,16 @@ export class CartStateService {
   }
 
   updateQuantity(itemId: number, quantity: number): void {
+    this.updateQuantityByKey(`ROBA:${itemId}`, quantity);
+  }
+
+  updateQuantityByKey(key: string, quantity: number): void {
     if (!this.isBrowser) {
       return;
     }
 
     let cart = this.getAll();
-    const item = cart.find((i) => i.robaId === itemId);
+    const item = cart.find((i) => i.key === key);
 
     if (item) {
       item.quantity = quantity;
@@ -142,7 +178,8 @@ export class CartStateService {
     let cart = this.getAll();
 
     robaList.forEach((roba) => {
-      const cartItem = cart.find((item) => item.robaId === roba.robaid);
+      const key = this.getItemKey(roba);
+      const cartItem = key ? cart.find((item) => item.key === key) : undefined;
       if (cartItem) {
         const status = getAvailabilityStatus(roba);
         const qty = cartItem.quantity ?? 0;
@@ -166,7 +203,8 @@ export class CartStateService {
       return;
     }
     let cart = this.getAll();
-    const cartItem = cart.find((item) => item.robaId === roba.robaid);
+    const key = this.getItemKey(roba);
+    const cartItem = key ? cart.find((item) => item.key === key) : undefined;
 
     if (cartItem) {
       const status = getAvailabilityStatus(roba);
@@ -186,7 +224,11 @@ export class CartStateService {
   }
 
   isInCart(itemId: number): boolean {
-    return this.getAll().some((item) => item.robaId === itemId);
+    return this.isInCartKey(`ROBA:${itemId}`);
+  }
+
+  isInCartKey(key: string): boolean {
+    return this.getAll().some((item) => item.key === key);
   }
 
   getRobaFromCart(): Roba[] {
@@ -218,15 +260,18 @@ export class CartStateService {
     const unitPrice = getPurchasableUnitPrice(roba);
     const stock = getPurchasableStock(roba);
     const isAdmin = this.accountStateService.isAdmin();
+    const key = this.getItemKey(roba);
 
     return {
+      key: key ?? undefined,
       discount: isProvider ? 0 : (roba.rabat || 0),
       image: roba.slika,
       manufacturer: roba.proizvodjac?.naziv || '',
+      manufacturerProid: roba?.proizvodjac?.proid,
       name: roba.naziv || '',
       partNumber: roba.katbr || '',
       quantity: roba.kolicina || 1,
-      robaId: roba.robaid || 0,
+      robaId: roba?.robaid ?? null,
       stock: stock || 0,
       totalPrice: unitPrice * (roba.kolicina || 1),
       unitPrice,
@@ -244,13 +289,21 @@ export class CartStateService {
 
   private mapToRoba(cartItem: CartItem): Roba {
     const retVal: Roba = {} as Roba;
+    retVal.cartKey = cartItem.key;
     retVal.cena = cartItem.unitPrice;
     retVal.katbr = cartItem.partNumber;
     retVal.kolicina = cartItem.quantity;
     retVal.naziv = cartItem.name;
-    retVal.proizvodjac = { naziv: cartItem.manufacturer } as Manufacture;
+    const manufacturerName =
+      typeof cartItem.manufacturer === 'string'
+        ? cartItem.manufacturer
+        : cartItem.manufacturer?.naziv;
+    retVal.proizvodjac = {
+      naziv: manufacturerName,
+      proid: cartItem.manufacturerProid,
+    } as Manufacture;
     retVal.rabat = cartItem.discount || 0;
-    retVal.robaid = cartItem.robaId;
+    retVal.robaid = (cartItem.robaId ?? undefined) as any;
     retVal.slika = cartItem.image;
     if (cartItem.source === 'PROVIDER') {
       retVal.stanje = 0;
@@ -272,5 +325,28 @@ export class CartStateService {
     }
     retVal.tehnickiOpis = cartItem.technicalDescription;
     return retVal;
+  }
+
+  private normalizeCart(cart: CartItem[]): CartItem[] {
+    // Backward compatibility: older stored items don't have `key`.
+    return (cart ?? []).map((item) => {
+      if (item?.key) {
+        return item;
+      }
+      const robaId = item?.robaId;
+      if (robaId != null) {
+        return { ...item, key: `ROBA:${robaId}` };
+      }
+      const provider = (item?.provider ?? '').toString().trim();
+      const proid = (item?.manufacturerProid ?? '').toString().trim().toUpperCase();
+      const articleNumber = (item?.providerArticleNumber ?? item?.partNumber ?? '')
+        .toString()
+        .trim()
+        .toUpperCase();
+      const fallbackKey = articleNumber
+        ? `PROVIDER:${provider || 'UNKNOWN'}:${proid || 'UNKNOWN'}:${articleNumber}`
+        : undefined;
+      return { ...item, key: fallbackKey };
+    });
   }
 }

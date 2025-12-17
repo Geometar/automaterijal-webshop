@@ -64,7 +64,7 @@ export class RowComponent implements OnInit, OnChanges {
   @Input() showCloseBtn = false;
   @Input() showPriceOnly = false;
   @Input() disableCategoryNavigation = false;
-  @Output() removeEvent = new EventEmitter<number>();
+  @Output() removeEvent = new EventEmitter<string>();
 
   quantity: number = 1;
   private readonly minQuantity = 1;
@@ -99,7 +99,11 @@ export class RowComponent implements OnInit, OnChanges {
   stringUtils = StringUtils;
 
   get specTableId(): string {
-    return `spec-${this.data?.robaid ?? 'row'}`;
+    const idPart =
+      this.data?.robaid != null
+        ? String(this.data.robaid)
+        : `${this.data?.proizvodjac?.proid ?? 'ext'}-${this.data?.katbr ?? 'row'}`;
+    return `spec-${this.sanitizeDomId(idPart)}`;
   }
 
   get nameWithoutManufacturer(): string {
@@ -185,11 +189,14 @@ export class RowComponent implements OnInit, OnChanges {
     }
 
     this.quantity = next;
-    this.cartStateService.updateQuantity(this.data.robaid!, this.quantity);
+    const key = this.cartKey;
+    if (key) {
+      this.cartStateService.updateQuantityByKey(key, this.quantity);
+    }
   }
 
   addToShoppingCart(data: Roba): void {
-    if (this.isUnavailable || !this.availabilityVm.hasValidPrice) {
+    if (!this.canAddToCart || this.isUnavailable || !this.availabilityVm.hasValidPrice) {
       this.snackbarService.showError('Artikal trenutno nije dostupan za poručivanje');
       return;
     }
@@ -200,6 +207,15 @@ export class RowComponent implements OnInit, OnChanges {
 
   isInCart(robaId: number): boolean {
     return this.cartStateService.isInCart(robaId);
+  }
+
+  get isInCartItem(): boolean {
+    const key = this.cartKey;
+    if (key) {
+      return this.cartStateService.isInCartKey(key);
+    }
+    const id = this.data?.robaid;
+    return id != null ? this.cartStateService.isInCart(id) : false;
   }
 
   openImageZoom(url: string) {
@@ -254,8 +270,26 @@ export class RowComponent implements OnInit, OnChanges {
     return this.availabilityVm.purchasableStock;
   }
 
+  get cartKey(): string | null {
+    return this.data?.cartKey ?? this.cartStateService.getItemKey(this.data);
+  }
+
+  get isExternalOnly(): boolean {
+    return this.data?.robaid == null && !!this.data?.providerAvailability?.available;
+  }
+
   get isTecDocOnly(): boolean {
-    return this.data?.robaid == null || this.data?.podGrupa === 1000000;
+    // Backend no longer guarantees magic `podGrupa===1000000` markers.
+    // Treat items without internal ID and without provider availability as "TecDoc-only" (not purchasable).
+    return this.data?.robaid == null && !this.data?.providerAvailability?.available;
+  }
+
+  get canAddToCart(): boolean {
+    return !this.isTecDocOnly && !!this.cartKey;
+  }
+
+  get canNavigateToDetails(): boolean {
+    return this.data?.robaid != null;
   }
 
   get isUnavailable(): boolean {
@@ -307,7 +341,7 @@ export class RowComponent implements OnInit, OnChanges {
     event.stopPropagation();
 
     const subGroupId = this.data?.podGrupa;
-    if (!subGroupId) {
+    if (subGroupId === null || subGroupId === undefined) {
       return;
     }
 
@@ -330,5 +364,12 @@ export class RowComponent implements OnInit, OnChanges {
       isAdmin: this.isAdmin,
       isTecDocOnly: this.isTecDocOnly,
     });
+  }
+
+  private sanitizeDomId(value: string): string {
+    return String(value)
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-zA-Z0-9\-_:.]/g, '-');
   }
 }

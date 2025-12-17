@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Roba } from '../../data-models/model/roba';
 import { InvoiceItem } from '../../data-models/model';
 import { Slika } from '../../data-models/model/slika';
+import { environment } from '../../../../environment/environment';
 
 export interface ProductImageMeta {
   src: string;
@@ -17,6 +18,7 @@ export class PictureService {
 
   private readonly fallbackImage = 'https://automaterijal.com/images/no-image/no-image.png';
   private readonly fallbackAlt = 'Nema dostupne slike';
+  private readonly apiBase = (environment.apiUrl || '').replace(/\/$/, '');
   private readonly fallbackComparisons = new Set<string>([
     '/images/no-image/no-image.png',
   ]);
@@ -146,7 +148,15 @@ export class PictureService {
     if (trimmed.startsWith('data:') || /^https?:\/\//i.test(trimmed)) {
       return trimmed;
     }
-    return trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
+    const path = trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
+    if (this.apiBase && this.isApiPath(path)) {
+      return `${this.apiBase}${path}`;
+    }
+    return path;
+  }
+
+  private isApiPath(path: string): boolean {
+    return /^\/api(?:\/|\?|#|$)/i.test(path);
   }
 
   private normalizeForComparison(url: string): string {
