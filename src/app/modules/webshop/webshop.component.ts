@@ -58,7 +58,6 @@ interface QueryParams {
   mandatoryproid?: string;
   pageIndex?: string;
   naStanju?: string;
-  dostupno?: string;
   podgrupe?: string;
   proizvodjaci?: string;
   rowsPerPage?: string;

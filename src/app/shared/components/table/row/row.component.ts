@@ -227,12 +227,19 @@ export class RowComponent implements OnInit, OnChanges {
   }
 
   getRouteParam(data: any): string | null {
-    const id = data?.robaid;
-    if (id == null) {
-      return null;
-    }
     const slug = this.getProductSlug(data);
-    return slug ? `${id}-${slug}` : String(id);
+    const robaId = data?.robaid;
+    if (robaId != null) {
+      return slug ? `${robaId}-${slug}` : String(robaId);
+    }
+
+    const tecDocArticleId = data?.tecDocArticleId;
+    if (tecDocArticleId != null) {
+      const token = `td${tecDocArticleId}`;
+      return slug ? `${token}-${slug}` : token;
+    }
+
+    return null;
   }
 
   get productImageMeta(): ProductImageMeta {
@@ -289,7 +296,7 @@ export class RowComponent implements OnInit, OnChanges {
   }
 
   get canNavigateToDetails(): boolean {
-    return this.data?.robaid != null;
+    return this.data?.robaid != null || this.data?.tecDocArticleId != null;
   }
 
   get isUnavailable(): boolean {

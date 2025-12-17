@@ -8,7 +8,6 @@ export class Filter {
   grupe?: string[];
   mandatoryProid?: string[];
   naStanju?: boolean = false;
-  dostupno?: boolean = false;
   podgrupe?: string[];
   pretrazitiGrupe?: boolean;
   proizvodjaci?: string[];
@@ -19,7 +18,6 @@ export class Filter {
 
   Filter() {
     this.naStanju = false;
-    this.dostupno = false;
     this.raspolozivost = 'Svi artikli';
   }
 }
@@ -123,6 +121,8 @@ export class Roba {
   providerAvailability?: ProviderAvailabilityDto;
   rabat: number = 0;
   robaid?: number;
+  /** TecDoc article identifier for external-only items (when `robaid` is null). */
+  tecDocArticleId?: number;
   slika?: Slika;
   stanje: number = 0;
   tdBrojevi?: RobaBrojevi[];

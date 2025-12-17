@@ -5,7 +5,13 @@ import { HttpClient } from '@angular/common/http';
 
 // Data models
 import { AssemblyGroupDetails, TDManufacture, TDModels, TDVehicleDetails } from '../data-models/model/tecdoc';
-import { Filter, Magacin, TecDocLinkedManufacturerTargets } from '../data-models/model/roba';
+import {
+  Filter,
+  Magacin,
+  Roba,
+  TecDocLinkedManufacturer,
+  TecDocLinkedManufacturerTargets
+} from '../data-models/model/roba';
 
 // Services
 import { ServiceHelpersService } from './utils/service-helpers.service';
@@ -88,9 +94,7 @@ export class TecdocService {
     const fullUrl = DOMAIN_URL + '/articles';
     const parameterObject = {} as any;
     parameterObject['assembleGroupId'] = assembleGroupId;
-    // TecDoc /articles is always "dostupno" mode (lager + dobavljači)
-    parameterObject['dostupno'] = true;
-    parameterObject['naStanju'] = null;
+    parameterObject['naStanju'] = filter.naStanju;
     parameterObject['page'] = page;
     parameterObject['pageSize'] = pageSize;
     parameterObject['tecdocTargetId'] = id;
@@ -115,9 +119,16 @@ export class TecdocService {
       .pipe(catchError((error: any) => throwError(() => new Error(error))));
   }
 
+  public fetchTecDocRobaDetails(tecDocArticleId: number): Observable<Roba> {
+    const url = `${DOMAIN_URL}/roba/${tecDocArticleId}`;
+    return this.http
+      .get<Roba>(url)
+      .pipe(catchError((error: any) => throwError(() => new Error(error))));
+  }
+
   public getArticleLinkedTargets(
     robaId: number,
-    linkingTargetType: string = 'VOLB'
+    linkingTargetType: string = 'PO'
   ): Observable<TecDocLinkedManufacturerTargets[]> {
     const url = `${DOMAIN_URL}/articles/${robaId}/linked-targets`;
     const parameterObject: Record<string, unknown> = {
@@ -126,6 +137,34 @@ export class TecdocService {
     const parametersString = this.helperService.formatQueryParameters(parameterObject);
     return this.http
       .get<TecDocLinkedManufacturerTargets[]>(url + parametersString)
+      .pipe(catchError((error: any) => throwError(() => new Error(error))));
+  }
+
+  public getTecDocRobaLinkedTargets(
+    tecDocArticleId: number,
+    linkingTargetType: string = 'PO'
+  ): Observable<TecDocLinkedManufacturerTargets[]> {
+    const url = `${DOMAIN_URL}/articles/by-article/${tecDocArticleId}/linked-targets`;
+    const parameterObject: Record<string, unknown> = {
+      linkingTargetType,
+    };
+    const parametersString = this.helperService.formatQueryParameters(parameterObject);
+    return this.http
+      .get<TecDocLinkedManufacturerTargets[]>(url + parametersString)
+      .pipe(catchError((error: any) => throwError(() => new Error(error))));
+  }
+
+  public getTecDocRobaLinkedManufacturers(
+    tecDocArticleId: number,
+    linkingTargetType: string = 'PO'
+  ): Observable<TecDocLinkedManufacturer[]> {
+    const url = `${DOMAIN_URL}/articles/by-article/${tecDocArticleId}/linked-manufacturers`;
+    const parameterObject: Record<string, unknown> = {
+      linkingTargetType,
+    };
+    const parametersString = this.helperService.formatQueryParameters(parameterObject);
+    return this.http
+      .get<TecDocLinkedManufacturer[]>(url + parametersString)
       .pipe(catchError((error: any) => throwError(() => new Error(error))));
   }
 }

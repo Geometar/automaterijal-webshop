@@ -51,7 +51,7 @@ export class WebshopRobaComponent {
   }
 
   resetSearchTerm(): void {
-    this.urlHelperService.removeQueryParams(['searchTerm', 'podgrupe', 'proizvodjaci', 'naStanju', 'dostupno', 'filterBy']);
+    this.urlHelperService.removeQueryParams(['searchTerm', 'podgrupe', 'proizvodjaci', 'naStanju', 'filterBy']);
   }
 
   // Build concise chips for active filters
@@ -88,7 +88,7 @@ export class WebshopRobaComponent {
 
   // Clear all filters & search in one go (URL-based like ostatak)
   clearAllFilters(): void {
-    this.urlHelperService.removeQueryParams(['podgrupe', 'proizvodjaci', 'naStanju', 'dostupno', 'filterBy']);
+    this.urlHelperService.removeQueryParams(['podgrupe', 'proizvodjaci', 'naStanju', 'filterBy']);
   }
 
 }

@@ -184,7 +184,7 @@ export class AutomProductCardComponent implements OnInit, OnChanges {
   }
 
   get canNavigateToDetails(): boolean {
-    return this.roba?.robaid != null;
+    return this.roba?.robaid != null || this.roba?.tecDocArticleId != null;
   }
 
   get cartKey(): string | null {
@@ -314,12 +314,19 @@ export class AutomProductCardComponent implements OnInit, OnChanges {
   }
 
   getRouteParam(data: any): string | null {
-    const id = data?.robaid;
-    if (id == null) {
-      return null;
-    }
     const slug = this.getProductSlug(data);
-    return slug ? `${id}-${slug}` : String(id);
+    const robaId = data?.robaid;
+    if (robaId != null) {
+      return slug ? `${robaId}-${slug}` : String(robaId);
+    }
+
+    const tecDocArticleId = data?.tecDocArticleId;
+    if (tecDocArticleId != null) {
+      const token = `td${tecDocArticleId}`;
+      return slug ? `${token}-${slug}` : token;
+    }
+
+    return null;
   }
 
   get productImageMeta(): ProductImageMeta {

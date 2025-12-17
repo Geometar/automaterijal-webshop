@@ -175,7 +175,6 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
   onAvailabilityChanged(isAvailable: boolean): void {
     this.urlHelperService.addOrUpdateQueryParams({
       naStanju: isAvailable,
-      dostupno: null,
     });
   }
   // End of: Emit handle
@@ -250,7 +249,6 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
     this.filter = new Filter();
     this.urlHelperService.setQueryParams({
       naStanju: null,
-      dostupno: null,
       podgrupe: null,
       proizvodjaci: null,
       filterBy: null,

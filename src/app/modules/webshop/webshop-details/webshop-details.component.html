@@ -403,7 +403,7 @@
           ></autom-button>
         </div>
       </div>
-      <div *ngIf="isAdmin" class="admin-edit-footer">
+      <div *ngIf="isAdmin && data?.robaid" class="admin-edit-footer">
         <h3 class="admin-edit-title">Admin tools</h3>
         <div class="admin-edit-actions">
           <autom-button

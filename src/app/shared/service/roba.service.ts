@@ -30,15 +30,10 @@ export class RobaService {
   public pronadjiSvuRobu(sort: Sort | null, pageSize: number, page: number, searchValue: string, filter: Filter): Observable<Magacin> {
     const trimmedSearch = (searchValue || '').trim();
 
-    const dostupno = !!filter.dostupno || !!filter.naStanju;
-
     const parameterObject = {} as any;
     parameterObject['pageSize'] = pageSize;
     parameterObject['page'] = page;
-    // For search results we always want "dostupno" mode (lager + dobavljači)
-    parameterObject['dostupno'] = dostupno ? true : null;
-    // Keep `naStanju` for URL/UI only; backend availability is driven by `dostupno`.
-    parameterObject['naStanju'] = null;
+    parameterObject['naStanju'] = filter.naStanju;
 
     if (sort) {
       parameterObject['sortBy'] = sort.active.toLocaleUpperCase();

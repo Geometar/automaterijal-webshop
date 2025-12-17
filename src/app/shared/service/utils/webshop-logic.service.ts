@@ -13,10 +13,8 @@ export class WebshopLogicService {
     const filter = new Filter();
     filter.grupe = this.parseArrayParam(params['grupe']);
     filter.mandatoryProid = this.parseArrayParam(params['mandatoryproid']);
-    filter.dostupno = params['dostupno'] === 'true';
-    // UI "Ima na stanju" toggles the available-only mode (stock + provider),
-    // so we keep it as `naStanju` in URL while translating to `dostupno` at the API layer.
-    filter.naStanju = params['naStanju'] === 'true' || filter.dostupno;
+    // Backward compatibility: some old links used `dostupno=true`.
+    filter.naStanju = params['naStanju'] === 'true' || params['dostupno'] === 'true';
     filter.podgrupe = this.parseArrayParam(params['podgrupe']);
     filter.proizvodjaci = this.parseArrayParam(params['proizvodjaci']);
     const filterBy = this.parseFilterBy(params['filterBy']);
