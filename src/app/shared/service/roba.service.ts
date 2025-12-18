@@ -70,6 +70,7 @@ export class RobaService {
 
     if (filter.showcase) {
       parameterObject['showcase'] = true;
+      parameterObject['skipProvider'] = true;
     }
 
     if (filter.filterBy) {

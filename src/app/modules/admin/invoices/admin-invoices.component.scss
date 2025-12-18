@@ -1,0 +1,15 @@
+.invoices {
+  &__filter {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+
+    @media (max-width: 991px) {
+      flex-direction: column;
+      gap: 20px;
+      align-items: stretch;
+      padding: 0 16px;
+    }
+  }
+}
+

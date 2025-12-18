@@ -113,6 +113,13 @@
                 </div>
               </button>
 
+              <button mat-menu-item routerLink="/admin/invoices">
+                <div class="menu-item-align">
+                  <autom-icon [source]="iconEnum.BOOK"></autom-icon>
+                  <span>Sve porudžbenice</span>
+                </div>
+              </button>
+
               <button mat-menu-item routerLink="/blog/admin">
                 <div class="menu-item-align">
                   <autom-icon [source]="iconEnum.FILE_TEXT"></autom-icon>
@@ -461,6 +468,16 @@
   <!-- Admin sekcija -->
   <div *ngIf="loggedIn && isAdmin" class="menu-section flex--1">
     <span class="menu-section-label">Admin</span>
+    <a
+      routerLink="/admin/invoices"
+      href="/admin/invoices"
+      [ngClass]="currentUrl.includes('/admin/invoices') ? 'nav-active' : null"
+      class="menu-title autom-padding--vertical__xxs"
+      (click)="closeMobileSidebar()"
+    >
+      <autom-icon [source]="iconEnum.BOOK"></autom-icon>
+      Sve porudžbenice
+    </a>
     <a
       routerLink="/sales-reports"
       href="/sales-reports"

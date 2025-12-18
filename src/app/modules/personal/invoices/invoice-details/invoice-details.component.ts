@@ -13,6 +13,7 @@ import { TableFlatComponent } from '../../../../shared/components/table-flat/tab
 
 // Data models
 import { Invoice, InvoiceItem } from '../../../../shared/data-models/model';
+import { StringUtils } from '../../../../shared/utils/string-utils';
 
 // Enums
 import {
@@ -41,6 +42,7 @@ import { PictureService } from '../../../../shared/service/utils/picture.service
 })
 export class InvoiceDetailsComponent implements OnInit {
   id: number | null = null;
+  ppid: number | null = null;
 
   // Table config
   columns: AutomTableColumn[] = [
@@ -52,6 +54,7 @@ export class InvoiceDetailsComponent implements OnInit {
       callback: (row) => this.onItemClicked(row),
     },
     { key: 'naziv', header: 'Naziv', type: CellType.TEXT },
+    { key: 'izvorLabel', header: 'Izvor', type: CellType.TEXT },
     { key: 'proizvodjac.naziv', header: 'Proizvodjac', type: CellType.TEXT },
     { key: 'kolicina', header: 'Kolicina', type: CellType.TEXT },
     { key: 'rabat', header: 'Rabat', type: CellType.PERCENTAGE },
@@ -59,7 +62,7 @@ export class InvoiceDetailsComponent implements OnInit {
   ];
 
   displayedColumns: string[] = this.columns.map((col) => col.key);
-  dataSource = new MatTableDataSource<Invoice>();
+  dataSource = new MatTableDataSource<InvoiceItem>();
 
   // Paging and Sorting elements
   pageIndex = 0;
@@ -91,8 +94,19 @@ export class InvoiceDetailsComponent implements OnInit {
 
   /** Start of: Angular lifecycle hooks */
   ngOnInit(): void {
-    this.id = +this.route.snapshot.paramMap.get('id')!;
-    this.fetchData(this.id);
+    const rawPpid = this.route.snapshot.paramMap.get('ppid');
+    const parsedPpid = rawPpid ? Number(rawPpid) : NaN;
+    this.ppid = Number.isFinite(parsedPpid)
+      ? parsedPpid
+      : this.accountStateService.get().ppid ?? null;
+
+    const rawId = this.route.snapshot.paramMap.get('id');
+    const parsed = rawId ? Number(rawId) : NaN;
+    this.id = Number.isFinite(parsed) ? parsed : null;
+
+    if (this.id != null && this.ppid != null) {
+      this.fetchData(this.id);
+    }
   }
 
   ngOnDestroy(): void {
@@ -107,7 +121,7 @@ export class InvoiceDetailsComponent implements OnInit {
   fetchData(id: number): void {
     this.loading = true;
     this.invoiceService
-      .fetchDetails(this.accountStateService.get().ppid!, id)
+      .fetchDetails(this.ppid!, id)
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => (this.loading = false))
@@ -119,6 +133,23 @@ export class InvoiceDetailsComponent implements OnInit {
           items.forEach((invoiceArticle: InvoiceItem) =>
             this.pictureService.convertByteToImageInvoice(invoiceArticle)
           );
+          items.forEach((invoiceArticle: InvoiceItem) => {
+            const izvor = invoiceArticle.izvor;
+            const isProvider =
+              izvor === 'PROVIDER' ||
+              invoiceArticle?.availabilityStatus === 'AVAILABLE' ||
+              !!invoiceArticle?.providerAvailability?.available;
+
+            if (izvor === 'STOCK') {
+              invoiceArticle.izvorLabel = 'Sa stanja';
+            } else if (isProvider) {
+              invoiceArticle.izvorLabel = 'Eksterni magacin';
+            } else if (invoiceArticle?.availabilityStatus === 'IN_STOCK') {
+              invoiceArticle.izvorLabel = 'Sa stanja';
+            } else {
+              invoiceArticle.izvorLabel = '—';
+            }
+          });
 
           this.dataSource.data = items;
           this.totalItems = items.length;
@@ -132,7 +163,25 @@ export class InvoiceDetailsComponent implements OnInit {
   }
 
   onItemClicked(item: InvoiceItem): void {
-    this.router.navigateByUrl('/webshop/' + item.robaId);
+    if (item.robaId != null) {
+      const slug = StringUtils.productSlug(
+        item?.proizvodjac?.naziv,
+        item?.naziv,
+        item?.kataloskiBroj
+      );
+      const idParam = slug ? `${item.robaId}-${slug}` : String(item.robaId);
+      this.router.navigateByUrl('/webshop/' + idParam);
+      return;
+    }
+
+    const searchTerm = (item.kataloskiBroj || item.naziv || '').trim();
+    if (!searchTerm) {
+      return;
+    }
+
+    this.router.navigate(['/webshop'], {
+      queryParams: { searchTerm, filterBy: 'searchTerm' },
+    });
   }
 
   // End of: Events

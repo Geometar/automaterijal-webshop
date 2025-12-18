@@ -104,6 +104,29 @@
           {{ data!.podGrupaNaziv || data!.grupaNaziv }}
         </autom-meta-pill>
       </ng-template>
+
+      <autom-meta-pill
+        *ngIf="showPriceOnly && availabilityVm.showProviderBox"
+        variant="accent"
+        size="md"
+        [value]="'Eksterni magacin'"
+        [attr.title]="'Artikal stiže iz eksternog magacina.'"
+        [ariaLabel]="'Eksterni magacin'"
+      ></autom-meta-pill>
+
+      <autom-meta-pill
+        *ngIf="
+          showPriceOnly &&
+          availabilityVm.showProviderBox &&
+          availabilityVm.provider.deliveryLabel
+        "
+        variant="soft"
+        size="md"
+        [label]="'Isporuka'"
+        [value]="availabilityVm.provider.deliveryLabel"
+        [attr.title]="'Procena isporuke za ovaj artikal.'"
+        [ariaLabel]="'Isporuka ' + availabilityVm.provider.deliveryLabel"
+      ></autom-meta-pill>
     </div>
 
     <p *ngIf="isEmployee">
@@ -215,7 +238,7 @@
     </div>
     <!-- Stara cena -->
     <p *ngIf="availabilityVm.showDiscount" class="sub-price old-price">
-      {{ data.cena! / (1 - data.rabat / 100) | rsdCurrency }}
+      {{ availabilityVm.displayPrice / (1 - data.rabat / 100) | rsdCurrency }}
     </p>
 
     <!-- Finalna cena -->
@@ -234,7 +257,10 @@
     <!-- Ušteda -->
     <p *ngIf="availabilityVm.showDiscount" class="saving">
       Ušteda
-      {{ data.cena! / (1 - data.rabat / 100) - data.cena! | rsdCurrency }}
+      {{
+        availabilityVm.displayPrice / (1 - data.rabat / 100) -
+          availabilityVm.displayPrice | rsdCurrency
+      }}
     </p>
 
     <div
@@ -312,7 +338,7 @@
   <!-- Pricing-only Section -->
   <div class="pricing-container" *ngIf="showPriceOnly">
     <p *ngIf="availabilityVm.showDiscount" class="sub-price old-price">
-      {{ data.cena! / (1 - data.rabat / 100) | rsdCurrency }}
+      {{ availabilityVm.displayPrice / (1 - data.rabat / 100) | rsdCurrency }}
     </p>
 
     <p class="sub-price final-price">
@@ -325,7 +351,10 @@
 
     <p *ngIf="availabilityVm.showDiscount" class="small-explanation saving">
       Ušteda
-      {{ data.cena! / (1 - data.rabat / 100) - data.cena! | rsdCurrency }}
+      {{
+        availabilityVm.displayPrice / (1 - data.rabat / 100) -
+          availabilityVm.displayPrice | rsdCurrency
+      }}
     </p>
 
     <p class="autom-align__right small-explanation">Cena po komadu</p>

@@ -264,7 +264,7 @@ export class CartStateService {
 
     return {
       key: key ?? undefined,
-      discount: isProvider ? 0 : (roba.rabat || 0),
+      discount: Number(roba?.rabat) || 0,
       image: roba.slika,
       manufacturer: roba.proizvodjac?.naziv || '',
       manufacturerProid: roba?.proizvodjac?.proid,
@@ -283,6 +283,10 @@ export class CartStateService {
       providerCurrency: isProvider ? provider?.currency : undefined,
       providerCustomerPrice: isProvider ? provider?.price : undefined,
       providerPurchasePrice: isProvider && isAdmin ? provider?.purchasePrice : undefined,
+      providerLeadTimeBusinessDays: isProvider ? provider?.leadTimeBusinessDays : undefined,
+      providerDeliveryToCustomerBusinessDaysMin: isProvider ? provider?.deliveryToCustomerBusinessDaysMin : undefined,
+      providerDeliveryToCustomerBusinessDaysMax: isProvider ? provider?.deliveryToCustomerBusinessDaysMax : undefined,
+      providerNextDispatchCutoff: isProvider ? provider?.nextDispatchCutoff : undefined,
       technicalDescription: roba.technicalDescription
     };
   }
@@ -319,6 +323,10 @@ export class CartStateService {
         price: cartItem.providerCustomerPrice ?? cartItem.unitPrice,
         purchasePrice: cartItem.providerPurchasePrice,
         currency: cartItem.providerCurrency ?? 'RSD',
+        leadTimeBusinessDays: cartItem.providerLeadTimeBusinessDays,
+        deliveryToCustomerBusinessDaysMin: cartItem.providerDeliveryToCustomerBusinessDaysMin,
+        deliveryToCustomerBusinessDaysMax: cartItem.providerDeliveryToCustomerBusinessDaysMax,
+        nextDispatchCutoff: cartItem.providerNextDispatchCutoff,
       };
     } else {
       retVal.stanje = cartItem.stock!;

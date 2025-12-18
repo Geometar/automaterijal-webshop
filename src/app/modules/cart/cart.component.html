@@ -193,20 +193,38 @@
           <td class="price">{{ total | rsdCurrency }}</td>
         </tr>
       </table>
+
+      <div *ngIf="shouldShowMixedDeliveryInfo" class="checkout-info">
+        <p class="checkout-info__title">Isporuka</p>
+        <ul class="checkout-info__list">
+          <li>Podrazumevano šaljemo kada sve stavke stignu.</li>
+          <li *ngIf="deliveryEstimateLabel; else unknownDelivery">
+            Procena isporuke: {{ deliveryEstimateLabel }}.
+          </li>
+          <ng-template #unknownDelivery>
+            <li>Procena isporuke se potvrđuje nakon obrade porudžbine.</li>
+          </ng-template>
+          <li>
+            Ako želite delimičnu isporuku (više paketa), napišite u napomeni.
+          </li>
+          <li>Dodatna poštarina može važiti za više paketa.</li>
+        </ul>
+      </div>
+
       <autom-button
         class="autom-align__right order-btn"
         [type]="buttonTypes.PRIMARY"
         [theme]="buttonThemes.LIGHT_ORANGE"
         [label]="'Potvrdi porudzbinu'"
         [disabled]="
-          hasProviderOnlyItems || invoiceSubmitted || (loggedIn ? !cartForm.valid : !userForm.valid)
+          invoiceSubmitted || (loggedIn ? !cartForm.valid : !userForm.valid)
         "
         (clickEvent)="submitInvoice()"
       ></autom-button>
       <div *ngIf="hasProviderOnlyItems" class="free-shipping-info warning">
         <autom-icon [source]="iconsEnum.INFO" class="info-icon"></autom-icon>
-        Korpa sadrži ponude dobavljača (artikli bez internog ID-ja). Poručivanje
-        tih stavki još nije podržano.
+        Korpa sadrži stavke iz eksternog magacina. Te stavke mogu imati duži rok
+        isporuke.
       </div>
       <div *ngIf="!loggedIn && total < 3000" class="free-shipping-info warning">
         <autom-icon [source]="iconsEnum.INFO" class="info-icon"></autom-icon>
@@ -218,8 +236,12 @@
         <p class="checkout-info__title">Dostava i plaćanje</p>
         <ul class="checkout-info__list">
           <li>
-            Sve što je u korpi je na stanju → predajemo kuriru u roku 24h
-            (Aks/Bex dostava 1–2 radna dana).
+            Artikle sa stanja predajemo kuriru u roku od 24h (Aks/Bex dostava
+            1–2 radna dana).
+          </li>
+          <li>
+            Ako neki artikal nije na stanju, obezbeđujemo ga iz eksternog
+            magacina (rok isporuke može biti duži).
           </li>
           <li>
             Plaćanje pouzećem (gotovina ili kartica kod kurira gde je

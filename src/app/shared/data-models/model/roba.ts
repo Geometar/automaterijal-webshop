@@ -155,5 +155,9 @@ export class CartItem {
   providerCurrency?: string;
   providerCustomerPrice?: number;
   providerPurchasePrice?: number;
+  providerLeadTimeBusinessDays?: number;
+  providerDeliveryToCustomerBusinessDaysMin?: number;
+  providerDeliveryToCustomerBusinessDaysMax?: number;
+  providerNextDispatchCutoff?: string;
   technicalDescription?: RobaTehnickiOpis[];
 }

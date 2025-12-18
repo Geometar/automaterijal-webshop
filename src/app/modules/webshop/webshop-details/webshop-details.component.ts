@@ -176,9 +176,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   }
 
   get hasDiscount(): boolean {
-    if (this.availabilityVm.status !== 'IN_STOCK') return false;
-    const rabat = this.getDiscountValue();
-    return rabat > 0 && rabat < 100;
+    return this.availabilityVm.showDiscount;
   }
 
   get discountValue(): number {

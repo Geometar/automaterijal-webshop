@@ -1,0 +1,40 @@
+<section class="header-margin--top invoices">
+  <autom-header
+    [headerData]="headerData"
+    [headingLevel]="headingLevelEnum.H2"
+  ></autom-header>
+
+  <div class="invoices__filter">
+    <autom-input-fields
+      [label]="'Datum od'"
+      [maxDate]="dateTo"
+      [type]="inputTypeEnum.DATE"
+      [value]="dateFrom"
+      (emitSelected)="onFilterDateFrom($event)"
+    >
+    </autom-input-fields>
+    <autom-input-fields
+      [label]="'Datum do'"
+      [minDate]="dateFrom"
+      [type]="inputTypeEnum.DATE"
+      [value]="dateTo"
+      (emitSelected)="onFilterDateTo($event)"
+    >
+    </autom-input-fields>
+  </div>
+
+  <autom-table-flat
+    [columns]="columns"
+    [displayedColumns]="displayedColumns"
+    [dataSource]="dataSource"
+    [loading]="loading"
+    [pagination]="{
+      length: totalItems,
+      pageIndex: pageIndex,
+      pageSize: rowsPerPage,
+      pageSizeOptions: [5, 10, 25, 50]
+    }"
+    (pageChange)="onPageChange($event)"
+  ></autom-table-flat>
+</section>
+

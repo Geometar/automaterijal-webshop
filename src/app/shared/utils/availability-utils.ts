@@ -202,8 +202,7 @@ export function buildAvailabilityVm(
     : null;
 
   const rabat = Number((roba as any)?.rabat) || 0;
-  const cena = Number((roba as any)?.cena) || 0;
-  const showDiscount = !isTecDocOnly && status === 'IN_STOCK' && rabat > 0 && rabat < 100 && cena > 0;
+  const showDiscount = !isTecDocOnly && rabat > 0 && rabat < 100 && displayPrice > 0;
 
   return {
     status,
