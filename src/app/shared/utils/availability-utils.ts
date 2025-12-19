@@ -191,14 +191,7 @@ export function buildAvailabilityVm(
     Number(roba?.providerAvailability?.totalQuantity) ||
     0;
   const sourceLabel = isAdmin
-    ? [
-        roba?.providerAvailability?.warehouseName,
-        roba?.providerAvailability?.warehouse,
-        roba?.providerAvailability?.provider,
-      ]
-        .map((x) => (typeof x === 'string' ? x.trim() : ''))
-        .filter(Boolean)
-        .join(' · ') || null
+    ? roba?.providerAvailability?.warehouseName ?? 'Eksterni magacin'
     : null;
 
   const rabat = Number((roba as any)?.rabat) || 0;

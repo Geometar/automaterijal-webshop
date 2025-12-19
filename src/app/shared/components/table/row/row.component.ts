@@ -258,6 +258,12 @@ export class RowComponent implements OnInit, OnChanges {
     return this.productImageMeta.title;
   }
 
+  get categoryLabel(): string | null {
+    const groupName = this.data?.grupaNaziv?.trim();
+    const subName = this.data?.podGrupaNaziv?.trim();
+    return subName || groupName || null;
+  }
+
   get categoryAriaLabel(): string | null {
     const groupName = this.data?.grupaNaziv?.trim();
     const subName = this.data?.podGrupaNaziv?.trim();

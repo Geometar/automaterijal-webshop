@@ -60,50 +60,51 @@
         [ariaLabel]="'Kataloški broj ' + data.katbr"
       ></autom-meta-pill>
 
-      <ng-container
-        *ngIf="categoryHref && !disableCategoryNavigation; else plainCategory"
-      >
-        <autom-meta-pill
-          class="product-meta__category category-pill"
-          variant="primary"
-          size="md"
-          [routerLink]="categoryLinkSegments"
-          [suffix]="categorySuffix"
-          [ariaLabel]="categoryAriaLabel"
+      <ng-container *ngIf="categoryLabel as label">
+        <ng-container
+          *ngIf="categoryHref && !disableCategoryNavigation; else plainCategory"
         >
-          <span class="category-pill__group" *ngIf="data?.grupaNaziv">{{
-            data.grupaNaziv
-          }}</span>
-          <span
-            class="category-pill__separator"
-            *ngIf="data?.grupaNaziv && data?.podGrupaNaziv"
-            aria-hidden="true"
+          <autom-meta-pill
+            class="product-meta__category category-pill"
+            variant="primary"
+            size="md"
+            [routerLink]="categoryLinkSegments"
+            [suffix]="categorySuffix"
+            [ariaLabel]="categoryAriaLabel"
           >
-            /
-          </span>
-          <span class="category-pill__sub" *ngIf="data?.podGrupaNaziv">{{
-            data.podGrupaNaziv
-          }}</span>
-        </autom-meta-pill>
+            <span class="category-pill__group" *ngIf="data?.grupaNaziv">{{
+              data.grupaNaziv
+            }}</span>
+            <span
+              class="category-pill__separator"
+              *ngIf="data?.grupaNaziv && data?.podGrupaNaziv"
+              aria-hidden="true"
+            >
+              /
+            </span>
+            <span class="category-pill__sub" *ngIf="data?.podGrupaNaziv">{{
+              data.podGrupaNaziv
+            }}</span>
+          </autom-meta-pill>
+        </ng-container>
+        <ng-template #plainCategory>
+          <autom-meta-pill
+            class="product-meta__category category-pill"
+            variant="primary"
+            size="md"
+            [style.cursor]="disableCategoryNavigation ? 'pointer' : null"
+            [attr.aria-label]="
+              disableCategoryNavigation
+                ? 'Filtriraj po podgrupi ' + label
+                : null
+            "
+            [ngClass]="{ 'clickable-placeholder': disableCategoryNavigation }"
+            (click)="onCategoryClick($event)"
+          >
+            {{ label }}
+          </autom-meta-pill>
+        </ng-template>
       </ng-container>
-      <ng-template #plainCategory>
-        <autom-meta-pill
-          class="product-meta__category category-pill"
-          variant="primary"
-          size="md"
-          [style.cursor]="disableCategoryNavigation ? 'pointer' : null"
-          [attr.aria-label]="
-            disableCategoryNavigation
-              ? 'Filtriraj po podgrupi ' +
-                (data!.podGrupaNaziv || data!.grupaNaziv)
-              : null
-          "
-          [ngClass]="{ 'clickable-placeholder': disableCategoryNavigation }"
-          (click)="onCategoryClick($event)"
-        >
-          {{ data!.podGrupaNaziv || data!.grupaNaziv }}
-        </autom-meta-pill>
-      </ng-template>
 
       <autom-meta-pill
         *ngIf="showPriceOnly && availabilityVm.showProviderBox"
@@ -132,7 +133,7 @@
     <p *ngIf="isEmployee">
       Stanje:
       <span class="color--figma-primary-800 display--inline font-medium">
-        {{ data!.stanje }}
+        {{ effectiveStock }}
       </span>
     </p>
 
@@ -194,6 +195,21 @@
       <span class="item-status__dot" aria-hidden="true"></span>
     </div>
 
+    <div
+      *ngIf="isInCartItem"
+      class="autom-flexbox autom-justify-content--flex-end"
+      role="status"
+      aria-live="polite"
+      style="margin-top: 6px"
+    >
+      <autom-icon
+        aria-label="Artikal je već dodat u korpu"
+        [color]="colorEnum.GREEN_700"
+        [source]="iconEnum.SHOPPING_BAG"
+        [tooltip]="{ tooltipText: 'Artikal je u korpi' }"
+      ></autom-icon>
+    </div>
+
     <!-- Eksterna dostupnost (dobavljač) -->
     <div class="provider-availability" *ngIf="availabilityVm.showProviderBox">
       <div
@@ -201,15 +217,6 @@
         *ngIf="availabilityVm.provider.deliveryLabel"
       >
         Isporuka: {{ availabilityVm.provider.deliveryLabel }}
-      </div>
-      <div
-        class="provider-availability__row"
-        *ngIf="
-          availabilityVm.provider.admin.isAdmin &&
-          availabilityVm.provider.quantity
-        "
-      >
-        Dostupno: {{ availabilityVm.provider.quantity }} kom
       </div>
       <div
         class="provider-availability__row"
@@ -317,21 +324,6 @@
             : "Nema na stanju — pošaljite upit."
         }}
       </span>
-    </div>
-
-    <div
-      *ngIf="isInCartItem"
-      class="util__flex--center"
-      role="status"
-      aria-live="polite"
-    >
-      <autom-icon
-        aria-label="Artikal je već dodat u korpu"
-        class="in-cart"
-        [color]="colorEnum.GREEN_700"
-        [source]="iconEnum.SHOPPING_BAG"
-        [tooltip]="{ tooltipText: 'Artikal je u korpi' }"
-      ></autom-icon>
     </div>
   </div>
 
