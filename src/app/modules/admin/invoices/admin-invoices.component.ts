@@ -49,7 +49,7 @@ export class AdminInvoicesComponent implements OnInit, OnDestroy {
       header: 'ID porudžbenice',
       type: CellType.LINK,
       callback: (row) => this.onInvoiceClick(row),
-      disableLink: (row) => row?.ppid == null || row?.id == null,
+      disableLink: (row) => row?.id == null,
     },
     { key: 'ppid', header: 'PPID', type: CellType.NUMBER },
     { key: 'partner', header: 'Partner', type: CellType.TEXT },
@@ -172,11 +172,16 @@ export class AdminInvoicesComponent implements OnInit, OnDestroy {
   }
 
   onInvoiceClick(row: Invoice): void {
-    if (row?.ppid == null || row?.id == null) {
+    if (row?.id == null) {
       return;
     }
 
-    this.router.navigateByUrl(`/admin/invoices/${row.ppid}/${row.id}`);
+    if (row?.ppid != null) {
+      this.router.navigateByUrl(`/admin/invoices/${row.ppid}/${row.id}`);
+      return;
+    }
+
+    this.router.navigateByUrl(`/admin/invoices/${row.id}`);
   }
 
   private applyClientPaging(): void {
@@ -185,4 +190,3 @@ export class AdminInvoicesComponent implements OnInit, OnDestroy {
     this.dataSource.data = (this.allInvoices ?? []).slice(start, end);
   }
 }
-

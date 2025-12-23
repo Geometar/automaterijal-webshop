@@ -10,9 +10,11 @@ import { MatTableDataSource } from '@angular/material/table';
 import { AutomIconComponent } from '../../../../shared/components/autom-icon/autom-icon.component';
 import { SpinnerComponent } from '../../../../shared/components/spinner/spinner.component';
 import { TableFlatComponent } from '../../../../shared/components/table-flat/table-flat.component';
+import { RsdCurrencyPipe } from '../../../../shared/pipe/rsd-currency.pipe';
 
 // Data models
 import { Invoice, InvoiceItem } from '../../../../shared/data-models/model';
+import { AvailabilityStatus, ProviderAvailabilityDto } from '../../../../shared/data-models/model/availability';
 import { StringUtils } from '../../../../shared/utils/string-utils';
 
 // Enums
@@ -33,6 +35,7 @@ import { PictureService } from '../../../../shared/service/utils/picture.service
   imports: [
     AutomIconComponent,
     CommonModule,
+    RsdCurrencyPipe,
     SpinnerComponent,
     TableFlatComponent,
   ],
@@ -61,6 +64,14 @@ export class InvoiceDetailsComponent implements OnInit {
     { key: 'cena', header: 'Cena', type: CellType.CURRENCY },
   ];
 
+  adminColumns: AutomTableColumn[] = [
+    { key: 'potvrdjenaKolicina', header: 'Potvrdjena', type: CellType.TEXT },
+    { key: 'status.naziv', header: 'Status stavke', type: CellType.TEXT },
+    { key: 'availabilityLabel', header: 'Dostupnost', type: CellType.TEXT },
+    { key: 'providerInfo', header: 'Provider info', type: CellType.TEXT },
+    { key: 'providerResponse', header: 'Odgovor providera', type: CellType.TEXT },
+  ];
+
   displayedColumns: string[] = this.columns.map((col) => col.key);
   dataSource = new MatTableDataSource<InvoiceItem>();
 
@@ -76,6 +87,7 @@ export class InvoiceDetailsComponent implements OnInit {
   // Enums
   colorEnum = ColorEnum;
   iconEnum = IconsEnum;
+  isAdmin = false;
 
   // Misc loading
   loading = false;
@@ -94,17 +106,30 @@ export class InvoiceDetailsComponent implements OnInit {
 
   /** Start of: Angular lifecycle hooks */
   ngOnInit(): void {
+    this.isAdmin = this.accountStateService.isAdmin();
+    if (this.isAdmin) {
+      this.columns = [...this.columns, ...this.adminColumns];
+      this.displayedColumns = this.columns.map((col) => col.key);
+    }
+
+    const hasPpidParam = this.route.snapshot.paramMap.has('ppid');
     const rawPpid = this.route.snapshot.paramMap.get('ppid');
     const parsedPpid = rawPpid ? Number(rawPpid) : NaN;
-    this.ppid = Number.isFinite(parsedPpid)
-      ? parsedPpid
-      : this.accountStateService.get().ppid ?? null;
+    if (Number.isFinite(parsedPpid)) {
+      this.ppid = parsedPpid;
+    } else if (this.isAdmin && !hasPpidParam) {
+      this.ppid = null;
+    } else {
+      this.ppid = this.accountStateService.get().ppid ?? null;
+    }
 
     const rawId = this.route.snapshot.paramMap.get('id');
     const parsed = rawId ? Number(rawId) : NaN;
     this.id = Number.isFinite(parsed) ? parsed : null;
 
-    if (this.id != null && this.ppid != null) {
+    if (this.id != null && this.isAdmin && !hasPpidParam) {
+      this.fetchAdminData(this.id);
+    } else if (this.id != null && this.ppid != null) {
       this.fetchData(this.id);
     }
   }
@@ -149,6 +174,68 @@ export class InvoiceDetailsComponent implements OnInit {
             } else {
               invoiceArticle.izvorLabel = '—';
             }
+
+            invoiceArticle.availabilityLabel = this.buildAvailabilityLabel(
+              invoiceArticle.availabilityStatus,
+              invoiceArticle.izvor,
+              invoiceArticle.providerAvailability
+            );
+            invoiceArticle.providerInfo = this.buildProviderInfo(invoiceArticle);
+            invoiceArticle.providerResponse =
+              this.buildProviderResponse(invoiceArticle);
+          });
+
+          this.dataSource.data = items;
+          this.totalItems = items.length;
+          this.pageIndex = 0;
+          this.rowsPerPage = items.length;
+        },
+        error: (err: HttpErrorResponse) => {
+          const error = err.error.details || err.error;
+        },
+      });
+  }
+
+  fetchAdminData(id: number): void {
+    this.loading = true;
+    this.invoiceService
+      .fetchAdminDetails(id)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => (this.loading = false))
+      )
+      .subscribe({
+        next: (invoice: Invoice) => {
+          this.data = invoice;
+          const items: InvoiceItem[] = invoice.detalji!;
+          items.forEach((invoiceArticle: InvoiceItem) =>
+            this.pictureService.convertByteToImageInvoice(invoiceArticle)
+          );
+          items.forEach((invoiceArticle: InvoiceItem) => {
+            const izvor = invoiceArticle.izvor;
+            const isProvider =
+              izvor === 'PROVIDER' ||
+              invoiceArticle?.availabilityStatus === 'AVAILABLE' ||
+              !!invoiceArticle?.providerAvailability?.available;
+
+            if (izvor === 'STOCK') {
+              invoiceArticle.izvorLabel = 'Sa stanja';
+            } else if (isProvider) {
+              invoiceArticle.izvorLabel = 'Eksterni magacin';
+            } else if (invoiceArticle?.availabilityStatus === 'IN_STOCK') {
+              invoiceArticle.izvorLabel = 'Sa stanja';
+            } else {
+              invoiceArticle.izvorLabel = '—';
+            }
+
+            invoiceArticle.availabilityLabel = this.buildAvailabilityLabel(
+              invoiceArticle.availabilityStatus,
+              invoiceArticle.izvor,
+              invoiceArticle.providerAvailability
+            );
+            invoiceArticle.providerInfo = this.buildProviderInfo(invoiceArticle);
+            invoiceArticle.providerResponse =
+              this.buildProviderResponse(invoiceArticle);
           });
 
           this.dataSource.data = items;
@@ -174,6 +261,18 @@ export class InvoiceDetailsComponent implements OnInit {
       return;
     }
 
+    if (item.tecDocArticleId != null) {
+      const slug = StringUtils.productSlug(
+        item?.proizvodjac?.naziv,
+        item?.naziv,
+        item?.kataloskiBroj
+      );
+      const token = `td${item.tecDocArticleId}`;
+      const idParam = slug ? `${token}-${slug}` : token;
+      this.router.navigateByUrl('/webshop/' + idParam);
+      return;
+    }
+
     const searchTerm = (item.kataloskiBroj || item.naziv || '').trim();
     if (!searchTerm) {
       return;
@@ -185,4 +284,98 @@ export class InvoiceDetailsComponent implements OnInit {
   }
 
   // End of: Events
+
+  private buildProviderInfo(item: InvoiceItem): string {
+    const pa = item?.providerAvailability;
+    const isProvider = item?.izvor === 'PROVIDER' || !!pa?.available;
+    if (!isProvider || !pa) {
+      return '—';
+    }
+
+    const parts: string[] = [];
+
+    const warehouse = (pa.warehouseName || pa.warehouse || '').trim();
+    if (warehouse) {
+      parts.push(`Mag: ${warehouse}`);
+    }
+
+    const qty =
+      pa.totalQuantity != null
+        ? pa.totalQuantity
+        : pa.warehouseQuantity != null
+          ? pa.warehouseQuantity
+          : null;
+    if (qty != null) {
+      parts.push(`Kol: ${qty}`);
+    }
+
+    const eta = this.buildProviderEta(pa);
+    if (eta) {
+      parts.push(`ETA: ${eta}`);
+    }
+
+    return parts.length ? parts.join('\n') : '—';
+  }
+
+  private buildProviderResponse(item: InvoiceItem): string {
+    const parts: string[] = [];
+    if (typeof item?.providerBackorder === 'boolean') {
+      parts.push(`Backorder: ${item.providerBackorder ? 'da' : 'ne'}`);
+    }
+
+    const message = (item?.providerMessage || '').trim();
+    if (message) {
+      parts.push(`Poruka: ${message}`);
+    }
+
+    return parts.length ? parts.join('\n') : '—';
+  }
+
+  private buildProviderEta(pa: ProviderAvailabilityDto): string | null {
+    const min = Number(pa?.deliveryToCustomerBusinessDaysMin);
+    const max = Number(pa?.deliveryToCustomerBusinessDaysMax);
+    const lead = Number(pa?.leadTimeBusinessDays);
+
+    if (Number.isFinite(min) && Number.isFinite(max) && min > 0 && max > 0) {
+      return this.formatBusinessDayRange(min, max);
+    }
+
+    if (Number.isFinite(lead) && lead > 0) {
+      return `${lead} ${this.pluralizeBusinessDays(lead)}`;
+    }
+
+    return null;
+  }
+
+  private formatBusinessDayRange(min: number, max: number): string {
+    if (min === max) {
+      return `${min} ${this.pluralizeBusinessDays(min)}`;
+    }
+    return `${min}-${max} ${this.pluralizeBusinessDays(max)}`;
+  }
+
+  private pluralizeBusinessDays(n: number): string {
+    const abs = Math.abs(n);
+    if (abs === 1) return 'radni dan';
+    if (
+      abs % 10 >= 2 &&
+      abs % 10 <= 4 &&
+      (abs % 100 < 10 || abs % 100 >= 20)
+    )
+      return 'radna dana';
+    return 'radnih dana';
+  }
+
+  private buildAvailabilityLabel(
+    status?: AvailabilityStatus,
+    source?: 'STOCK' | 'PROVIDER',
+    provider?: ProviderAvailabilityDto
+  ): string {
+    if (status === 'IN_STOCK') return 'Na stanju';
+    if (status === 'AVAILABLE') return 'Dostupno';
+    if (status === 'OUT_OF_STOCK') return 'Nema na stanju';
+    if (source === 'STOCK') return 'Na stanju';
+    if (source === 'PROVIDER' || provider?.available) return 'Dostupno';
+    return '—';
+  }
 }

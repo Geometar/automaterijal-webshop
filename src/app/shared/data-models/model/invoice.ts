@@ -33,6 +33,7 @@ export class Invoice {
  */
 export class InvoiceItem {
   availabilityStatus?: AvailabilityStatus;
+  availabilityLabel?: string;
   cena?: number;
   /**
    * Item source in fulfillment flow.
@@ -43,13 +44,19 @@ export class InvoiceItem {
   /** Convenience label for UI rendering. */
   izvorLabel?: string;
   kataloskiBroj?: string;
+  kataloskiBrojProizvodjaca?: string;
   kolicina?: number;
   naziv?: string;
   potvrdjenaKolicina?: number;
   proizvodjac?: Manufacture;
+  providerBackorder?: boolean;
   providerAvailability?: ProviderAvailabilityDto;
+  providerMessage?: string;
+  providerInfo?: string;
+  providerResponse?: string;
   rabat?: number;
   robaId?: number;
+  tecDocArticleId?: number;
   slika?: Slika;
   status?: ValueHelp;
   vremePorucivanja?: string;

@@ -174,7 +174,7 @@
                   <span>Kartica dokumenata</span>
                 </div>
               </button>
-              <button mat-menu-item routerLink="/invoices">
+              <button *ngIf="!isAdmin" mat-menu-item routerLink="/invoices">
                 <div class="menu-item-align">
                   <autom-icon [source]="iconEnum.BOOK"></autom-icon>
                   <span>Web Porudzbenice</span>
@@ -304,21 +304,6 @@
     ></autom-icon>
     <span class="action-label">Dokumenta</span>
   </a>
-  <a
-    *ngIf="loggedIn && isAdmin"
-    class="action-btn"
-    routerLink="/invoices"
-    href="/invoices"
-    aria-label="Web Porudžbenice"
-    [attr.aria-current]="currentUrl.includes('/invoices') ? 'page' : null"
-  >
-    <autom-icon
-      [ngClass]="currentUrl.includes('/invoices') ? 'icon-active' : null"
-      [color]="colorEnum.RICH_BLACK"
-      [source]="iconEnum.BOOK"
-    ></autom-icon>
-    <span class="action-label">Web Porudžbenice</span>
-  </a>
 
   <a
     *ngIf="!loggedIn"
@@ -441,7 +426,7 @@
         Kartica dokumenata
       </a>
     </li>
-    <li class="menu-category" *ngIf="loggedIn">
+    <li class="menu-category" *ngIf="loggedIn && !isAdmin">
       <a
         routerLink="/invoices"
         href="/invoices"

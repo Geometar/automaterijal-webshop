@@ -179,6 +179,12 @@ export const routes: Routes = [
     canActivate: [adminGuard]
   },
   {
+    path: 'admin/invoices/:id',
+    loadComponent: () =>
+      import('./modules/personal/invoices/invoice-details/invoice-details.component').then((m) => m.InvoiceDetailsComponent),
+    canActivate: [adminGuard]
+  },
+  {
     path: 'admin/invoices/:ppid/:id',
     loadComponent: () =>
       import('./modules/personal/invoices/invoice-details/invoice-details.component').then((m) => m.InvoiceDetailsComponent),

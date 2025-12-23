@@ -47,6 +47,16 @@ export class InvoiceService {
       );
   }
 
+  public fetchAdminDetails(invoiceId: number): Observable<Invoice> {
+    const fullUrl = DOMAIN_URL + INVOICE_URL + '/admin/' + invoiceId;
+
+    return this.http
+      .get<Invoice>(fullUrl)
+      .pipe(
+        catchError((error: any) => throwError(error))
+      );
+  }
+
   public submit(invoice: Invoice): Observable<Roba[]> {
     const fullUrl = DOMAIN_URL + INVOICE_URL;
     return this.http

@@ -1,69 +1,161 @@
 .invoice-details {
-  text-align: center;
-  padding: 20px;
+  padding: 24px;
+  text-align: left;
 
-  h2 {
-    margin-top: 35px !important;
+  .invoice-details__header {
+    max-width: 1200px;
+    margin: 0 auto 12px;
+
+    h2 {
+      margin: 20px 0 0;
+      font-size: 22px;
+      color: var(--figma-grey-900);
+    }
   }
 
-  .border-info {
-    border-right: 1px solid var(--figma-grey-100);
+  .invoice-admin-bar {
+    max-width: 1200px;
+    margin: 0 auto 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1px solid var(--figma-grey-100);
+    border-radius: 12px;
+    background: var(--figma-accent-green-25);
+  }
+
+  .admin-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .label {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--figma-grey-600);
+    }
+
+    .value {
+      font-weight: 600;
+      color: var(--figma-grey-900);
+    }
   }
 
   .invoice-info {
-    display: flex;
-    align-items: stretch; // 👈 Sve kolone iste visine
-    justify-content: center;
-    margin: 0 auto;
-    max-width: 1000px;
-    padding: 20px 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    max-width: 1200px;
+    margin: 0 auto 24px;
   }
 
-  .info-item {
+  .info-card {
     display: flex;
     flex-direction: column;
-    justify-content: flex-start; // 👈 Poravnaj sadržaj na vrh
-    align-items: center;
-    flex: 1;
-    padding: 20px;
-    height: auto;
+    gap: 8px;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid var(--figma-grey-100);
+    background: var(--figma-base-white);
 
     autom-icon {
-      margin-bottom: 12px; // 👈 razmak ispod ikone
-    }
-
-    a:hover {
-      color: var(--figma-primary-800);
-    }
-
-    p {
-      margin: 0;
+      margin-bottom: 4px;
     }
   }
 
   .invoice-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 15px;
+    font-size: 14px;
     color: var(--figma-grey-900);
 
     td {
-      padding: 6px 10px !important;
+      padding: 4px 0 !important;
       vertical-align: top;
     }
 
     td:first-child {
       font-weight: 600;
-      color: var(--figma-primary-700);
+      color: var(--figma-grey-700);
       white-space: nowrap;
       width: 90px;
     }
 
     td:last-child {
-      text-align: left;
-      color: var(--figma-grey-800);
+      color: var(--figma-grey-900);
       word-break: break-word;
     }
+  }
+
+  .invoices-wrapper {
+    padding: 0;
+  }
+
+  .invoices-table-container {
+    border-radius: 12px;
+  }
+
+  .mdc-data-table__table {
+    min-width: 1180px;
+  }
+
+  th.mat-mdc-header-cell {
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--figma-grey-600);
+    background: var(--figma-grey-50);
+  }
+
+  td.mat-mdc-cell {
+    font-size: 13px;
+    line-height: 1.35;
+    white-space: normal;
+  }
+
+  .mat-column-slika\.slikeUrl,
+  .mat-column-slika {
+    width: 90px;
+  }
+
+  .mat-column-kataloskiBroj {
+    width: 110px;
+  }
+
+  .mat-column-naziv {
+    min-width: 220px;
+  }
+
+  .mat-column-izvorLabel {
+    min-width: 140px;
+  }
+
+  .mat-column-kolicina,
+  .mat-column-potvrdjenaKolicina,
+  .mat-column-rabat {
+    text-align: center;
+    width: 80px;
+  }
+
+  .mat-column-cena {
+    text-align: right;
+    width: 120px;
+  }
+
+  .mat-column-availabilityLabel {
+    width: 140px;
+  }
+
+  .mat-column-providerInfo,
+  .mat-column-providerResponse {
+    min-width: 220px;
+    white-space: pre-line;
+  }
+
+  .mat-column-status\.naziv {
+    min-width: 160px;
   }
 }
 
@@ -71,58 +163,26 @@
   .invoice-details {
     padding: 12px;
 
-    h2 {
-      font-size: 20px;
-      margin-top: 24px !important;
+    .invoice-details__header {
+      margin-bottom: 8px;
+
+      h2 {
+        font-size: 20px;
+      }
+    }
+
+    .invoice-admin-bar {
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      padding: 10px 12px;
     }
 
     .invoice-info {
-      flex-direction: column;
-      gap: 16px;
-      align-items: stretch;
-      padding: 12px 0;
+      grid-template-columns: 1fr;
+      margin-bottom: 16px;
     }
 
-    .info-item {
-      align-items: center;
-      padding: 16px;
-      text-align: left;
-
-      autom-icon {
-        margin-bottom: 10px;
-      }
-
-      .invoice-table {
-        font-size: 14px;
-
-        td {
-          display: block;
-          padding: 4px 0;
-        }
-
-        td:first-child {
-          display: inline-block;
-          font-weight: 600;
-          width: auto;
-          margin-right: 6px;
-        }
-
-        td:last-child {
-          display: inline;
-        }
-      }
-    }
-
-    .invoice-table {
-      td {
-        vertical-align: baseline;
-      }
-    }
-
-    .border-info {
-      border-right: none;
-      border-bottom: 1px solid var(--figma-grey-100);
-      padding-bottom: 16px;
+    .invoice-table td:first-child {
+      width: 80px;
     }
   }
 }
