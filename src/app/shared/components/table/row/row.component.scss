@@ -629,8 +629,11 @@
 }
 
 .zoomed-image {
-  max-width: 90%;
-  max-height: 90%;
+  width: min(90vw, 720px);
+  height: auto;
+  max-width: 90vw;
+  max-height: 85vh;
+  object-fit: contain;
   box-shadow: 0 0 20px var(--figma-figma-base-black);
   cursor: auto;
 }

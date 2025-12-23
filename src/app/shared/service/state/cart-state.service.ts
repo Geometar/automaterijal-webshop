@@ -272,6 +272,7 @@ export class CartStateService {
       partNumber: roba.katbr || '',
       quantity: roba.kolicina || 1,
       robaId: roba?.robaid ?? null,
+      tecDocArticleId: roba?.tecDocArticleId ?? undefined,
       stock: stock || 0,
       totalPrice: unitPrice * (roba.kolicina || 1),
       unitPrice,
@@ -308,6 +309,7 @@ export class CartStateService {
     } as Manufacture;
     retVal.rabat = cartItem.discount || 0;
     retVal.robaid = (cartItem.robaId ?? undefined) as any;
+    retVal.tecDocArticleId = cartItem.tecDocArticleId ?? undefined;
     retVal.slika = cartItem.image;
     if (cartItem.source === 'PROVIDER') {
       retVal.stanje = 0;
