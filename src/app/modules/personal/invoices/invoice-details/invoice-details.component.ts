@@ -48,31 +48,8 @@ export class InvoiceDetailsComponent implements OnInit {
   ppid: number | null = null;
 
   // Table config
-  columns: AutomTableColumn[] = [
-    { key: 'slika.slikeUrl', header: 'SLika', type: CellType.IMG },
-    {
-      key: 'kataloskiBroj',
-      header: 'Kat br',
-      type: CellType.LINK,
-      callback: (row) => this.onItemClicked(row),
-    },
-    { key: 'naziv', header: 'Naziv', type: CellType.TEXT },
-    { key: 'izvorLabel', header: 'Izvor', type: CellType.TEXT },
-    { key: 'proizvodjac.naziv', header: 'Proizvodjac', type: CellType.TEXT },
-    { key: 'kolicina', header: 'Kolicina', type: CellType.TEXT },
-    { key: 'rabat', header: 'Rabat', type: CellType.PERCENTAGE },
-    { key: 'cena', header: 'Cena', type: CellType.CURRENCY },
-  ];
-
-  adminColumns: AutomTableColumn[] = [
-    { key: 'potvrdjenaKolicina', header: 'Potvrdjena', type: CellType.TEXT },
-    { key: 'status.naziv', header: 'Status stavke', type: CellType.TEXT },
-    { key: 'availabilityLabel', header: 'Dostupnost', type: CellType.TEXT },
-    { key: 'providerInfo', header: 'Provider info', type: CellType.TEXT },
-    { key: 'providerResponse', header: 'Odgovor providera', type: CellType.TEXT },
-  ];
-
-  displayedColumns: string[] = this.columns.map((col) => col.key);
+  columns: AutomTableColumn[] = [];
+  displayedColumns: string[] = [];
   dataSource = new MatTableDataSource<InvoiceItem>();
 
   // Paging and Sorting elements
@@ -107,10 +84,7 @@ export class InvoiceDetailsComponent implements OnInit {
   /** Start of: Angular lifecycle hooks */
   ngOnInit(): void {
     this.isAdmin = this.accountStateService.isAdmin();
-    if (this.isAdmin) {
-      this.columns = [...this.columns, ...this.adminColumns];
-      this.displayedColumns = this.columns.map((col) => col.key);
-    }
+    this.configureColumns();
 
     const hasPpidParam = this.route.snapshot.paramMap.has('ppid');
     const rawPpid = this.route.snapshot.paramMap.get('ppid');
@@ -155,35 +129,8 @@ export class InvoiceDetailsComponent implements OnInit {
         next: (invoice: Invoice) => {
           this.data = invoice;
           const items: InvoiceItem[] = invoice.detalji!;
-          items.forEach((invoiceArticle: InvoiceItem) =>
-            this.pictureService.convertByteToImageInvoice(invoiceArticle)
-          );
-          items.forEach((invoiceArticle: InvoiceItem) => {
-            const izvor = invoiceArticle.izvor;
-            const isProvider =
-              izvor === 'PROVIDER' ||
-              invoiceArticle?.availabilityStatus === 'AVAILABLE' ||
-              !!invoiceArticle?.providerAvailability?.available;
-
-            if (izvor === 'STOCK') {
-              invoiceArticle.izvorLabel = 'Sa stanja';
-            } else if (isProvider) {
-              invoiceArticle.izvorLabel = 'Eksterni magacin';
-            } else if (invoiceArticle?.availabilityStatus === 'IN_STOCK') {
-              invoiceArticle.izvorLabel = 'Sa stanja';
-            } else {
-              invoiceArticle.izvorLabel = '—';
-            }
-
-            invoiceArticle.availabilityLabel = this.buildAvailabilityLabel(
-              invoiceArticle.availabilityStatus,
-              invoiceArticle.izvor,
-              invoiceArticle.providerAvailability
-            );
-            invoiceArticle.providerInfo = this.buildProviderInfo(invoiceArticle);
-            invoiceArticle.providerResponse =
-              this.buildProviderResponse(invoiceArticle);
-          });
+          this.decorateInvoiceItems(items);
+          this.configureColumns(invoice);
 
           this.dataSource.data = items;
           this.totalItems = items.length;
@@ -208,35 +155,8 @@ export class InvoiceDetailsComponent implements OnInit {
         next: (invoice: Invoice) => {
           this.data = invoice;
           const items: InvoiceItem[] = invoice.detalji!;
-          items.forEach((invoiceArticle: InvoiceItem) =>
-            this.pictureService.convertByteToImageInvoice(invoiceArticle)
-          );
-          items.forEach((invoiceArticle: InvoiceItem) => {
-            const izvor = invoiceArticle.izvor;
-            const isProvider =
-              izvor === 'PROVIDER' ||
-              invoiceArticle?.availabilityStatus === 'AVAILABLE' ||
-              !!invoiceArticle?.providerAvailability?.available;
-
-            if (izvor === 'STOCK') {
-              invoiceArticle.izvorLabel = 'Sa stanja';
-            } else if (isProvider) {
-              invoiceArticle.izvorLabel = 'Eksterni magacin';
-            } else if (invoiceArticle?.availabilityStatus === 'IN_STOCK') {
-              invoiceArticle.izvorLabel = 'Sa stanja';
-            } else {
-              invoiceArticle.izvorLabel = '—';
-            }
-
-            invoiceArticle.availabilityLabel = this.buildAvailabilityLabel(
-              invoiceArticle.availabilityStatus,
-              invoiceArticle.izvor,
-              invoiceArticle.providerAvailability
-            );
-            invoiceArticle.providerInfo = this.buildProviderInfo(invoiceArticle);
-            invoiceArticle.providerResponse =
-              this.buildProviderResponse(invoiceArticle);
-          });
+          this.decorateInvoiceItems(items);
+          this.configureColumns(invoice);
 
           this.dataSource.data = items;
           this.totalItems = items.length;
@@ -284,6 +204,87 @@ export class InvoiceDetailsComponent implements OnInit {
   }
 
   // End of: Events
+
+  private configureColumns(invoice?: Invoice | null): void {
+    const isInternal = this.isInternalOrder(invoice);
+    const next: AutomTableColumn[] = [
+      { key: 'slika.slikeUrl', header: 'Slika', type: CellType.IMG },
+      {
+        key: 'kataloskiBroj',
+        header: 'Kat br',
+        type: CellType.LINK,
+        callback: (row) => this.onItemClicked(row),
+      },
+      { key: 'naziv', header: 'Naziv', type: CellType.TEXT },
+      { key: 'proizvodjac.naziv', header: 'Proizvodjac', type: CellType.TEXT },
+      { key: 'izvorLabel', header: 'Izvor', type: CellType.TEXT },
+      { key: 'kolicina', header: 'Kolicina', type: CellType.TEXT },
+    ];
+
+    if (this.isAdmin) {
+      next.push({ key: 'potvrdjenaKolicina', header: 'Potvrdjena', type: CellType.TEXT });
+    }
+
+    if (isInternal) {
+      next.push({ key: 'nabavnaCena', header: 'Nabavna cena', type: CellType.CURRENCY });
+    } else {
+      next.push(
+        { key: 'rabat', header: 'Rabat', type: CellType.PERCENTAGE },
+        { key: 'cena', header: 'Cena', type: CellType.CURRENCY }
+      );
+    }
+
+    if (this.isAdmin) {
+      next.push(
+        { key: 'status.naziv', header: 'Status stavke', type: CellType.TEXT },
+        { key: 'availabilityLabel', header: 'Dostupnost', type: CellType.TEXT },
+        { key: 'providerInfo', header: 'Provider info', type: CellType.TEXT },
+        { key: 'providerResponse', header: 'Odgovor providera', type: CellType.TEXT }
+      );
+    }
+
+    this.columns = next;
+    this.displayedColumns = next.map((col) => col.key);
+  }
+
+  private decorateInvoiceItems(items: InvoiceItem[]): void {
+    items.forEach((invoiceArticle: InvoiceItem) =>
+      this.pictureService.convertByteToImageInvoice(invoiceArticle)
+    );
+
+    items.forEach((invoiceArticle: InvoiceItem) => {
+      invoiceArticle.izvorLabel = this.resolveSourceLabel(invoiceArticle);
+      invoiceArticle.availabilityLabel = this.buildAvailabilityLabel(
+        invoiceArticle.availabilityStatus,
+        invoiceArticle.izvor,
+        invoiceArticle.providerAvailability
+      );
+      invoiceArticle.providerInfo = this.buildProviderInfo(invoiceArticle);
+      invoiceArticle.providerResponse = this.buildProviderResponse(invoiceArticle);
+      invoiceArticle.nabavnaCena = this.resolvePurchasePrice(invoiceArticle);
+    });
+  }
+
+  private resolveSourceLabel(item: InvoiceItem): string {
+    const warehouseName = (item?.providerAvailability?.warehouseName || '').trim();
+    if (warehouseName) {
+      return warehouseName;
+    }
+
+    return 'Automaterijal Magacin';
+  }
+
+  private resolvePurchasePrice(item: InvoiceItem): number | null {
+    const purchase = item?.providerAvailability?.purchasePrice;
+    return typeof purchase === 'number' ? purchase : null;
+  }
+
+  private isInternalOrder(invoice?: Invoice | null): boolean {
+    if (typeof invoice?.internalOrder === 'boolean') {
+      return invoice.internalOrder;
+    }
+    return Number(invoice?.internalOrder) === 1;
+  }
 
   private buildProviderInfo(item: InvoiceItem): string {
     const pa = item?.providerAvailability;

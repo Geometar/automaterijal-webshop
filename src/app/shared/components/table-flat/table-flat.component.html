@@ -4,7 +4,7 @@
   <div class="invoices-table-container mat-elevation-z1">
     <!-- DESKTOP TABLE -->
     <div class="desktop-table" *ngIf="!isMobileView()">
-      <div class="table-scroll">
+      <div class="table-scroll" #tableScroll>
         <table mat-table [dataSource]="dataSource" class="mat-table">
         <ng-container
           *ngFor="let column of columns"
@@ -48,6 +48,16 @@
                     ? (getNestedValue(row, column.key) | date : column.dateFormat || "dd-MMM-yyyy")
                     : "-"
                 }}
+              </ng-container>
+              <ng-container *ngSwitchCase="CellType.BADGE">
+                <span
+                  class="autom-badge"
+                  [class.autom-badge--true]="getBadgeState(getNestedValue(row, column.key)) === 'true'"
+                  [class.autom-badge--false]="getBadgeState(getNestedValue(row, column.key)) === 'false'"
+                  [class.autom-badge--null]="getBadgeState(getNestedValue(row, column.key)) === 'null'"
+                >
+                  {{ getBadgeLabel(getNestedValue(row, column.key), column) }}
+                </span>
               </ng-container>
               <ng-container *ngSwitchCase="CellType.PERCENTAGE">
                 {{ row[column.key] }}%
@@ -123,6 +133,16 @@
                     ? (getNestedValue(row, column.key) | date : column.dateFormat || "dd-MMM-yyyy")
                     : "-"
                 }}
+              </ng-container>
+              <ng-container *ngSwitchCase="CellType.BADGE">
+                <span
+                  class="autom-badge"
+                  [class.autom-badge--true]="getBadgeState(getNestedValue(row, column.key)) === 'true'"
+                  [class.autom-badge--false]="getBadgeState(getNestedValue(row, column.key)) === 'false'"
+                  [class.autom-badge--null]="getBadgeState(getNestedValue(row, column.key)) === 'null'"
+                >
+                  {{ getBadgeLabel(getNestedValue(row, column.key), column) }}
+                </span>
               </ng-container>
               <ng-container *ngSwitchCase="CellType.PERCENTAGE">
                 {{ row[column.key] }}%

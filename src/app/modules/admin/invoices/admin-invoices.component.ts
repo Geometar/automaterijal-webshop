@@ -51,18 +51,27 @@ export class AdminInvoicesComponent implements OnInit, OnDestroy {
       callback: (row) => this.onInvoiceClick(row),
       disableLink: (row) => row?.id == null,
     },
-    { key: 'ppid', header: 'PPID', type: CellType.NUMBER },
+    {
+      key: 'internalOrder',
+      header: 'Tip porudžbine',
+      type: CellType.BADGE,
+      badgeLabels: {
+        trueLabel: 'Zaposleni',
+        falseLabel: 'Kupac',
+        nullLabel: 'Nepoznato',
+      },
+    },
     { key: 'partner', header: 'Partner', type: CellType.TEXT },
-    { key: 'brojStavki', header: 'Broj stavki', type: CellType.NUMBER },
-    { key: 'iznosNarucen', header: 'Iznos naručen', type: CellType.CURRENCY },
-    { key: 'iznosPotvrdjen', header: 'Iznos potvrđen', type: CellType.CURRENCY },
+    { key: 'status.naziv', header: 'Status', type: CellType.TEXT },
     {
       key: 'vremePorucivanja',
       header: 'Datum',
       type: CellType.DATE,
       dateFormat: 'dd-MMM-yyyy HH:mm',
     },
-    { key: 'status.naziv', header: 'Status', type: CellType.TEXT },
+    { key: 'brojStavki', header: 'Broj stavki', type: CellType.NUMBER },
+    { key: 'iznosNarucen', header: 'Iznos naručen', type: CellType.CURRENCY },
+    { key: 'iznosPotvrdjen', header: 'Iznos potvrđen', type: CellType.CURRENCY },
   ];
 
   displayedColumns: string[] = this.columns.map((col) => col.key);
@@ -73,6 +82,7 @@ export class AdminInvoicesComponent implements OnInit, OnDestroy {
 
   dateFrom: Date | null = null;
   dateTo: Date | null = null;
+  internalFilter: boolean | null = null;
   pageIndex = 0;
   rowsPerPage = 10;
   totalItems = 0;
@@ -97,6 +107,7 @@ export class AdminInvoicesComponent implements OnInit, OnDestroy {
     this.dateTo = params['dateTo'] ? new Date(params['dateTo']) : null;
     this.pageIndex = params['pageIndex'] ? +params['pageIndex'] : 0;
     this.rowsPerPage = params['rowsPerPage'] ? +params['rowsPerPage'] : 10;
+    this.internalFilter = params['internal'] === 'true' ? true : params['internal'] === 'false' ? false : null;
 
     this.getInvoices();
   }
@@ -112,11 +123,12 @@ export class AdminInvoicesComponent implements OnInit, OnDestroy {
       dateTo: this.dateTo ? this.dateTo?.toISOString() : '',
       pageIndex: this.pageIndex,
       rowsPerPage: this.rowsPerPage,
+      internal: this.internalFilter === null ? '' : this.internalFilter,
     });
 
     this.loading = true;
     this.invoiceService
-      .getAdminInvoices(this.pageIndex, this.rowsPerPage, this.dateFrom, this.dateTo)
+      .getAdminInvoices(this.pageIndex, this.rowsPerPage, this.dateFrom, this.dateTo, this.internalFilter)
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => {
@@ -168,6 +180,16 @@ export class AdminInvoicesComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.getInvoices();
+  }
+
+  onInternalFilterChange(value: boolean | null): void {
+    if (this.internalFilter === value) {
+      return;
+    }
+
+    this.internalFilter = value;
+    this.pageIndex = 0;
     this.getInvoices();
   }
 

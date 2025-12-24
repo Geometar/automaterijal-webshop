@@ -101,6 +101,7 @@ export class CartComponent implements OnInit, OnDestroy {
   account?: Account;
   bezPdv: number = 0;
   invoiceSubmitted = false;
+  isAdmin = false;
   loggedIn = false;
   pdv: number = 0;
   total: number = 0;
@@ -151,11 +152,17 @@ export class CartComponent implements OnInit, OnDestroy {
   /** Angular lifecycle hooks start */
 
   ngOnInit(): void {
-    this.getInformation();
-    this.syncOnCartItemSize();
     this.account = this.accountStateService.get();
     this.loggedIn = this.accountStateService.isUserLoggedIn();
+    this.isAdmin = this.accountStateService.isAdmin();
+    this.getInformation();
+    this.syncOnCartItemSize();
     this.setUpdateSeoTags();
+
+    if (this.isAdmin) {
+      const address = this.account?.adresa?.trim() || 'Automaterijal Magacin';
+      this.cartForm.patchValue({ address });
+    }
   }
 
   ngOnDestroy(): void {
@@ -179,6 +186,9 @@ export class CartComponent implements OnInit, OnDestroy {
           this.payingChoices = valueHelps.map((value: ValueHelp) => {
             return { key: value.id, value: value.naziv } as SelectModel;
           });
+          if (this.isAdmin && this.payingChoices.length) {
+            this.setCartSelectionValue('payment', String(this.payingChoices[0].key));
+          }
         },
         error: () => {
           this.payingChoices = [];
@@ -193,6 +203,9 @@ export class CartComponent implements OnInit, OnDestroy {
           this.transportChoices = valueHelps.map((value: ValueHelp) => {
             return { key: value.id, value: value.naziv } as SelectModel;
           });
+          if (this.isAdmin && this.transportChoices.length) {
+            this.setCartSelectionValue('transport', String(this.transportChoices[0].key));
+          }
         },
         error: () => {
           this.transportChoices = [];
@@ -235,14 +248,35 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   sumTotal(): void {
-    let total = 0;
+    let totalNet = 0;
     this.roba
-      .map((roba: Roba) => roba.kolicina! * roba.cena!)
-      .forEach((value: number) => (total += value));
+      .map((roba: Roba) => roba.kolicina! * this.getUnitPriceForTotals(roba))
+      .forEach((value: number) => (totalNet += value));
 
-    this.total = total;
-    this.pdv = total - total / 1.2;
-    this.bezPdv = total / 1.2;
+    if (this.isAdmin) {
+      this.bezPdv = totalNet;
+      this.pdv = totalNet * 0.2;
+      this.total = totalNet + this.pdv;
+      return;
+    }
+
+    this.total = totalNet;
+    this.pdv = totalNet - totalNet / 1.2;
+    this.bezPdv = totalNet / 1.2;
+  }
+
+  private getUnitPriceForTotals(roba: Roba): number {
+    if (!this.isAdmin) {
+      return Number(roba?.cena) || 0;
+    }
+
+    const purchase = Number(roba?.providerAvailability?.purchasePrice);
+    if (Number.isFinite(purchase) && purchase > 0) {
+      return purchase;
+    }
+
+    const fallback = Number(roba?.cena);
+    return Number.isFinite(fallback) ? fallback : 0;
   }
 
   get hasProviderOnlyItems(): boolean {
@@ -466,14 +500,14 @@ export class CartComponent implements OnInit, OnDestroy {
         kataloskiBroj: r.katbr,
         proizvodjac: r.proizvodjac,
         kolicina: r.kolicina,
-        cena: r.cena,
-        rabat: r.rabat,
+        cena: this.isAdmin ? this.getUnitPriceForTotals(r) : r.cena,
+        rabat: this.isAdmin ? undefined : r.rabat,
         slika: this.buildInvoiceItemImage(r),
         providerAvailability: r.providerAvailability,
       })
     );
 
-    this.invoice.iznosNarucen = this.total;
+    this.invoice.iznosNarucen = this.isAdmin ? this.bezPdv : this.total;
 
     this.invoice.napomena = isAnon
       ? this.buildAnonymousNote()
@@ -554,6 +588,11 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   private buildLoggedUserNote(): string {
+    if (this.isAdmin) {
+      const comment = this.cartForm.get('comment')?.value?.trim();
+      return comment ? `Komentar: ${comment}` : '';
+    }
+
     const formAddress = this.cartForm.get('address')?.value?.trim();
     const userAddress = this.account?.adresa?.trim();
     const comment = this.cartForm.get('comment')?.value?.trim();

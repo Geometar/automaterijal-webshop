@@ -5,22 +5,53 @@
   ></autom-header>
 
   <div class="invoices__filter">
-    <autom-input-fields
-      [label]="'Datum od'"
-      [maxDate]="dateTo"
-      [type]="inputTypeEnum.DATE"
-      [value]="dateFrom"
-      (emitSelected)="onFilterDateFrom($event)"
-    >
-    </autom-input-fields>
-    <autom-input-fields
-      [label]="'Datum do'"
-      [minDate]="dateFrom"
-      [type]="inputTypeEnum.DATE"
-      [value]="dateTo"
-      (emitSelected)="onFilterDateTo($event)"
-    >
-    </autom-input-fields>
+    <div class="invoices__filter-group">
+      <autom-input-fields
+        [label]="'Datum od'"
+        [maxDate]="dateTo"
+        [type]="inputTypeEnum.DATE"
+        [value]="dateFrom"
+        (emitSelected)="onFilterDateFrom($event)"
+      >
+      </autom-input-fields>
+      <autom-input-fields
+        [label]="'Datum do'"
+        [minDate]="dateFrom"
+        [type]="inputTypeEnum.DATE"
+        [value]="dateTo"
+        (emitSelected)="onFilterDateTo($event)"
+      >
+      </autom-input-fields>
+    </div>
+    <div class="invoices__filter-group invoices__filter-group--tight">
+      <span class="invoices__segment-label">Tip porudzbine</span>
+      <div class="invoices__segment" role="group" aria-label="Tip porudzbine">
+        <button
+          type="button"
+          class="invoices__segment-btn"
+          [class.is-active]="internalFilter === null"
+          (click)="onInternalFilterChange(null)"
+        >
+          Sve
+        </button>
+        <button
+          type="button"
+          class="invoices__segment-btn"
+          [class.is-active]="internalFilter === false"
+          (click)="onInternalFilterChange(false)"
+        >
+          Kupci
+        </button>
+        <button
+          type="button"
+          class="invoices__segment-btn"
+          [class.is-active]="internalFilter === true"
+          (click)="onInternalFilterChange(true)"
+        >
+          Zaposleni
+        </button>
+      </div>
+    </div>
   </div>
 
   <autom-table-flat
@@ -37,4 +68,3 @@
     (pageChange)="onPageChange($event)"
   ></autom-table-flat>
 </section>
-

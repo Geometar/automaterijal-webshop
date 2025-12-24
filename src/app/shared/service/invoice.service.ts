@@ -66,7 +66,13 @@ export class InvoiceService {
       );
   }
 
-  public getAdminInvoices(page: number, pageSize: number, dateFrom: Date | null, dateTo: Date | null): Observable<PaginatedResponse<Invoice> | Invoice[]> {
+  public getAdminInvoices(
+    page: number,
+    pageSize: number,
+    dateFrom: Date | null,
+    dateTo: Date | null,
+    internal: boolean | null
+  ): Observable<PaginatedResponse<Invoice> | Invoice[]> {
     const parameterObject = {} as any;
     parameterObject['page'] = page;
     parameterObject['pageSize'] = pageSize;
@@ -76,6 +82,9 @@ export class InvoiceService {
     }
     if (dateTo) {
       parameterObject['dateTo'] = dateTo.getTime();
+    }
+    if (internal !== null) {
+      parameterObject['internal'] = internal;
     }
 
     const parametersString = this.helperService.formatQueryParameters(parameterObject);

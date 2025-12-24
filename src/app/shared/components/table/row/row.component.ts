@@ -283,6 +283,37 @@ export class RowComponent implements OnInit, OnChanges {
     return this.availabilityVm.purchasableStock;
   }
 
+  get isAdminCartView(): boolean {
+    return this.isAdmin && this.showPriceOnly;
+  }
+
+  get unitPrice(): number {
+    if (!this.isAdminCartView) {
+      return this.availabilityVm.displayPrice || 0;
+    }
+
+    const purchase = Number(this.data?.providerAvailability?.purchasePrice);
+    if (Number.isFinite(purchase) && purchase > 0) {
+      return purchase;
+    }
+
+    const fallback = Number(this.data?.cena);
+    return Number.isFinite(fallback) ? fallback : 0;
+  }
+
+  get totalPrice(): number {
+    return this.unitPrice * (this.data?.kolicina || 0);
+  }
+
+  get warehouseLabel(): string | null {
+    if (!this.isAdminCartView) {
+      return null;
+    }
+
+    const warehouse = (this.data?.providerAvailability?.warehouseName || '').trim();
+    return warehouse || 'Automaterijal Magacin';
+  }
+
   get cartKey(): string | null {
     return this.data?.cartKey ?? this.cartStateService.getItemKey(this.data);
   }

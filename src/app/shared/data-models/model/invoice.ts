@@ -13,6 +13,8 @@ export class Invoice {
   id?: number;
   iznosNarucen?: number;
   iznosPotvrdjen?: number;
+  /** 1 = interna porudžbina (zaposleni), 0 = kupac */
+  internalOrder?: number;
   nacinPlacanja?: ValueHelp;
   nacinPrevoza?: ValueHelp;
   napomena?: string;
@@ -51,6 +53,8 @@ export class InvoiceItem {
   proizvodjac?: Manufacture;
   providerBackorder?: boolean;
   providerAvailability?: ProviderAvailabilityDto;
+  /** Nabavna cena (koristi se za interne porudžbine). */
+  nabavnaCena?: number | null;
   providerMessage?: string;
   providerInfo?: string;
   providerResponse?: string;

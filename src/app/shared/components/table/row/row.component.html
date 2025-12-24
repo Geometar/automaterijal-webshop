@@ -2,7 +2,10 @@
   <!-- Image Section -->
   <div class="image-container" [class.image-smaller]="showPriceOnly">
     <!-- Popust badge -->
-    <div class="discount-badge" *ngIf="!isTecDocOnly && data.rabat">
+    <div
+      class="discount-badge"
+      *ngIf="!isAdminCartView && !isTecDocOnly && data.rabat"
+    >
       -{{ data.rabat }}%
     </div>
 
@@ -107,7 +110,7 @@
       </ng-container>
 
       <autom-meta-pill
-        *ngIf="showPriceOnly && availabilityVm.showProviderBox"
+        *ngIf="showPriceOnly && !isAdminCartView && availabilityVm.showProviderBox"
         variant="accent"
         size="md"
         [value]="'Eksterni magacin'"
@@ -116,8 +119,18 @@
       ></autom-meta-pill>
 
       <autom-meta-pill
+        *ngIf="showPriceOnly && isAdminCartView && warehouseLabel"
+        variant="accent"
+        size="md"
+        [value]="warehouseLabel"
+        [attr.title]="'Magacin za porucivanje'"
+        [ariaLabel]="'Magacin ' + warehouseLabel"
+      ></autom-meta-pill>
+
+      <autom-meta-pill
         *ngIf="
           showPriceOnly &&
+          !isAdminCartView &&
           availabilityVm.showProviderBox &&
           availabilityVm.provider.deliveryLabel
         "
@@ -329,19 +342,17 @@
 
   <!-- Pricing-only Section -->
   <div class="pricing-container" *ngIf="showPriceOnly">
-    <p *ngIf="availabilityVm.showDiscount" class="sub-price old-price">
+    <p *ngIf="!isAdminCartView && availabilityVm.showDiscount" class="sub-price old-price">
       {{ availabilityVm.displayPrice / (1 - data.rabat / 100) | rsdCurrency }}
     </p>
 
     <p class="sub-price final-price">
       {{
-        availabilityVm.displayPrice
-          ? (availabilityVm.displayPrice | rsdCurrency)
-          : (0 | rsdCurrency)
+        unitPrice ? (unitPrice | rsdCurrency) : (0 | rsdCurrency)
       }}
     </p>
 
-    <p *ngIf="availabilityVm.showDiscount" class="small-explanation saving">
+    <p *ngIf="!isAdminCartView && availabilityVm.showDiscount" class="small-explanation saving">
       Ušteda
       {{
         availabilityVm.displayPrice / (1 - data.rabat / 100) -
@@ -349,7 +360,9 @@
       }}
     </p>
 
-    <p class="autom-align__right small-explanation">Cena po komadu</p>
+    <p class="autom-align__right small-explanation">
+      {{ isAdminCartView ? 'Nabavna cena po komadu' : 'Cena po komadu' }}
+    </p>
 
     <div class="util__flex--center">
       <autom-input-fields
@@ -372,13 +385,10 @@
       ></autom-input-fields>
 
       <div>
-        <p class="price">
-          {{
-            (availabilityVm.displayPrice || 0) * (data.kolicina || 0)
-              | rsdCurrency
-          }}
+        <p class="price">{{ totalPrice | rsdCurrency }}</p>
+        <p class="autom-align__right autom-margin__none">
+          {{ isAdminCartView ? 'Ukupno bez PDV-a' : 'Ukupno sa PDV-om' }}
         </p>
-        <p class="autom-align__right autom-margin__none">Ukupno sa pdv-om</p>
       </div>
     </div>
   </div>

@@ -54,6 +54,36 @@ td.mat-mdc-cell {
   color: #333;
 }
 
+.autom-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid transparent;
+  letter-spacing: 0.2px;
+}
+
+.autom-badge--true {
+  background-color: var(--figma-success-100);
+  color: var(--figma-success-700);
+  border-color: var(--figma-success-300);
+}
+
+.autom-badge--false {
+  background-color: var(--figma-info-100);
+  color: var(--figma-info-700);
+  border-color: var(--figma-info-300);
+}
+
+.autom-badge--null {
+  background-color: var(--figma-accent-yellow-100);
+  color: var(--figma-accent-yellow-700);
+  border-color: var(--figma-accent-yellow-300);
+}
+
 .mat-mdc-row {
   border-color: var(--figma-grey-100);
   border-right: var(--space-default) solid var(--figma-grey-200);
