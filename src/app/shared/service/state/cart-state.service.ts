@@ -10,6 +10,7 @@ import { CartItem, Roba } from '../../data-models/model/roba';
 // Services
 import { AccountStateService } from './account-state.service';
 import { AnalyticsService } from '../analytics.service';
+import { getAvailabilityStatus, getPurchasableStock, getPurchasableUnitPrice } from '../../utils/availability-utils';
 
 @Injectable({
   providedIn: 'root',
@@ -38,36 +39,92 @@ export class CartStateService {
     if (!this.isBrowser) {
       return [];
     }
-    return this.localStorage.retrieve(this.storageKey) || [];
+    const raw = (this.localStorage.retrieve(this.storageKey) || []) as CartItem[];
+    return this.normalizeCart(raw);
+  }
+
+  /** Stable cart key used across local + provider-only items. */
+  getItemKey(roba: any): string | null {
+    const robaId = roba?.robaid;
+    if (robaId !== null && robaId !== undefined && robaId !== '') {
+      const n = Number(robaId);
+      if (Number.isFinite(n) && n > 0) {
+        return `ROBA:${n}`;
+      }
+      return `ROBA:${String(robaId)}`;
+    }
+
+    const provider = (roba?.providerAvailability?.provider ?? '').toString().trim();
+    const proid = (roba?.proizvodjac?.proid ?? '').toString().trim().toUpperCase();
+    const articleNumber = (roba?.providerAvailability?.articleNumber ?? roba?.katbr ?? '')
+      .toString()
+      .trim()
+      .toUpperCase();
+
+    if (!articleNumber) {
+      return null;
+    }
+
+    return `PROVIDER:${provider || 'UNKNOWN'}:${proid || 'UNKNOWN'}:${articleNumber}`;
+  }
+
+  removeFromCartByKey(key: string): void {
+    if (!this.isBrowser) {
+      return;
+    }
+    const cart = this.getAll();
+    const removedItem = cart.find((item) => item.key === key);
+    const updatedCart = cart.filter((item) => item.key !== key);
+    this.localStorage.store(this.storageKey, updatedCart);
+    this.updateCartSize();
+
+    if (removedItem) {
+      const account = this.accountStateService.get();
+      const quantityRemoved = removedItem.quantity ?? 1;
+      this.analytics.trackRemoveFromCart(removedItem, quantityRemoved, account);
+    }
   }
 
   addToCart(roba: any, quantity: number = 1): void {
-    const unitPrice = Number(roba?.cena) || 0;
-    const currentStock = Number(roba?.stanje) || 0;
+    const key = this.getItemKey(roba);
+    if (!key) return;
 
-    // Block adding items without a valid price or stock
-    if (unitPrice <= 0 || currentStock <= 0) {
-      return;
-    }
+    const status = getAvailabilityStatus(roba);
+    const unitPrice = getPurchasableUnitPrice(roba);
+    const currentStock = getPurchasableStock(roba);
+
+    const qtyToAdd = Math.min(Math.max(1, Math.floor(quantity || 1)), currentStock || 0);
+    if (unitPrice <= 0 || qtyToAdd <= 0) return;
 
     let cart = this.getAll();
-    const existingItem = cart.find((item) => item.robaId === roba.robaid);
+    const existingItem = cart.find((item) => item.key === key);
     let trackedItem: CartItem;
 
     if (existingItem) {
-      existingItem.quantity! += quantity;
-      existingItem.totalPrice = (existingItem.unitPrice ?? 1) * existingItem.quantity!;
+      const max = Number(existingItem.stock) || (existingItem.quantity ?? 0) + qtyToAdd;
+      existingItem.quantity = Math.min((existingItem.quantity ?? 0) + qtyToAdd, max);
+      existingItem.totalPrice = (existingItem.unitPrice ?? 0) * (existingItem.quantity ?? 0);
       trackedItem = existingItem;
     } else {
       const newItem: CartItem = this.mapToCartItem(roba);
-      newItem.quantity = quantity;
-      newItem.totalPrice = (newItem.unitPrice ?? 1) * quantity;
+      newItem.quantity = qtyToAdd;
+      newItem.totalPrice = (newItem.unitPrice ?? 0) * qtyToAdd;
       cart.push(newItem);
       trackedItem = newItem;
     }
 
-    // ✅ Smanjuje stanje robe
-    roba.stanje = this.calculateNewStock(roba.stanje, quantity);
+    // ✅ Smanjuje stanje (lokalno u UI)
+    if (status === 'IN_STOCK') {
+      roba.stanje = this.calculateNewStock(roba.stanje, qtyToAdd);
+    } else if (status === 'AVAILABLE' && roba?.providerAvailability) {
+      const pa = roba.providerAvailability;
+      if (pa.warehouseQuantity != null) {
+        pa.warehouseQuantity = this.calculateNewStock(pa.warehouseQuantity, qtyToAdd);
+      }
+      if (pa.totalQuantity != null) {
+        pa.totalQuantity = this.calculateNewStock(pa.totalQuantity, qtyToAdd);
+      }
+    }
 
     if (!this.isBrowser) {
       return;
@@ -77,25 +134,11 @@ export class CartStateService {
     this.updateCartSize();
 
     const account = this.accountStateService.get();
-    this.analytics.trackAddToCart(trackedItem, quantity, account);
+    this.analytics.trackAddToCart(trackedItem, qtyToAdd, account);
   }
 
   removeFromCart(itemId: number): void {
-    if (!this.isBrowser) {
-      return;
-    }
-
-    const cart = this.getAll();
-    const removedItem = cart.find((item) => item.robaId === itemId);
-    const updatedCart = cart.filter((item) => item.robaId !== itemId);
-    this.localStorage.store(this.storageKey, updatedCart);
-    this.updateCartSize();
-
-    if (removedItem) {
-      const account = this.accountStateService.get();
-      const quantityRemoved = removedItem.quantity ?? 1;
-      this.analytics.trackRemoveFromCart(removedItem, quantityRemoved, account);
-    }
+    this.removeFromCartByKey(`ROBA:${itemId}`);
   }
 
   resetCart(): void {
@@ -108,12 +151,16 @@ export class CartStateService {
   }
 
   updateQuantity(itemId: number, quantity: number): void {
+    this.updateQuantityByKey(`ROBA:${itemId}`, quantity);
+  }
+
+  updateQuantityByKey(key: string, quantity: number): void {
     if (!this.isBrowser) {
       return;
     }
 
     let cart = this.getAll();
-    const item = cart.find((i) => i.robaId === itemId);
+    const item = cart.find((i) => i.key === key);
 
     if (item) {
       item.quantity = quantity;
@@ -131,9 +178,22 @@ export class CartStateService {
     let cart = this.getAll();
 
     robaList.forEach((roba) => {
-      const cartItem = cart.find((item) => item.robaId === roba.robaid);
+      const key = this.getItemKey(roba);
+      const cartItem = key ? cart.find((item) => item.key === key) : undefined;
       if (cartItem) {
-        roba.stanje = this.calculateNewStock(roba.stanje, cartItem.quantity!);
+        const status = getAvailabilityStatus(roba);
+        const qty = cartItem.quantity ?? 0;
+        if (status === 'AVAILABLE' && roba?.providerAvailability) {
+          const pa = roba.providerAvailability;
+          if (pa.warehouseQuantity != null) {
+            pa.warehouseQuantity = this.calculateNewStock(pa.warehouseQuantity, qty);
+          }
+          if (pa.totalQuantity != null) {
+            pa.totalQuantity = this.calculateNewStock(pa.totalQuantity, qty);
+          }
+        } else {
+          roba.stanje = this.calculateNewStock(roba.stanje, qty);
+        }
       }
     });
   }
@@ -143,15 +203,32 @@ export class CartStateService {
       return;
     }
     let cart = this.getAll();
-    const cartItem = cart.find((item) => item.robaId === roba.robaid);
+    const key = this.getItemKey(roba);
+    const cartItem = key ? cart.find((item) => item.key === key) : undefined;
 
     if (cartItem) {
-      roba.stanje = this.calculateNewStock(roba.stanje, cartItem.quantity!);
+      const status = getAvailabilityStatus(roba);
+      const qty = cartItem.quantity ?? 0;
+      if (status === 'AVAILABLE' && roba?.providerAvailability) {
+        const pa = roba.providerAvailability;
+        if (pa.warehouseQuantity != null) {
+          pa.warehouseQuantity = this.calculateNewStock(pa.warehouseQuantity, qty);
+        }
+        if (pa.totalQuantity != null) {
+          pa.totalQuantity = this.calculateNewStock(pa.totalQuantity, qty);
+        }
+      } else {
+        roba.stanje = this.calculateNewStock(roba.stanje, qty);
+      }
     }
   }
 
   isInCart(itemId: number): boolean {
-    return this.getAll().some((item) => item.robaId === itemId);
+    return this.isInCartKey(`ROBA:${itemId}`);
+  }
+
+  isInCartKey(key: string): boolean {
+    return this.getAll().some((item) => item.key === key);
   }
 
   getRobaFromCart(): Roba[] {
@@ -177,33 +254,109 @@ export class CartStateService {
   }
 
   private mapToCartItem(roba: any): CartItem {
+    const status = getAvailabilityStatus(roba);
+    const provider = roba?.providerAvailability;
+    const isProvider = status === 'AVAILABLE' && !!provider?.available;
+    const unitPrice = getPurchasableUnitPrice(roba);
+    const stock = getPurchasableStock(roba);
+    const isAdmin = this.accountStateService.isAdmin();
+    const key = this.getItemKey(roba);
+
     return {
-      discount: roba.rabat || 0,
+      key: key ?? undefined,
+      discount: Number(roba?.rabat) || 0,
       image: roba.slika,
       manufacturer: roba.proizvodjac?.naziv || '',
+      manufacturerProid: roba?.proizvodjac?.proid,
       name: roba.naziv || '',
       partNumber: roba.katbr || '',
       quantity: roba.kolicina || 1,
-      robaId: roba.robaid || 0,
-      stock: roba.stanje || 0,
-      totalPrice: (roba.cena || 0) * (roba.kolicina || 1),
-      unitPrice: roba.cena || 0,
+      robaId: roba?.robaid ?? null,
+      tecDocArticleId: roba?.tecDocArticleId ?? undefined,
+      stock: stock || 0,
+      totalPrice: unitPrice * (roba.kolicina || 1),
+      unitPrice,
+      source: isProvider ? 'PROVIDER' : 'STOCK',
+      provider: isProvider ? provider?.provider : undefined,
+      providerArticleNumber: isProvider ? provider?.articleNumber : undefined,
+      providerWarehouse: isProvider ? provider?.warehouse : undefined,
+      providerWarehouseName: isProvider ? provider?.warehouseName : undefined,
+      providerCurrency: isProvider ? provider?.currency : undefined,
+      providerCustomerPrice: isProvider ? provider?.price : undefined,
+      providerPurchasePrice: isProvider && isAdmin ? provider?.purchasePrice : undefined,
+      providerLeadTimeBusinessDays: isProvider ? provider?.leadTimeBusinessDays : undefined,
+      providerDeliveryToCustomerBusinessDaysMin: isProvider ? provider?.deliveryToCustomerBusinessDaysMin : undefined,
+      providerDeliveryToCustomerBusinessDaysMax: isProvider ? provider?.deliveryToCustomerBusinessDaysMax : undefined,
+      providerNextDispatchCutoff: isProvider ? provider?.nextDispatchCutoff : undefined,
       technicalDescription: roba.technicalDescription
     };
   }
 
   private mapToRoba(cartItem: CartItem): Roba {
     const retVal: Roba = {} as Roba;
+    retVal.cartKey = cartItem.key;
     retVal.cena = cartItem.unitPrice;
     retVal.katbr = cartItem.partNumber;
     retVal.kolicina = cartItem.quantity;
     retVal.naziv = cartItem.name;
-    retVal.proizvodjac = { naziv: cartItem.manufacturer } as Manufacture;
+    const manufacturerName =
+      typeof cartItem.manufacturer === 'string'
+        ? cartItem.manufacturer
+        : cartItem.manufacturer?.naziv;
+    retVal.proizvodjac = {
+      naziv: manufacturerName,
+      proid: cartItem.manufacturerProid,
+    } as Manufacture;
     retVal.rabat = cartItem.discount || 0;
-    retVal.robaid = cartItem.robaId;
+    retVal.robaid = (cartItem.robaId ?? undefined) as any;
+    retVal.tecDocArticleId = cartItem.tecDocArticleId ?? undefined;
     retVal.slika = cartItem.image;
-    retVal.stanje = cartItem.stock!;
+    if (cartItem.source === 'PROVIDER') {
+      retVal.stanje = 0;
+      retVal.availabilityStatus = 'AVAILABLE';
+      retVal.providerAvailability = {
+        available: true,
+        provider: cartItem.provider,
+        articleNumber: cartItem.providerArticleNumber,
+        warehouse: cartItem.providerWarehouse,
+        warehouseName: cartItem.providerWarehouseName,
+        warehouseQuantity: cartItem.stock ?? 0,
+        totalQuantity: cartItem.stock ?? 0,
+        price: cartItem.providerCustomerPrice ?? cartItem.unitPrice,
+        purchasePrice: cartItem.providerPurchasePrice,
+        currency: cartItem.providerCurrency ?? 'RSD',
+        leadTimeBusinessDays: cartItem.providerLeadTimeBusinessDays,
+        deliveryToCustomerBusinessDaysMin: cartItem.providerDeliveryToCustomerBusinessDaysMin,
+        deliveryToCustomerBusinessDaysMax: cartItem.providerDeliveryToCustomerBusinessDaysMax,
+        nextDispatchCutoff: cartItem.providerNextDispatchCutoff,
+      };
+    } else {
+      retVal.stanje = cartItem.stock!;
+    }
     retVal.tehnickiOpis = cartItem.technicalDescription;
     return retVal;
+  }
+
+  private normalizeCart(cart: CartItem[]): CartItem[] {
+    // Backward compatibility: older stored items don't have `key`.
+    return (cart ?? []).map((item) => {
+      if (item?.key) {
+        return item;
+      }
+      const robaId = item?.robaId;
+      if (robaId != null) {
+        return { ...item, key: `ROBA:${robaId}` };
+      }
+      const provider = (item?.provider ?? '').toString().trim();
+      const proid = (item?.manufacturerProid ?? '').toString().trim().toUpperCase();
+      const articleNumber = (item?.providerArticleNumber ?? item?.partNumber ?? '')
+        .toString()
+        .trim()
+        .toUpperCase();
+      const fallbackKey = articleNumber
+        ? `PROVIDER:${provider || 'UNKNOWN'}:${proid || 'UNKNOWN'}:${articleNumber}`
+        : undefined;
+      return { ...item, key: fallbackKey };
+    });
   }
 }

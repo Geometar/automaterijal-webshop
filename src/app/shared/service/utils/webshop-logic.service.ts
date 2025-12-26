@@ -13,7 +13,8 @@ export class WebshopLogicService {
     const filter = new Filter();
     filter.grupe = this.parseArrayParam(params['grupe']);
     filter.mandatoryProid = this.parseArrayParam(params['mandatoryproid']);
-    filter.naStanju = params['naStanju'] === 'true';
+    // Backward compatibility: some old links used `dostupno=true`.
+    filter.naStanju = params['naStanju'] === 'true' || params['dostupno'] === 'true';
     filter.podgrupe = this.parseArrayParam(params['podgrupe']);
     filter.proizvodjaci = this.parseArrayParam(params['proizvodjaci']);
     const filterBy = this.parseFilterBy(params['filterBy']);

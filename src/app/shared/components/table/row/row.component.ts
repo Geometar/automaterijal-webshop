@@ -34,6 +34,10 @@ import { PictureService, ProductImageMeta } from '../../../service/utils/picture
 import { SnackbarService } from '../../../service/utils/snackbar.service';
 import { StringUtils } from '../../../utils/string-utils';
 import { UrlHelperService } from '../../../service/utils/url-helper.service';
+import {
+  AvailabilityVm,
+  buildAvailabilityVm
+} from '../../../utils/availability-utils';
 
 @Component({
   selector: 'row',
@@ -60,7 +64,7 @@ export class RowComponent implements OnInit, OnChanges {
   @Input() showCloseBtn = false;
   @Input() showPriceOnly = false;
   @Input() disableCategoryNavigation = false;
-  @Output() removeEvent = new EventEmitter<number>();
+  @Output() removeEvent = new EventEmitter<string>();
 
   quantity: number = 1;
   private readonly minQuantity = 1;
@@ -86,6 +90,7 @@ export class RowComponent implements OnInit, OnChanges {
   inquirySent = false;
   hasMoreThanFiveSpecs = false;
   isEmployee = false;
+  isAdmin = false;
   loggedIn = false;
   showAllSpecs = false;
   categoryHref: string | null = null;
@@ -94,7 +99,11 @@ export class RowComponent implements OnInit, OnChanges {
   stringUtils = StringUtils;
 
   get specTableId(): string {
-    return `spec-${this.data?.robaid ?? 'row'}`;
+    const idPart =
+      this.data?.robaid != null
+        ? String(this.data.robaid)
+        : `${this.data?.proizvodjac?.proid ?? 'ext'}-${this.data?.katbr ?? 'row'}`;
+    return `spec-${this.sanitizeDomId(idPart)}`;
   }
 
   get nameWithoutManufacturer(): string {
@@ -132,6 +141,7 @@ export class RowComponent implements OnInit, OnChanges {
 
   ngOnInit() {
     this.isEmployee = this.accountStateService.isEmployee();
+    this.isAdmin = this.accountStateService.isAdmin();
     this.loggedIn = this.accountStateService.isUserLoggedIn();
     this.quantity = this.clampQuantity(this.data.kolicina ?? this.quantity);
     this.updateDisplayedSpecs();
@@ -179,11 +189,14 @@ export class RowComponent implements OnInit, OnChanges {
     }
 
     this.quantity = next;
-    this.cartStateService.updateQuantity(this.data.robaid!, this.quantity);
+    const key = this.cartKey;
+    if (key) {
+      this.cartStateService.updateQuantityByKey(key, this.quantity);
+    }
   }
 
   addToShoppingCart(data: Roba): void {
-    if (this.isUnavailable || !this.hasValidPrice) {
+    if (!this.canAddToCart || this.isUnavailable || !this.availabilityVm.hasValidPrice) {
       this.snackbarService.showError('Artikal trenutno nije dostupan za poručivanje');
       return;
     }
@@ -196,6 +209,15 @@ export class RowComponent implements OnInit, OnChanges {
     return this.cartStateService.isInCart(robaId);
   }
 
+  get isInCartItem(): boolean {
+    const key = this.cartKey;
+    if (key) {
+      return this.cartStateService.isInCartKey(key);
+    }
+    const id = this.data?.robaid;
+    return id != null ? this.cartStateService.isInCart(id) : false;
+  }
+
   openImageZoom(url: string) {
     this.zoomedImageUrl = url;
   }
@@ -205,12 +227,19 @@ export class RowComponent implements OnInit, OnChanges {
   }
 
   getRouteParam(data: any): string | null {
-    const id = data?.robaid;
-    if (id == null) {
-      return null;
-    }
     const slug = this.getProductSlug(data);
-    return slug ? `${id}-${slug}` : String(id);
+    const robaId = data?.robaid;
+    if (robaId != null) {
+      return slug ? `${robaId}-${slug}` : String(robaId);
+    }
+
+    const tecDocArticleId = data?.tecDocArticleId;
+    if (tecDocArticleId != null) {
+      const token = `td${tecDocArticleId}`;
+      return slug ? `${token}-${slug}` : token;
+    }
+
+    return null;
   }
 
   get productImageMeta(): ProductImageMeta {
@@ -229,6 +258,12 @@ export class RowComponent implements OnInit, OnChanges {
     return this.productImageMeta.title;
   }
 
+  get categoryLabel(): string | null {
+    const groupName = this.data?.grupaNaziv?.trim();
+    const subName = this.data?.podGrupaNaziv?.trim();
+    return subName || groupName || null;
+  }
+
   get categoryAriaLabel(): string | null {
     const groupName = this.data?.grupaNaziv?.trim();
     const subName = this.data?.podGrupaNaziv?.trim();
@@ -245,11 +280,60 @@ export class RowComponent implements OnInit, OnChanges {
   }
 
   get effectiveStock(): number {
-    return this.hasValidPrice ? this.data?.stanje ?? 0 : 0;
+    return this.availabilityVm.purchasableStock;
+  }
+
+  get isAdminCartView(): boolean {
+    return this.isAdmin && this.showPriceOnly;
+  }
+
+  get unitPrice(): number {
+    if (!this.isAdminCartView) {
+      return this.availabilityVm.displayPrice || 0;
+    }
+
+    const purchase = Number(this.data?.providerAvailability?.purchasePrice);
+    if (Number.isFinite(purchase) && purchase > 0) {
+      return purchase;
+    }
+
+    const fallback = Number(this.data?.cena);
+    return Number.isFinite(fallback) ? fallback : 0;
+  }
+
+  get totalPrice(): number {
+    return this.unitPrice * (this.data?.kolicina || 0);
+  }
+
+  get warehouseLabel(): string | null {
+    if (!this.isAdminCartView) {
+      return null;
+    }
+
+    const warehouse = (this.data?.providerAvailability?.warehouseName || '').trim();
+    return warehouse || 'Automaterijal Magacin';
+  }
+
+  get cartKey(): string | null {
+    return this.data?.cartKey ?? this.cartStateService.getItemKey(this.data);
+  }
+
+  get isExternalOnly(): boolean {
+    return this.data?.robaid == null && !!this.data?.providerAvailability?.available;
   }
 
   get isTecDocOnly(): boolean {
-    return this.data?.robaid == null || this.data?.podGrupa === 1000000;
+    // Backend no longer guarantees magic `podGrupa===1000000` markers.
+    // Treat items without internal ID and without provider availability as "TecDoc-only" (not purchasable).
+    return this.data?.robaid == null && !this.data?.providerAvailability?.available;
+  }
+
+  get canAddToCart(): boolean {
+    return !this.isTecDocOnly && !!this.cartKey;
+  }
+
+  get canNavigateToDetails(): boolean {
+    return this.data?.robaid != null || this.data?.tecDocArticleId != null;
   }
 
   get isUnavailable(): boolean {
@@ -301,7 +385,7 @@ export class RowComponent implements OnInit, OnChanges {
     event.stopPropagation();
 
     const subGroupId = this.data?.podGrupa;
-    if (!subGroupId) {
+    if (subGroupId === null || subGroupId === undefined) {
       return;
     }
 
@@ -311,16 +395,25 @@ export class RowComponent implements OnInit, OnChanges {
     });
   }
 
-  private get hasValidPrice(): boolean {
-    const price = Number(this.data?.cena) || 0;
-    return price > 0;
-  }
-
   private clampQuantity(value: number): number {
     if (!Number.isFinite(value)) return this.minQuantity;
     if (value < this.minQuantity) return this.minQuantity;
     const max = this.effectiveStock || this.minQuantity;
     if (value > max) return max;
     return Math.floor(value);
+  }
+
+  get availabilityVm(): AvailabilityVm {
+    return buildAvailabilityVm(this.data, {
+      isAdmin: this.isAdmin,
+      isTecDocOnly: this.isTecDocOnly,
+    });
+  }
+
+  private sanitizeDomId(value: string): string {
+    return String(value)
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-zA-Z0-9\-_:.]/g, '-');
   }
 }

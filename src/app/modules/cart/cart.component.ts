@@ -53,6 +53,8 @@ import { InvoiceService } from '../../shared/service/invoice.service';
 import { PictureService } from '../../shared/service/utils/picture.service';
 import { SeoService } from '../../shared/service/seo.service';
 import { SnackbarPosition, SnackbarService } from '../../shared/service/utils/snackbar.service';
+import { getAvailabilityStatus } from '../../shared/utils/availability-utils';
+import { Slika } from '../../shared/data-models/model/slika';
 
 
 @Component({
@@ -99,6 +101,7 @@ export class CartComponent implements OnInit, OnDestroy {
   account?: Account;
   bezPdv: number = 0;
   invoiceSubmitted = false;
+  isAdmin = false;
   loggedIn = false;
   pdv: number = 0;
   total: number = 0;
@@ -149,11 +152,17 @@ export class CartComponent implements OnInit, OnDestroy {
   /** Angular lifecycle hooks start */
 
   ngOnInit(): void {
-    this.getInformation();
-    this.syncOnCartItemSize();
     this.account = this.accountStateService.get();
     this.loggedIn = this.accountStateService.isUserLoggedIn();
+    this.isAdmin = this.accountStateService.isAdmin();
+    this.getInformation();
+    this.syncOnCartItemSize();
     this.setUpdateSeoTags();
+
+    if (this.isAdmin) {
+      const address = this.account?.adresa?.trim() || 'Automaterijal Magacin';
+      this.cartForm.patchValue({ address });
+    }
   }
 
   ngOnDestroy(): void {
@@ -177,6 +186,9 @@ export class CartComponent implements OnInit, OnDestroy {
           this.payingChoices = valueHelps.map((value: ValueHelp) => {
             return { key: value.id, value: value.naziv } as SelectModel;
           });
+          if (this.isAdmin && this.payingChoices.length) {
+            this.setCartSelectionValue('payment', String(this.payingChoices[0].key));
+          }
         },
         error: () => {
           this.payingChoices = [];
@@ -191,6 +203,9 @@ export class CartComponent implements OnInit, OnDestroy {
           this.transportChoices = valueHelps.map((value: ValueHelp) => {
             return { key: value.id, value: value.naziv } as SelectModel;
           });
+          if (this.isAdmin && this.transportChoices.length) {
+            this.setCartSelectionValue('transport', String(this.transportChoices[0].key));
+          }
         },
         error: () => {
           this.transportChoices = [];
@@ -233,19 +248,164 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   sumTotal(): void {
-    let total = 0;
+    let totalNet = 0;
     this.roba
-      .map((roba: Roba) => roba.kolicina! * roba.cena!)
-      .forEach((value: number) => (total += value));
+      .map((roba: Roba) => roba.kolicina! * this.getUnitPriceForTotals(roba))
+      .forEach((value: number) => (totalNet += value));
 
-    this.total = total;
-    this.pdv = total - total / 1.2;
-    this.bezPdv = total / 1.2;
+    if (this.isAdmin) {
+      this.bezPdv = totalNet;
+      this.pdv = totalNet * 0.2;
+      this.total = totalNet + this.pdv;
+      return;
+    }
+
+    this.total = totalNet;
+    this.pdv = totalNet - totalNet / 1.2;
+    this.bezPdv = totalNet / 1.2;
   }
 
-  removeFromBasketHandler(robaId: number): void {
-    this.cartStateService.removeFromCart(robaId);
+  private getUnitPriceForTotals(roba: Roba): number {
+    if (!this.isAdmin) {
+      return Number(roba?.cena) || 0;
+    }
 
+    const purchase = Number(roba?.providerAvailability?.purchasePrice);
+    if (Number.isFinite(purchase) && purchase > 0) {
+      return purchase;
+    }
+
+    const fallback = Number(roba?.cena);
+    return Number.isFinite(fallback) ? fallback : 0;
+  }
+
+  get hasProviderOnlyItems(): boolean {
+    return (this.roba ?? []).some(
+      (r) =>
+        getAvailabilityStatus(r) === 'AVAILABLE' &&
+        !!r?.providerAvailability?.available
+    );
+  }
+
+  get shouldShowMixedDeliveryInfo(): boolean {
+    const items = this.roba ?? [];
+    if (items.length < 2) {
+      return false;
+    }
+
+    const hasProvider = items.some(
+      (r) => getAvailabilityStatus(r) === 'AVAILABLE' && !!r?.providerAvailability?.available
+    );
+    const hasStock = items.some((r) => getAvailabilityStatus(r) === 'IN_STOCK');
+
+    return hasProvider && hasStock;
+  }
+
+  get deliveryEstimateLabel(): string | null {
+    const items = this.roba ?? [];
+    if (!items.length) {
+      return null;
+    }
+
+    // Baseline for in-stock items (internal warehouse).
+    let maxMin = 1;
+    let maxMax = 2;
+    let hasAnyEstimate = true;
+
+    for (const item of items) {
+      const p = item?.providerAvailability;
+      const isProvider =
+        getAvailabilityStatus(item) === 'AVAILABLE' && !!p?.available;
+
+      if (!isProvider) {
+        continue;
+      }
+
+      const min = Number(p?.deliveryToCustomerBusinessDaysMin);
+      const max = Number(p?.deliveryToCustomerBusinessDaysMax);
+      const lead = Number(p?.leadTimeBusinessDays);
+
+      if (Number.isFinite(min) && Number.isFinite(max) && min > 0 && max > 0) {
+        maxMin = Math.max(maxMin, min);
+        maxMax = Math.max(maxMax, max);
+        continue;
+      }
+
+      if (Number.isFinite(lead) && lead > 0) {
+        maxMin = Math.max(maxMin, lead);
+        maxMax = Math.max(maxMax, lead);
+        continue;
+      }
+
+      hasAnyEstimate = false;
+    }
+
+    if (!hasAnyEstimate) {
+      return null;
+    }
+
+    return this.formatBusinessDayRange(maxMin, maxMax);
+  }
+
+  private formatBusinessDayRange(min: number, max: number): string {
+    if (min === max) {
+      return `${min} ${this.pluralizeBusinessDays(min)}`;
+    }
+    return `${min}–${max} ${this.pluralizeBusinessDays(max)}`;
+  }
+
+  private pluralizeBusinessDays(n: number): string {
+    const abs = Math.abs(n);
+    if (abs === 1) return 'radni dan';
+    if (
+      abs % 10 >= 2 &&
+      abs % 10 <= 4 &&
+      (abs % 100 < 10 || abs % 100 >= 20)
+    )
+      return 'radna dana';
+    return 'radnih dana';
+  }
+
+  private buildInvoiceItemImage(roba: Roba): Slika | undefined {
+    const raw = (roba?.slika?.slikeUrl || '').trim();
+    if (!raw) {
+      return roba?.slika;
+    }
+
+    const isProvider =
+      getAvailabilityStatus(roba) === 'AVAILABLE' &&
+      !!roba?.providerAvailability?.available;
+
+    if (!isProvider) {
+      return roba?.slika;
+    }
+
+    const slika = new Slika();
+    slika.slikeUrl = this.normalizeToRelativeUrl(raw);
+    slika.isUrl = true;
+    return slika;
+  }
+
+  private normalizeToRelativeUrl(url: string): string {
+    const trimmed = (url || '').trim();
+    if (!trimmed) {
+      return trimmed;
+    }
+
+    if (/^https?:\/\//i.test(trimmed)) {
+      try {
+        const u = new URL(trimmed);
+        return `${u.pathname}${u.search}`;
+      } catch {
+        return trimmed;
+      }
+    }
+
+    return trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
+  }
+
+  removeFromBasketHandler(cartKey: string): void {
+    this.cartStateService.removeFromCartByKey(cartKey);
   }
 
   /** Basket send: start */
@@ -273,24 +433,44 @@ export class CartComponent implements OnInit, OnDestroy {
         })
       )
       .subscribe({
-        next: (item: Roba[]) => {
-          if (!item.length) {
-            if (cartItemsSnapshot.length) {
-              this.analytics.trackPurchase(
-                this.generateTransactionId(),
-                cartItemsSnapshot,
-                this.total,
-                accountSnapshot,
-                { tax: this.pdv, shipping: 0 }
-              );
-            }
-            this.snackbarService.showAutoClose('Porudžbina je uspešno poslata i uskoro će biti obradjena.', SnackbarPosition.TOP);
-            this.router.navigateByUrl('/webshop');
-            this.hasTrackedCartView = false;
-            this.cartStateService.resetCart();
-          } else {
-            // TODO: Add fallback
+        next: (outOfStockItems: Roba[]) => {
+          if (cartItemsSnapshot.length) {
+            this.analytics.trackPurchase(
+              this.generateTransactionId(),
+              cartItemsSnapshot,
+              this.total,
+              accountSnapshot,
+              { tax: this.pdv, shipping: 0 }
+            );
           }
+
+          if (!outOfStockItems.length) {
+            this.snackbarService.showAutoClose(
+              'Porudžbina je uspešno poslata i uskoro će biti obrađena.',
+              SnackbarPosition.TOP
+            );
+          } else {
+            const preview = outOfStockItems
+              .slice(0, 3)
+              .map((r) => r?.katbr || r?.naziv)
+              .filter(Boolean)
+              .join(', ');
+            const more =
+              outOfStockItems.length > 3
+                ? ` (+${outOfStockItems.length - 3})`
+                : '';
+
+            this.snackbarService.showAutoClose(
+              preview
+                ? `Porudžbina je uspešno poslata. Neke stavke nisu na stanju i biće obezbeđene iz eksternog magacina: ${preview}${more}.`
+                : 'Porudžbina je uspešno poslata. Neke stavke nisu na stanju i biće obezbeđene iz eksternog magacina.',
+              SnackbarPosition.TOP
+            );
+          }
+
+          this.router.navigateByUrl('/webshop');
+          this.hasTrackedCartView = false;
+          this.cartStateService.resetCart();
         },
         error: () => { },
       });
@@ -314,18 +494,20 @@ export class CartComponent implements OnInit, OnDestroy {
 
     this.invoice.detalji = this.roba.map((r) =>
       new InvoiceItem({
+        availabilityStatus: r.availabilityStatus,
         robaId: r.robaid,
         naziv: r.naziv,
         kataloskiBroj: r.katbr,
         proizvodjac: r.proizvodjac,
         kolicina: r.kolicina,
-        cena: r.cena,
-        rabat: r.rabat,
-        slika: r.slika,
+        cena: this.isAdmin ? this.getUnitPriceForTotals(r) : r.cena,
+        rabat: this.isAdmin ? undefined : r.rabat,
+        slika: this.buildInvoiceItemImage(r),
+        providerAvailability: r.providerAvailability,
       })
     );
 
-    this.invoice.iznosNarucen = this.total;
+    this.invoice.iznosNarucen = this.isAdmin ? this.bezPdv : this.total;
 
     this.invoice.napomena = isAnon
       ? this.buildAnonymousNote()
@@ -406,6 +588,11 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   private buildLoggedUserNote(): string {
+    if (this.isAdmin) {
+      const comment = this.cartForm.get('comment')?.value?.trim();
+      return comment ? `Komentar: ${comment}` : '';
+    }
+
     const formAddress = this.cartForm.get('address')?.value?.trim();
     const userAddress = this.account?.adresa?.trim();
     const comment = this.cartForm.get('comment')?.value?.trim();
