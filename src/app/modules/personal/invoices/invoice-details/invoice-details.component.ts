@@ -204,6 +204,9 @@ export class InvoiceDetailsComponent implements OnInit {
   }
 
   // End of: Events
+  get isInternalOrderView(): boolean {
+    return this.isInternalOrder(this.data);
+  }
 
   private configureColumns(invoice?: Invoice | null): void {
     const isInternal = this.isInternalOrder(invoice);

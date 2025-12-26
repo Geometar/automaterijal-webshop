@@ -52,7 +52,7 @@
           </tr>
         </table>
       </div>
-      <div class="info-card">
+      <div class="info-card" *ngIf="!isInternalOrderView">
         <autom-icon
           [color]="colorEnum.YELLOW_700"
           [source]="iconEnum.TRUCK"
@@ -68,7 +68,7 @@
           </tr>
         </table>
       </div>
-      <div class="info-card">
+      <div class="info-card" *ngIf="!isInternalOrderView">
         <autom-icon
           [color]="colorEnum.YELLOW_700"
           [source]="iconEnum.CREDIT_CARD"
