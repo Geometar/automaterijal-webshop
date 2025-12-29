@@ -60,7 +60,7 @@ export class VehicleCompatibilityComponent implements OnChanges, OnDestroy {
 
   private expandedManufacturers = new Set<number>();
   private expandedModels = new Set<string>();
-  private vehicleDetailsCache = new Map<string, TDVehicleDetails>();
+  private vehicleDetailsCache = new Map<string, TDVehicleDetails | null>();
   private pendingVehicleDetailRequests = new Set<string>();
 
   private destroy$ = new Subject<void>();
@@ -224,8 +224,8 @@ export class VehicleCompatibilityComponent implements OnChanges, OnDestroy {
     this.linkedTargetsLoading = true;
 
     const request$ = canUseRobaId
-      ? this.tecDocService.getArticleLinkedTargets(robaId, 'PO')
-      : this.tecDocService.getTecDocRobaLinkedTargets(tecDocArticleId, 'PO');
+      ? this.tecDocService.getArticleLinkedTargets(robaId, 'VOLB')
+      : this.tecDocService.getTecDocRobaLinkedTargets(tecDocArticleId, 'VOLB');
 
     request$
       .pipe(
@@ -704,9 +704,21 @@ export class VehicleCompatibilityComponent implements OnChanges, OnDestroy {
     const tecdocType = this.getVariantTecdocType(variant);
     const key = this.buildVehicleKey(tecdocId, tecdocType);
 
-    const cached = this.vehicleDetailsCache.get(key);
-    if (cached) {
-      return this.vehicleUrlService.buildVehiclePath(cached);
+    if (this.vehicleDetailsCache.has(key)) {
+      const cached = this.vehicleDetailsCache.get(key);
+      if (cached) {
+        return this.vehicleUrlService.buildVehiclePath(cached);
+      }
+      const fallbackDetails = this.buildFallbackVehicleDetails(
+        tecdocId,
+        tecdocType,
+        manufacturer,
+        model,
+        variant
+      );
+      return fallbackDetails
+        ? this.vehicleUrlService.buildVehiclePath(fallbackDetails)
+        : null;
     }
 
     this.fetchVehicleDetail(tecdocId, tecdocType, key);
@@ -801,12 +813,11 @@ export class VehicleCompatibilityComponent implements OnChanges, OnDestroy {
       .subscribe({
         next: (details) => {
           const detail = Array.isArray(details) && details.length ? details[0] : null;
-          if (!detail) {
-            return;
-          }
           this.vehicleDetailsCache.set(key, detail);
         },
-        error: () => { },
+        error: () => {
+          this.vehicleDetailsCache.set(key, null);
+        },
       });
   }
 
