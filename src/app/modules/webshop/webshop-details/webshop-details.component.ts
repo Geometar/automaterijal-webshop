@@ -39,6 +39,7 @@ import {
   TecDocDokumentacija,
   TecDocLinkedManufacturerTargets,
 } from '../../../shared/data-models/model/roba';
+import { AvailabilityStatus } from '../../../shared/data-models/model/availability';
 import { Slika } from '../../../shared/data-models/model/slika';
 import { TooltipModel } from '../../../shared/data-models/interface';
 import { ShowcaseComponent, ShowcaseSection } from '../../../shared/components/showcase/showcase.component';
@@ -58,6 +59,10 @@ import { RsdCurrencyPipe } from '../../../shared/pipe/rsd-currency.pipe';
 import { SpinnerComponent } from '../../../shared/components/spinner/spinner.component';
 import { TextAreaComponent } from '../../../shared/components/text-area/text-area.component';
 import { EmailService } from '../../../shared/service/email.service';
+import {
+  AvailabilityVm,
+  buildAvailabilityVm
+} from '../../../shared/utils/availability-utils';
 
 // Services
 import { AccountStateService } from '../../../shared/service/state/account-state.service';
@@ -111,6 +116,7 @@ interface SpecEntry {
 })
 export class WebshopDetailsComponent implements OnInit, OnDestroy {
   id: number | null = null;
+  private routeRef: { kind: 'ROBA' | 'TECDOC'; id: number; token: string } | null = null;
   data: Roba = new Roba();
 
   // Enums
@@ -165,9 +171,12 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     return isPlatformBrowser(this.platformId);
   }
 
+  get availabilityVm(): AvailabilityVm {
+    return buildAvailabilityVm(this.data, { isAdmin: this.isAdmin });
+  }
+
   get hasDiscount(): boolean {
-    const rabat = this.getDiscountValue();
-    return rabat > 0 && rabat < 100;
+    return this.availabilityVm.showDiscount;
   }
 
   get discountValue(): number {
@@ -196,9 +205,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   }
 
   private getPrice(): number {
-    const raw = (this.data as any)?.cena;
-    const n = Number(raw);
-    return Number.isFinite(n) ? n : 0;
+    return this.displayPrice;
   }
 
   private getDiscountValue(): number {
@@ -257,6 +264,9 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   // ─────────────────────────────────────────────────────────────────────────────
 
   ngOnInit(): void {
+    this.isAdmin = this.accountStateService.isAdmin();
+    this.loggedIn = this.accountStateService.isUserLoggedIn();
+
     this.route.paramMap
       .pipe(
         takeUntil(this.destroy$),
@@ -266,19 +276,22 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       .subscribe((raw) => {
         this.routeSlug = this.extractSlug(raw);
         this.applyRouteCanonical(raw);
-        this.id = this.parseId(raw);
-        if (this.id) {
-          const hydrated = this.tryHydrateFromTransferState(this.id);
-          if (!hydrated) {
-            this.fetchData(this.id);
-          }
-        } else {
+        this.routeRef = this.parseRouteRef(raw);
+        this.id = this.routeRef?.kind === 'ROBA' ? this.routeRef.id : null;
+
+        if (!this.routeRef) {
           console.warn('Nevažeći ID u ruti:', raw);
+          return;
+        }
+
+        const hydrated =
+          this.routeRef.kind === 'ROBA'
+            ? this.tryHydrateFromTransferState(this.routeRef.id)
+            : false;
+        if (!hydrated) {
+          this.fetchData(this.routeRef);
         }
       });
-
-    this.isAdmin = this.accountStateService.isAdmin();
-    this.loggedIn = this.accountStateService.isUserLoggedIn();
   }
 
   ngOnDestroy(): void {
@@ -320,6 +333,10 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   private handleProductLoad(response: Roba): void {
     this.pictureService.convertByteToImage(response);
 
+    if (this.routeRef?.kind === 'TECDOC' && response.tecDocArticleId == null) {
+      response.tecDocArticleId = this.routeRef.id;
+    }
+
     this.data = response;
     this.shareLink = this.buildShareLink(response);
     this.shareTitle = this.buildShareTitle(response);
@@ -346,20 +363,23 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     this.inquirySent = false;
   }
 
-  fetchData(id: number): void {
+  fetchData(ref: { kind: 'ROBA' | 'TECDOC'; id: number; token: string }): void {
     this.loading = true;
     this.shareLink = null;
     this.shareTitle = '';
-    this.robaService
-      .fetchDetails(id)
+
+    const request$ =
+      ref.kind === 'ROBA'
+        ? this.robaService.fetchDetails(ref.id)
+        : this.tecDocService.fetchTecDocRobaDetails(ref.id);
+
+    request$
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => (this.loading = false))
       )
       .subscribe({
-        next: (response: Roba) => {
-          this.handleProductLoad(response);
-        },
+        next: (response: Roba) => this.handleProductLoad(response),
         error: (err: HttpErrorResponse) => {
           console.error('fetchDetails error', err.error?.details || err.error);
         },
@@ -516,7 +536,9 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.snackbarService.showSuccess('Image uploaded successfully');
-          this.fetchData(this.id!);
+          if (this.routeRef?.kind === 'ROBA') {
+            this.fetchData(this.routeRef);
+          }
         },
         error: () => {
           this.snackbarService.showError('Image upload failed');
@@ -525,6 +547,10 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   }
 
   removeAttributes(): void {
+    if (!this.data?.robaid) {
+      this.snackbarService.showError('Ova akcija je dostupna samo za interne artikle.');
+      return;
+    }
     this.robaService
       .removeTecDocAttributes(this.data.robaid!)
       .pipe(takeUntil(this.destroy$))
@@ -542,6 +568,10 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   }
 
   removeImage(): void {
+    if (!this.data?.robaid) {
+      this.snackbarService.showError('Ova akcija je dostupna samo za interne artikle.');
+      return;
+    }
     this.robaService
       .removeImage(this.data.robaid!)
       .pipe(takeUntil(this.destroy$))
@@ -563,6 +593,10 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   }
 
   saveTextDescription(): void {
+    if (!this.data?.robaid) {
+      this.snackbarService.showError('Ova akcija je dostupna samo za interne artikle.');
+      return;
+    }
     this.robaService
       .saveText(this.data.robaid!, this.data.tekst!)
       .pipe(takeUntil(this.destroy$))
@@ -749,12 +783,47 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   }
 
   get hasValidPrice(): boolean {
-    const price = Number(this.data?.cena) || 0;
-    return price > 0;
+    return this.availabilityVm.hasValidPrice;
+  }
+
+  get displayPrice(): number {
+    return this.availabilityVm.displayPrice;
+  }
+
+  get providerPurchasePriceLabel(): string | null {
+    return this.availabilityVm.provider.admin.purchasePriceLabel;
+  }
+
+  get availabilityStatus(): AvailabilityStatus {
+    return this.availabilityVm.status;
+  }
+
+  get availabilityLabel(): string {
+    return this.availabilityVm.label;
+  }
+
+  get showProviderAvailability(): boolean {
+    return this.availabilityVm.showProviderBox;
+  }
+
+  get providerPriceLabel(): string | null {
+    return this.availabilityVm.provider.admin.customerPriceLabel;
+  }
+
+  get providerQuantity(): number | null {
+    return this.availabilityVm.provider.quantity;
+  }
+
+  get providerDeliveryLabel(): string | null {
+    return this.availabilityVm.provider.deliveryLabel;
+  }
+
+  get providerCutoffLabel(): string | null {
+    return this.availabilityVm.provider.cutoffLabel;
   }
 
   get availableStock(): number {
-    return this.hasValidPrice ? this.data?.stanje ?? 0 : 0;
+    return this.availabilityVm.purchasableStock;
   }
 
   get isOutOfStock(): boolean {
@@ -897,7 +966,9 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     this.showAddAttributes = false;
     this.showDeleteWarningPopup = false;
     this.showImageDeleteWarningPopup = false;
-    if (this.id) this.fetchData(this.id);
+    if (this.routeRef) {
+      this.fetchData(this.routeRef);
+    }
   }
   toggleTextEdit(): void {
     this.editingText = !this.editingText;
@@ -1116,7 +1187,12 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   }
 
   private buildCanonical(roba: Roba): { idParam: string; url: string } {
-    const id = roba.robaid ?? '';
+    const id =
+      roba.robaid != null
+        ? String(roba.robaid)
+        : roba.tecDocArticleId != null
+          ? `td${roba.tecDocArticleId}`
+          : '';
     const slug = this.buildSlug(roba);
     const idParam = slug ? `${id}-${slug}` : String(id);
     const url = `https://automaterijal.com/webshop/${idParam}`;
@@ -1581,22 +1657,35 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const idPart = this.parseId(raw);
-    if (!idPart) {
+    const ref = this.parseRouteRef(raw);
+    if (!ref) {
       return;
     }
 
     const slug = this.extractSlug(raw);
-    const idParam = slug ? `${idPart}-${slug}` : String(idPart);
+    const idParam = slug ? `${ref.token}-${slug}` : ref.token;
     const canonical = `https://automaterijal.com/webshop/${idParam}`;
     this.seoService.setCanonicalUrl(canonical);
     this.seoService.setRobots('noindex, follow');
   }
 
-  private parseId(raw: string | null): number | null {
+  private parseRouteRef(raw: string | null): { kind: 'ROBA' | 'TECDOC'; id: number; token: string } | null {
     if (!raw) return null;
-    const m = raw.match(/^\d+/);     // uzmi početne cifre pre prvog '-'
-    return m ? Number(m[0]) : null;
+    const trimmed = raw.trim();
+    if (!trimmed) return null;
+
+    // TecDoc: `td<digits>[-slug]`
+    const td = trimmed.match(/^td(\d+)/i);
+    if (td && td[1]) {
+      const id = Number(td[1]);
+      return Number.isFinite(id) ? { kind: 'TECDOC', id, token: `td${id}` } : null;
+    }
+
+    // Internal roba: `<digits>[-slug]`
+    const m = trimmed.match(/^(\d+)/);
+    if (!m || !m[1]) return null;
+    const id = Number(m[1]);
+    return Number.isFinite(id) ? { kind: 'ROBA', id, token: String(id) } : null;
   }
 
 

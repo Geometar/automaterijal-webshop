@@ -60,7 +60,7 @@ export class VehicleCompatibilityComponent implements OnChanges, OnDestroy {
 
   private expandedManufacturers = new Set<number>();
   private expandedModels = new Set<string>();
-  private vehicleDetailsCache = new Map<string, TDVehicleDetails>();
+  private vehicleDetailsCache = new Map<string, TDVehicleDetails | null>();
   private pendingVehicleDetailRequests = new Set<string>();
 
   private destroy$ = new Subject<void>();
@@ -187,6 +187,12 @@ export class VehicleCompatibilityComponent implements OnChanges, OnDestroy {
     this.displayedManufacturers = this.flatManufacturers;
 
     this.emitTargetsChange(true);
+
+    const hasManufacturers = this.flatManufacturers.length > 0;
+    const tecDocArticleId = Number(this.product?.tecDocArticleId ?? Number.NaN);
+    if (!hasManufacturers && Number.isFinite(tecDocArticleId)) {
+      this.fetchLinkedManufacturersByTecDocArticle(tecDocArticleId);
+    }
   }
 
   private resetState(): void {
@@ -205,16 +211,23 @@ export class VehicleCompatibilityComponent implements OnChanges, OnDestroy {
   }
 
   private fetchLinkedTargets(): void {
-    const id = Number(this.product?.robaid ?? Number.NaN);
-    if (!Number.isFinite(id) || this.requestedDetailedTargets) {
+    const robaId = Number(this.product?.robaid ?? Number.NaN);
+    const tecDocArticleId = Number(this.product?.tecDocArticleId ?? Number.NaN);
+    const canUseRobaId = Number.isFinite(robaId);
+    const canUseTecDocId = Number.isFinite(tecDocArticleId);
+
+    if ((!canUseRobaId && !canUseTecDocId) || this.requestedDetailedTargets) {
       return;
     }
 
     this.requestedDetailedTargets = true;
     this.linkedTargetsLoading = true;
 
-    this.tecDocService
-      .getArticleLinkedTargets(id, 'VOLB')
+    const request$ = canUseRobaId
+      ? this.tecDocService.getArticleLinkedTargets(robaId, 'VOLB')
+      : this.tecDocService.getTecDocRobaLinkedTargets(tecDocArticleId, 'VOLB');
+
+    request$
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => {
@@ -234,6 +247,51 @@ export class VehicleCompatibilityComponent implements OnChanges, OnDestroy {
         error: () => {
           this.detailedTargetsLoaded = false;
         },
+      });
+  }
+
+  private fetchLinkedManufacturersByTecDocArticle(tecDocArticleId: number): void {
+    if (!Number.isFinite(tecDocArticleId) || this.requestedDetailedTargets) {
+      return;
+    }
+
+    this.requestedDetailedTargets = true;
+    this.linkedTargetsLoading = true;
+
+    this.tecDocService
+      .getTecDocRobaLinkedManufacturers(tecDocArticleId, 'PO')
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.linkedTargetsLoading = false;
+          this.requestedDetailedTargets = false;
+        })
+      )
+      .subscribe({
+        next: (manufacturers) => {
+          if (!Array.isArray(manufacturers) || !manufacturers.length) {
+            return;
+          }
+          const unique = new Map<number, TecDocLinkedManufacturer>();
+          manufacturers
+            .map((manufacturer) => {
+              const id = Number((manufacturer as any)?.linkingTargetId ?? Number.NaN);
+              const name = this.normalizeWhitespace((manufacturer as any)?.name ?? '');
+              if (!Number.isFinite(id) || !name) {
+                return null;
+              }
+              return { linkingTargetId: id, name };
+            })
+            .filter((item): item is TecDocLinkedManufacturer => !!item)
+            .forEach((item) => unique.set(item.linkingTargetId, item));
+
+          this.flatManufacturers = Array.from(unique.values()).sort((a, b) =>
+            this.collator.compare(a.name, b.name)
+          );
+          this.displayedManufacturers = this.flatManufacturers;
+          this.emitTargetsChange(true);
+        },
+        error: () => { },
       });
   }
 
@@ -646,9 +704,21 @@ export class VehicleCompatibilityComponent implements OnChanges, OnDestroy {
     const tecdocType = this.getVariantTecdocType(variant);
     const key = this.buildVehicleKey(tecdocId, tecdocType);
 
-    const cached = this.vehicleDetailsCache.get(key);
-    if (cached) {
-      return this.vehicleUrlService.buildVehiclePath(cached);
+    if (this.vehicleDetailsCache.has(key)) {
+      const cached = this.vehicleDetailsCache.get(key);
+      if (cached) {
+        return this.vehicleUrlService.buildVehiclePath(cached);
+      }
+      const fallbackDetails = this.buildFallbackVehicleDetails(
+        tecdocId,
+        tecdocType,
+        manufacturer,
+        model,
+        variant
+      );
+      return fallbackDetails
+        ? this.vehicleUrlService.buildVehiclePath(fallbackDetails)
+        : null;
     }
 
     this.fetchVehicleDetail(tecdocId, tecdocType, key);
@@ -743,12 +813,11 @@ export class VehicleCompatibilityComponent implements OnChanges, OnDestroy {
       .subscribe({
         next: (details) => {
           const detail = Array.isArray(details) && details.length ? details[0] : null;
-          if (!detail) {
-            return;
-          }
           this.vehicleDetailsCache.set(key, detail);
         },
-        error: () => { },
+        error: () => {
+          this.vehicleDetailsCache.set(key, null);
+        },
       });
   }
 
