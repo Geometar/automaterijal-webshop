@@ -1,18 +1,63 @@
 <section *ngIf="roba.length" class="header-margin--top cart">
-  <div class="cart_items">
-    <div class="product-row" *ngFor="let row of roba">
-      <row
-        [data]="row"
-        [showPriceOnly]="true"
-        [showCloseBtn]="true"
-        (removeEvent)="removeFromBasketHandler($event)"
-      ></row>
+  <header class="cart-header">
+    <div class="cart-header__intro">
+      <span *ngIf="isAdmin" class="cart-header__kicker">Admin nabavka</span>
+      <h1 class="cart-header__title">{{ isAdmin ? 'Korpa za nabavku' : 'Korpa' }}</h1>
+      <p *ngIf="isAdmin" class="cart-header__subtitle">
+        Pregled stavki koje idu u internu nabavku.
+      </p>
+      <p *ngIf="!isAdmin" class="cart-header__subtitle">
+        Proverite porudžbinu i nastavite na potvrdu.
+      </p>
+      <p *ngIf="isAdmin && cartOutOfStockCount" class="cart-header__alert">
+        {{ cartOutOfStockCount }} stavki nije na stanju. Proverite eksterni magacin i rokove.
+      </p>
     </div>
-  </div>
+    <div class="cart-metrics">
+      <div class="metric-card">
+        <span class="metric-label">Stavke</span>
+        <span class="metric-value">{{ cartItemCount }}</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-label">Količina</span>
+        <span class="metric-value">{{ cartQuantityTotal }}</span>
+      </div>
+      <div class="metric-card" *ngIf="isAdmin">
+        <span class="metric-label">Eksterni</span>
+        <span class="metric-value">{{ cartProviderCount }}</span>
+      </div>
+    </div>
+  </header>
 
-  <div class="display--flex justify-content--space-between">
-    <form *ngIf="loggedIn" class="information" [formGroup]="cartForm">
-      <ng-container *ngIf="!isAdmin; else adminCartForm">
+  <div class="cart-layout">
+    <div class="cart-items">
+      <div class="cart-items__header">
+        <span class="cart-items__ghost" aria-hidden="true"></span>
+        <span>Artikal</span>
+        <span class="text-right">
+          {{ isAdmin ? 'Nabavno / Količina / Ukupno' : 'Cena / Količina / Ukupno' }}
+        </span>
+        <span class="text-right" aria-hidden="true"></span>
+      </div>
+      <div class="cart_items">
+        <div class="product-row" *ngFor="let row of roba">
+          <row
+            [data]="row"
+            [showPriceOnly]="true"
+            [showCloseBtn]="true"
+            (removeEvent)="removeFromBasketHandler($event)"
+          ></row>
+        </div>
+      </div>
+    </div>
+
+    <div class="cart-bottom">
+      <div class="cart-bottom__form">
+        <form *ngIf="loggedIn" class="information cart-panel" [formGroup]="cartForm">
+          <h3 class="cart-panel__title">
+            {{ isAdmin ? 'Interna napomena' : 'Podaci za isporuku' }}
+          </h3>
+        <ng-container *ngIf="!isAdmin; else adminCartForm">
         <div class="display--flex gap-7">
           <autom-select
             class="flex--1"
@@ -76,231 +121,246 @@
           ngDefaultControl
         ></autom-text-area>
       </ng-template>
-    </form>
-    <form *ngIf="!loggedIn" class="information" [formGroup]="userForm">
-      <div class="display--flex gap-7">
-        <autom-input-fields
-          class="flex--1"
-          [clearBtn]="true"
-          [formControlName]="'name'"
-          [label]="'Ime'"
-          [required]="true"
-          (emitSelected)="setUserSelectionValue('name', $event)"
-          ngDefaultControl
-        ></autom-input-fields>
-        <autom-input-fields
-          class="flex--1"
-          [clearBtn]="true"
-          [formControlName]="'surname'"
-          [label]="'Prezime'"
-          [required]="true"
-          (emitSelected)="setUserSelectionValue('surname', $event)"
-          ngDefaultControl
-        ></autom-input-fields>
-      </div>
-      <div class="display--flex gap-7">
-        <autom-input-fields
-          class="flex--1"
-          [clearBtn]="true"
-          [formControlName]="'postalcode'"
-          [label]="'Postal code'"
-          [required]="true"
-          (emitSelected)="setUserSelectionValue('postalcode', $event)"
-          ngDefaultControl
-        ></autom-input-fields>
-        <autom-input-fields
-          class="flex--1"
-          [clearBtn]="true"
-          [formControlName]="'city'"
-          [label]="'Grad'"
-          [required]="true"
-          (emitSelected)="setUserSelectionValue('city', $event)"
-          ngDefaultControl
-        ></autom-input-fields>
-      </div>
-      <div class="display--flex gap-7">
-        <autom-input-fields
-          class="flex--1"
-          [clearBtn]="true"
-          [formControlName]="'street'"
-          [label]="'Ulica i broj'"
-          [required]="true"
-          (emitSelected)="setUserSelectionValue('street', $event)"
-          ngDefaultControl
-        ></autom-input-fields>
-        <autom-input-fields
-          class="flex--1"
-          [clearBtn]="true"
-          [formControlName]="'phone'"
-          [label]="'Telefon'"
-          [required]="true"
-          (emitSelected)="setUserSelectionValue('phone', $event)"
-          ngDefaultControl
-        ></autom-input-fields>
-      </div>
-      <autom-input-fields
-        [clearBtn]="true"
-        [formControlName]="'email'"
-        [id]="'email'"
-        [label]="'Email'"
-        [required]="true"
-        [type]="inputTypeEnum.EMAIL"
-        [validators]="[
-          {
-            name: 'pattern',
-            value: emailAddressPattern
-          }
-        ]"
-        (emitSelected)="setUserSelectionValue('email', $event)"
-        ngDefaultControl
-      ></autom-input-fields>
-      <autom-input-fields
-        [clearBtn]="true"
-        [formControlName]="'pib'"
-        [label]="'PIB'"
-        (emitSelected)="setUserSelectionValue('pib', $event)"
-        ngDefaultControl
-      ></autom-input-fields>
-      <autom-text-area
-        [label]="'Komentar'"
-        [placeholder]="'Unesite vas komentar ovde'"
-        (emitSelected)="setUserSelectionValue('comment', $event)"
-        ngDefaultControl
-      ></autom-text-area>
-      <autom-input-fields
-        class="flex--1"
-        [clearBtn]="true"
-        [formControlName]="'vin'"
-        [label]="'VIN'"
-        [placeholder]="'npr. WDBUF56X28B123456'"
-        [required]="false"
-        [maxLength]="17"
-        [attr.aria-describedby]="'vinHelp'"
-        (emitSelected)="setUserSelectionValue('vin', $event)"
-        ngDefaultControl
-      ></autom-input-fields>
-
-      <small id="vinHelp" class="form-hint">
-        <strong>Opciono polje:</strong> Ako unesete VIN broj, naš tim može uz
-        pomoć profesionalnih alata proveriti da li deo koji ste pronašli zaista
-        odgovara vašem vozilu. Za isti model automobila može postojati više
-        različitih varijanti delova iz mnogo razloga (oprema, motor, godina,
-        tržište…). VIN nam omogućava da budete sigurni u ispravnost izbora.
-      </small>
-    </form>
-    <div *ngIf="total" class="total">
-      <table>
-        <tr>
-          <td>{{ isAdmin ? 'Nabavno bez PDV-a:' : 'Bez PDV-a:' }}</td>
-          <td class="price">{{ bezPdv | rsdCurrency }}</td>
-        </tr>
-        <tr>
-          <td>PDV:</td>
-          <td class="price">{{ pdv | rsdCurrency }}</td>
-        </tr>
-        <tr>
-          <td>{{ isAdmin ? 'Ukupno nabavno sa PDV-om:' : 'Ukupno sa PDV-om:' }}</td>
-          <td class="price">{{ total | rsdCurrency }}</td>
-        </tr>
-      </table>
-
-      <div *ngIf="!isAdmin && shouldShowMixedDeliveryInfo" class="checkout-info">
-        <p class="checkout-info__title">Isporuka</p>
-        <ul class="checkout-info__list">
-          <li>Podrazumevano šaljemo kada sve stavke stignu.</li>
-          <li *ngIf="deliveryEstimateLabel; else unknownDelivery">
-            Procena isporuke: {{ deliveryEstimateLabel }}.
-          </li>
-          <ng-template #unknownDelivery>
-            <li>Procena isporuke se potvrđuje nakon obrade porudžbine.</li>
-          </ng-template>
-          <li>
-            Ako želite delimičnu isporuku (više paketa), napišite u napomeni.
-          </li>
-          <li>Dodatna poštarina može važiti za više paketa.</li>
-        </ul>
-      </div>
-
-      <autom-button
-        class="autom-align__right order-btn"
-        [type]="buttonTypes.PRIMARY"
-        [theme]="buttonThemes.LIGHT_ORANGE"
-        [label]="'Potvrdi porudzbinu'"
-        [disabled]="
-          invoiceSubmitted || (loggedIn ? !cartForm.valid : !userForm.valid)
-        "
-        (clickEvent)="submitInvoice()"
-      ></autom-button>
-      <div *ngIf="!isAdmin && hasProviderOnlyItems" class="free-shipping-info warning">
-        <autom-icon [source]="iconsEnum.INFO" class="info-icon"></autom-icon>
-        Korpa sadrži stavke iz eksternog magacina. Te stavke mogu imati duži rok
-        isporuke.
-      </div>
-      <div *ngIf="!isAdmin && !loggedIn && total < 3000" class="free-shipping-info warning">
-        <autom-icon [source]="iconsEnum.INFO" class="info-icon"></autom-icon>
-        Porudžbine preko 3.000 RSD (kupci bez ugovora) imaju besplatnu
-        dostavu. Još {{ 3000 - total | rsdCurrency }} i vaša dostava će biti
-        besplatna!
-      </div>
-      <div *ngIf="!isAdmin && !loggedIn" class="checkout-info">
-        <p class="checkout-info__title">Dostava i plaćanje</p>
-        <ul class="checkout-info__list">
-          <li>
-            Artikle sa stanja predajemo kuriru u roku od 24h (Aks/Bex dostava
-            1–2 radna dana).
-          </li>
-          <li>
-            Ako neki artikal nije na stanju, obezbeđujemo ga iz eksternog
-            magacina (rok isporuke može biti duži).
-          </li>
-          <li>
-            Plaćanje pouzećem (gotovina ili kartica kod kurira gde je
-            omogućeno).
-          </li>
-          <li>Fiskalni račun stiže u paketu.</li>
-          <li>
-            Ako ste na ruti našeg vozila tog dana, javljamo se ili pozovite za
-            direktnu isporuku.
-          </li>
-          <li>
-            Besplatna dostava za maloprodajne online porudžbine (bez ugovora)
-            iznad 3.000 RSD.
-          </li>
-        </ul>
-        <div class="checkout-info__links">
-          <a
-            routerLink="/uslovi-kupovine"
-            fragment="dostava"
-            href="/uslovi-kupovine#dostava"
-            >Dostava</a
-          >
-          <span aria-hidden="true">•</span>
-          <a
-            routerLink="/uslovi-kupovine"
-            fragment="placanje"
-            href="/uslovi-kupovine#placanje"
-            >Plaćanje</a
-          >
-          <span aria-hidden="true">•</span>
-          <a
-            routerLink="/uslovi-kupovine"
-            fragment="povrat"
-            href="/uslovi-kupovine#povrat"
-            >Povrat i garancija</a
-          >
+      </form>
+      <form *ngIf="!loggedIn" class="information cart-panel" [formGroup]="userForm">
+        <h3 class="cart-panel__title">Podaci kupca</h3>
+        <div class="display--flex gap-7">
+          <autom-input-fields
+            class="flex--1"
+            [clearBtn]="true"
+            [formControlName]="'name'"
+            [label]="'Ime'"
+            [required]="true"
+            (emitSelected)="setUserSelectionValue('name', $event)"
+            ngDefaultControl
+          ></autom-input-fields>
+          <autom-input-fields
+            class="flex--1"
+            [clearBtn]="true"
+            [formControlName]="'surname'"
+            [label]="'Prezime'"
+            [required]="true"
+            (emitSelected)="setUserSelectionValue('surname', $event)"
+            ngDefaultControl
+          ></autom-input-fields>
         </div>
+        <div class="display--flex gap-7">
+          <autom-input-fields
+            class="flex--1"
+            [clearBtn]="true"
+            [formControlName]="'postalcode'"
+            [label]="'Postal code'"
+            [required]="true"
+            (emitSelected)="setUserSelectionValue('postalcode', $event)"
+            ngDefaultControl
+          ></autom-input-fields>
+          <autom-input-fields
+            class="flex--1"
+            [clearBtn]="true"
+            [formControlName]="'city'"
+            [label]="'Grad'"
+            [required]="true"
+            (emitSelected)="setUserSelectionValue('city', $event)"
+            ngDefaultControl
+          ></autom-input-fields>
+        </div>
+        <div class="display--flex gap-7">
+          <autom-input-fields
+            class="flex--1"
+            [clearBtn]="true"
+            [formControlName]="'street'"
+            [label]="'Ulica i broj'"
+            [required]="true"
+            (emitSelected)="setUserSelectionValue('street', $event)"
+            ngDefaultControl
+          ></autom-input-fields>
+          <autom-input-fields
+            class="flex--1"
+            [clearBtn]="true"
+            [formControlName]="'phone'"
+            [label]="'Telefon'"
+            [required]="true"
+            (emitSelected)="setUserSelectionValue('phone', $event)"
+            ngDefaultControl
+          ></autom-input-fields>
+        </div>
+        <autom-input-fields
+          [clearBtn]="true"
+          [formControlName]="'email'"
+          [id]="'email'"
+          [label]="'Email'"
+          [required]="true"
+          [type]="inputTypeEnum.EMAIL"
+          [validators]="[
+            {
+              name: 'pattern',
+              value: emailAddressPattern
+            }
+          ]"
+          (emitSelected)="setUserSelectionValue('email', $event)"
+          ngDefaultControl
+        ></autom-input-fields>
+        <autom-input-fields
+          [clearBtn]="true"
+          [formControlName]="'pib'"
+          [label]="'PIB'"
+          (emitSelected)="setUserSelectionValue('pib', $event)"
+          ngDefaultControl
+        ></autom-input-fields>
+        <autom-text-area
+          [label]="'Komentar'"
+          [placeholder]="'Unesite vas komentar ovde'"
+          (emitSelected)="setUserSelectionValue('comment', $event)"
+          ngDefaultControl
+        ></autom-text-area>
+        <autom-input-fields
+          class="flex--1"
+          [clearBtn]="true"
+          [formControlName]="'vin'"
+          [label]="'VIN'"
+          [placeholder]="'npr. WDBUF56X28B123456'"
+          [required]="false"
+          [maxLength]="17"
+          [attr.aria-describedby]="'vinHelp'"
+          (emitSelected)="setUserSelectionValue('vin', $event)"
+          ngDefaultControl
+        ></autom-input-fields>
+
+        <small id="vinHelp" class="form-hint">
+          <strong>Opciono polje:</strong> Ako unesete VIN broj, naš tim može uz
+          pomoć profesionalnih alata proveriti da li deo koji ste pronašli zaista
+          odgovara vašem vozilu. Za isti model automobila može postojati više
+          različitih varijanti delova iz mnogo razloga (oprema, motor, godina,
+          tržište…). VIN nam omogućava da budete sigurni u ispravnost izbora.
+        </small>
+      </form>
       </div>
 
-      <div
-        *ngIf="!isAdmin && !loggedIn && total >= 3000"
-        class="free-shipping-info success"
-      >
-        <autom-icon
-          [source]="iconsEnum.CHECK_CIRCLE"
-          class="info-icon"
-        ></autom-icon>
-        Obezbedili ste besplatnu dostavu!
-      </div>
+      <aside class="cart-summary">
+        <div *ngIf="total" class="total cart-panel">
+        <div class="cart-summary__header">
+          <p class="cart-summary__title">Rezime porudžbine</p>
+          <p class="cart-summary__subtitle">
+            {{ cartItemCount }} stavki • {{ cartQuantityTotal }} kom
+          </p>
+        </div>
+        <table class="cart-summary__table">
+          <tr>
+            <td>{{ isAdmin ? 'Nabavno bez PDV-a:' : 'Bez PDV-a:' }}</td>
+            <td class="price">{{ bezPdv | rsdCurrency }}</td>
+          </tr>
+          <tr>
+            <td>PDV:</td>
+            <td class="price">{{ pdv | rsdCurrency }}</td>
+          </tr>
+          <tr>
+            <td>{{ isAdmin ? 'Ukupno nabavno sa PDV-om:' : 'Ukupno sa PDV-om:' }}</td>
+            <td class="price">{{ total | rsdCurrency }}</td>
+          </tr>
+        </table>
+
+        <div *ngIf="!isAdmin && shouldShowMixedDeliveryInfo" class="checkout-info">
+          <p class="checkout-info__title">Isporuka</p>
+          <ul class="checkout-info__list">
+            <li>Podrazumevano šaljemo kada sve stavke stignu.</li>
+            <li *ngIf="deliveryEstimateLabel; else unknownDelivery">
+              Procena isporuke: {{ deliveryEstimateLabel }}.
+            </li>
+            <ng-template #unknownDelivery>
+              <li>Procena isporuke se potvrđuje nakon obrade porudžbine.</li>
+            </ng-template>
+            <li>
+              Ako želite delimičnu isporuku (više paketa), napišite u napomeni.
+            </li>
+            <li>Dodatna poštarina može važiti za više paketa.</li>
+          </ul>
+        </div>
+
+        <autom-button
+          class="autom-align__right order-btn"
+          [type]="buttonTypes.PRIMARY"
+          [theme]="buttonThemes.LIGHT_ORANGE"
+          [label]="'Potvrdi porudzbinu'"
+          [disabled]="
+            invoiceSubmitted || (loggedIn ? !cartForm.valid : !userForm.valid)
+          "
+          (clickEvent)="submitInvoice()"
+        ></autom-button>
+        <div *ngIf="!isAdmin && hasProviderOnlyItems" class="free-shipping-info warning">
+          <autom-icon [source]="iconsEnum.INFO" class="info-icon"></autom-icon>
+          Korpa sadrži stavke iz eksternog magacina. Te stavke mogu imati duži rok
+          isporuke.
+        </div>
+        <div
+          *ngIf="!isAdmin && !loggedIn && total < 3000"
+          class="free-shipping-info warning"
+        >
+          <autom-icon [source]="iconsEnum.INFO" class="info-icon"></autom-icon>
+          Porudžbine preko 3.000 RSD (kupci bez ugovora) imaju besplatnu
+          dostavu. Još {{ 3000 - total | rsdCurrency }} i vaša dostava će biti
+          besplatna!
+        </div>
+        <div *ngIf="!isAdmin && !loggedIn" class="checkout-info">
+          <p class="checkout-info__title">Dostava i plaćanje</p>
+          <ul class="checkout-info__list">
+            <li>
+              Artikle sa stanja predajemo kuriru u roku od 24h (Aks/Bex dostava
+              1–2 radna dana).
+            </li>
+            <li>
+              Ako neki artikal nije na stanju, obezbeđujemo ga iz eksternog
+              magacina (rok isporuke može biti duži).
+            </li>
+            <li>
+              Plaćanje pouzećem (gotovina ili kartica kod kurira gde je
+              omogućeno).
+            </li>
+            <li>Fiskalni račun stiže u paketu.</li>
+            <li>
+              Ako ste na ruti našeg vozila tog dana, javljamo se ili pozovite za
+              direktnu isporuku.
+            </li>
+            <li>
+              Besplatna dostava za maloprodajne online porudžbine (bez ugovora)
+              iznad 3.000 RSD.
+            </li>
+          </ul>
+          <div class="checkout-info__links">
+            <a
+              routerLink="/uslovi-kupovine"
+              fragment="dostava"
+              href="/uslovi-kupovine#dostava"
+              >Dostava</a
+            >
+            <span aria-hidden="true">•</span>
+            <a
+              routerLink="/uslovi-kupovine"
+              fragment="placanje"
+              href="/uslovi-kupovine#placanje"
+              >Plaćanje</a
+            >
+            <span aria-hidden="true">•</span>
+            <a
+              routerLink="/uslovi-kupovine"
+              fragment="povrat"
+              href="/uslovi-kupovine#povrat"
+              >Povrat i garancija</a
+            >
+          </div>
+        </div>
+
+        <div
+          *ngIf="!isAdmin && !loggedIn && total >= 3000"
+          class="free-shipping-info success"
+        >
+          <autom-icon
+            [source]="iconsEnum.CHECK_CIRCLE"
+            class="info-icon"
+          ></autom-icon>
+          Obezbedili ste besplatnu dostavu!
+        </div>
+        </div>
+      </aside>
     </div>
   </div>
 </section>

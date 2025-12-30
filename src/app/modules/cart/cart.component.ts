@@ -287,6 +287,31 @@ export class CartComponent implements OnInit, OnDestroy {
     );
   }
 
+  get cartItemCount(): number {
+    return this.roba?.length ?? 0;
+  }
+
+  get cartQuantityTotal(): number {
+    return (this.roba ?? []).reduce(
+      (sum, item) => sum + (Number(item.kolicina) || 0),
+      0
+    );
+  }
+
+  get cartProviderCount(): number {
+    return (this.roba ?? []).filter(
+      (r) =>
+        getAvailabilityStatus(r) === 'AVAILABLE' &&
+        !!r?.providerAvailability?.available
+    ).length;
+  }
+
+  get cartOutOfStockCount(): number {
+    return (this.roba ?? []).filter(
+      (r) => getAvailabilityStatus(r) === 'OUT_OF_STOCK'
+    ).length;
+  }
+
   get shouldShowMixedDeliveryInfo(): boolean {
     const items = this.roba ?? [];
     if (items.length < 2) {

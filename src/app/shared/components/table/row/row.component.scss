@@ -123,7 +123,7 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 0px;
+  gap: 5px;
 
   /* --- Image --- */
   .image-container {
@@ -442,6 +442,79 @@
   }
 }
 
+/* ---------- Cart overrides ---------- */
+:host-context(.cart) {
+  .row-container {
+    display: grid;
+    grid-template-columns: 160px minmax(0, 1fr) minmax(240px, 280px) 40px;
+    gap: 16px;
+    align-items: start;
+  }
+
+  .image-container {
+    width: 160px;
+    height: 140px;
+  }
+
+  .image-smaller {
+    height: 140px;
+  }
+
+  .details-container {
+    padding: 0;
+  }
+
+  .details-container h3.product-heading {
+    font-size: 17px !important;
+    line-height: 1.25 !important;
+    margin-bottom: 6px !important;
+  }
+
+  .details-container h3.product-heading .product-link__brand {
+    font-size: 14px !important;
+    letter-spacing: 0.06em !important;
+  }
+
+  .details-container h3.product-heading .product-name-fragment {
+    font-size: 17px !important;
+  }
+
+  .details-container h3.product-heading .product-link__chev {
+    font-size: 15px !important;
+  }
+
+  .pricing-container {
+    text-align: right;
+    padding-right: 6px;
+  }
+
+  .pricing-container .util__flex--center {
+    justify-content: flex-end;
+    gap: 12px;
+  }
+
+  .remove-icon {
+    align-self: start;
+    justify-self: end;
+    margin-top: 4px;
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+  }
+
+  .remove-icon autom-icon {
+    font-size: 16px;
+    line-height: 1;
+    display: block;
+  }
+}
+
 /* ---------- Responsive (≤ 991px) ---------- */
 @media (max-width: 991px) {
   .row-container {
@@ -610,6 +683,26 @@
   }
   .mobile-quantity-cart {
     flex-direction: row !important;
+  }
+}
+
+@media (max-width: 991px) {
+  :host-context(.cart) {
+    .row-container {
+      display: flex;
+    }
+
+    .remove-icon {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+    }
+
+    .remove-icon autom-icon {
+      font-size: 22px;
+      line-height: 1;
+    }
   }
 }
 
