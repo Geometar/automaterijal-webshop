@@ -65,6 +65,7 @@ export class InvoiceDetailsComponent implements OnInit {
   colorEnum = ColorEnum;
   iconEnum = IconsEnum;
   isAdmin = false;
+  isEmployee = false;
 
   // Misc loading
   loading = false;
@@ -84,6 +85,7 @@ export class InvoiceDetailsComponent implements OnInit {
   /** Start of: Angular lifecycle hooks */
   ngOnInit(): void {
     this.isAdmin = this.accountStateService.isAdmin();
+    this.isEmployee = this.accountStateService.isEmployee();
     this.configureColumns();
 
     const hasPpidParam = this.route.snapshot.paramMap.has('ppid');
@@ -270,11 +272,20 @@ export class InvoiceDetailsComponent implements OnInit {
 
   private resolveSourceLabel(item: InvoiceItem): string {
     const warehouseName = (item?.providerAvailability?.warehouseName || '').trim();
+    const isProvider = item?.izvor === 'PROVIDER' || !!item?.providerAvailability?.available;
+
+    if (!this.isStaff && isProvider) {
+      return 'Eksterni magacin';
+    }
     if (warehouseName) {
       return warehouseName;
     }
 
     return 'Automaterijal Magacin';
+  }
+
+  private get isStaff(): boolean {
+    return this.isAdmin || this.isEmployee;
   }
 
   private resolvePurchasePrice(item: InvoiceItem): number | null {

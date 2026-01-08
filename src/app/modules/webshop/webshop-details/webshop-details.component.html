@@ -118,7 +118,14 @@
                   <i class="dot"></i>Na stanju — spremno za brzu isporuku
                 </li>
                 <li *ngIf="availabilityStatus === 'AVAILABLE'">
-                  <i class="dot"></i>Dostupno (eksterni magacin)<span *ngIf="providerDeliveryLabel"> — isporuka {{ providerDeliveryLabel }}</span>
+                  <i class="dot"></i
+                  >{{
+                    isStaff
+                      ? 'Dostupno (eksterni magacin)'
+                      : 'Na stanju (eksterni magacin)'
+                  }}<span *ngIf="providerDeliveryLabel">
+                    — isporuka {{ providerDeliveryLabel }}</span
+                  >
                 </li>
                 <li *ngIf="availabilityStatus === 'OUT_OF_STOCK'">
                   <i class="dot"></i>Nema na stanju
@@ -135,13 +142,18 @@
             <div
               class="stock"
               [class.ok]="hasValidPrice && availabilityStatus === 'IN_STOCK'"
-              [class.supplier]="hasValidPrice && availabilityStatus === 'AVAILABLE'"
+              [class.supplier]="hasValidPrice && availabilityStatus === 'AVAILABLE' && isStaff"
+              [class.external]="hasValidPrice && availabilityStatus === 'AVAILABLE' && !isStaff"
               [class.nope]="!hasValidPrice || availabilityStatus === 'OUT_OF_STOCK'"
             >
               {{ availabilityLabel }}<span class="led" aria-hidden="true"></span>
             </div>
 
-            <div class="provider-availability" *ngIf="showProviderAvailability">
+            <div
+              class="provider-availability"
+              [class.provider-availability--customer]="!isStaff"
+              *ngIf="showProviderAvailability"
+            >
               <div class="provider-availability__row" *ngIf="providerDeliveryLabel">
                 Isporuka: {{ providerDeliveryLabel }}
               </div>

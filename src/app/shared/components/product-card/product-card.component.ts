@@ -18,6 +18,7 @@ import { ColorEnum, IconsEnum, InputTypeEnum, SizeEnum } from '../../data-models
 import { RsdCurrencyPipe } from '../../pipe/rsd-currency.pipe';
 
 // Services
+import { AccountStateService } from '../../service/state/account-state.service';
 import { CartStateService } from '../../service/state/cart-state.service';
 import { SnackbarService } from '../../service/utils/snackbar.service';
 import { StringUtils } from '../../utils/string-utils';
@@ -56,10 +57,14 @@ export class AutomProductCardComponent implements OnInit, OnChanges {
   inputTypeEnum = InputTypeEnum;
   sizeEnum = SizeEnum;
 
+  isAdmin = false;
+  isEmployee = false;
+
   // Quantity state
   quantity = 1;
 
   constructor(
+    private accountStateService: AccountStateService,
     private cartStateService: CartStateService,
     private snackbarService: SnackbarService,
     private router: Router,
@@ -69,6 +74,9 @@ export class AutomProductCardComponent implements OnInit, OnChanges {
   /* ---------------------------- Lifecycle ---------------------------- */
 
   ngOnInit(): void {
+    this.isAdmin = this.accountStateService.isAdmin();
+    this.isEmployee = this.accountStateService.isEmployee();
+
     // Initialize quantity from incoming data if present
     const incomingQty = this.roba?.kolicina ?? 0;
     if (incomingQty > 0) {
@@ -286,7 +294,8 @@ export class AutomProductCardComponent implements OnInit, OnChanges {
   get availabilityVm(): AvailabilityVm {
     return buildAvailabilityVm(this.roba, {
       isTecDocOnly: this.isTecDocOnly,
-      isAdmin: false,
+      isAdmin: this.isAdmin,
+      isStaff: this.isAdmin || this.isEmployee,
     });
   }
 

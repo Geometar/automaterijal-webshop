@@ -287,6 +287,10 @@ export class RowComponent implements OnInit, OnChanges {
     return this.isAdmin && this.showPriceOnly;
   }
 
+  get isStaff(): boolean {
+    return this.isAdmin || this.isEmployee;
+  }
+
   get unitPrice(): number {
     if (!this.isAdminCartView) {
       return this.availabilityVm.displayPrice || 0;
@@ -407,6 +411,7 @@ export class RowComponent implements OnInit, OnChanges {
     return buildAvailabilityVm(this.data, {
       isAdmin: this.isAdmin,
       isTecDocOnly: this.isTecDocOnly,
+      isStaff: this.isStaff,
     });
   }
 

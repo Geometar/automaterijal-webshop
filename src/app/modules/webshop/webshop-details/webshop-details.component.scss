@@ -474,6 +474,14 @@
     &.supplier .led {
       background: var(--figma-info-500);
     }
+    &.external {
+      background: var(--figma-success-25);
+      border-color: var(--figma-success-100);
+      color: var(--figma-success-700);
+    }
+    &.external .led {
+      background: var(--figma-success-500);
+    }
   }
 
   .provider-availability {
@@ -488,12 +496,22 @@
     line-height: 1.35;
   }
 
+  .provider-availability--customer {
+    border-color: var(--figma-success-100);
+    background: var(--figma-success-25);
+    color: var(--figma-success-700);
+  }
+
   .provider-availability__row + .provider-availability__row {
     margin-top: 4px;
   }
 
   .provider-availability__value {
     font-weight: 800;
+  }
+
+  .provider-availability--customer .provider-availability__value {
+    color: var(--figma-success-700);
   }
 
   .provider-availability__admin {

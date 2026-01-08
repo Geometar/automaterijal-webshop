@@ -190,6 +190,10 @@
       color: var(--figma-info-700);
     }
 
+    &.green .product-stock__sub {
+      color: var(--figma-success-700);
+    }
+
     .product-stock__sep {
       padding: 0 6px;
     }

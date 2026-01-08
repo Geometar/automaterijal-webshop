@@ -160,9 +160,10 @@ export function formatDispatchCutoff(cutoffIso: string | null | undefined): stri
 
 export function buildAvailabilityVm(
   roba: Pick<Roba, 'availabilityStatus' | 'stanje' | 'cena' | 'rabat' | 'providerAvailability'> | null | undefined,
-  opts?: { isAdmin?: boolean; isTecDocOnly?: boolean }
+  opts?: { isAdmin?: boolean; isTecDocOnly?: boolean; isStaff?: boolean }
 ): AvailabilityVm {
   const isAdmin = !!opts?.isAdmin;
+  const isStaff = isAdmin || !!opts?.isStaff;
   const isTecDocOnly = !!opts?.isTecDocOnly;
 
   const status: AvailabilityStatus = isTecDocOnly ? 'OUT_OF_STOCK' : getAvailabilityStatus(roba as any);
@@ -177,8 +178,8 @@ export function buildAvailabilityVm(
     label = 'Na stanju';
     tone = 'green';
   } else if (status === 'AVAILABLE') {
-    label = 'Dostupno (eksterni magacin)';
-    tone = 'blue';
+    label = isStaff ? 'Dostupno (eksterni magacin)' : 'Na stanju (eksterni magacin)';
+    tone = isStaff ? 'blue' : 'green';
   }
 
   const purchasableStock = isTecDocOnly ? 0 : getPurchasableStock(roba as any);

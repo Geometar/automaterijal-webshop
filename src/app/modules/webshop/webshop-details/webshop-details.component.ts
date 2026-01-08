@@ -137,6 +137,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   // Misc
   editingText = false;
   isAdmin = false;
+  isEmployee = false;
   loggedIn = false;
   loading = true;
   quantity: number = 1;
@@ -172,7 +173,10 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   }
 
   get availabilityVm(): AvailabilityVm {
-    return buildAvailabilityVm(this.data, { isAdmin: this.isAdmin });
+    return buildAvailabilityVm(this.data, {
+      isAdmin: this.isAdmin,
+      isStaff: this.isStaff,
+    });
   }
 
   get hasDiscount(): boolean {
@@ -265,6 +269,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.isAdmin = this.accountStateService.isAdmin();
+    this.isEmployee = this.accountStateService.isEmployee();
     this.loggedIn = this.accountStateService.isUserLoggedIn();
 
     this.route.paramMap
@@ -800,6 +805,10 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
 
   get availabilityLabel(): string {
     return this.availabilityVm.label;
+  }
+
+  get isStaff(): boolean {
+    return this.isAdmin || this.isEmployee;
   }
 
   get showProviderAvailability(): boolean {

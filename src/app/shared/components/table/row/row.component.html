@@ -224,7 +224,11 @@
     </div>
 
     <!-- Eksterna dostupnost (dobavljač) -->
-    <div class="provider-availability" *ngIf="availabilityVm.showProviderBox">
+    <div
+      class="provider-availability"
+      [class.provider-availability--customer]="!isStaff"
+      *ngIf="availabilityVm.showProviderBox"
+    >
       <div
         class="provider-availability__row"
         *ngIf="availabilityVm.provider.deliveryLabel"
