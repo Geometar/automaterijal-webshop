@@ -58,6 +58,7 @@ import { PopupComponent } from '../../../shared/components/popup/popup.component
 import { RsdCurrencyPipe } from '../../../shared/pipe/rsd-currency.pipe';
 import { SpinnerComponent } from '../../../shared/components/spinner/spinner.component';
 import { TextAreaComponent } from '../../../shared/components/text-area/text-area.component';
+import { ProviderAvailabilityComponent } from '../../../shared/components/provider-availability/provider-availability.component';
 import { EmailService } from '../../../shared/service/email.service';
 import {
   AvailabilityVm,
@@ -106,6 +107,7 @@ interface SpecEntry {
     RsdCurrencyPipe,
     SpinnerComponent,
     TextAreaComponent,
+    ProviderAvailabilityComponent,
     DividerComponent,
     ShowcaseComponent
   ],
@@ -795,10 +797,6 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     return this.availabilityVm.displayPrice;
   }
 
-  get providerPurchasePriceLabel(): string | null {
-    return this.availabilityVm.provider.admin.purchasePriceLabel;
-  }
-
   get availabilityStatus(): AvailabilityStatus {
     return this.availabilityVm.status;
   }
@@ -815,20 +813,8 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     return this.availabilityVm.showProviderBox;
   }
 
-  get providerPriceLabel(): string | null {
-    return this.availabilityVm.provider.admin.customerPriceLabel;
-  }
-
-  get providerQuantity(): number | null {
-    return this.availabilityVm.provider.quantity;
-  }
-
   get providerDeliveryLabel(): string | null {
     return this.availabilityVm.provider.deliveryLabel;
-  }
-
-  get providerCutoffLabel(): string | null {
-    return this.availabilityVm.provider.cutoffLabel;
   }
 
   get availableStock(): number {

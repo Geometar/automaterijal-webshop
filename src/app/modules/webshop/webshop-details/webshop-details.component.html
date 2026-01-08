@@ -118,12 +118,7 @@
                   <i class="dot"></i>Na stanju — spremno za brzu isporuku
                 </li>
                 <li *ngIf="availabilityStatus === 'AVAILABLE'">
-                  <i class="dot"></i
-                  >{{
-                    isStaff
-                      ? 'Dostupno (eksterni magacin)'
-                      : 'Na stanju (eksterni magacin)'
-                  }}<span *ngIf="providerDeliveryLabel">
+                  <i class="dot"></i>{{ availabilityLabel }}<span *ngIf="providerDeliveryLabel">
                     — isporuka {{ providerDeliveryLabel }}</span
                   >
                 </li>
@@ -149,27 +144,12 @@
               {{ availabilityLabel }}<span class="led" aria-hidden="true"></span>
             </div>
 
-            <div
-              class="provider-availability"
-              [class.provider-availability--customer]="!isStaff"
-              *ngIf="showProviderAvailability"
-            >
-              <div class="provider-availability__row" *ngIf="providerDeliveryLabel">
-                Isporuka: {{ providerDeliveryLabel }}
-              </div>
-              <div class="provider-availability__row" *ngIf="availabilityVm.provider.admin.isAdmin && providerQuantity">
-                Dostupno: {{ providerQuantity }} kom
-              </div>
-              <div class="provider-availability__row" *ngIf="providerCutoffLabel">
-                Poruči do: {{ providerCutoffLabel }}
-              </div>
-              <div class="provider-availability__row provider-availability__admin" *ngIf="availabilityVm.provider.admin.sourceLabel">
-                Izvor: <span class="provider-availability__value">{{ availabilityVm.provider.admin.sourceLabel }}</span>
-              </div>
-              <div class="provider-availability__row provider-availability__purchase" *ngIf="providerPurchasePriceLabel">
-                Nabavna: <span class="provider-availability__value">{{ providerPurchasePriceLabel }}</span>
-              </div>
-            </div>
+            <autom-provider-availability
+              [availability]="availabilityVm"
+              [isStaff]="isStaff"
+              [showQuantity]="availabilityVm.provider.admin.isAdmin"
+              variant="details"
+            ></autom-provider-availability>
 
             <div class="price-wrap">
               <div class="price-row" *ngIf="hasDiscount">

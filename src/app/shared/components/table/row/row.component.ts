@@ -9,6 +9,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { InputFieldsComponent } from '../../input-fields/input-fields.component';
 import { MetaPillComponent } from '../../meta-pill/meta-pill.component';
 import { InquiryDialogComponent } from '../../inquiry-dialog/inquiry-dialog.component';
+import { ProviderAvailabilityComponent } from '../../provider-availability/provider-availability.component';
 
 // Data models
 import { Roba } from '../../../data-models/model/roba';
@@ -36,7 +37,8 @@ import { StringUtils } from '../../../utils/string-utils';
 import { UrlHelperService } from '../../../service/utils/url-helper.service';
 import {
   AvailabilityVm,
-  buildAvailabilityVm
+  buildAvailabilityVm,
+  EXTERNAL_WAREHOUSE_LABEL
 } from '../../../utils/availability-utils';
 
 @Component({
@@ -50,6 +52,7 @@ import {
     InputFieldsComponent,
     MetaPillComponent,
     InquiryDialogComponent,
+    ProviderAvailabilityComponent,
     ReactiveFormsModule,
     RouterModule,
     RsdCurrencyPipe,
@@ -95,6 +98,7 @@ export class RowComponent implements OnInit, OnChanges {
   showAllSpecs = false;
   categoryHref: string | null = null;
   categoryLinkSegments: string[] | null = null;
+  externalWarehouseLabel = EXTERNAL_WAREHOUSE_LABEL;
 
   stringUtils = StringUtils;
 

@@ -16,6 +16,10 @@ import { RsdCurrencyPipe } from '../../../../shared/pipe/rsd-currency.pipe';
 import { Invoice, InvoiceItem } from '../../../../shared/data-models/model';
 import { AvailabilityStatus, ProviderAvailabilityDto } from '../../../../shared/data-models/model/availability';
 import { StringUtils } from '../../../../shared/utils/string-utils';
+import {
+  EXTERNAL_WAREHOUSE_LABEL,
+  isProviderSource
+} from '../../../../shared/utils/availability-utils';
 
 // Enums
 import {
@@ -272,10 +276,10 @@ export class InvoiceDetailsComponent implements OnInit {
 
   private resolveSourceLabel(item: InvoiceItem): string {
     const warehouseName = (item?.providerAvailability?.warehouseName || '').trim();
-    const isProvider = item?.izvor === 'PROVIDER' || !!item?.providerAvailability?.available;
+    const isProvider = isProviderSource(item?.izvor, item?.providerAvailability);
 
     if (!this.isStaff && isProvider) {
-      return 'Eksterni magacin';
+      return EXTERNAL_WAREHOUSE_LABEL;
     }
     if (warehouseName) {
       return warehouseName;
@@ -302,7 +306,7 @@ export class InvoiceDetailsComponent implements OnInit {
 
   private buildProviderInfo(item: InvoiceItem): string {
     const pa = item?.providerAvailability;
-    const isProvider = item?.izvor === 'PROVIDER' || !!pa?.available;
+    const isProvider = isProviderSource(item?.izvor, pa);
     if (!isProvider || !pa) {
       return '—';
     }
@@ -390,7 +394,7 @@ export class InvoiceDetailsComponent implements OnInit {
     if (status === 'AVAILABLE') return 'Dostupno';
     if (status === 'OUT_OF_STOCK') return 'Nema na stanju';
     if (source === 'STOCK') return 'Na stanju';
-    if (source === 'PROVIDER' || provider?.available) return 'Dostupno';
+    if (isProviderSource(source, provider)) return 'Dostupno';
     return '—';
   }
 }

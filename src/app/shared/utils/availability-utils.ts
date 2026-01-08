@@ -3,6 +3,23 @@ import { Roba } from '../data-models/model/roba';
 
 export type AvailabilityTone = 'green' | 'blue' | 'red' | 'yellow';
 
+export const EXTERNAL_WAREHOUSE_LABEL = 'Eksterni magacin';
+export const EXTERNAL_AVAILABILITY_LABEL_STAFF = 'Dostupno (eksterni magacin)';
+export const EXTERNAL_AVAILABILITY_LABEL_CUSTOMER = 'Na stanju (eksterni magacin)';
+
+export function getExternalAvailabilityLabel(isStaff: boolean): string {
+  return isStaff
+    ? EXTERNAL_AVAILABILITY_LABEL_STAFF
+    : EXTERNAL_AVAILABILITY_LABEL_CUSTOMER;
+}
+
+export function isProviderSource(
+  source?: 'STOCK' | 'PROVIDER',
+  provider?: ProviderAvailabilityDto | null
+): boolean {
+  return source === 'PROVIDER' || !!provider?.available;
+}
+
 export interface AvailabilityVm {
   status: AvailabilityStatus;
   label: string;
@@ -178,7 +195,7 @@ export function buildAvailabilityVm(
     label = 'Na stanju';
     tone = 'green';
   } else if (status === 'AVAILABLE') {
-    label = isStaff ? 'Dostupno (eksterni magacin)' : 'Na stanju (eksterni magacin)';
+    label = getExternalAvailabilityLabel(isStaff);
     tone = isStaff ? 'blue' : 'green';
   }
 
@@ -192,7 +209,7 @@ export function buildAvailabilityVm(
     Number(roba?.providerAvailability?.totalQuantity) ||
     0;
   const sourceLabel = isAdmin
-    ? roba?.providerAvailability?.warehouseName ?? 'Eksterni magacin'
+    ? roba?.providerAvailability?.warehouseName ?? EXTERNAL_WAREHOUSE_LABEL
     : null;
 
   const rabat = Number((roba as any)?.rabat) || 0;

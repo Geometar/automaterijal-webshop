@@ -484,58 +484,6 @@
     }
   }
 
-  .provider-availability {
-    margin-top: 12px;
-    padding: 12px 12px;
-    border-radius: 14px;
-    border: 1px solid var(--figma-info-100);
-    background: var(--figma-info-25);
-    color: var(--figma-info-700);
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 1.35;
-  }
-
-  .provider-availability--customer {
-    border-color: var(--figma-success-100);
-    background: var(--figma-success-25);
-    color: var(--figma-success-700);
-  }
-
-  .provider-availability__row + .provider-availability__row {
-    margin-top: 4px;
-  }
-
-  .provider-availability__value {
-    font-weight: 800;
-  }
-
-  .provider-availability--customer .provider-availability__value {
-    color: var(--figma-success-700);
-  }
-
-  .provider-availability__admin {
-    margin-top: 8px !important;
-    padding-top: 8px;
-    border-top: 1px dashed var(--figma-info-100);
-    color: var(--figma-grey-700);
-    font-size: 11.5px;
-    font-weight: 700;
-  }
-
-  .provider-availability__purchase {
-    margin-top: 6px;
-    color: var(--figma-grey-800);
-    font-size: 12.5px;
-    font-weight: 800;
-  }
-
-  .provider-availability__purchase .provider-availability__value {
-    font-size: 13px;
-    font-weight: 900;
-    color: var(--figma-grey-900);
-  }
-
   .price-wrap {
     margin: 14px 0 12px;
 
