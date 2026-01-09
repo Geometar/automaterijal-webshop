@@ -114,8 +114,16 @@
                     >› {{ data.podGrupaNaziv }}</span
                   >
                 </li>
-                <li *ngIf="availableStock > 0">
+                <li *ngIf="availabilityStatus === 'IN_STOCK'">
                   <i class="dot"></i>Na stanju — spremno za brzu isporuku
+                </li>
+                <li *ngIf="availabilityStatus === 'AVAILABLE'">
+                  <i class="dot"></i>{{ availabilityLabel }}<span *ngIf="providerDeliveryLabel">
+                    — isporuka {{ providerDeliveryLabel }}</span
+                  >
+                </li>
+                <li *ngIf="availabilityStatus === 'OUT_OF_STOCK'">
+                  <i class="dot"></i>Nema na stanju
                 </li>
                 <li *ngIf="data.katbr">
                   <i class="dot"></i>Kat. broj: {{ data.katbr }}
@@ -128,19 +136,27 @@
           <aside class="buy-card card">
             <div
               class="stock"
-              [class.ok]="availableStock > 0"
-              [class.nope]="isOutOfStock"
+              [class.ok]="hasValidPrice && availabilityStatus === 'IN_STOCK'"
+              [class.supplier]="hasValidPrice && availabilityStatus === 'AVAILABLE' && isStaff"
+              [class.external]="hasValidPrice && availabilityStatus === 'AVAILABLE' && !isStaff"
+              [class.nope]="!hasValidPrice || availabilityStatus === 'OUT_OF_STOCK'"
             >
-              <span class="led"></span
-              >{{ !isOutOfStock ? "Na stanju" : "Nema na stanju" }}
+              {{ availabilityLabel }}<span class="led" aria-hidden="true"></span>
             </div>
+
+            <autom-provider-availability
+              [availability]="availabilityVm"
+              [isStaff]="isStaff"
+              [showQuantity]="availabilityVm.provider.admin.isAdmin"
+              variant="details"
+            ></autom-provider-availability>
 
             <div class="price-wrap">
               <div class="price-row" *ngIf="hasDiscount">
                 <span class="old-price">{{ oldPrice! | rsdCurrency }}</span>
                 <span class="discount-badge">-{{ discountValue }}%</span>
               </div>
-              <div class="price">{{ data.cena! | rsdCurrency }}</div>
+              <div class="price">{{ displayPrice | rsdCurrency }}</div>
               <div class="note">cena sa PDV-om</div>
               <div *ngIf="hasDiscount && savings" class="saving">
                 Ušteda {{ savings! | rsdCurrency }}
@@ -179,7 +195,11 @@
 
             <div *ngIf="isOutOfStock" class="inquiry">
               <p class="inquiry__title" *ngIf="!inquirySent">
-                Nema na stanju? Pošalji upit za nabavku
+                {{
+                  showProviderAvailability
+                    ? 'Dostupno u eksternom magacinu — pošalji upit za nabavku'
+                    : 'Nema na stanju? Pošalji upit za nabavku'
+                }}
               </p>
               <p class="inquiry__title success" *ngIf="inquirySent">
                 Upit poslat. Javićemo se uskoro.
@@ -375,7 +395,7 @@
           ></autom-button>
         </div>
       </div>
-      <div *ngIf="isAdmin" class="admin-edit-footer">
+      <div *ngIf="isAdmin && data?.robaid" class="admin-edit-footer">
         <h3 class="admin-edit-title">Admin tools</h3>
         <div class="admin-edit-actions">
           <autom-button

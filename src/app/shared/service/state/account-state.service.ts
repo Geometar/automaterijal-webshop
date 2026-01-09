@@ -55,4 +55,9 @@ export class AccountStateService {
   isAdmin(): boolean {
     return this.get()?.isAdmin;
   }
+
+  isSuperAdmin(): boolean {
+    const account = this.get();
+    return !!account?.isSuperAdmin;
+  }
 }

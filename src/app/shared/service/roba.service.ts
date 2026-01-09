@@ -28,6 +28,8 @@ export class RobaService {
 
 
   public pronadjiSvuRobu(sort: Sort | null, pageSize: number, page: number, searchValue: string, filter: Filter): Observable<Magacin> {
+    const trimmedSearch = (searchValue || '').trim();
+
     const parameterObject = {} as any;
     parameterObject['pageSize'] = pageSize;
     parameterObject['page'] = page;
@@ -38,8 +40,8 @@ export class RobaService {
       parameterObject['sortDirection'] = sort.direction.toLocaleUpperCase();
     }
 
-    if (searchValue) {
-      parameterObject['searchTerm'] = searchValue;
+    if (trimmedSearch) {
+      parameterObject['searchTerm'] = trimmedSearch;
     }
 
     if (filter.proizvodjaci && filter.proizvodjaci.length) {
@@ -68,6 +70,7 @@ export class RobaService {
 
     if (filter.showcase) {
       parameterObject['showcase'] = true;
+      parameterObject['skipProvider'] = true;
     }
 
     if (filter.filterBy) {

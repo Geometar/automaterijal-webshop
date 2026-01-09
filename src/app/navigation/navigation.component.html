@@ -113,6 +113,13 @@
                 </div>
               </button>
 
+              <button mat-menu-item routerLink="/admin/invoices">
+                <div class="menu-item-align">
+                  <autom-icon [source]="iconEnum.BOOK"></autom-icon>
+                  <span>Sve porudžbenice</span>
+                </div>
+              </button>
+
               <button mat-menu-item routerLink="/blog/admin">
                 <div class="menu-item-align">
                   <autom-icon [source]="iconEnum.FILE_TEXT"></autom-icon>
@@ -124,6 +131,13 @@
                 <div class="menu-item-align">
                   <autom-icon [source]="iconEnum.LIFE_BUOY"></autom-icon>
                   <span>Logovi</span>
+                </div>
+              </button>
+
+              <button mat-menu-item *ngIf="isSuperAdmin" routerLink="/admin/hogwarts">
+                <div class="menu-item-align">
+                  <autom-icon [source]="iconEnum.CAST"></autom-icon>
+                  <span>Hogwarts</span>
                 </div>
               </button>
             </mat-menu>
@@ -167,7 +181,7 @@
                   <span>Kartica dokumenata</span>
                 </div>
               </button>
-              <button mat-menu-item routerLink="/invoices">
+              <button *ngIf="!isAdmin" mat-menu-item routerLink="/invoices">
                 <div class="menu-item-align">
                   <autom-icon [source]="iconEnum.BOOK"></autom-icon>
                   <span>Web Porudzbenice</span>
@@ -297,21 +311,6 @@
     ></autom-icon>
     <span class="action-label">Dokumenta</span>
   </a>
-  <a
-    *ngIf="loggedIn && isAdmin"
-    class="action-btn"
-    routerLink="/invoices"
-    href="/invoices"
-    aria-label="Web Porudžbenice"
-    [attr.aria-current]="currentUrl.includes('/invoices') ? 'page' : null"
-  >
-    <autom-icon
-      [ngClass]="currentUrl.includes('/invoices') ? 'icon-active' : null"
-      [color]="colorEnum.RICH_BLACK"
-      [source]="iconEnum.BOOK"
-    ></autom-icon>
-    <span class="action-label">Web Porudžbenice</span>
-  </a>
 
   <a
     *ngIf="!loggedIn"
@@ -434,7 +433,7 @@
         Kartica dokumenata
       </a>
     </li>
-    <li class="menu-category" *ngIf="loggedIn">
+    <li class="menu-category" *ngIf="loggedIn && !isAdmin">
       <a
         routerLink="/invoices"
         href="/invoices"
@@ -461,6 +460,16 @@
   <!-- Admin sekcija -->
   <div *ngIf="loggedIn && isAdmin" class="menu-section flex--1">
     <span class="menu-section-label">Admin</span>
+    <a
+      routerLink="/admin/invoices"
+      href="/admin/invoices"
+      [ngClass]="currentUrl.includes('/admin/invoices') ? 'nav-active' : null"
+      class="menu-title autom-padding--vertical__xxs"
+      (click)="closeMobileSidebar()"
+    >
+      <autom-icon [source]="iconEnum.BOOK"></autom-icon>
+      Sve porudžbenice
+    </a>
     <a
       routerLink="/sales-reports"
       href="/sales-reports"
@@ -489,6 +498,17 @@
     >
       <autom-icon [source]="iconEnum.LIFE_BUOY"></autom-icon>
       Logovi
+    </a>
+    <a
+      *ngIf="isSuperAdmin"
+      routerLink="/admin/hogwarts"
+      href="/admin/hogwarts"
+      [ngClass]="currentUrl.includes('/admin/hogwarts') ? 'nav-active' : null"
+      class="menu-title autom-padding--vertical__xxs"
+      (click)="closeMobileSidebar()"
+    >
+      <autom-icon [source]="iconEnum.CAST"></autom-icon>
+      Hogwarts
     </a>
   </div>
 
