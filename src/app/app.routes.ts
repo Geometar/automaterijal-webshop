@@ -3,6 +3,7 @@ import { Routes } from '@angular/router';
 // Guards
 import { authGuard } from './shared/guards/auth.guard';
 import { adminGuard } from './shared/guards/admin.guard';
+import { superAdminGuard } from './shared/guards/super-admin.guard';
 import { salesGuard } from './shared/guards/sales.guard';
 
 export const routes: Routes = [
@@ -189,6 +190,12 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./modules/personal/invoices/invoice-details/invoice-details.component').then((m) => m.InvoiceDetailsComponent),
     canActivate: [adminGuard]
+  },
+  {
+    path: 'admin/hogwarts',
+    loadComponent: () =>
+      import('./modules/admin/hogwarts/hogwarts.component').then((m) => m.HogwartsComponent),
+    canActivate: [superAdminGuard]
   },
 
   // --- Catch all ---

@@ -81,6 +81,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
   account: Account | null = null;
   fixedHeaderClass = false;
   isAdmin = false;
+  isSuperAdmin = false;
   loggedIn = false;
   mobileSidebarClosing = false;
   mobileSidebarOpen = false;
@@ -122,10 +123,12 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
           this.loggedIn = true;
           this.isAdmin = this.account.isAdmin; // now it works ✅
+          this.isSuperAdmin = this.account.isSuperAdmin;
         } else {
           this.account = null;
           this.loggedIn = false;
           this.isAdmin = false;
+          this.isSuperAdmin = false;
         }
       }
     );

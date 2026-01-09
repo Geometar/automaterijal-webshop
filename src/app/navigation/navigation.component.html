@@ -133,6 +133,13 @@
                   <span>Logovi</span>
                 </div>
               </button>
+
+              <button mat-menu-item *ngIf="isSuperAdmin" routerLink="/admin/hogwarts">
+                <div class="menu-item-align">
+                  <autom-icon [source]="iconEnum.CAST"></autom-icon>
+                  <span>Hogwarts</span>
+                </div>
+              </button>
             </mat-menu>
           </li>
         </ul>
@@ -491,6 +498,17 @@
     >
       <autom-icon [source]="iconEnum.LIFE_BUOY"></autom-icon>
       Logovi
+    </a>
+    <a
+      *ngIf="isSuperAdmin"
+      routerLink="/admin/hogwarts"
+      href="/admin/hogwarts"
+      [ngClass]="currentUrl.includes('/admin/hogwarts') ? 'nav-active' : null"
+      class="menu-title autom-padding--vertical__xxs"
+      (click)="closeMobileSidebar()"
+    >
+      <autom-icon [source]="iconEnum.CAST"></autom-icon>
+      Hogwarts
     </a>
   </div>
 
