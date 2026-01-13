@@ -114,6 +114,18 @@
         </small>
       </ng-container>
       <ng-template #adminCartForm>
+        <div *ngIf="shouldShowFebiDeliveryOptions" class="provider-delivery">
+          <autom-radio-button
+            [label]="'Febi - nacin isporuke'"
+            [options]="febiDeliveryOptions"
+            [displaySubtitle]="true"
+            [theme]="orientation.VERTICAL"
+            (emitSelected)="onFebiDeliveryPartySelected($event)"
+          ></autom-radio-button>
+          <small class="provider-delivery__hint">
+            Opcija vazi samo za Febi artikle u korpi.
+          </small>
+        </div>
         <autom-text-area
           [label]="'Komentar'"
           [placeholder]="'Unesite komentar za internu porudzbinu'"

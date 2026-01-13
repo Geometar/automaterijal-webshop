@@ -64,12 +64,16 @@ export class InvoiceDetailsComponent implements OnInit {
 
   // Data
   data: Invoice | null = null;
+  noteHtml: string | null = null;
 
   // Enums
   colorEnum = ColorEnum;
   iconEnum = IconsEnum;
   isAdmin = false;
   isEmployee = false;
+  readonly febiProviderKey = 'febi-stock';
+  readonly febiDeliveryPartyDefault = '0001001983';
+  readonly febiDeliveryPartyPickup = '0001003023';
 
   // Misc loading
   loading = false;
@@ -134,6 +138,7 @@ export class InvoiceDetailsComponent implements OnInit {
       .subscribe({
         next: (invoice: Invoice) => {
           this.data = invoice;
+          this.noteHtml = this.buildNoteHtml(invoice?.napomena);
           const items: InvoiceItem[] = invoice.detalji!;
           this.decorateInvoiceItems(items);
           this.configureColumns(invoice);
@@ -160,6 +165,7 @@ export class InvoiceDetailsComponent implements OnInit {
       .subscribe({
         next: (invoice: Invoice) => {
           this.data = invoice;
+          this.noteHtml = this.buildNoteHtml(invoice?.napomena);
           const items: InvoiceItem[] = invoice.detalji!;
           this.decorateInvoiceItems(items);
           this.configureColumns(invoice);
@@ -333,6 +339,11 @@ export class InvoiceDetailsComponent implements OnInit {
       parts.push(`ETA: ${eta}`);
     }
 
+    const deliveryParty = this.resolveProviderDeliveryParty(item);
+    if (deliveryParty) {
+      parts.push(`Isporuka: ${deliveryParty}`);
+    }
+
     return parts.length ? parts.join('\n') : '—';
   }
 
@@ -350,6 +361,25 @@ export class InvoiceDetailsComponent implements OnInit {
     return parts.length ? parts.join('\n') : '—';
   }
 
+  private resolveProviderDeliveryParty(item: InvoiceItem): string | null {
+    const code = (item?.providerDeliveryParty || '').trim();
+    if (!code) {
+      return null;
+    }
+
+    const provider = (item?.providerAvailability?.provider || '').trim().toLowerCase();
+    if (provider === this.febiProviderKey) {
+      if (code === this.febiDeliveryPartyPickup) {
+        return 'Naše dostavno vozilo';
+      }
+      if (code === this.febiDeliveryPartyDefault) {
+        return 'Brza pošta';
+      }
+    }
+
+    return code;
+  }
+
   private buildProviderEta(pa: ProviderAvailabilityDto): string | null {
     const min = Number(pa?.deliveryToCustomerBusinessDaysMin);
     const max = Number(pa?.deliveryToCustomerBusinessDaysMax);
@@ -364,6 +394,24 @@ export class InvoiceDetailsComponent implements OnInit {
     }
 
     return null;
+  }
+
+  private buildNoteHtml(note?: string | null): string | null {
+    if (!note) {
+      return null;
+    }
+
+    let cleaned = note.trim();
+    const prefix = 'komentar:';
+    while (cleaned.toLowerCase().startsWith(prefix)) {
+      cleaned = cleaned.slice(prefix.length).trim();
+    }
+
+    if (!cleaned) {
+      return null;
+    }
+
+    return cleaned.replaceAll(';', '<br>');
   }
 
   private formatBusinessDayRange(min: number, max: number): string {

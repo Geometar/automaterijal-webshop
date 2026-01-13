@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { finalize, Subject, takeUntil } from 'rxjs';
 import { CommonModule, CurrencyPipe } from '@angular/common';
-import { SelectModel } from '../../shared/data-models/interface';
+import { RadioOption, SelectModel } from '../../shared/data-models/interface';
 import { Router, RouterLink } from '@angular/router';
 import {
   FormsModule,
@@ -15,6 +15,7 @@ import {
 import { AutomIconComponent } from '../../shared/components/autom-icon/autom-icon.component';
 import { ButtonComponent } from '../../shared/components/button/button.component';
 import { InputFieldsComponent } from '../../shared/components/input-fields/input-fields.component';
+import { RadioButtonComponent } from '../../shared/components/radio-button/radio-button.component';
 import { RowComponent } from '../../shared/components/table/row/row.component';
 import { SelectComponent } from '../../shared/components/select/select.component';
 import { TextAreaComponent } from '../../shared/components/text-area/text-area.component';
@@ -28,6 +29,7 @@ import {
   Cart,
   Invoice,
   InvoiceItem,
+  ProviderOrderOption,
   ValueHelp,
 } from '../../shared/data-models/model';
 import { Roba } from '../../shared/data-models/model/roba';
@@ -39,6 +41,7 @@ import {
   ColorEnum,
   IconsEnum,
   InputTypeEnum,
+  OrientationEnum,
 } from '../../shared/data-models/enums';
 
 // Pipes
@@ -66,6 +69,7 @@ import { Slika } from '../../shared/data-models/model/slika';
     CommonModule,
     FormsModule,
     InputFieldsComponent,
+    RadioButtonComponent,
     ReactiveFormsModule,
     RouterLink,
     RowComponent,
@@ -96,6 +100,11 @@ export class CartComponent implements OnInit, OnDestroy {
   colorEnum = ColorEnum;
   iconsEnum = IconsEnum;
   inputTypeEnum = InputTypeEnum;
+  orientation = OrientationEnum;
+
+  readonly febiProviderKey = 'febi-stock';
+  readonly febiDeliveryPartyDefault = '0001001983';
+  readonly febiDeliveryPartyPickup = '0001003023';
 
   // Misc
   account?: Account;
@@ -107,6 +116,7 @@ export class CartComponent implements OnInit, OnDestroy {
   total: number = 0;
 
   // Select config
+  febiDeliveryOptions: RadioOption[] = [];
   payingChoices: SelectModel[] = [];
   transportChoices: SelectModel[] = [];
 
@@ -131,6 +141,7 @@ export class CartComponent implements OnInit, OnDestroy {
     this.cartForm = this.fb.group({
       address: ['', Validators.required],
       comment: [''],
+      febiDeliveryParty: [this.febiDeliveryPartyDefault],
       payment: ['', Validators.required],
       transport: ['', Validators.required],
       vin: [''],
@@ -155,6 +166,7 @@ export class CartComponent implements OnInit, OnDestroy {
     this.account = this.accountStateService.get();
     this.loggedIn = this.accountStateService.isUserLoggedIn();
     this.isAdmin = this.accountStateService.isAdmin();
+    this.buildFebiDeliveryOptions();
     this.getInformation();
     this.syncOnCartItemSize();
     this.setUpdateSeoTags();
@@ -312,6 +324,21 @@ export class CartComponent implements OnInit, OnDestroy {
     ).length;
   }
 
+  get hasFebiProviderItems(): boolean {
+    return (this.roba ?? []).some((item) => {
+      const provider = (item?.providerAvailability?.provider || '').trim().toLowerCase();
+      return (
+        provider === this.febiProviderKey &&
+        getAvailabilityStatus(item) === 'AVAILABLE' &&
+        !!item?.providerAvailability?.available
+      );
+    });
+  }
+
+  get shouldShowFebiDeliveryOptions(): boolean {
+    return this.isAdmin && this.hasFebiProviderItems;
+  }
+
   get shouldShowMixedDeliveryInfo(): boolean {
     const items = this.roba ?? [];
     if (items.length < 2) {
@@ -433,6 +460,11 @@ export class CartComponent implements OnInit, OnDestroy {
     this.cartStateService.removeFromCartByKey(cartKey);
   }
 
+  onFebiDeliveryPartySelected(option?: RadioOption | null): void {
+    const selected = option?.key?.trim() || this.febiDeliveryPartyDefault;
+    this.setCartSelectionValue('febiDeliveryParty', selected);
+  }
+
   /** Basket send: start */
 
   submitInvoice(): void {
@@ -537,6 +569,11 @@ export class CartComponent implements OnInit, OnDestroy {
     this.invoice.napomena = isAnon
       ? this.buildAnonymousNote()
       : this.buildLoggedUserNote();
+
+    const providerOptions = this.buildProviderOptions();
+    if (providerOptions.length) {
+      this.invoice.providerOptions = providerOptions;
+    }
   }
 
   createValueHelp(id: number): ValueHelp {
@@ -562,6 +599,23 @@ export class CartComponent implements OnInit, OnDestroy {
     }
 
     return metadata;
+  }
+
+  private buildProviderOptions(): ProviderOrderOption[] {
+    if (!this.shouldShowFebiDeliveryOptions) {
+      return [];
+    }
+
+    const selection =
+      this.cartForm.get('febiDeliveryParty')?.value || this.febiDeliveryPartyDefault;
+    const deliveryParty = selection?.toString().trim() || this.febiDeliveryPartyDefault;
+
+    return [
+      {
+        providerKey: this.febiProviderKey,
+        deliveryParty,
+      },
+    ];
   }
 
   private generateTransactionId(): string {
@@ -687,6 +741,21 @@ export class CartComponent implements OnInit, OnDestroy {
         }
       ]
     }, 'seo-jsonld-cart');
+  }
+
+  private buildFebiDeliveryOptions(): void {
+    this.febiDeliveryOptions = [
+      {
+        key: this.febiDeliveryPartyDefault,
+        value: 'Brza pošta',
+        checked: true,
+      },
+      {
+        key: this.febiDeliveryPartyPickup,
+        value: 'Naše dostavno vozilo',
+        checked: false,
+      },
+    ];
   }
   /** End of: seo */
 }

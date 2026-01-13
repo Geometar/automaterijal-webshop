@@ -3,6 +3,11 @@ import { Manufacture } from './proizvodjac';
 import { Slika } from './slika';
 import { AvailabilityStatus, ProviderAvailabilityDto } from './availability';
 
+export interface ProviderOrderOption {
+  providerKey: string;
+  deliveryParty?: string;
+}
+
 /**
  * Represents a complete invoice (Faktura).
  */
@@ -24,6 +29,7 @@ export class Invoice {
   ppid?: number;
   status?: ValueHelp;
   vremePorucivanja?: string;
+  providerOptions?: ProviderOrderOption[];
 
   constructor(init?: Partial<Invoice>) {
     Object.assign(this, init);
@@ -55,6 +61,7 @@ export class InvoiceItem {
   providerAvailability?: ProviderAvailabilityDto;
   /** Nabavna cena (koristi se za interne porudžbine). */
   nabavnaCena?: number | null;
+  providerDeliveryParty?: string;
   providerMessage?: string;
   providerInfo?: string;
   providerResponse?: string;

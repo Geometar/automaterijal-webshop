@@ -52,38 +52,54 @@
           </tr>
         </table>
       </div>
-      <div class="info-card" *ngIf="!isInternalOrderView">
-        <autom-icon
-          [color]="colorEnum.YELLOW_700"
-          [source]="iconEnum.TRUCK"
-        ></autom-icon>
-        <table class="invoice-table">
-          <tr>
-            <td>Prevoz:</td>
-            <td>{{ data?.nacinPrevoza?.naziv ?? '—' }}</td>
-          </tr>
-          <tr>
-            <td>Adresa:</td>
-            <td>{{ data?.adresa?.naziv ?? '—' }}</td>
-          </tr>
-        </table>
-      </div>
-      <div class="info-card" *ngIf="!isInternalOrderView">
-        <autom-icon
-          [color]="colorEnum.YELLOW_700"
-          [source]="iconEnum.CREDIT_CARD"
-        ></autom-icon>
-        <table class="invoice-table">
-          <tr>
-            <td>Plaćanje:</td>
-            <td>{{ data?.nacinPlacanja?.naziv ?? '—' }}</td>
-          </tr>
-          <tr>
-            <td>Napomena:</td>
-            <td [innerHTML]="data?.napomena?.replaceAll(';', '<br>') || '—'"></td>
-          </tr>
-        </table>
-      </div>
+      <ng-container *ngIf="isInternalOrderView; else externalInfo">
+        <div class="info-card">
+          <autom-icon
+            [color]="colorEnum.YELLOW_700"
+            [source]="iconEnum.MESSAGE_CIRCLE"
+          ></autom-icon>
+          <table class="invoice-table">
+            <tr>
+              <td>Napomena:</td>
+              <td [innerHTML]="noteHtml || '—'"></td>
+            </tr>
+          </table>
+        </div>
+      </ng-container>
+      <ng-template #externalInfo>
+        <div class="info-card">
+          <autom-icon
+            [color]="colorEnum.YELLOW_700"
+            [source]="iconEnum.TRUCK"
+          ></autom-icon>
+          <table class="invoice-table">
+            <tr>
+              <td>Prevoz:</td>
+              <td>{{ data?.nacinPrevoza?.naziv ?? '—' }}</td>
+            </tr>
+            <tr>
+              <td>Adresa:</td>
+              <td>{{ data?.adresa?.naziv ?? '—' }}</td>
+            </tr>
+          </table>
+        </div>
+        <div class="info-card">
+          <autom-icon
+            [color]="colorEnum.YELLOW_700"
+            [source]="iconEnum.CREDIT_CARD"
+          ></autom-icon>
+          <table class="invoice-table">
+            <tr>
+              <td>Plaćanje:</td>
+              <td>{{ data?.nacinPlacanja?.naziv ?? '—' }}</td>
+            </tr>
+            <tr>
+              <td>Napomena:</td>
+              <td [innerHTML]="noteHtml || '—'"></td>
+            </tr>
+          </table>
+        </div>
+      </ng-template>
     </div>
   </div>
 

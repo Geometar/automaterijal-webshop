@@ -282,6 +282,21 @@
     color: var(--figma-neutral-600);
   }
 
+  .provider-delivery {
+    padding: 12px;
+    border: 1px dashed #e5e7eb;
+    border-radius: 12px;
+    background: #f8fafc;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .provider-delivery__hint {
+    font-size: 12px;
+    color: var(--figma-grey-600);
+  }
+
   .checkout-info {
     margin-top: 12px;
     padding: 10px 12px;
