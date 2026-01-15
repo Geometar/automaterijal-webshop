@@ -1,84 +1,357 @@
 <section class="hogwarts-page">
-  <div class="nebula nebula-1"></div>
-  <div class="nebula nebula-2"></div>
-  <div class="nebula nebula-3"></div>
+  <div class="bg-sparkles"></div>
+  <div class="floating-candles" aria-hidden="true">
+    <span class="candle candle-1"></span>
+    <span class="candle candle-2"></span>
+    <span class="candle candle-3"></span>
+    <span class="candle candle-4"></span>
+  </div>
+  <div class="secret-sigil" aria-hidden="true">
+    <svg viewBox="0 0 160 160" role="presentation">
+      <circle cx="80" cy="80" r="62" fill="none" stroke="currentColor" stroke-width="2.2"/>
+      <circle cx="80" cy="80" r="46" fill="none" stroke="currentColor" stroke-width="1.4" stroke-dasharray="6 6"/>
+      <path d="M80 18v24M80 118v24M18 80h24M118 80h24" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <path d="M54 80l26-34 26 34-26 34Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M80 58l10 10-10 34-10-34Z" fill="currentColor" opacity="0.25"/>
+      <circle cx="80" cy="80" r="4" fill="currentColor"/>
+      <path d="M30 52c8-6 16-9 25-10M105 42c9 1 17 4 25 10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      <path d="M30 108c8 6 16 9 25 10M105 118c9-1 17-4 25-10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+    </svg>
+  </div>
 
-  <div class="hogwarts-card">
-    <div class="card-header">
-      <div class="crest">
-        <autom-icon [source]="icons.STAR"></autom-icon>
-      </div>
-      <div>
-        <p class="eyebrow">Super Admin Sanctum</p>
-        <h1>Hogwarts</h1>
-        <p class="lede">
-          Febi price list spellbook — upload & reload bez restarta.
-        </p>
-      </div>
-    </div>
-    <div class="sigil" aria-hidden="true">
-      <svg viewBox="0 0 64 64">
-        <path d="M32 4 12 14v18c0 12 9 22 20 28 11-6 20-16 20-28V14Z" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
-        <path d="M22 30l5 6 15-14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M32 18v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-      </svg>
-    </div>
-
-    <div class="spell-row">
-      <label class="file-drop" [class.has-file]="uploadFile" [class.disabled]="loading">
-        <span class="label-title">Odaberi novi price list (.xlsx)</span>
-        <span class="label-sub">Najnoviji grimoire sa Febi cenama</span>
-        <div class="file-chip" *ngIf="uploadFile; else filePlaceholder">
-          <autom-icon [source]="icons.FILE"></autom-icon>
-          <span>{{ uploadFile.name }}</span>
+  <div class="hogwarts-shell">
+    <header class="hogwarts-hero">
+      <div class="hero-left">
+        <div class="crest">
+          <autom-icon [source]="icons.STAR"></autom-icon>
         </div>
-        <ng-template #filePlaceholder>
-          <div class="file-chip ghost">
-            <autom-icon [source]="icons.UPLOAD_CLOUD"></autom-icon>
-            <span>Izaberi fajl</span>
+        <div class="hero-text">
+          <p class="eyebrow">Super Admin Sanctum</p>
+          <h1>Hogwarts Chamber</h1>
+          <p class="lede">
+            Your private watchtower - a calm, warm, and magical view of the ERP heartbeat.
+          </p>
+          <div class="hero-meta">
+            <span class="meta-pill">
+              <autom-icon [source]="icons.CLOCK"></autom-icon>
+              {{ today | date:'dd.MM.yyyy' }}
+            </span>
+            <span class="meta-pill">
+              <autom-icon [source]="icons.LOCK"></autom-icon>
+              Super admin only
+            </span>
+            <span class="meta-pill">
+              <autom-icon [source]="icons.MAP"></autom-icon>
+              Hogwarts calm
+            </span>
           </div>
-        </ng-template>
-        <input
-          #fileInput
-          id="hogwarts-file-input"
-          type="file"
-          accept=".xlsx"
-          [attr.disabled]="loading ? true : null"
-          (change)="onFileSelected($event)"
-        />
-      </label>
-
-      <div class="cta-row">
-        <button class="hogwarts-btn primary" [class.is-loading]="loading" (click)="castUpload()" [disabled]="loading">
-          <span class="spark"></span>
-          <autom-icon [source]="icons.CAST"></autom-icon>
-          <span>{{ loading ? 'Casting...' : 'Cast upload' }}</span>
-          <span class="btn-spinner" *ngIf="loading"></span>
-        </button>
-        <button class="hogwarts-btn ghost" [class.is-loading]="loading" (click)="recastFromDisk()" [disabled]="loading">
-          <autom-icon [source]="icons.REFRESH_CW"></autom-icon>
-          <span>{{ loading ? 'Recasting...' : 'Recast from disk' }}</span>
-          <span class="btn-spinner" *ngIf="loading"></span>
-        </button>
-      </div>
-    </div>
-
-      <div class="status" *ngIf="statusMessage">
-        <div class="status-badge" [ngClass]="statusType">
-          <autom-icon [source]="statusType === 'success' ? icons.CHECK : icons.ALERT_TRIANGLE"></autom-icon>
-          <span>{{ statusMessage }}</span>
         </div>
-      <div class="meta">
-        <span *ngIf="lastCount !== null">Tomes indexed: {{ lastCount }}</span>
-        <span *ngIf="lastPath">Path: {{ lastPath }}</span>
-        <span *ngIf="lastModified">Last modified: {{ lastModified | date:'dd.MM.yyyy HH:mm' }}</span>
-        <span *ngIf="lastSizeBytes !== null">Size: {{ lastSizeBytes / 1024 | number:'1.0-1' }} KB</span>
       </div>
-    </div>
+      <div class="sigil" aria-hidden="true">
+        <svg viewBox="0 0 64 64">
+          <path d="M32 4 12 14v18c0 12 9 22 20 28 11-6 20-16 20-28V14Z" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
+          <path d="M22 30l5 6 15-14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M32 18v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </header>
 
-    <div class="casting" *ngIf="loading">
-      <div class="orb"></div>
-      <span>Bacanje čini...</span>
-    </div>
+    <section class="house-points">
+      <div class="section-title">
+        <p class="eyebrow">House Points</p>
+        <h2>Mood of the day</h2>
+      </div>
+      <div class="house-grid">
+        <article class="house-card" *ngFor="let house of housePoints" [style.--house-accent]="house.accent">
+          <div class="house-top">
+            <span class="house-name">{{ house.name }}</span>
+            <span class="house-mascot">{{ house.mascot }}</span>
+          </div>
+          <div class="house-points-value">{{ house.points }}</div>
+          <div class="house-bar">
+            <span [style.width.%]="house.progress"></span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="hogwarts-grid">
+      <article class="hogwarts-panel wide">
+        <div class="panel-header">
+          <div>
+            <p class="panel-eyebrow">Owl Post Alerts</p>
+            <h2>ERP pickup + processing</h2>
+            <p class="panel-sub">Most critical signals: NOT_TAKEN_FOR_PROCESSING and PROCESSING_IN_PROGRESS.</p>
+          </div>
+          <div class="panel-chip">
+            <autom-icon [source]="icons.BELL"></autom-icon>
+            Active alerts
+          </div>
+        </div>
+        <div class="panel-note" *ngIf="overviewLoading">Refreshing signals...</div>
+        <div class="panel-note error" *ngIf="overviewError">{{ overviewError }}</div>
+
+        <div class="status-grid">
+          <article class="status-card" *ngFor="let card of statusCards" [ngClass]="card.severity">
+            <div class="status-top">
+              <div class="status-icon">
+                <autom-icon [source]="card.icon"></autom-icon>
+              </div>
+              <div>
+                <p class="status-eyebrow">{{ card.key }}</p>
+                <h3>{{ card.title }}</h3>
+                <p class="status-sub">{{ card.description }}</p>
+              </div>
+              <span class="status-badge" [ngClass]="card.severity">{{ card.badge }}</span>
+            </div>
+            <div class="status-metrics">
+              <div class="metric">
+                <span class="metric-label">Count</span>
+                <span class="metric-value">{{ card.count }}</span>
+              </div>
+              <div class="metric">
+                <span class="metric-label">Oldest</span>
+                <span class="metric-value">
+                  {{ card.oldestMinutes !== null ? (card.oldestMinutes + 'm') : '--' }}
+                </span>
+              </div>
+              <div class="metric">
+                <span class="metric-label">p95</span>
+                <span class="metric-value">
+                  {{ card.p95Minutes !== null ? (card.p95Minutes + 'm') : '--' }}
+                </span>
+              </div>
+              <div class="metric">
+                <span class="metric-label">Updated {{ card.windowMinutes }}m</span>
+                <span class="metric-value">
+                  {{ card.updatedLastWindow !== null ? card.updatedLastWindow : '--' }}
+                </span>
+              </div>
+            </div>
+            <div class="status-foot">
+              <autom-icon [source]="icons.ACTIVITY"></autom-icon>
+              <span>{{ card.trend }}</span>
+            </div>
+          </article>
+        </div>
+      </article>
+
+      <article class="hogwarts-panel">
+        <div class="panel-header">
+          <div>
+            <p class="panel-eyebrow">Marauder's Map</p>
+            <h2>Oldest stuck orders</h2>
+            <p class="panel-sub">Quick look at orders that have stalled.</p>
+          </div>
+          <div class="panel-chip subtle">
+            <autom-icon [source]="icons.MAP"></autom-icon>
+            Stuck list
+          </div>
+        </div>
+
+        <div class="stuck-list" *ngIf="stuckOrders.length; else stuckEmpty">
+          <div class="stuck-row stuck-header">
+            <span>ID</span>
+            <span>Status</span>
+            <span>Age</span>
+            <span>Last update</span>
+            <span>Customer</span>
+            <span>Amount</span>
+          </div>
+          <div class="stuck-row" *ngFor="let order of stuckOrders">
+            <span class="stuck-id">{{ order.id }}</span>
+            <span class="stuck-status">{{ order.status }}</span>
+            <span>{{ order.ageMinutes !== null ? (order.ageMinutes + 'm') : '--' }}</span>
+            <span>{{ order.updatedAt }}</span>
+            <span>{{ order.customer }}</span>
+            <span>{{ order.total }}</span>
+          </div>
+        </div>
+        <ng-template #stuckEmpty>
+          <div class="stuck-empty">No stuck orders right now.</div>
+        </ng-template>
+      </article>
+
+      <article class="hogwarts-panel">
+        <div class="panel-header">
+          <div>
+            <p class="panel-eyebrow">Provider Wing</p>
+            <h2>Integrations</h2>
+            <p class="panel-sub">Provider health, error rate, and backlog.</p>
+          </div>
+          <div class="panel-chip subtle">
+            <autom-icon [source]="icons.CLOUD"></autom-icon>
+            Live
+          </div>
+        </div>
+
+        <div class="provider-grid">
+          <article class="provider-card" *ngFor="let provider of providers" [ngClass]="provider.severity">
+            <div class="provider-top">
+              <div>
+                <p class="provider-name">{{ provider.name }}</p>
+                <p class="provider-status">{{ provider.status }}</p>
+              </div>
+              <span class="provider-badge" [ngClass]="provider.severity">{{ provider.severity }}</span>
+            </div>
+            <div class="provider-metrics">
+              <div>
+                <span>Last order</span>
+                <strong>{{ provider.lastOrder }}</strong>
+              </div>
+              <div>
+                <span>Orders 10d</span>
+                <strong>{{ provider.ordersLast10d }}</strong>
+              </div>
+              <div>
+                <span>Backorders 10d</span>
+                <strong>{{ provider.backorderCount }}</strong>
+              </div>
+              <div>
+                <span>Messages 10d</span>
+                <strong>{{ provider.messageCount }}</strong>
+              </div>
+            </div>
+            <div class="provider-error">
+              <autom-icon [source]="provider.alertIcon"></autom-icon>
+              <span>{{ provider.alertLabel }}</span>
+            </div>
+          </article>
+          <div class="provider-empty" *ngIf="!providers.length">
+            No provider activity in the last 10 days.
+          </div>
+        </div>
+      </article>
+
+      <article class="hogwarts-panel trivia">
+        <div class="panel-header">
+          <div>
+            <p class="panel-eyebrow">Daily Prophet</p>
+            <h2>Stories & calm</h2>
+            <p class="panel-sub">Longform Hogwarts notes, rotating every 30 minutes.</p>
+          </div>
+          <div class="panel-chip subtle">
+            <autom-icon [source]="icons.BOOK_OPEN"></autom-icon>
+            Stories
+          </div>
+        </div>
+        <div class="trivia-card">
+          <p class="trivia-title">{{ activeTrivia.title }}</p>
+          <div class="trivia-story">
+            <p class="trivia-body" *ngFor="let paragraph of activeTrivia.body">
+              {{ paragraph }}
+            </p>
+          </div>
+          <button class="hogwarts-btn ghost small" type="button" (click)="nextTrivia()">
+            <autom-icon [source]="icons.REFRESH_CW"></autom-icon>
+            Next story
+          </button>
+        </div>
+      </article>
+
+      <article class="hogwarts-panel library">
+        <div class="panel-header">
+          <div>
+            <p class="panel-eyebrow">Common Room Library</p>
+            <h2>School notes</h2>
+            <p class="panel-sub">Rotates every 30 minutes. One lesson at a time.</p>
+          </div>
+          <div class="panel-chip subtle">
+            <autom-icon [source]="icons.BOOK"></autom-icon>
+            Journal
+          </div>
+        </div>
+        <article class="library-card" *ngIf="activeLesson; else noLesson">
+          <div class="library-header">
+            <span class="library-tag" *ngIf="activeLesson.tag">{{ activeLesson.tag }}</span>
+            <h3>{{ activeLesson.title }}</h3>
+            <p class="library-sub">{{ activeLesson.subtitle }}</p>
+          </div>
+          <div class="library-body">
+            <p *ngFor="let paragraph of activeLesson.body">{{ paragraph }}</p>
+          </div>
+          <div class="library-actions">
+            <button class="hogwarts-btn ghost small" type="button" (click)="nextLesson()">
+              <autom-icon [source]="icons.REFRESH_CW"></autom-icon>
+              Next lesson
+            </button>
+          </div>
+        </article>
+        <ng-template #noLesson>
+          <div class="library-empty">No lessons available right now.</div>
+        </ng-template>
+      </article>
+
+      <article class="hogwarts-panel wide spellbook">
+        <div class="panel-header">
+          <div>
+            <p class="panel-eyebrow">Spellbook</p>
+            <h2>Febi price list</h2>
+            <p class="panel-sub">Upload and reload without restarting the app.</p>
+          </div>
+          <div class="panel-chip">
+            <autom-icon [source]="icons.FILE_TEXT"></autom-icon>
+            Grimoire
+          </div>
+        </div>
+
+        <div class="spell-row">
+          <label class="file-drop" [class.has-file]="uploadFile" [class.disabled]="loading">
+            <span class="label-title">Choose a new price list (.xlsx)</span>
+            <span class="label-sub">Latest grimoire with Febi prices</span>
+            <div class="file-chip" *ngIf="uploadFile; else filePlaceholder">
+              <autom-icon [source]="icons.FILE"></autom-icon>
+              <span>{{ uploadFile.name }}</span>
+            </div>
+            <ng-template #filePlaceholder>
+              <div class="file-chip ghost">
+                <autom-icon [source]="icons.UPLOAD_CLOUD"></autom-icon>
+                <span>Choose file</span>
+              </div>
+            </ng-template>
+            <input
+              #fileInput
+              id="hogwarts-file-input"
+              type="file"
+              accept=".xlsx"
+              [attr.disabled]="loading ? true : null"
+              (change)="onFileSelected($event)"
+            />
+          </label>
+
+          <div class="cta-row">
+            <button class="hogwarts-btn primary" [class.is-loading]="loading" (click)="castUpload()" [disabled]="loading">
+              <span class="spark"></span>
+              <autom-icon [source]="icons.CAST"></autom-icon>
+              <span>{{ loading ? 'Casting...' : 'Cast upload' }}</span>
+              <span class="btn-spinner" *ngIf="loading"></span>
+            </button>
+            <button class="hogwarts-btn ghost" [class.is-loading]="loading" (click)="recastFromDisk()" [disabled]="loading">
+              <autom-icon [source]="icons.REFRESH_CW"></autom-icon>
+              <span>{{ loading ? 'Recasting...' : 'Recast from disk' }}</span>
+              <span class="btn-spinner" *ngIf="loading"></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="status" *ngIf="statusMessage">
+          <div class="status-badge" [ngClass]="statusType">
+            <autom-icon [source]="statusType === 'success' ? icons.CHECK : icons.ALERT_TRIANGLE"></autom-icon>
+            <span>{{ statusMessage }}</span>
+          </div>
+          <div class="hogwarts-meta">
+            <span *ngIf="lastCount !== null">Tomes indexed: {{ lastCount }}</span>
+            <span *ngIf="lastPath">Path: {{ lastPath }}</span>
+            <span *ngIf="lastModified">Last modified: {{ lastModified | date:'dd.MM.yyyy HH:mm' }}</span>
+            <span *ngIf="lastSizeBytes !== null">Size: {{ lastSizeBytes / 1024 | number:'1.0-1' }} KB</span>
+          </div>
+        </div>
+
+        <div class="casting" *ngIf="loading">
+          <div class="orb"></div>
+          <span>Casting spell...</span>
+        </div>
+      </article>
+    </section>
   </div>
 </section>

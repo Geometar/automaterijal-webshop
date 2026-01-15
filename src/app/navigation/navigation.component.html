@@ -134,9 +134,46 @@
                 </div>
               </button>
 
-              <button mat-menu-item *ngIf="isSuperAdmin" routerLink="/admin/hogwarts">
+              <button
+                mat-menu-item
+                *ngIf="isSuperAdmin"
+                routerLink="/admin/hogwarts"
+                class="menu-item-magical"
+              >
                 <div class="menu-item-align">
-                  <autom-icon [source]="iconEnum.CAST"></autom-icon>
+                  <autom-icon [source]="iconEnum.SHIELD"></autom-icon>
+                  <span class="menu-sigil" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" role="presentation">
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="9"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.4"
+                      />
+                      <path
+                        d="M12 4v4M12 16v4M4 12h4M16 12h4"
+                        stroke="currentColor"
+                        stroke-width="1.4"
+                        stroke-linecap="round"
+                      />
+                      <path
+                        d="M8 12l4-5 4 5-4 5Z"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.2"
+                        stroke-linejoin="round"
+                      />
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="1.6"
+                        fill="currentColor"
+                        opacity="0.6"
+                      />
+                    </svg>
+                  </span>
                   <span>Hogwarts</span>
                 </div>
               </button>
@@ -507,7 +544,7 @@
       class="menu-title autom-padding--vertical__xxs"
       (click)="closeMobileSidebar()"
     >
-      <autom-icon [source]="iconEnum.CAST"></autom-icon>
+      <autom-icon [source]="iconEnum.SHIELD"></autom-icon>
       Hogwarts
     </a>
   </div>
