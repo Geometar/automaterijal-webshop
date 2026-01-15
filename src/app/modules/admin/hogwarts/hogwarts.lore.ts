@@ -10,6 +10,12 @@ export interface HogwartsArticle {
   tag?: string;
 }
 
+export interface HogwartsLetter {
+  title: string;
+  from: string;
+  body: string[];
+}
+
 export const HOGWARTS_STORIES: HogwartsStory[] = [
   {
     title: 'Quidditch Minute',
@@ -505,6 +511,121 @@ export const HOGWARTS_STORIES: HogwartsStory[] = [
       'The professor calls it temporal manners. Do not interrupt the hour. Let it finish speaking.',
       'Back in the ordinary corridors, your steps slow a little. Not because you are tired, but because you learned that time can be treated with respect.',
       'Some lessons do not give you a spell. They give you a different way to live in your day.',
+    ],
+  },
+];
+
+export const HOGWARTS_LETTERS: HogwartsLetter[] = [
+  {
+    title: 'A Quiet Corner by the Fire',
+    from: 'Your House Prefect',
+    body: [
+      'If you ever need a calm corner, take the armchair nearest the far window. It catches the last of the sunset, and the light makes even the old carpet look new.',
+      'No one will bother you there. They think you are napping, which is the best kind of privacy in a common room.',
+      'Bring a mug of tea, or warm cider if the night is cold. The house elves do not mind when you are polite.',
+      'Do not rush your reading. Let the words settle the way the fire settles into embers.',
+      'If you lose your place, that is fine. The story will still be waiting when you look up again.',
+      'I keep a small bookmark there, a strip of parchment with a pressed leaf. Use it if you like.',
+      'The castle can be loud. It is kind to remember there are small spaces where you can just breathe.',
+      'If you need anything, leave a note under the chessboard. I will find it.',
+    ],
+  },
+  {
+    title: 'Owlery Notes on Slow Evenings',
+    from: 'The Owlery Keeper',
+    body: [
+      'Evenings in the owlery are not dramatic. They are steady, soft, and filled with quiet wingbeats.',
+      'If you climb up late, the owls will already be watching. They are not suspicious. They are simply awake.',
+      'Write your letter as if you have time. The owls can wait, and so can the world beyond the tower.',
+      'Some students only visit when they are worried. I hope you visit when you are calm, too.',
+      'There is a perch in the far corner that catches the breeze. It helps when your thoughts feel heavy.',
+      'Take a moment to listen. The sound of feathers is a small kind of music.',
+      'If you leave the window open for a minute, the room smells like the sky.',
+      'That is the owlery gift: distance without loneliness.',
+    ],
+  },
+  {
+    title: 'From the Greenhouse Bench',
+    from: 'Herbology Assistant',
+    body: [
+      'I write this with soil under my nails and sunlight on the windows.',
+      'The greenhouse is quiet in the early morning. The plants are awake, but they are not hurried.',
+      'If you want to feel steady, start with a watering round. Each plant asks for attention, not performance.',
+      'When you give a little care at a time, the room becomes calm around you.',
+      'There is a bench near the far wall. Sit there and watch the leaves move. It is a very small lesson in patience.',
+      'Bring a notebook if you like. The greenhouse is good for gentle thoughts.',
+      'Do not worry if you do nothing at all. The air here still helps.',
+      'Sometimes the kindest spell is simply showing up.',
+    ],
+  },
+  {
+    title: 'A Librarian’s Reminder',
+    from: 'The Library Desk',
+    body: [
+      'If you feel overwhelmed by books, start with one page. One page is a small promise you can keep.',
+      'The library is not a test. It is a room full of help.',
+      'Choose a table with a lamp and a window. The light steadies your eyes and the window steadies your mind.',
+      'If you need silence, we have it. If you need a whisper, we can allow that, too.',
+      'Do not be afraid to ask for a suggestion. The right book can make a hard subject feel kind.',
+      'Remember to stand up and stretch. Even the best ideas need a body that is not cramped.',
+      'When you leave, close the book gently. It has done its work for you.',
+      'There is always time to return to the shelves.',
+    ],
+  },
+  {
+    title: 'Postcard from Hogsmeade',
+    from: 'A Friend in the Village',
+    body: [
+      'The village is dusted with snow today, and the windows glow like tiny suns.',
+      'I passed the bakery and thought of you, the way you like the warm corner by the door.',
+      'There is a bench by the fountain that stays clear even in winter. I sat there and listened to the quiet.',
+      'It was not empty. It was simply gentle, like a room that has learned to be calm.',
+      'Bring gloves next time. The air is crisp, and it makes everything taste brighter.',
+      'I bought a small packet of sweets for you. They are in my bag, safe and waiting.',
+      'If the castle feels heavy, the village is a small reminder that the world is kind too.',
+      'We will go together when you want.',
+    ],
+  },
+  {
+    title: 'Portrait Gallery Gossip',
+    from: 'A Friendly Portrait',
+    body: [
+      'You always walk too fast. Slow down once in a while, and you will hear more of the castle.',
+      'We portraits are chatty, yes, but we are also observant. We can tell when you are tired.',
+      'If you pass by late, we will keep our voices low. We are not unkind.',
+      'There is a painting near the third landing that sings softly at night. It is worth hearing once.',
+      'You look like someone who needs a quiet laugh. I can provide one if you stop.',
+      'Ask me about the feast of 1892. It was a marvelous chaos.',
+      'If you are lost, I will point you in the right direction. If you are bored, I will tell a story.',
+      'The walls remember you, and that can be a comfort.',
+    ],
+  },
+  {
+    title: 'A Note from the Common Room Window',
+    from: 'The Night Watch',
+    body: [
+      'The lake looks like a dark mirror tonight. The stars are careful in it.',
+      'If you have a thought that will not leave, write it down. The page can hold it for a while.',
+      'The fire is low, but warm enough. It does not demand anything from you.',
+      'Sometimes the best way to rest is to sit quietly, not asleep, not working, just present.',
+      'There is no wrong way to be calm. There is only the way that fits you.',
+      'If you hear the stairs move, do not worry. The castle is simply shifting its weight.',
+      'I have left a blanket on the back of your chair. Take it if you want.',
+      'The night is kind to those who listen.',
+    ],
+  },
+  {
+    title: 'The Small Ritual of Tea',
+    from: 'The Kitchens',
+    body: [
+      'We noticed you like tea. The small pot is waiting whenever you pass by.',
+      'There is something grounding about a warm cup. It gives your hands a job when your mind is busy.',
+      'If the day was loud, hold the cup and breathe. It is a tiny ritual, but it works.',
+      'The elves are proud of simple comforts. A soft chair, a warm drink, a quiet plate of bread.',
+      'Do not feel guilty for resting. The castle runs on kindness as much as it runs on magic.',
+      'If you want a different blend, leave a note. We can do honey, mint, or a little cinnamon.',
+      'Tea is a slow spell. It asks you to wait, and that waiting is part of the magic.',
+      'We are always nearby if you need anything else.',
     ],
   },
 ];

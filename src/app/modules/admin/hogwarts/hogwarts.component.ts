@@ -28,7 +28,13 @@ import {
   HogwartsRevenuePeriodRow,
 } from '../../../shared/service/hogwarts-admin.service';
 import { SnackbarService } from '../../../shared/service/utils/snackbar.service';
-import { HOGWARTS_ARTICLES, HOGWARTS_STORIES } from './hogwarts.lore';
+import {
+  HOGWARTS_ARTICLES,
+  HOGWARTS_LETTERS,
+  HOGWARTS_STORIES,
+  HogwartsLetter,
+} from './hogwarts.lore';
+import { HOGWARTS_COMMERCE_LESSONS } from './hogwarts.commerce';
 
 type StatusSeverity = 'critical' | 'warning';
 type ProviderSeverity = 'stable' | 'warning';
@@ -56,6 +62,8 @@ interface StatusCardView extends StatusCardConfig {
   count: number;
   oldestMinutes: number | null;
   p95Minutes: number | null;
+  oldestLabel: string;
+  p95Label: string;
   updatedLastWindow: number | null;
   trend: string;
 }
@@ -64,6 +72,7 @@ interface StuckOrderView {
   id: string;
   status: string;
   ageMinutes: number | null;
+  ageLabel: string;
   updatedAt: string;
   customer: string;
   total: string;
@@ -101,6 +110,14 @@ interface RevenueHistoryRowView {
   ordersPerPartner: string;
 }
 
+interface ReadingNookContent {
+  title: string;
+  subtitle?: string;
+  body: string[];
+  tag?: string;
+  source?: string;
+}
+
 @Component({
   selector: 'app-hogwarts',
   standalone: true,
@@ -114,9 +131,19 @@ export class HogwartsComponent implements OnInit, OnDestroy {
 
   icons = IconsEnum;
   readonly today = new Date();
+  activeTab: 'common' | 'watchtower' = 'common';
+  glowLevel: 'low' | 'medium' | 'high' = 'medium';
+  rainEnabled = false;
+  readingNook: ReadingNookContent | null = null;
   private readonly triviaIntervalMs = 30 * 60 * 1000;
+  private readonly letterIntervalMs = 60 * 60 * 1000;
+  private readonly commerceIntervalMs = 24 * 60 * 60 * 1000;
   private triviaTimerId: ReturnType<typeof setInterval> | null = null;
   private triviaTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  private letterTimerId: ReturnType<typeof setInterval> | null = null;
+  private letterTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  private commerceTimerId: ReturnType<typeof setInterval> | null = null;
+  private commerceTimeoutId: ReturnType<typeof setTimeout> | null = null;
   overviewLoading = false;
   overviewError = '';
   revenueLoading = false;
@@ -189,8 +216,12 @@ export class HogwartsComponent implements OnInit, OnDestroy {
   ];
   readonly trivia = HOGWARTS_STORIES;
   readonly loreArticles = HOGWARTS_ARTICLES;
+  readonly commerceLessons = HOGWARTS_COMMERCE_LESSONS;
+  readonly letters: HogwartsLetter[] = HOGWARTS_LETTERS;
   triviaIndex = 0;
   lessonIndex = 0;
+  letterIndex = 0;
+  commerceIndex = 0;
   uploadFile: File | null = null;
   loading = false;
   statusMessage = '';
@@ -212,7 +243,11 @@ export class HogwartsComponent implements OnInit, OnDestroy {
     this.loadRevenue();
     this.setInitialTriviaIndex();
     this.setInitialLessonIndex();
+    this.setInitialLetterIndex();
+    this.setInitialCommerceIndex();
     this.startTriviaRotation();
+    this.startLetterRotation();
+    this.startCommerceRotation();
   }
 
   ngOnDestroy(): void {
@@ -222,6 +257,26 @@ export class HogwartsComponent implements OnInit, OnDestroy {
     if (this.triviaTimeoutId) {
       clearTimeout(this.triviaTimeoutId);
     }
+    if (this.letterTimerId) {
+      clearInterval(this.letterTimerId);
+    }
+    if (this.letterTimeoutId) {
+      clearTimeout(this.letterTimeoutId);
+    }
+    if (this.commerceTimerId) {
+      clearInterval(this.commerceTimerId);
+    }
+    if (this.commerceTimeoutId) {
+      clearTimeout(this.commerceTimeoutId);
+    }
+  }
+
+  get pageClasses(): string[] {
+    const classes = [`tab-${this.activeTab}`, `glow-${this.glowLevel}`];
+    if (this.rainEnabled) {
+      classes.push('rain-on');
+    }
+    return classes;
   }
 
   get activeTrivia() {
@@ -232,12 +287,122 @@ export class HogwartsComponent implements OnInit, OnDestroy {
     return this.loreArticles[this.lessonIndex] ?? this.loreArticles[0];
   }
 
+  get activeLetter() {
+    return this.letters[this.letterIndex] ?? this.letters[0];
+  }
+
+  get activeCommerceLesson() {
+    return this.commerceLessons[this.commerceIndex] ?? this.commerceLessons[0];
+  }
+
+  get revenueHistorySorted(): RevenueHistoryRowView[] {
+    const direction = this.ledgerSort.direction === 'desc' ? -1 : 1;
+    const rows = [...this.revenueHistory];
+    const numeric = (value: number | null | undefined) => {
+      if (value === null || value === undefined || Number.isNaN(value)) {
+        return this.ledgerSort.direction === 'desc'
+          ? Number.NEGATIVE_INFINITY
+          : Number.POSITIVE_INFINITY;
+      }
+      return value;
+    };
+
+    rows.sort((a, b) => {
+      const aValue = this.ledgerSortValue(a, numeric);
+      const bValue = this.ledgerSortValue(b, numeric);
+      if (aValue === bValue) {
+        return (b.year - a.year) * direction;
+      }
+      return (aValue - bValue) * direction;
+    });
+
+    return rows;
+  }
+
+  setActiveTab(tab: 'common' | 'watchtower'): void {
+    this.activeTab = tab;
+  }
+
+  setGlow(level: 'low' | 'medium' | 'high'): void {
+    this.glowLevel = level;
+  }
+
+  toggleRain(): void {
+    this.rainEnabled = !this.rainEnabled;
+  }
+
   nextTrivia(): void {
     this.rotateTrivia();
   }
 
   nextLesson(): void {
     this.rotateLesson();
+  }
+
+  nextLetter(): void {
+    this.rotateLetter();
+  }
+
+  nextCommerceLesson(): void {
+    this.rotateCommerceLesson();
+  }
+
+  openStoryNook(): void {
+    const story = this.activeTrivia;
+    if (!story) {
+      return;
+    }
+    this.readingNook = {
+      title: story.title,
+      body: story.body,
+      tag: 'Story',
+      source: 'Daily Prophet',
+    };
+  }
+
+  openLessonNook(): void {
+    const lesson = this.activeLesson;
+    if (!lesson) {
+      return;
+    }
+    this.readingNook = {
+      title: lesson.title,
+      subtitle: lesson.subtitle,
+      body: lesson.body,
+      tag: lesson.tag ?? 'Lesson',
+      source: 'Common Room Library',
+    };
+  }
+
+  openLetterNook(): void {
+    const letter = this.activeLetter;
+    if (!letter) {
+      return;
+    }
+    this.readingNook = {
+      title: letter.title,
+      body: letter.body,
+      tag: 'Owl Post',
+      source: letter.from,
+    };
+  }
+
+  openCommerceNook(): void {
+    const lesson = this.activeCommerceLesson;
+    if (!lesson) {
+      return;
+    }
+    this.readingNook = {
+      title: lesson.title,
+      subtitle: lesson.subtitle,
+      body: lesson.body,
+      tag: lesson.tag ?? 'Commerce Lesson',
+      source: 'Professor of Commerce',
+    };
+  }
+
+  closeReadingNook(): void {
+    this.readingNook = null;
   }
 
   private setInitialTriviaIndex(): void {
@@ -258,6 +423,24 @@ export class HogwartsComponent implements OnInit, OnDestroy {
     this.lessonIndex = (slot + 5) % this.loreArticles.length;
   }
 
+  private setInitialLetterIndex(): void {
+    if (!this.letters.length) {
+      this.letterIndex = 0;
+      return;
+    }
+    const slot = Math.floor(Date.now() / this.letterIntervalMs);
+    this.letterIndex = slot % this.letters.length;
+  }
+
+  private setInitialCommerceIndex(): void {
+    if (!this.commerceLessons.length) {
+      this.commerceIndex = 0;
+      return;
+    }
+    const slot = Math.floor(Date.now() / this.commerceIntervalMs);
+    this.commerceIndex = slot % this.commerceLessons.length;
+  }
+
   private startTriviaRotation(): void {
     const now = Date.now();
     const msUntilNext = this.triviaIntervalMs - (now % this.triviaIntervalMs);
@@ -268,6 +451,29 @@ export class HogwartsComponent implements OnInit, OnDestroy {
         this.rotateTrivia();
         this.rotateLesson();
       }, this.triviaIntervalMs);
+    }, msUntilNext);
+  }
+
+  private startLetterRotation(): void {
+    const now = Date.now();
+    const msUntilNext = this.letterIntervalMs - (now % this.letterIntervalMs);
+    this.letterTimeoutId = setTimeout(() => {
+      this.rotateLetter();
+      this.letterTimerId = setInterval(() => {
+        this.rotateLetter();
+      }, this.letterIntervalMs);
+    }, msUntilNext);
+  }
+
+  private startCommerceRotation(): void {
+    const now = Date.now();
+    const msUntilNext =
+      this.commerceIntervalMs - (now % this.commerceIntervalMs);
+    this.commerceTimeoutId = setTimeout(() => {
+      this.rotateCommerceLesson();
+      this.commerceTimerId = setInterval(() => {
+        this.rotateCommerceLesson();
+      }, this.commerceIntervalMs);
     }, msUntilNext);
   }
 
@@ -283,6 +489,20 @@ export class HogwartsComponent implements OnInit, OnDestroy {
       return;
     }
     this.lessonIndex = (this.lessonIndex + 1) % this.loreArticles.length;
+  }
+
+  private rotateLetter(): void {
+    if (!this.letters.length) {
+      return;
+    }
+    this.letterIndex = (this.letterIndex + 1) % this.letters.length;
+  }
+
+  private rotateCommerceLesson(): void {
+    if (!this.commerceLessons.length) {
+      return;
+    }
+    this.commerceIndex = (this.commerceIndex + 1) % this.commerceLessons.length;
   }
 
   private loadOverview(): void {
@@ -327,6 +547,7 @@ export class HogwartsComponent implements OnInit, OnDestroy {
     this.revenueCurrentYear =
       overview?.currentTo ? new Date(overview.currentTo).getFullYear() : null;
     this.revenueHistory = history.map((row) => this.mapRevenueHistoryRow(row));
+    this.ledgerSort = { column: 'revenue', direction: 'desc' };
   }
 
   sortLedger(column: LedgerSortColumn): void {
@@ -340,38 +561,11 @@ export class HogwartsComponent implements OnInit, OnDestroy {
     this.ledgerSort = { column, direction: 'desc' };
   }
 
-  get revenueHistorySorted(): RevenueHistoryRowView[] {
-    const direction = this.ledgerSort.direction === 'desc' ? -1 : 1;
-    const column = this.ledgerSort.column;
-    const rows = [...this.revenueHistory];
-
-    const numeric = (value: number | null | undefined) => {
-      if (value === null || value === undefined || Number.isNaN(value)) {
-        return this.ledgerSort.direction === 'desc'
-          ? Number.NEGATIVE_INFINITY
-          : Number.POSITIVE_INFINITY;
-      }
-      return value;
-    };
-
-    rows.sort((a, b) => {
-      const aValue = this.ledgerSortValue(a, column, numeric);
-      const bValue = this.ledgerSortValue(b, column, numeric);
-      if (aValue === bValue) {
-        return (b.year - a.year) * direction;
-      }
-      return (aValue - bValue) * direction;
-    });
-
-    return rows;
-  }
-
   private ledgerSortValue(
     row: RevenueHistoryRowView,
-    column: LedgerSortColumn,
     numeric: (value: number | null | undefined) => number
   ): number {
-    switch (column) {
+    switch (this.ledgerSort.column) {
       case 'year':
         return row.year;
       case 'orders':
@@ -414,12 +608,16 @@ export class HogwartsComponent implements OnInit, OnDestroy {
       updatedLastWindow !== null
         ? `+${updatedLastWindow} in last ${windowMinutes}m`
         : 'No recent updates';
+    const oldestLabel = this.formatDurationShort(snapshot?.oldestMinutes ?? null);
+    const p95Label = this.formatDurationShort(snapshot?.p95Minutes ?? null);
 
     return {
       ...config,
       count: snapshot?.count ?? 0,
       oldestMinutes: snapshot?.oldestMinutes ?? null,
       p95Minutes: snapshot?.p95Minutes ?? null,
+      oldestLabel,
+      p95Label,
       updatedLastWindow,
       windowMinutes,
       trend,
@@ -434,6 +632,7 @@ export class HogwartsComponent implements OnInit, OnDestroy {
           : 'UNKNOWN';
       const ageMinutes = row.ageMinutes ?? null;
       const updatedAt = this.formatAge(ageMinutes);
+      const ageLabel = this.formatDurationShort(ageMinutes);
       const customer =
         row.partnerName?.trim() ||
         (row.ppid !== null && row.ppid !== undefined
@@ -444,6 +643,7 @@ export class HogwartsComponent implements OnInit, OnDestroy {
         id: this.formatOrderId(row),
         status: statusKey,
         ageMinutes,
+        ageLabel,
         updatedAt,
         customer,
         total: this.formatTotal(row.total),
@@ -507,10 +707,24 @@ export class HogwartsComponent implements OnInit, OnDestroy {
   }
 
   private formatAge(minutes: number | null | undefined): string {
+    const duration = this.formatDurationShort(minutes);
+    return duration === '--' ? '--' : `${duration} ago`;
+  }
+
+  private formatDurationShort(minutes: number | null | undefined): string {
     if (minutes === null || minutes === undefined) {
       return '--';
     }
-    return `${minutes}m ago`;
+    const totalMinutes = Math.max(0, Math.floor(minutes));
+    const days = Math.floor(totalMinutes / 1440);
+    const hours = Math.floor((totalMinutes % 1440) / 60);
+    if (days > 0) {
+      return hours > 0 ? `${days}d ${hours}h` : `${days}d`;
+    }
+    if (totalMinutes > 0 && hours === 0) {
+      return '<1h';
+    }
+    return `${hours}h`;
   }
 
   private formatMoney(value: number | null | undefined): string {
@@ -535,7 +749,8 @@ export class HogwartsComponent implements OnInit, OnDestroy {
       return '--';
     }
     const diffMinutes = Math.max(0, Math.round((Date.now() - timestamp) / 60000));
-    return `${diffMinutes}m ago`;
+    const duration = this.formatDurationShort(diffMinutes);
+    return duration === '--' ? '--' : `${duration} ago`;
   }
 
   private formatOrderId(order: HogwartsStuckOrder): string {

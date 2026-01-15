@@ -11,6 +11,7 @@
   --emerald: #1f6b4a;
   --sapphire: #2a5a88;
   --shadow: rgba(22, 12, 6, 0.35);
+  --candle-glow: 0 0 20px rgba(255, 221, 137, 0.8);
   position: relative;
   min-height: calc(100vh - 140px);
   padding: 92px 20px 96px;
@@ -26,15 +27,46 @@
   content: '';
   position: absolute;
   inset: 0;
+  z-index: 0;
   background-image: radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.18), transparent 40%),
     radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.12), transparent 45%);
   opacity: 0.5;
   pointer-events: none;
 }
 
+.hogwarts-page.rain-on::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: repeating-linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.08),
+    rgba(255, 255, 255, 0.08) 2px,
+    transparent 2px,
+    transparent 10px
+  );
+  opacity: 0.25;
+  animation: rain-drift 18s linear infinite;
+  pointer-events: none;
+}
+
+.hogwarts-page.glow-low {
+  --candle-glow: 0 0 10px rgba(255, 221, 137, 0.55);
+}
+
+.hogwarts-page.glow-medium {
+  --candle-glow: 0 0 18px rgba(255, 221, 137, 0.75);
+}
+
+.hogwarts-page.glow-high {
+  --candle-glow: 0 0 28px rgba(255, 221, 137, 0.95);
+}
+
 .bg-sparkles {
   position: absolute;
   inset: -10%;
+  z-index: 0;
   background-image: radial-gradient(rgba(255, 255, 255, 0.3) 1px, transparent 0);
   background-size: 140px 140px;
   opacity: 0.16;
@@ -87,7 +119,7 @@
   height: 18px;
   border-radius: 50% 50% 60% 60%;
   background: radial-gradient(circle at 40% 35%, #fff2b4, #f4b24f 65%, rgba(255, 255, 255, 0) 70%);
-  box-shadow: 0 0 20px rgba(255, 221, 137, 0.8);
+  box-shadow: var(--candle-glow);
 }
 
 .candle-1 {
@@ -118,7 +150,7 @@
 
 .hogwarts-shell {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   max-width: 1180px;
   margin: 0 auto;
   display: flex;
@@ -196,6 +228,39 @@
   height: 58px;
   color: rgba(255, 226, 152, 0.7);
   filter: drop-shadow(0 0 10px rgba(216, 182, 91, 0.35));
+}
+
+.hogwarts-tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 999px;
+  background: rgba(18, 10, 5, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  width: fit-content;
+}
+
+.tab-btn {
+  border: 0;
+  background: transparent;
+  color: rgba(255, 246, 222, 0.7);
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: all 0.2s ease;
+}
+
+.tab-btn.is-active {
+  background: linear-gradient(140deg, rgba(255, 240, 206, 0.95), rgba(255, 226, 181, 0.9));
+  color: #2a1a0f;
+  box-shadow: 0 10px 20px rgba(196, 154, 73, 0.25);
+}
+
+.tab-btn:hover {
+  color: rgba(255, 246, 222, 0.95);
 }
 
 .house-points {
@@ -731,6 +796,107 @@
   line-height: 1.6;
 }
 
+.trivia-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.letter-card {
+  margin-top: 16px;
+  padding: 18px;
+  border-radius: 14px;
+  background: linear-gradient(160deg, rgba(255, 248, 233, 0.95), rgba(244, 231, 206, 0.9));
+  border: 1px solid rgba(196, 154, 73, 0.3);
+  display: grid;
+  gap: 10px;
+}
+
+.letter-title {
+  margin: 0;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.letter-from {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+.letter-preview {
+  display: grid;
+  gap: 8px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+.letter-body {
+  margin: 0;
+}
+
+.letter-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.letter-empty {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(44, 26, 15, 0.06);
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+.ambience-controls {
+  margin-top: 16px;
+  display: grid;
+  gap: 14px;
+}
+
+.ambience-group {
+  display: grid;
+  gap: 8px;
+}
+
+.ambience-label {
+  font-size: 12px;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+}
+
+.toggle-group {
+  display: inline-flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.toggle {
+  border: 1px solid rgba(44, 26, 15, 0.2);
+  background: rgba(255, 255, 255, 0.6);
+  color: var(--ink);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toggle.wide {
+  padding: 6px 18px;
+}
+
+.toggle.is-active {
+  background: linear-gradient(140deg, rgba(255, 240, 206, 0.95), rgba(255, 226, 181, 0.9));
+  border-color: rgba(196, 154, 73, 0.5);
+  box-shadow: 0 8px 16px rgba(196, 154, 73, 0.2);
+}
+
 .library-card {
   margin-top: 16px;
   padding: 16px;
@@ -994,6 +1160,102 @@
   animation: pulse 1.8s ease-in-out infinite;
 }
 
+.reading-nook {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 20;
+  padding: 24px;
+}
+
+.reading-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(16, 9, 5, 0.65);
+  backdrop-filter: blur(4px);
+}
+
+.reading-panel {
+  position: relative;
+  max-width: 760px;
+  width: min(92vw, 760px);
+  max-height: 85vh;
+  overflow: auto;
+  padding: 28px;
+  border-radius: 18px;
+  background: linear-gradient(160deg, rgba(255, 250, 236, 0.98), rgba(244, 231, 206, 0.96));
+  border: 1px solid rgba(196, 154, 73, 0.35);
+  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.35);
+  color: var(--ink);
+  z-index: 1;
+}
+
+.reading-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  border: 0;
+  background: rgba(44, 26, 15, 0.08);
+  color: var(--ink);
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.reading-header h2 {
+  margin: 8px 0 6px;
+  font-family: 'Cinzel', 'Playfair Display', serif;
+  font-size: 24px;
+}
+
+.reading-tag,
+.reading-source {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(196, 154, 73, 0.2);
+  color: var(--ink);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  margin-right: 6px;
+}
+
+.reading-source {
+  background: rgba(44, 26, 15, 0.08);
+}
+
+.reading-sub {
+  margin: 0 0 12px;
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
+.reading-body {
+  display: grid;
+  gap: 12px;
+  line-height: 1.75;
+  font-size: 16px;
+}
+
+.reading-body p {
+  margin: 0;
+}
+
+@keyframes rain-drift {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 200px 300px;
+  }
+}
+
 @keyframes float {
   0% {
     transform: translateY(0px);
@@ -1082,6 +1344,14 @@
 
   .ledger-header {
     display: none;
+  }
+
+  .hogwarts-tabs {
+    flex-wrap: wrap;
+  }
+
+  .reading-panel {
+    padding: 20px;
   }
 }
 

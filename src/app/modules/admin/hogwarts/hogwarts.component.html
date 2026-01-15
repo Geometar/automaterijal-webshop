@@ -1,4 +1,4 @@
-<section class="hogwarts-page">
+<section class="hogwarts-page" [ngClass]="pageClasses">
   <div class="bg-sparkles"></div>
   <div class="floating-candles" aria-hidden="true">
     <span class="candle candle-1"></span>
@@ -56,26 +56,223 @@
       </div>
     </header>
 
-    <section class="house-points">
-      <div class="section-title">
-        <p class="eyebrow">House Points</p>
-        <h2>Mood of the day</h2>
-      </div>
-      <div class="house-grid">
-        <article class="house-card" *ngFor="let house of housePoints" [style.--house-accent]="house.accent">
-          <div class="house-top">
-            <span class="house-name">{{ house.name }}</span>
-            <span class="house-mascot">{{ house.mascot }}</span>
+    <nav class="hogwarts-tabs" aria-label="Hogwarts tabs">
+      <button
+        class="tab-btn"
+        type="button"
+        [class.is-active]="activeTab === 'common'"
+        (click)="setActiveTab('common')"
+      >
+        Common Room
+      </button>
+      <button
+        class="tab-btn"
+        type="button"
+        [class.is-active]="activeTab === 'watchtower'"
+        (click)="setActiveTab('watchtower')"
+      >
+        Watchtower
+      </button>
+    </nav>
+
+    <ng-container *ngIf="activeTab === 'common'">
+      <section class="house-points">
+        <div class="section-title">
+          <p class="eyebrow">House Points</p>
+          <h2>Mood of the day</h2>
+        </div>
+        <div class="house-grid">
+          <article class="house-card" *ngFor="let house of housePoints" [style.--house-accent]="house.accent">
+            <div class="house-top">
+              <span class="house-name">{{ house.name }}</span>
+              <span class="house-mascot">{{ house.mascot }}</span>
+            </div>
+            <div class="house-points-value">{{ house.points }}</div>
+            <div class="house-bar">
+              <span [style.width.%]="house.progress"></span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="hogwarts-grid common-grid">
+        <article class="hogwarts-panel ambience">
+          <div class="panel-header">
+            <div>
+              <p class="panel-eyebrow">Common Room</p>
+              <h2>Atmosphere</h2>
+              <p class="panel-sub">Adjust the glow and calm the room.</p>
+            </div>
+            <div class="panel-chip subtle">
+              <autom-icon [source]="icons.MOON"></autom-icon>
+              Cozy
+            </div>
           </div>
-          <div class="house-points-value">{{ house.points }}</div>
-          <div class="house-bar">
-            <span [style.width.%]="house.progress"></span>
+
+          <div class="ambience-controls">
+            <div class="ambience-group">
+              <span class="ambience-label">Candle glow</span>
+              <div class="toggle-group">
+                <button class="toggle" type="button" (click)="setGlow('low')" [class.is-active]="glowLevel === 'low'">Low</button>
+                <button class="toggle" type="button" (click)="setGlow('medium')" [class.is-active]="glowLevel === 'medium'">Medium</button>
+                <button class="toggle" type="button" (click)="setGlow('high')" [class.is-active]="glowLevel === 'high'">High</button>
+              </div>
+            </div>
+            <div class="ambience-group">
+              <span class="ambience-label">Window rain</span>
+              <button class="toggle wide" type="button" (click)="toggleRain()" [class.is-active]="rainEnabled">
+                {{ rainEnabled ? 'On' : 'Off' }}
+              </button>
+            </div>
           </div>
         </article>
-      </div>
-    </section>
 
-    <section class="hogwarts-grid">
+        <article class="hogwarts-panel letters">
+          <div class="panel-header">
+            <div>
+              <p class="panel-eyebrow">Owl Post</p>
+              <h2>Letters from the castle</h2>
+              <p class="panel-sub">Long letters, slow reading. Rotates every hour.</p>
+            </div>
+            <div class="panel-chip subtle">
+              <autom-icon [source]="icons.MAIL"></autom-icon>
+              Letters
+            </div>
+          </div>
+          <div class="letter-card" *ngIf="activeLetter; else noLetter">
+            <p class="letter-title">{{ activeLetter.title }}</p>
+            <p class="letter-from">From {{ activeLetter.from }}</p>
+            <div class="letter-preview">
+              <ng-container *ngFor="let paragraph of activeLetter.body; let i = index">
+                <p class="letter-body" *ngIf="i < 3">{{ paragraph }}</p>
+              </ng-container>
+            </div>
+            <div class="letter-actions">
+              <button class="hogwarts-btn ghost small" type="button" (click)="openLetterNook()">
+                <autom-icon [source]="icons.BOOK_OPEN"></autom-icon>
+                Read in nook
+              </button>
+              <button class="hogwarts-btn ghost small" type="button" (click)="nextLetter()">
+                <autom-icon [source]="icons.REFRESH_CW"></autom-icon>
+                Next letter
+              </button>
+            </div>
+          </div>
+          <ng-template #noLetter>
+            <div class="letter-empty">No letters available right now.</div>
+          </ng-template>
+        </article>
+
+        <article class="hogwarts-panel trivia">
+          <div class="panel-header">
+            <div>
+              <p class="panel-eyebrow">Daily Prophet</p>
+              <h2>Stories & calm</h2>
+              <p class="panel-sub">Longform Hogwarts notes, rotating every 30 minutes.</p>
+            </div>
+            <div class="panel-chip subtle">
+              <autom-icon [source]="icons.BOOK_OPEN"></autom-icon>
+              Stories
+            </div>
+          </div>
+          <div class="trivia-card">
+            <p class="trivia-title">{{ activeTrivia.title }}</p>
+            <div class="trivia-story">
+              <p class="trivia-body" *ngFor="let paragraph of activeTrivia.body">
+                {{ paragraph }}
+              </p>
+            </div>
+            <div class="trivia-actions">
+              <button class="hogwarts-btn ghost small" type="button" (click)="openStoryNook()">
+                <autom-icon [source]="icons.BOOK_OPEN"></autom-icon>
+                Read in nook
+              </button>
+              <button class="hogwarts-btn ghost small" type="button" (click)="nextTrivia()">
+                <autom-icon [source]="icons.REFRESH_CW"></autom-icon>
+                Next story
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <article class="hogwarts-panel library">
+          <div class="panel-header">
+            <div>
+              <p class="panel-eyebrow">Common Room Library</p>
+              <h2>School notes</h2>
+              <p class="panel-sub">Rotates every 30 minutes. One lesson at a time.</p>
+            </div>
+            <div class="panel-chip subtle">
+              <autom-icon [source]="icons.BOOK"></autom-icon>
+              Journal
+            </div>
+          </div>
+          <article class="library-card" *ngIf="activeLesson; else noLesson">
+            <div class="library-header">
+              <span class="library-tag" *ngIf="activeLesson.tag">{{ activeLesson.tag }}</span>
+              <h3>{{ activeLesson.title }}</h3>
+              <p class="library-sub">{{ activeLesson.subtitle }}</p>
+            </div>
+            <div class="library-body">
+              <p *ngFor="let paragraph of activeLesson.body">{{ paragraph }}</p>
+            </div>
+            <div class="library-actions">
+              <button class="hogwarts-btn ghost small" type="button" (click)="openLessonNook()">
+                <autom-icon [source]="icons.BOOK_OPEN"></autom-icon>
+                Read in nook
+              </button>
+              <button class="hogwarts-btn ghost small" type="button" (click)="nextLesson()">
+                <autom-icon [source]="icons.REFRESH_CW"></autom-icon>
+                Next lesson
+              </button>
+            </div>
+          </article>
+          <ng-template #noLesson>
+            <div class="library-empty">No lessons available right now.</div>
+          </ng-template>
+        </article>
+
+        <article class="hogwarts-panel commerce">
+          <div class="panel-header">
+            <div>
+              <p class="panel-eyebrow">Professor of Commerce</p>
+              <h2>Selling, but gentle</h2>
+              <p class="panel-sub">One practical lesson per day, for calm confidence.</p>
+            </div>
+            <div class="panel-chip subtle">
+              <autom-icon [source]="icons.PEN_TOOL"></autom-icon>
+              Commerce
+            </div>
+          </div>
+
+          <div class="letter-card" *ngIf="activeCommerceLesson; else noCommerceLesson">
+            <p class="letter-title">{{ activeCommerceLesson.title }}</p>
+            <p class="letter-from">{{ activeCommerceLesson.subtitle }}</p>
+            <div class="letter-preview">
+              <ng-container *ngFor="let paragraph of activeCommerceLesson.body; let i = index">
+                <p class="letter-body" *ngIf="i < 3">{{ paragraph }}</p>
+              </ng-container>
+            </div>
+            <div class="letter-actions">
+              <button class="hogwarts-btn ghost small" type="button" (click)="openCommerceNook()">
+                <autom-icon [source]="icons.BOOK_OPEN"></autom-icon>
+                Read in nook
+              </button>
+              <button class="hogwarts-btn ghost small" type="button" (click)="nextCommerceLesson()">
+                <autom-icon [source]="icons.REFRESH_CW"></autom-icon>
+                Next lesson
+              </button>
+            </div>
+          </div>
+          <ng-template #noCommerceLesson>
+            <div class="letter-empty">No commerce lessons available right now.</div>
+          </ng-template>
+        </article>
+      </section>
+    </ng-container>
+
+    <ng-container *ngIf="activeTab === 'watchtower'">
+      <section class="hogwarts-grid watchtower-grid">
       <article class="hogwarts-panel wide">
         <div class="panel-header">
           <div>
@@ -111,15 +308,11 @@
               </div>
               <div class="metric">
                 <span class="metric-label">Oldest</span>
-                <span class="metric-value">
-                  {{ card.oldestMinutes !== null ? (card.oldestMinutes + 'm') : '--' }}
-                </span>
+                <span class="metric-value">{{ card.oldestLabel }}</span>
               </div>
               <div class="metric">
                 <span class="metric-label">p95</span>
-                <span class="metric-value">
-                  {{ card.p95Minutes !== null ? (card.p95Minutes + 'm') : '--' }}
-                </span>
+                <span class="metric-value">{{ card.p95Label }}</span>
               </div>
               <div class="metric">
                 <span class="metric-label">Updated {{ card.windowMinutes }}m</span>
@@ -161,7 +354,7 @@
           <div class="stuck-row" *ngFor="let order of stuckOrders">
             <span class="stuck-id">{{ order.id }}</span>
             <span class="stuck-status">{{ order.status }}</span>
-            <span>{{ order.ageMinutes !== null ? (order.ageMinutes + 'm') : '--' }}</span>
+            <span>{{ order.ageLabel }}</span>
             <span>{{ order.updatedAt }}</span>
             <span>{{ order.customer }}</span>
             <span>{{ order.total }}</span>
@@ -337,65 +530,6 @@
         </ng-template>
       </article>
 
-      <article class="hogwarts-panel trivia">
-        <div class="panel-header">
-          <div>
-            <p class="panel-eyebrow">Daily Prophet</p>
-            <h2>Stories & calm</h2>
-            <p class="panel-sub">Longform Hogwarts notes, rotating every 30 minutes.</p>
-          </div>
-          <div class="panel-chip subtle">
-            <autom-icon [source]="icons.BOOK_OPEN"></autom-icon>
-            Stories
-          </div>
-        </div>
-        <div class="trivia-card">
-          <p class="trivia-title">{{ activeTrivia.title }}</p>
-          <div class="trivia-story">
-            <p class="trivia-body" *ngFor="let paragraph of activeTrivia.body">
-              {{ paragraph }}
-            </p>
-          </div>
-          <button class="hogwarts-btn ghost small" type="button" (click)="nextTrivia()">
-            <autom-icon [source]="icons.REFRESH_CW"></autom-icon>
-            Next story
-          </button>
-        </div>
-      </article>
-
-      <article class="hogwarts-panel library">
-        <div class="panel-header">
-          <div>
-            <p class="panel-eyebrow">Common Room Library</p>
-            <h2>School notes</h2>
-            <p class="panel-sub">Rotates every 30 minutes. One lesson at a time.</p>
-          </div>
-          <div class="panel-chip subtle">
-            <autom-icon [source]="icons.BOOK"></autom-icon>
-            Journal
-          </div>
-        </div>
-        <article class="library-card" *ngIf="activeLesson; else noLesson">
-          <div class="library-header">
-            <span class="library-tag" *ngIf="activeLesson.tag">{{ activeLesson.tag }}</span>
-            <h3>{{ activeLesson.title }}</h3>
-            <p class="library-sub">{{ activeLesson.subtitle }}</p>
-          </div>
-          <div class="library-body">
-            <p *ngFor="let paragraph of activeLesson.body">{{ paragraph }}</p>
-          </div>
-          <div class="library-actions">
-            <button class="hogwarts-btn ghost small" type="button" (click)="nextLesson()">
-              <autom-icon [source]="icons.REFRESH_CW"></autom-icon>
-              Next lesson
-            </button>
-          </div>
-        </article>
-        <ng-template #noLesson>
-          <div class="library-empty">No lessons available right now.</div>
-        </ng-template>
-      </article>
-
       <article class="hogwarts-panel wide spellbook">
         <div class="panel-header">
           <div>
@@ -467,5 +601,22 @@
         </div>
       </article>
     </section>
+    </ng-container>
+  </div>
+
+  <div class="reading-nook" *ngIf="readingNook">
+    <div class="reading-backdrop" (click)="closeReadingNook()"></div>
+    <article class="reading-panel">
+      <button class="reading-close" type="button" (click)="closeReadingNook()">Close</button>
+      <div class="reading-header">
+        <span class="reading-tag" *ngIf="readingNook.tag">{{ readingNook.tag }}</span>
+        <span class="reading-source" *ngIf="readingNook.source">From {{ readingNook.source }}</span>
+        <h2>{{ readingNook.title }}</h2>
+        <p class="reading-sub" *ngIf="readingNook.subtitle">{{ readingNook.subtitle }}</p>
+      </div>
+      <div class="reading-body">
+        <p *ngFor="let paragraph of readingNook.body">{{ paragraph }}</p>
+      </div>
+    </article>
   </div>
 </section>
