@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
 import {
+  ChangeDetectorRef,
   Component,
   ElementRef,
+  NgZone,
   OnDestroy,
   OnInit,
   ViewChild,
@@ -131,6 +133,7 @@ export class HogwartsComponent implements OnInit, OnDestroy {
 
   icons = IconsEnum;
   readonly today = new Date();
+  private destroyed = false;
   activeTab: 'common' | 'watchtower' = 'common';
   glowLevel: 'low' | 'medium' | 'high' = 'medium';
   rainEnabled = false;
@@ -234,7 +237,9 @@ export class HogwartsComponent implements OnInit, OnDestroy {
   constructor(
     private febiPriceAdminService: FebiPriceAdminService,
     private hogwartsAdminService: HogwartsAdminService,
-    private snackbarService: SnackbarService
+    private snackbarService: SnackbarService,
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone
   ) { }
 
   ngOnInit(): void {
@@ -251,6 +256,7 @@ export class HogwartsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.destroyed = true;
     if (this.triviaTimerId) {
       clearInterval(this.triviaTimerId);
     }
@@ -321,30 +327,37 @@ export class HogwartsComponent implements OnInit, OnDestroy {
 
   setActiveTab(tab: 'common' | 'watchtower'): void {
     this.activeTab = tab;
+    this.refreshUi();
   }
 
   setGlow(level: 'low' | 'medium' | 'high'): void {
     this.glowLevel = level;
+    this.refreshUi();
   }
 
   toggleRain(): void {
     this.rainEnabled = !this.rainEnabled;
+    this.refreshUi();
   }
 
   nextTrivia(): void {
     this.rotateTrivia();
+    this.refreshUi();
   }
 
   nextLesson(): void {
     this.rotateLesson();
+    this.refreshUi();
   }
 
   nextLetter(): void {
     this.rotateLetter();
+    this.refreshUi();
   }
 
   nextCommerceLesson(): void {
     this.rotateCommerceLesson();
+    this.refreshUi();
   }
 
   openStoryNook(): void {
@@ -503,6 +516,20 @@ export class HogwartsComponent implements OnInit, OnDestroy {
       return;
     }
     this.commerceIndex = (this.commerceIndex + 1) % this.commerceLessons.length;
+  }
+
+  private refreshUi(): void {
+    if (this.destroyed) {
+      return;
+    }
+    this.ngZone.run(() => {
+      Promise.resolve().then(() => {
+        if (this.destroyed) {
+          return;
+        }
+        this.cdr.detectChanges();
+      });
+    });
   }
 
   private loadOverview(): void {
