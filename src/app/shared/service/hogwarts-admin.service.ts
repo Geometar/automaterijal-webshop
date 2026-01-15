@@ -39,6 +39,31 @@ export interface HogwartsOverviewResponse {
   providers: HogwartsProviderSnapshot[];
 }
 
+export interface HogwartsRevenueMetrics {
+  orders: number;
+  revenue: number;
+  activePartners: number;
+  aov: number | null;
+  ordersPerActivePartner: number | null;
+}
+
+export interface HogwartsRevenuePeriodRow {
+  year: number;
+  from: number;
+  to: number;
+  metrics: HogwartsRevenueMetrics;
+}
+
+export interface HogwartsRevenueOverviewResponse {
+  generatedAt: number;
+  days: number;
+  years: number;
+  currentFrom: number;
+  currentTo: number;
+  current: HogwartsRevenueMetrics;
+  history: HogwartsRevenuePeriodRow[];
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -49,5 +74,11 @@ export class HogwartsAdminService {
 
   fetchOverview(): Observable<HogwartsOverviewResponse> {
     return this.http.get<HogwartsOverviewResponse>(`${this.baseUrl}/overview`);
+  }
+
+  fetchRevenueOverview(days = 30, years = 10): Observable<HogwartsRevenueOverviewResponse> {
+    return this.http.get<HogwartsRevenueOverviewResponse>(
+      `${this.baseUrl}/revenue-overview?days=${days}&years=${years}`
+    );
   }
 }

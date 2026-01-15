@@ -23,12 +23,23 @@ import {
   HogwartsStatusSnapshot,
   HogwartsStuckOrder,
   HogwartsProviderSnapshot,
+  HogwartsRevenueOverviewResponse,
+  HogwartsRevenueMetrics,
+  HogwartsRevenuePeriodRow,
 } from '../../../shared/service/hogwarts-admin.service';
 import { SnackbarService } from '../../../shared/service/utils/snackbar.service';
 import { HOGWARTS_ARTICLES, HOGWARTS_STORIES } from './hogwarts.lore';
 
 type StatusSeverity = 'critical' | 'warning';
 type ProviderSeverity = 'stable' | 'warning';
+type SortDirection = 'asc' | 'desc';
+type LedgerSortColumn =
+  | 'year'
+  | 'orders'
+  | 'revenue'
+  | 'aov'
+  | 'activePartners'
+  | 'ordersPerPartner';
 
 interface StatusCardConfig {
   status: number;
@@ -70,6 +81,26 @@ interface ProviderView {
   alertIcon: IconsEnum;
 }
 
+interface RevenueSummaryView {
+  orders: number;
+  revenue: string;
+  aov: string;
+  activePartners: number;
+  ordersPerPartner: string;
+}
+
+interface RevenueHistoryRowView {
+  year: number;
+  orders: number;
+  revenueValue: number;
+  revenue: string;
+  aovValue: number | null;
+  aov: string;
+  activePartners: number;
+  ordersPerPartnerValue: number | null;
+  ordersPerPartner: string;
+}
+
 @Component({
   selector: 'app-hogwarts',
   standalone: true,
@@ -88,6 +119,14 @@ export class HogwartsComponent implements OnInit, OnDestroy {
   private triviaTimeoutId: ReturnType<typeof setTimeout> | null = null;
   overviewLoading = false;
   overviewError = '';
+  revenueLoading = false;
+  revenueError = '';
+  revenueSummary: RevenueSummaryView | null = null;
+  revenueHistory: RevenueHistoryRowView[] = [];
+  revenueCurrentYear: number | null = null;
+  ledgerSort = { column: 'revenue' as LedgerSortColumn, direction: 'desc' as SortDirection };
+  readonly revenueDays = 30;
+  readonly revenueYears = 10;
   private readonly statusCardConfig: StatusCardConfig[] = [
     {
       status: 2,
@@ -170,6 +209,7 @@ export class HogwartsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadMeta();
     this.loadOverview();
+    this.loadRevenue();
     this.setInitialTriviaIndex();
     this.setInitialLessonIndex();
     this.startTriviaRotation();
@@ -264,6 +304,91 @@ export class HogwartsComponent implements OnInit, OnDestroy {
       });
   }
 
+  private loadRevenue(): void {
+    this.revenueLoading = true;
+    this.revenueError = '';
+    this.hogwartsAdminService
+      .fetchRevenueOverview(this.revenueDays, this.revenueYears)
+      .pipe(finalize(() => (this.revenueLoading = false)))
+      .subscribe({
+        next: (overview) => this.applyRevenueOverview(overview),
+        error: () => {
+          this.revenueError = 'Revenue metrics are currently unavailable.';
+          this.revenueSummary = null;
+          this.revenueHistory = [];
+        },
+      });
+  }
+
+  private applyRevenueOverview(overview: HogwartsRevenueOverviewResponse): void {
+    const current = overview?.current;
+    const history = overview?.history ?? [];
+    this.revenueSummary = current ? this.mapRevenueSummary(current) : null;
+    this.revenueCurrentYear =
+      overview?.currentTo ? new Date(overview.currentTo).getFullYear() : null;
+    this.revenueHistory = history.map((row) => this.mapRevenueHistoryRow(row));
+  }
+
+  sortLedger(column: LedgerSortColumn): void {
+    if (this.ledgerSort.column === column) {
+      this.ledgerSort = {
+        column,
+        direction: this.ledgerSort.direction === 'desc' ? 'asc' : 'desc',
+      };
+      return;
+    }
+    this.ledgerSort = { column, direction: 'desc' };
+  }
+
+  get revenueHistorySorted(): RevenueHistoryRowView[] {
+    const direction = this.ledgerSort.direction === 'desc' ? -1 : 1;
+    const column = this.ledgerSort.column;
+    const rows = [...this.revenueHistory];
+
+    const numeric = (value: number | null | undefined) => {
+      if (value === null || value === undefined || Number.isNaN(value)) {
+        return this.ledgerSort.direction === 'desc'
+          ? Number.NEGATIVE_INFINITY
+          : Number.POSITIVE_INFINITY;
+      }
+      return value;
+    };
+
+    rows.sort((a, b) => {
+      const aValue = this.ledgerSortValue(a, column, numeric);
+      const bValue = this.ledgerSortValue(b, column, numeric);
+      if (aValue === bValue) {
+        return (b.year - a.year) * direction;
+      }
+      return (aValue - bValue) * direction;
+    });
+
+    return rows;
+  }
+
+  private ledgerSortValue(
+    row: RevenueHistoryRowView,
+    column: LedgerSortColumn,
+    numeric: (value: number | null | undefined) => number
+  ): number {
+    switch (column) {
+      case 'year':
+        return row.year;
+      case 'orders':
+        return row.orders;
+      case 'revenue':
+        return numeric(row.revenueValue);
+      case 'aov':
+        return numeric(row.aovValue);
+      case 'activePartners':
+        return row.activePartners;
+      case 'ordersPerPartner':
+        return numeric(row.ordersPerPartnerValue);
+      default:
+        return 0;
+    }
+  }
+
   private applyOverview(overview: HogwartsOverviewResponse): void {
     const statusMap = new Map<number, HogwartsStatusSnapshot>();
     for (const status of overview?.statuses ?? []) {
@@ -353,11 +478,56 @@ export class HogwartsComponent implements OnInit, OnDestroy {
     });
   }
 
+  private mapRevenueSummary(metrics: HogwartsRevenueMetrics): RevenueSummaryView {
+    return {
+      orders: metrics.orders ?? 0,
+      revenue: this.formatTotal(metrics.revenue),
+      aov: this.formatMoney(metrics.aov),
+      activePartners: metrics.activePartners ?? 0,
+      ordersPerPartner: this.formatRatio(metrics.ordersPerActivePartner),
+    };
+  }
+
+  private mapRevenueHistoryRow(row: HogwartsRevenuePeriodRow): RevenueHistoryRowView {
+    const revenueValue = row.metrics?.revenue ?? 0;
+    const aovValue = row.metrics?.aov ?? null;
+    const ordersPerPartnerValue = row.metrics?.ordersPerActivePartner ?? null;
+
+    return {
+      year: row.year,
+      orders: row.metrics?.orders ?? 0,
+      revenueValue,
+      revenue: this.formatTotal(revenueValue),
+      aovValue,
+      aov: this.formatMoney(aovValue),
+      activePartners: row.metrics?.activePartners ?? 0,
+      ordersPerPartnerValue,
+      ordersPerPartner: this.formatRatio(ordersPerPartnerValue),
+    };
+  }
+
   private formatAge(minutes: number | null | undefined): string {
     if (minutes === null || minutes === undefined) {
       return '--';
     }
     return `${minutes}m ago`;
+  }
+
+  private formatMoney(value: number | null | undefined): string {
+    if (value === null || value === undefined) {
+      return '--';
+    }
+    const formatted = new Intl.NumberFormat('sr-RS', {
+      maximumFractionDigits: 0,
+    }).format(value);
+    return `${formatted} RSD`;
+  }
+
+  private formatRatio(value: number | null | undefined): string {
+    if (value === null || value === undefined) {
+      return '--';
+    }
+    return value.toFixed(2);
   }
 
   private formatAgeFromTimestamp(timestamp: number | null | undefined): string {

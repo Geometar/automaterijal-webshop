@@ -223,6 +223,120 @@
         </div>
       </article>
 
+      <article class="hogwarts-panel wide ledger">
+        <div class="panel-header">
+          <div>
+            <p class="panel-eyebrow">Vault Ledger</p>
+            <h2>Revenue & active partners</h2>
+            <p class="panel-sub">Last {{ revenueDays }} days, plus the same window across {{ revenueYears }} years.</p>
+          </div>
+          <div class="panel-chip subtle">
+            <autom-icon [source]="icons.BOOK"></autom-icon>
+            Totals
+          </div>
+        </div>
+
+        <div class="panel-note" *ngIf="revenueLoading">Refreshing ledger...</div>
+        <div class="panel-note error" *ngIf="revenueError">{{ revenueError }}</div>
+
+        <div class="ledger-summary" *ngIf="revenueSummary">
+          <div class="metric">
+            <span class="metric-label">Orders</span>
+            <span class="metric-value">{{ revenueSummary.orders }}</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Revenue</span>
+            <span class="metric-value">{{ revenueSummary.revenue }}</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">AOV</span>
+            <span class="metric-value">{{ revenueSummary.aov }}</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Active partners</span>
+            <span class="metric-value">{{ revenueSummary.activePartners }}</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Orders/partner</span>
+            <span class="metric-value">{{ revenueSummary.ordersPerPartner }}</span>
+          </div>
+        </div>
+
+        <div class="ledger-table" *ngIf="revenueHistory.length; else ledgerEmpty">
+          <div class="ledger-row ledger-header">
+            <button
+              class="ledger-sort"
+              type="button"
+              (click)="sortLedger('year')"
+              [class.is-active]="ledgerSort.column === 'year'"
+              [attr.data-dir]="ledgerSort.column === 'year' ? ledgerSort.direction : null"
+            >
+              Year
+            </button>
+            <button
+              class="ledger-sort"
+              type="button"
+              (click)="sortLedger('orders')"
+              [class.is-active]="ledgerSort.column === 'orders'"
+              [attr.data-dir]="ledgerSort.column === 'orders' ? ledgerSort.direction : null"
+            >
+              Orders
+            </button>
+            <button
+              class="ledger-sort"
+              type="button"
+              (click)="sortLedger('revenue')"
+              [class.is-active]="ledgerSort.column === 'revenue'"
+              [attr.data-dir]="ledgerSort.column === 'revenue' ? ledgerSort.direction : null"
+            >
+              Revenue
+            </button>
+            <button
+              class="ledger-sort"
+              type="button"
+              (click)="sortLedger('aov')"
+              [class.is-active]="ledgerSort.column === 'aov'"
+              [attr.data-dir]="ledgerSort.column === 'aov' ? ledgerSort.direction : null"
+            >
+              AOV
+            </button>
+            <button
+              class="ledger-sort"
+              type="button"
+              (click)="sortLedger('activePartners')"
+              [class.is-active]="ledgerSort.column === 'activePartners'"
+              [attr.data-dir]="ledgerSort.column === 'activePartners' ? ledgerSort.direction : null"
+            >
+              Active partners
+            </button>
+            <button
+              class="ledger-sort"
+              type="button"
+              (click)="sortLedger('ordersPerPartner')"
+              [class.is-active]="ledgerSort.column === 'ordersPerPartner'"
+              [attr.data-dir]="ledgerSort.column === 'ordersPerPartner' ? ledgerSort.direction : null"
+            >
+              Orders/partner
+            </button>
+          </div>
+          <div
+            class="ledger-row"
+            *ngFor="let row of revenueHistorySorted"
+            [class.is-current]="revenueCurrentYear !== null && row.year === revenueCurrentYear"
+          >
+            <span class="ledger-year">{{ row.year }}</span>
+            <span>{{ row.orders }}</span>
+            <span>{{ row.revenue }}</span>
+            <span>{{ row.aov }}</span>
+            <span>{{ row.activePartners }}</span>
+            <span>{{ row.ordersPerPartner }}</span>
+          </div>
+        </div>
+        <ng-template #ledgerEmpty>
+          <div class="ledger-empty">No revenue data for this window.</div>
+        </ng-template>
+      </article>
+
       <article class="hogwarts-panel trivia">
         <div class="panel-header">
           <div>
