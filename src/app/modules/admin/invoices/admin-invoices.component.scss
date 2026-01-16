@@ -1,0 +1,94 @@
+.invoices {
+  &__filter {
+    display: flex;
+    gap: 32px;
+    justify-content: center;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    @media (max-width: 991px) {
+      flex-direction: column;
+      gap: 20px;
+      align-items: stretch;
+      padding: 0 16px;
+    }
+  }
+
+  &__filter-group {
+    display: flex;
+    gap: 40px;
+    align-items: center;
+  }
+
+  &__filter-group--tight {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  &__segment-label {
+    color: var(--figma-primary-700);
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  &__segment {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px;
+    border-radius: 999px;
+    border: 1px solid var(--figma-primary-200);
+    background-color: var(--figma-accent-green-25);
+  }
+
+  &__segment-btn {
+    border: none;
+    background: transparent;
+    color: var(--figma-primary-700);
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  &__segment-btn:hover {
+    background-color: var(--figma-primary-100);
+  }
+
+  &__segment-btn.is-active {
+    background-color: var(--figma-primary-600);
+    color: var(--figma-base-white);
+  }
+
+  &__segment-btn:focus-visible {
+    outline: 2px solid var(--figma-primary-400);
+    outline-offset: 2px;
+  }
+
+  .mat-mdc-header-cell.mat-column-internalOrder,
+  .mat-mdc-cell.mat-column-internalOrder {
+    text-align: center;
+  }
+
+  @media (max-width: 991px) {
+    &__filter-group {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 16px;
+    }
+
+    &__filter-group--tight {
+      align-items: flex-start;
+    }
+
+    &__segment {
+      width: 100%;
+    }
+
+    &__segment-btn {
+      flex: 1;
+      text-align: center;
+    }
+  }
+}

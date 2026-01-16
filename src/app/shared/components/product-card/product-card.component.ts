@@ -1,5 +1,5 @@
 import { CommonModule, CurrencyPipe } from '@angular/common';
-import { Component, Input, Output, EventEmitter, ViewEncapsulation, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewEncapsulation, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 
@@ -18,10 +18,15 @@ import { ColorEnum, IconsEnum, InputTypeEnum, SizeEnum } from '../../data-models
 import { RsdCurrencyPipe } from '../../pipe/rsd-currency.pipe';
 
 // Services
+import { AccountStateService } from '../../service/state/account-state.service';
 import { CartStateService } from '../../service/state/cart-state.service';
 import { SnackbarService } from '../../service/utils/snackbar.service';
 import { StringUtils } from '../../utils/string-utils';
 import { PictureService, ProductImageMeta } from '../../service/utils/picture.service';
+import {
+  AvailabilityVm,
+  buildAvailabilityVm
+} from '../../utils/availability-utils';
 
 @Component({
   selector: 'autom-product-card',
@@ -41,7 +46,7 @@ import { PictureService, ProductImageMeta } from '../../service/utils/picture.se
   styleUrls: ['./product-card.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class AutomProductCardComponent implements OnInit {
+export class AutomProductCardComponent implements OnInit, OnChanges {
   @Input() roba!: Roba;
   @Output() onClick = new EventEmitter<number>();
   @Output() addToCart = new EventEmitter<{ roba: Roba; quantity: number }>();
@@ -52,10 +57,14 @@ export class AutomProductCardComponent implements OnInit {
   inputTypeEnum = InputTypeEnum;
   sizeEnum = SizeEnum;
 
+  isAdmin = false;
+  isEmployee = false;
+
   // Quantity state
   quantity = 1;
 
   constructor(
+    private accountStateService: AccountStateService,
     private cartStateService: CartStateService,
     private snackbarService: SnackbarService,
     private router: Router,
@@ -65,10 +74,24 @@ export class AutomProductCardComponent implements OnInit {
   /* ---------------------------- Lifecycle ---------------------------- */
 
   ngOnInit(): void {
+    this.isAdmin = this.accountStateService.isAdmin();
+    this.isEmployee = this.accountStateService.isEmployee();
+
     // Initialize quantity from incoming data if present
     const incomingQty = this.roba?.kolicina ?? 0;
     if (incomingQty > 0) {
       this.quantity = this.clampQuantity(incomingQty);
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['roba']) {
+      const incomingQty = this.roba?.kolicina ?? 0;
+      if (incomingQty > 0) {
+        this.quantity = this.clampQuantity(incomingQty);
+      } else {
+        this.quantity = 1;
+      }
     }
   }
 
@@ -82,6 +105,10 @@ export class AutomProductCardComponent implements OnInit {
     event?.preventDefault();
     event?.stopPropagation();
 
+    if (!this.canNavigateToDetails) {
+      return;
+    }
+
     const targetParam = this.getRouteParam(this.roba);
     if (!targetParam) {
       return;
@@ -92,6 +119,9 @@ export class AutomProductCardComponent implements OnInit {
 
   handleAddToCart(event?: Event): void {
     event?.stopPropagation();
+    if (!this.canAddToCart) {
+      return;
+    }
     if (this.roba && this.quantity > 0) {
       if (!this.hasValidPrice || this.isOutOfStock) {
         this.snackbarService.showError('Artikal trenutno nije dostupan za poručivanje');
@@ -107,11 +137,11 @@ export class AutomProductCardComponent implements OnInit {
   }
 
   private get hasValidPrice(): boolean {
-    return this.getPriceValue() > 0;
+    return this.availabilityVm.hasValidPrice;
   }
 
   get availableStock(): number {
-    return this.hasValidPrice ? this.roba?.stanje ?? 0 : 0;
+    return this.availabilityVm.purchasableStock;
   }
 
   private clampQuantity(value: number): number {
@@ -150,15 +180,33 @@ export class AutomProductCardComponent implements OnInit {
 
   /* ----------------------- Derived business flags -------------------- */
 
+  get isExternalOnly(): boolean {
+    return this.roba?.robaid == null && !!this.roba?.providerAvailability?.available;
+  }
+
   // TecDoc-only article recognition (by business rule)
   get isTecDocOnly(): boolean {
-    return this.roba?.robaid == null || this.roba?.podGrupa === 1000000;
+    // Backend no longer guarantees magic `podGrupa===1000000` markers.
+    // Treat items without internal ID and without provider availability as "TecDoc-only" (not purchasable).
+    return this.roba?.robaid == null && !this.roba?.providerAvailability?.available;
+  }
+
+  get canNavigateToDetails(): boolean {
+    return this.roba?.robaid != null || this.roba?.tecDocArticleId != null;
+  }
+
+  get cartKey(): string | null {
+    return this.roba?.cartKey ?? this.cartStateService.getItemKey(this.roba);
+  }
+
+  get canAddToCart(): boolean {
+    return !this.isTecDocOnly && !!this.cartKey;
   }
 
   // Is in cart indicator
   get isInCart(): boolean {
-    const id = this.roba?.robaid;
-    return id != null && this.cartStateService.isInCart(id);
+    const key = this.cartKey;
+    return key ? this.cartStateService.isInCartKey(key) : false;
 
   }
 
@@ -169,13 +217,8 @@ export class AutomProductCardComponent implements OnInit {
     return !this.hasValidPrice || this.availableStock <= 0;
   }
 
-  get stockLabel(): string {
-    if (this.isTecDocOnly) return 'TecDoc artikal';
-    if (!this.hasValidPrice) return 'Nema na stanju';
-    const stanje = this.availableStock;
-    if (stanje >= 5) return 'Na stanju';
-    if (stanje > 0) return 'Ograničene količine';
-    return 'Nema na stanju';
+  get showDiscount(): boolean {
+    return this.availabilityVm.showDiscount;
   }
 
   /* ---------------------------- Pricing ------------------------------ */
@@ -187,7 +230,7 @@ export class AutomProductCardComponent implements OnInit {
   }
 
   get oldPrice(): number | null {
-    if (!this.hasDiscount) {
+    if (!this.availabilityVm.showDiscount) {
       return null;
     }
 
@@ -203,7 +246,7 @@ export class AutomProductCardComponent implements OnInit {
   }
 
   get savings(): number | null {
-    if (!this.hasDiscount) {
+    if (!this.availabilityVm.showDiscount) {
       return null;
     }
 
@@ -248,6 +291,14 @@ export class AutomProductCardComponent implements OnInit {
     return Math.round((cena / liters) * 100) / 100;
   }
 
+  get availabilityVm(): AvailabilityVm {
+    return buildAvailabilityVm(this.roba, {
+      isTecDocOnly: this.isTecDocOnly,
+      isAdmin: this.isAdmin,
+      isStaff: this.isAdmin || this.isEmployee,
+    });
+  }
+
   /* ------------------------- Compatibility --------------------------- */
 
   // Works for Map<string, RobaAplikacija[]> or plain object
@@ -272,12 +323,19 @@ export class AutomProductCardComponent implements OnInit {
   }
 
   getRouteParam(data: any): string | null {
-    const id = data?.robaid;
-    if (id == null) {
-      return null;
-    }
     const slug = this.getProductSlug(data);
-    return slug ? `${id}-${slug}` : String(id);
+    const robaId = data?.robaid;
+    if (robaId != null) {
+      return slug ? `${robaId}-${slug}` : String(robaId);
+    }
+
+    const tecDocArticleId = data?.tecDocArticleId;
+    if (tecDocArticleId != null) {
+      const token = `td${tecDocArticleId}`;
+      return slug ? `${token}-${slug}` : token;
+    }
+
+    return null;
   }
 
   get productImageMeta(): ProductImageMeta {

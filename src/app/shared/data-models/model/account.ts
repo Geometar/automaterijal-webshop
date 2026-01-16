@@ -20,6 +20,10 @@ export class Account {
     return this.privilegije === 2043;
   }
 
+  get isSuperAdmin(): boolean {
+    return this.isAdmin && this.ppid === 3456;
+  }
+
   get isRegularUser(): boolean {
     return !this.isAdmin && !this.isSubAdmin;
   }

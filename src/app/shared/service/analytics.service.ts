@@ -210,7 +210,7 @@ export class AnalyticsService {
         : item.manufacturer?.naziv ?? '';
 
     const analyticsItem: Record<string, unknown> = {
-      item_id: item.robaId ?? '',
+      item_id: item.robaId ?? item.key ?? '',
       item_name: item.name ?? '',
       item_brand: manufacturer,
       item_variant: item.partNumber ?? '',

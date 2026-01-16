@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { CommonModule } from '@angular/common';
@@ -19,7 +19,7 @@ import { RsdCurrencyPipe } from '../../pipe/rsd-currency.pipe';
   templateUrl: './table-flat.component.html',
   styleUrl: './table-flat.component.scss'
 })
-export class TableFlatComponent {
+export class TableFlatComponent implements OnChanges {
   @Input() columns: AutomTableColumn[] = [];
   @Input() displayedColumns: string[] = [];
   @Input() dataSource!: MatTableDataSource<any>;
@@ -34,7 +34,19 @@ export class TableFlatComponent {
   @Output() pageChange: EventEmitter<PageEvent> = new EventEmitter<PageEvent>();
   @Output() rowClick = new EventEmitter<any>();
 
+  @ViewChild('tableScroll') tableScroll?: ElementRef<HTMLDivElement>;
+
   CellType = CellType;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['columns'] || changes['displayedColumns'] || changes['dataSource']) {
+      queueMicrotask(() => {
+        if (this.tableScroll?.nativeElement) {
+          this.tableScroll.nativeElement.scrollLeft = 0;
+        }
+      });
+    }
+  }
 
   isMobileView(): boolean {
     return window.innerWidth < 768;
@@ -51,5 +63,42 @@ export class TableFlatComponent {
 
   onPageChange(event: PageEvent): void {
     this.pageChange.emit(event);
+  }
+
+  getBadgeState(value: unknown): 'true' | 'false' | 'null' {
+    if (value === null || value === undefined || value === '') {
+      return 'null';
+    }
+
+    if (typeof value === 'boolean') {
+      return value ? 'true' : 'false';
+    }
+
+    if (typeof value === 'number') {
+      return value === 1 ? 'true' : 'false';
+    }
+
+    if (typeof value === 'string') {
+      const normalized = value.trim().toLowerCase();
+      if (normalized === 'true' || normalized === '1') {
+        return 'true';
+      }
+      if (normalized === 'false' || normalized === '0') {
+        return 'false';
+      }
+    }
+
+    return value ? 'true' : 'false';
+  }
+
+  getBadgeLabel(value: unknown, column: AutomTableColumn): string {
+    const state = this.getBadgeState(value);
+    if (state === 'true') {
+      return column.badgeLabels?.trueLabel ?? 'Da';
+    }
+    if (state === 'false') {
+      return column.badgeLabels?.falseLabel ?? 'Ne';
+    }
+    return column.badgeLabels?.nullLabel ?? '-';
   }
 }

@@ -2,6 +2,7 @@ import { Manufacture } from "./proizvodjac";
 import { PaginatedResponse } from "./page";
 import { Slika } from "./slika";
 import { WebshopPrimaryFilter } from "../enums/webshop-primary-filter.enum";
+import { AvailabilityStatus, ProviderAvailabilityDto } from "./availability";
 
 export class Filter {
   grupe?: string[];
@@ -101,6 +102,9 @@ export interface ShowcaseResponse {
 export class Roba {
   aplikacije?: Map<string, RobaAplikacija[]>;
   asociraniArtikli: Roba[] = [];
+  availabilityStatus?: AvailabilityStatus;
+  /** Internal UI key for cart identification (supports provider-only items). */
+  cartKey?: string;
   cena?: number;
   dokumentacija?: Object;
   dozvoljenoZaAnonimusa?: boolean;
@@ -114,8 +118,11 @@ export class Roba {
   podGrupaNaziv?: string;
   proizvodjac?: Manufacture;
   proizvodjacLogo?: string | ArrayBuffer;
+  providerAvailability?: ProviderAvailabilityDto;
   rabat: number = 0;
   robaid?: number;
+  /** TecDoc article identifier for external-only items (when `robaid` is null). */
+  tecDocArticleId?: number;
   slika?: Slika;
   stanje: number = 0;
   tdBrojevi?: RobaBrojevi[];
@@ -127,15 +134,31 @@ export class Roba {
 }
 
 export class CartItem {
+  /** Stable cart identifier. For local items: `ROBA:<robaId>`, for provider items: `PROVIDER:<provider>:<proid>:<articleNumber>` */
+  key?: string;
   discount?: number;
   image?: Slika;
-  manufacturer?: Manufacture;
+  manufacturer?: Manufacture | string;
+  manufacturerProid?: string;
   name?: string;
   partNumber?: string;
   quantity?: number;
-  robaId?: number;
+  robaId?: number | null;
+  tecDocArticleId?: number;
   stock?: number;
   totalPrice?: number;
   unitPrice?: number;
+  source?: 'STOCK' | 'PROVIDER';
+  provider?: string;
+  providerArticleNumber?: string;
+  providerWarehouse?: string;
+  providerWarehouseName?: string;
+  providerCurrency?: string;
+  providerCustomerPrice?: number;
+  providerPurchasePrice?: number;
+  providerLeadTimeBusinessDays?: number;
+  providerDeliveryToCustomerBusinessDaysMin?: number;
+  providerDeliveryToCustomerBusinessDaysMax?: number;
+  providerNextDispatchCutoff?: string;
   technicalDescription?: RobaTehnickiOpis[];
 }

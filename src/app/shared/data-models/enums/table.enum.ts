@@ -1,4 +1,5 @@
 export enum CellType {
+  BADGE = 'badge',
   CURRENCY = 'currency',
   DATE = 'date',
   DATE_ONLY = 'date-only',
@@ -17,4 +18,9 @@ export interface AutomTableColumn {
   dateFormat?: string; // for date pipe (e.g. 'dd-MMM-yyyy')
   currencyCode?: string; // e.g. 'RSD', 'USD' (defaults to RSD if not provided)
   disableLink?: (row: any) => boolean; // for disabling link action
+  badgeLabels?: {
+    trueLabel?: string;
+    falseLabel?: string;
+    nullLabel?: string;
+  };
 }

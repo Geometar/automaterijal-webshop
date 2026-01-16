@@ -16,7 +16,7 @@ export class InvoiceService {
 
   constructor(private http: HttpClient, private helperService: ServiceHelpersService) { }
 
-  public getInvoices(page: number, pageSize: number, ppid: number, dateFrom: Date | null, dateTo: Date | null): Observable<PaginatedResponse<Invoice>> {
+  public getInvoices(page: number, pageSize: number, ppid: number, dateFrom: Date | null, dateTo: Date | null): Observable<PaginatedResponse<Invoice> | Invoice[]> {
     const parameterObject = {} as any;
     parameterObject['page'] = page;
     parameterObject['pageSize'] = pageSize;
@@ -31,7 +31,7 @@ export class InvoiceService {
     const parametersString = this.helperService.formatQueryParameters(parameterObject);
     const fullUrl = DOMAIN_URL + INVOICE_URL + '/' + ppid + parametersString;
     return this.http
-      .get<PaginatedResponse<Invoice>>(fullUrl)
+      .get<PaginatedResponse<Invoice> | Invoice[]>(fullUrl)
       .pipe(
         catchError((error: any) => throwError(error))
       );
@@ -47,10 +47,50 @@ export class InvoiceService {
       );
   }
 
+  public fetchAdminDetails(invoiceId: number): Observable<Invoice> {
+    const fullUrl = DOMAIN_URL + INVOICE_URL + '/admin/' + invoiceId;
+
+    return this.http
+      .get<Invoice>(fullUrl)
+      .pipe(
+        catchError((error: any) => throwError(error))
+      );
+  }
+
   public submit(invoice: Invoice): Observable<Roba[]> {
     const fullUrl = DOMAIN_URL + INVOICE_URL;
     return this.http
       .post<Roba[]>(fullUrl, invoice)
+      .pipe(
+        catchError((error: any) => throwError(error))
+      );
+  }
+
+  public getAdminInvoices(
+    page: number,
+    pageSize: number,
+    dateFrom: Date | null,
+    dateTo: Date | null,
+    internal: boolean | null
+  ): Observable<PaginatedResponse<Invoice> | Invoice[]> {
+    const parameterObject = {} as any;
+    parameterObject['page'] = page;
+    parameterObject['pageSize'] = pageSize;
+
+    if (dateFrom) {
+      parameterObject['dateFrom'] = dateFrom.getTime();
+    }
+    if (dateTo) {
+      parameterObject['dateTo'] = dateTo.getTime();
+    }
+    if (internal !== null) {
+      parameterObject['internal'] = internal;
+    }
+
+    const parametersString = this.helperService.formatQueryParameters(parameterObject);
+    const fullUrl = DOMAIN_URL + INVOICE_URL + '/admin' + parametersString;
+    return this.http
+      .get<PaginatedResponse<Invoice> | Invoice[]>(fullUrl)
       .pipe(
         catchError((error: any) => throwError(error))
       );

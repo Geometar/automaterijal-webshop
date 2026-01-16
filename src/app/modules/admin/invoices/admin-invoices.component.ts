@@ -11,99 +11,94 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 
-// Data models
 import { HeaderData } from '../../../shared/data-models/interface/header.interface';
 import { Invoice, isPaginatedResponse, PaginatedResponse } from '../../../shared/data-models/model';
 
-// Enums
 import { AutomTableColumn, CellType } from '../../../shared/data-models/enums/table.enum';
 import { HeadingLevelEnum } from '../../../shared/data-models/enums/heading.enum';
 import { InputTypeEnum } from '../../../shared/data-models/enums';
 
-// Import components
 import { AutomHeaderComponent } from '../../../shared/components/autom-header/autom-header.component';
-import { InputFieldsComponent } from "../../../shared/components/input-fields/input-fields.component";
+import { InputFieldsComponent } from '../../../shared/components/input-fields/input-fields.component';
 import { TableFlatComponent } from '../../../shared/components/table-flat/table-flat.component';
 
-// Services
-import { AccountStateService } from '../../../shared/service/state/account-state.service';
 import { InvoiceService } from '../../../shared/service/invoice.service';
 import { UrlHelperService } from '../../../shared/service/utils/url-helper.service';
 
-
-export const InvoicesHeader: HeaderData = {
+export const AdminInvoicesHeader: HeaderData = {
   titleInfo: {
-    title: 'Porudzbenice',
+    title: 'Sve porudžbenice',
   },
 };
 
 @Component({
-  selector: 'app-invoices',
+  selector: 'app-admin-invoices',
   standalone: true,
-  imports: [
-    AutomHeaderComponent,
-    CommonModule,
-    InputFieldsComponent,
-    TableFlatComponent,
-  ],
+  imports: [AutomHeaderComponent, CommonModule, InputFieldsComponent, TableFlatComponent],
   providers: [CurrencyPipe],
-  templateUrl: './invoices.component.html',
-  styleUrl: './invoices.component.scss',
+  templateUrl: './admin-invoices.component.html',
+  styleUrl: './admin-invoices.component.scss',
   encapsulation: ViewEncapsulation.None,
 })
-export class InvoicesComponent implements OnInit, OnDestroy {
-  headerData = InvoicesHeader;
+export class AdminInvoicesComponent implements OnInit, OnDestroy {
+  headerData = AdminInvoicesHeader;
 
-  // Table config
   columns: AutomTableColumn[] = [
     {
       key: 'id',
-      header: 'Broj fakture',
+      header: 'ID porudžbenice',
       type: CellType.LINK,
-      callback: (row) => this.onInvoiceClick(row.id)
+      callback: (row) => this.onInvoiceClick(row),
+      disableLink: (row) => row?.id == null,
+    },
+    {
+      key: 'internalOrder',
+      header: 'Tip porudžbine',
+      type: CellType.BADGE,
+      badgeLabels: {
+        trueLabel: 'Zaposleni',
+        falseLabel: 'Kupac',
+        nullLabel: 'Nepoznato',
+      },
     },
     { key: 'partner', header: 'Partner', type: CellType.TEXT },
-    { key: 'brojStavki', header: 'Broj stavki', type: CellType.NUMBER },
-    { key: 'iznosNarucen', header: 'Iznos naručen', type: CellType.CURRENCY },
-    { key: 'iznosPotvrdjen', header: 'Iznos potvrđen', type: CellType.CURRENCY },
+    { key: 'status.naziv', header: 'Status', type: CellType.TEXT },
     {
       key: 'vremePorucivanja',
       header: 'Datum',
       type: CellType.DATE,
-      dateFormat: 'dd-MMM-yyyy HH:mm'
+      dateFormat: 'dd-MMM-yyyy HH:mm',
     },
-    { key: 'status.naziv', header: 'Status', type: CellType.TEXT }
+    { key: 'brojStavki', header: 'Broj stavki', type: CellType.NUMBER },
+    { key: 'iznosNarucen', header: 'Iznos naručen', type: CellType.CURRENCY },
+    { key: 'iznosPotvrdjen', header: 'Iznos potvrđen', type: CellType.CURRENCY },
   ];
 
-  displayedColumns: string[] = this.columns.map(col => col.key);
+  displayedColumns: string[] = this.columns.map((col) => col.key);
   dataSource = new MatTableDataSource<Invoice>();
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  // Misc
   loading = false;
-  private allInvoices: Invoice[] = [];
-  private clientPaged = false;
 
-  // Paging and Sorting elements
   dateFrom: Date | null = null;
   dateTo: Date | null = null;
+  internalFilter: boolean | null = null;
   pageIndex = 0;
   rowsPerPage = 10;
   totalItems = 0;
 
-  // Enums
   headingLevelEnum = HeadingLevelEnum;
   inputTypeEnum = InputTypeEnum;
   private destroy$ = new Subject<void>();
 
+  private allInvoices: Invoice[] = [];
+  private clientPaged = false;
+
   constructor(
-    private accountStateService: AccountStateService,
     private invoiceService: InvoiceService,
     private urlHelperService: UrlHelperService,
     private router: Router
   ) { }
-
-  /** Angular lifecycle hooks start */
 
   ngOnInit(): void {
     const params = this.urlHelperService.readQueryParams();
@@ -112,6 +107,7 @@ export class InvoicesComponent implements OnInit, OnDestroy {
     this.dateTo = params['dateTo'] ? new Date(params['dateTo']) : null;
     this.pageIndex = params['pageIndex'] ? +params['pageIndex'] : 0;
     this.rowsPerPage = params['rowsPerPage'] ? +params['rowsPerPage'] : 10;
+    this.internalFilter = params['internal'] === 'true' ? true : params['internal'] === 'false' ? false : null;
 
     this.getInvoices();
   }
@@ -121,25 +117,18 @@ export class InvoicesComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  /** Angular lifecycle hooks end */
-
   getInvoices(): void {
     this.urlHelperService.addOrUpdateQueryParams({
       dateFrom: this.dateFrom ? this.dateFrom?.toISOString() : '',
       dateTo: this.dateTo ? this.dateTo?.toISOString() : '',
       pageIndex: this.pageIndex,
-      rowsPerPage: this.rowsPerPage
+      rowsPerPage: this.rowsPerPage,
+      internal: this.internalFilter === null ? '' : this.internalFilter,
     });
 
     this.loading = true;
     this.invoiceService
-      .getInvoices(
-        this.pageIndex,
-        this.rowsPerPage,
-        this.accountStateService.get().ppid!,
-        this.dateFrom,
-        this.dateTo
-      )
+      .getAdminInvoices(this.pageIndex, this.rowsPerPage, this.dateFrom, this.dateTo, this.internalFilter)
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => {
@@ -158,7 +147,6 @@ export class InvoicesComponent implements OnInit, OnDestroy {
             return;
           }
 
-          // Backward/forward compatibility: some backends return a plain list.
           this.clientPaged = true;
           this.allInvoices = response;
           this.totalItems = response.length;
@@ -169,21 +157,24 @@ export class InvoicesComponent implements OnInit, OnDestroy {
 
   onFilterDateFrom(date: Date): void {
     this.dateFrom = date;
+    this.pageIndex = 0;
     this.getInvoices();
   }
 
   onFilterDateTo(date: Date): void {
     this.dateTo = date;
+    this.pageIndex = 0;
     this.getInvoices();
   }
 
   onPageChange(event: any): void {
     this.pageIndex = event.pageIndex;
     this.rowsPerPage = event.pageSize;
+
     if (this.clientPaged) {
       this.urlHelperService.addOrUpdateQueryParams({
         pageIndex: this.pageIndex,
-        rowsPerPage: this.rowsPerPage
+        rowsPerPage: this.rowsPerPage,
       });
       this.applyClientPaging();
       return;
@@ -192,8 +183,27 @@ export class InvoicesComponent implements OnInit, OnDestroy {
     this.getInvoices();
   }
 
-  onInvoiceClick(invoiceId: number): void {
-    this.router.navigateByUrl('/invoices/' + invoiceId);
+  onInternalFilterChange(value: boolean | null): void {
+    if (this.internalFilter === value) {
+      return;
+    }
+
+    this.internalFilter = value;
+    this.pageIndex = 0;
+    this.getInvoices();
+  }
+
+  onInvoiceClick(row: Invoice): void {
+    if (row?.id == null) {
+      return;
+    }
+
+    if (row?.ppid != null) {
+      this.router.navigateByUrl(`/admin/invoices/${row.ppid}/${row.id}`);
+      return;
+    }
+
+    this.router.navigateByUrl(`/admin/invoices/${row.id}`);
   }
 
   private applyClientPaging(): void {

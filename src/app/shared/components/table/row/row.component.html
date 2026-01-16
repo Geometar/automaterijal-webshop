@@ -2,7 +2,10 @@
   <!-- Image Section -->
   <div class="image-container" [class.image-smaller]="showPriceOnly">
     <!-- Popust badge -->
-    <div class="discount-badge" *ngIf="!isTecDocOnly && data.rabat">
+    <div
+      class="discount-badge"
+      *ngIf="!isAdminCartView && !isTecDocOnly && data.rabat"
+    >
       -{{ data.rabat }}%
     </div>
 
@@ -21,16 +24,32 @@
 
   <!-- Details Section -->
   <div class="details-container">
-    <h3 class="product-heading" [class.disabled]="isTecDocOnly">
-      <a
-        class="product-link"
-        [routerLink]="['/webshop', data.robaid + '-' + getProductSlug(data)]"
-        [attr.href]="'/webshop/' + (data.robaid + '-' + getProductSlug(data))"
-      >
-        <span class="product-link__brand"> {{ data.proizvodjac?.naziv }}</span>
-        <span class="product-name-fragment">{{ nameWithoutManufacturer }}</span>
-        <span class="product-link__chev" aria-hidden="true">›</span>
-      </a>
+    <h3 class="product-heading" [class.disabled]="!canNavigateToDetails">
+      <ng-container *ngIf="canNavigateToDetails; else plainHeading">
+        <a
+          class="product-link"
+          [routerLink]="['/webshop', getRouteParam(data)]"
+          [attr.href]="'/webshop/' + getRouteParam(data)"
+        >
+          <span class="product-link__brand">
+            {{ data.proizvodjac?.naziv }}</span
+          >
+          <span class="product-name-fragment">{{
+            nameWithoutManufacturer
+          }}</span>
+          <span class="product-link__chev" aria-hidden="true">›</span>
+        </a>
+      </ng-container>
+      <ng-template #plainHeading>
+        <span class="product-link" role="text">
+          <span class="product-link__brand">
+            {{ data.proizvodjac?.naziv }}</span
+          >
+          <span class="product-name-fragment">{{
+            nameWithoutManufacturer
+          }}</span>
+        </span>
+      </ng-template>
     </h3>
 
     <div class="product-meta">
@@ -44,49 +63,90 @@
         [ariaLabel]="'Kataloški broj ' + data.katbr"
       ></autom-meta-pill>
 
-      <ng-container *ngIf="categoryHref && !disableCategoryNavigation; else plainCategory">
-        <autom-meta-pill
-          class="product-meta__category category-pill"
-          variant="primary"
-          size="md"
-          [routerLink]="categoryLinkSegments"
-          [suffix]="categorySuffix"
-          [ariaLabel]="categoryAriaLabel"
+      <ng-container *ngIf="categoryLabel as label">
+        <ng-container
+          *ngIf="categoryHref && !disableCategoryNavigation; else plainCategory"
         >
-          <span class="category-pill__group" *ngIf="data?.grupaNaziv">{{
-            data.grupaNaziv
-          }}</span>
-          <span
-            class="category-pill__separator"
-            *ngIf="data?.grupaNaziv && data?.podGrupaNaziv"
-            aria-hidden="true"
+          <autom-meta-pill
+            class="product-meta__category category-pill"
+            variant="primary"
+            size="md"
+            [routerLink]="categoryLinkSegments"
+            [suffix]="categorySuffix"
+            [ariaLabel]="categoryAriaLabel"
           >
-            /
-          </span>
-          <span class="category-pill__sub" *ngIf="data?.podGrupaNaziv">{{
-            data.podGrupaNaziv
-          }}</span>
-        </autom-meta-pill>
+            <span class="category-pill__group" *ngIf="data?.grupaNaziv">{{
+              data.grupaNaziv
+            }}</span>
+            <span
+              class="category-pill__separator"
+              *ngIf="data?.grupaNaziv && data?.podGrupaNaziv"
+              aria-hidden="true"
+            >
+              /
+            </span>
+            <span class="category-pill__sub" *ngIf="data?.podGrupaNaziv">{{
+              data.podGrupaNaziv
+            }}</span>
+          </autom-meta-pill>
+        </ng-container>
+        <ng-template #plainCategory>
+          <autom-meta-pill
+            class="product-meta__category category-pill"
+            variant="primary"
+            size="md"
+            [style.cursor]="disableCategoryNavigation ? 'pointer' : null"
+            [attr.aria-label]="
+              disableCategoryNavigation
+                ? 'Filtriraj po podgrupi ' + label
+                : null
+            "
+            [ngClass]="{ 'clickable-placeholder': disableCategoryNavigation }"
+            (click)="onCategoryClick($event)"
+          >
+            {{ label }}
+          </autom-meta-pill>
+        </ng-template>
       </ng-container>
-      <ng-template #plainCategory>
-        <autom-meta-pill
-          class="product-meta__category category-pill"
-          variant="primary"
-          size="md"
-          [style.cursor]="disableCategoryNavigation ? 'pointer' : null"
-          [attr.aria-label]="disableCategoryNavigation ? 'Filtriraj po podgrupi ' + (data!.podGrupaNaziv || data!.grupaNaziv) : null"
-          [ngClass]="{ 'clickable-placeholder': disableCategoryNavigation }"
-          (click)="onCategoryClick($event)"
-        >
-          {{ data!.podGrupaNaziv || data!.grupaNaziv }}
-        </autom-meta-pill>
-      </ng-template>
+
+      <autom-meta-pill
+        *ngIf="showPriceOnly && !isAdminCartView && availabilityVm.showProviderBox"
+        variant="accent"
+        size="md"
+        [value]="externalWarehouseLabel"
+        [attr.title]="'Artikal stiže iz eksternog magacina.'"
+        [ariaLabel]="externalWarehouseLabel"
+      ></autom-meta-pill>
+
+      <autom-meta-pill
+        *ngIf="showPriceOnly && isAdminCartView && warehouseLabel"
+        variant="accent"
+        size="md"
+        [value]="warehouseLabel"
+        [attr.title]="'Magacin za porucivanje'"
+        [ariaLabel]="'Magacin ' + warehouseLabel"
+      ></autom-meta-pill>
+
+      <autom-meta-pill
+        *ngIf="
+          showPriceOnly &&
+          !isAdminCartView &&
+          availabilityVm.showProviderBox &&
+          availabilityVm.provider.deliveryLabel
+        "
+        variant="soft"
+        size="md"
+        [label]="'Isporuka'"
+        [value]="availabilityVm.provider.deliveryLabel"
+        [attr.title]="'Procena isporuke za ovaj artikal.'"
+        [ariaLabel]="'Isporuka ' + availabilityVm.provider.deliveryLabel"
+      ></autom-meta-pill>
     </div>
 
     <p *ngIf="isEmployee">
       Stanje:
       <span class="color--figma-primary-800 display--inline font-medium">
-        {{ data!.stanje }}
+        {{ effectiveStock }}
       </span>
     </p>
 
@@ -143,33 +203,44 @@
   <!-- Add to basket Section -->
   <div class="pricing-container" *ngIf="showAddToBasket">
     <!-- Status -->
-    <div
-      [ngClass]="{
-        'item-status': true,
-        green: !isTecDocOnly && !isUnavailable,
-        red: !isTecDocOnly && isUnavailable,
-        yellow: isTecDocOnly
-      }"
-    >
-      {{
-        isTecDocOnly
-          ? "TecDoc artikal"
-          : !isUnavailable
-          ? "Ima na stanju"
-          : "Nema na stanju"
-      }}
+    <div [ngClass]="['item-status', availabilityVm.tone]">
+      <span class="item-status__text">{{ availabilityVm.label }}</span>
+      <span class="item-status__dot" aria-hidden="true"></span>
     </div>
-    <!-- Stara cena -->
-    <p
-      *ngIf="!isTecDocOnly && data.rabat"
-      class="sub-price old-price"
+
+    <div
+      *ngIf="isInCartItem"
+      class="autom-flexbox autom-justify-content--flex-end"
+      role="status"
+      aria-live="polite"
+      style="margin-top: 6px"
     >
-      {{ data.cena! / (1 - data.rabat / 100) | rsdCurrency }}
+      <autom-icon
+        aria-label="Artikal je već dodat u korpu"
+        [color]="colorEnum.GREEN_700"
+        [source]="iconEnum.SHOPPING_BAG"
+        [tooltip]="{ tooltipText: 'Artikal je u korpi' }"
+      ></autom-icon>
+    </div>
+
+    <!-- Eksterna dostupnost (dobavljač) -->
+    <autom-provider-availability
+      [availability]="availabilityVm"
+      [isStaff]="isStaff"
+      variant="row"
+    ></autom-provider-availability>
+    <!-- Stara cena -->
+    <p *ngIf="availabilityVm.showDiscount" class="sub-price old-price">
+      {{ availabilityVm.displayPrice / (1 - data.rabat / 100) | rsdCurrency }}
     </p>
 
     <!-- Finalna cena -->
     <p *ngIf="!isTecDocOnly" class="price">
-      {{ data.cena ? (data.cena! | rsdCurrency) : (0 | rsdCurrency) }}
+      {{
+        availabilityVm.displayPrice
+          ? (availabilityVm.displayPrice | rsdCurrency)
+          : (0 | rsdCurrency)
+      }}
     </p>
 
     <p *ngIf="!isTecDocOnly" class="mobile-row autom-align__right">
@@ -177,14 +248,17 @@
     </p>
 
     <!-- Ušteda -->
-    <p *ngIf="!isTecDocOnly && data.rabat" class="saving">
+    <p *ngIf="availabilityVm.showDiscount" class="saving">
       Ušteda
-      {{ data.cena! / (1 - data.rabat / 100) - data.cena! | rsdCurrency }}
+      {{
+        availabilityVm.displayPrice / (1 - data.rabat / 100) -
+          availabilityVm.displayPrice | rsdCurrency
+      }}
     </p>
 
     <div
       class="mobile-quantity-cart util__flex--center"
-      *ngIf="!isTecDocOnly && !isUnavailable"
+      *ngIf="canAddToCart && !isUnavailable"
     >
       <autom-input-fields
         [clearBtn]="false"
@@ -230,44 +304,38 @@
       <span class="inquiry-trigger__hint" [class.sent]="inquirySent">
         {{
           inquirySent
-            ? 'Upit poslat — odgovorićemo na tvoj email.'
-            : 'Artikal nije na stanju — pošaljite upit.'
+            ? "Upit poslat — odgovorićemo na tvoj email."
+            : availabilityVm.showProviderBox
+            ? "Dostupno u eksternom magacinu — pošaljite upit za nabavku."
+            : "Nema na stanju — pošaljite upit."
         }}
       </span>
-    </div>
-
-    <div
-      *ngIf="isInCart(data.robaid ?? 0)"
-      class="util__flex--center"
-      role="status"
-      aria-live="polite"
-    >
-      <autom-icon
-        aria-label="Artikal je već dodat u korpu"
-        class="in-cart"
-        [color]="colorEnum.GREEN_700"
-        [source]="iconEnum.SHOPPING_BAG"
-        [tooltip]="{ tooltipText: 'Artikal je u korpi' }"
-      ></autom-icon>
     </div>
   </div>
 
   <!-- Pricing-only Section -->
   <div class="pricing-container" *ngIf="showPriceOnly">
-    <p *ngIf="data.rabat" class="sub-price old-price">
-      {{ data.cena! / (1 - data.rabat / 100) | rsdCurrency }}
+    <p *ngIf="!isAdminCartView && availabilityVm.showDiscount" class="sub-price old-price">
+      {{ availabilityVm.displayPrice / (1 - data.rabat / 100) | rsdCurrency }}
     </p>
 
     <p class="sub-price final-price">
-      {{ data.cena ? (data.cena! | rsdCurrency) : (0 | rsdCurrency) }}
+      {{
+        unitPrice ? (unitPrice | rsdCurrency) : (0 | rsdCurrency)
+      }}
     </p>
 
-    <p *ngIf="data.rabat" class="small-explanation saving">
+    <p *ngIf="!isAdminCartView && availabilityVm.showDiscount" class="small-explanation saving">
       Ušteda
-      {{ data.cena! / (1 - data.rabat / 100) - data.cena! | rsdCurrency }}
+      {{
+        availabilityVm.displayPrice / (1 - data.rabat / 100) -
+          availabilityVm.displayPrice | rsdCurrency
+      }}
     </p>
 
-    <p class="autom-align__right small-explanation">Cena po komadu</p>
+    <p class="autom-align__right small-explanation">
+      {{ isAdminCartView ? 'Nabavna cena po komadu' : 'Cena po komadu' }}
+    </p>
 
     <div class="util__flex--center">
       <autom-input-fields
@@ -290,10 +358,10 @@
       ></autom-input-fields>
 
       <div>
-        <p class="price">
-          {{ (data.cena || 0) * (data.kolicina || 0) | rsdCurrency }}
+        <p class="price">{{ totalPrice | rsdCurrency }}</p>
+        <p class="autom-align__right autom-margin__none">
+          {{ isAdminCartView ? 'Ukupno bez PDV-a' : 'Ukupno sa PDV-om' }}
         </p>
-        <p class="autom-align__right autom-margin__none">Ukupno sa pdv-om</p>
       </div>
     </div>
   </div>
@@ -303,7 +371,7 @@
     <autom-icon
       [tooltip]="{ tooltipText: 'Izbrisi iz korpe' }"
       [source]="iconEnum.X"
-      (click)="removeEvent.emit(data.robaid)"
+      (click)="cartKey && removeEvent.emit(cartKey)"
     ></autom-icon>
   </div>
 </article>

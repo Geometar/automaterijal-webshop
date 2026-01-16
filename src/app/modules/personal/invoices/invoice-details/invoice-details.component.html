@@ -1,8 +1,38 @@
 <section class="header-margin--top invoice-details">
   <div *ngIf="!loading">
-    <h2>Detalji porudzbenice</h2>
-    <div class="invoice-info autom-margin--top__m">
-      <div class="info-item border-info">
+    <div class="invoice-details__header">
+      <h2>Detalji porudzbenice</h2>
+    </div>
+
+    <div *ngIf="isAdmin" class="invoice-admin-bar">
+      <div class="admin-stat">
+        <span class="label">ID</span>
+        <span class="value">{{ data?.id ?? '—' }}</span>
+      </div>
+      <div class="admin-stat">
+        <span class="label">Order ID</span>
+        <span class="value">{{ data?.orderId ?? '—' }}</span>
+      </div>
+      <div class="admin-stat" *ngIf="data?.ppid != null">
+        <span class="label">PPID</span>
+        <span class="value">{{ data?.ppid }}</span>
+      </div>
+      <div class="admin-stat">
+        <span class="label">Stavke</span>
+        <span class="value">{{ data?.brojStavki ?? '—' }}</span>
+      </div>
+      <div class="admin-stat">
+        <span class="label">Naručeno</span>
+        <span class="value">{{ (data?.iznosNarucen ?? 0) | rsdCurrency }}</span>
+      </div>
+      <div class="admin-stat">
+        <span class="label">Potvrđeno</span>
+        <span class="value">{{ (data?.iznosPotvrdjen ?? 0) | rsdCurrency }}</span>
+      </div>
+    </div>
+
+    <div class="invoice-info">
+      <div class="info-card">
         <autom-icon
           [color]="colorEnum.YELLOW_700"
           [source]="iconEnum.ANCHOR"
@@ -10,7 +40,7 @@
         <table class="invoice-table">
           <tr>
             <td>Status:</td>
-            <td>{{ data?.status?.naziv }}</td>
+            <td>{{ data?.status?.naziv ?? '—' }}</td>
           </tr>
           <tr>
             <td>Datum:</td>
@@ -18,42 +48,58 @@
           </tr>
           <tr>
             <td>Partner:</td>
-            <td>{{ data?.partner }}</td>
+            <td>{{ data?.partner ?? '—' }}</td>
           </tr>
         </table>
       </div>
-      <div class="info-item border-info">
-        <autom-icon
-          [color]="colorEnum.YELLOW_700"
-          [source]="iconEnum.TRUCK"
-        ></autom-icon>
-        <table class="invoice-table">
-          <tr>
-            <td>Prevoz:</td>
-            <td>{{ data?.nacinPrevoza?.naziv }}</td>
-          </tr>
-          <tr>
-            <td>Adresa:</td>
-            <td>{{ data?.adresa?.naziv }}</td>
-          </tr>
-        </table>
-      </div>
-      <div class="info-item">
-        <autom-icon
-          [color]="colorEnum.YELLOW_700"
-          [source]="iconEnum.CREDIT_CARD"
-        ></autom-icon>
-        <table class="invoice-table">
-          <tr>
-            <td>Plaćanje:</td>
-            <td>{{ data?.nacinPlacanja?.naziv }}</td>
-          </tr>
-          <tr>
-            <td>Napomena:</td>
-            <td [innerHTML]="data?.napomena?.replaceAll(';', '<br>')"></td>
-          </tr>
-        </table>
-      </div>
+      <ng-container *ngIf="isInternalOrderView; else externalInfo">
+        <div class="info-card">
+          <autom-icon
+            [color]="colorEnum.YELLOW_700"
+            [source]="iconEnum.MESSAGE_CIRCLE"
+          ></autom-icon>
+          <table class="invoice-table">
+            <tr>
+              <td>Napomena:</td>
+              <td [innerHTML]="noteHtml || '—'"></td>
+            </tr>
+          </table>
+        </div>
+      </ng-container>
+      <ng-template #externalInfo>
+        <div class="info-card">
+          <autom-icon
+            [color]="colorEnum.YELLOW_700"
+            [source]="iconEnum.TRUCK"
+          ></autom-icon>
+          <table class="invoice-table">
+            <tr>
+              <td>Prevoz:</td>
+              <td>{{ data?.nacinPrevoza?.naziv ?? '—' }}</td>
+            </tr>
+            <tr>
+              <td>Adresa:</td>
+              <td>{{ data?.adresa?.naziv ?? '—' }}</td>
+            </tr>
+          </table>
+        </div>
+        <div class="info-card">
+          <autom-icon
+            [color]="colorEnum.YELLOW_700"
+            [source]="iconEnum.CREDIT_CARD"
+          ></autom-icon>
+          <table class="invoice-table">
+            <tr>
+              <td>Plaćanje:</td>
+              <td>{{ data?.nacinPlacanja?.naziv ?? '—' }}</td>
+            </tr>
+            <tr>
+              <td>Napomena:</td>
+              <td [innerHTML]="noteHtml || '—'"></td>
+            </tr>
+          </table>
+        </div>
+      </ng-template>
     </div>
   </div>
 

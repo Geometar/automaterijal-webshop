@@ -1,0 +1,44 @@
+<div
+  class="provider-availability"
+  [class.provider-availability--customer]="!isStaff"
+  [class.provider-availability--row]="variant === 'row'"
+  [class.provider-availability--details]="variant === 'details'"
+  *ngIf="showBox"
+>
+  <div
+    class="provider-availability__row"
+    *ngIf="availability?.provider?.deliveryLabel"
+  >
+    Isporuka: {{ availability?.provider?.deliveryLabel }}
+  </div>
+  <div
+    class="provider-availability__row"
+    *ngIf="showQuantity && availability?.provider?.quantity"
+  >
+    Dostupno: {{ availability?.provider?.quantity }} kom
+  </div>
+  <div
+    class="provider-availability__row"
+    *ngIf="availability?.provider?.cutoffLabel"
+  >
+    Poruči do: {{ availability?.provider?.cutoffLabel }}
+  </div>
+  <div
+    class="provider-availability__row provider-availability__admin"
+    *ngIf="availability?.provider?.admin?.sourceLabel"
+  >
+    Izvor:
+    <span class="provider-availability__value">{{
+      availability?.provider?.admin?.sourceLabel
+    }}</span>
+  </div>
+  <div
+    class="provider-availability__row provider-availability__purchase"
+    *ngIf="availability?.provider?.admin?.purchasePriceLabel"
+  >
+    Nabavna:
+    <span class="provider-availability__value">{{
+      availability?.provider?.admin?.purchasePriceLabel
+    }}</span>
+  </div>
+</div>

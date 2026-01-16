@@ -437,33 +437,50 @@
 }
 
 /* Buy card (sticky) */
-.buy-card {
+  .buy-card {
   position: sticky;
   top: 80px;
   padding: 18px;
 
-  .stock {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    padding: 6px 10px;
-    border-radius: 999px;
-    background: #f7f7fb;
-    border: 1px solid var(--stroke);
-    color: var(--text-700);
+    .stock {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #f7f7fb;
+      border: 1px solid var(--stroke);
+      color: var(--text-700);
 
-    .led {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #c4c4c4;
-    }
+      .led {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #c4c4c4;
+        order: 2;
+      }
     &.ok .led {
       background: var(--success);
     }
     &.nope .led {
       background: var(--error);
+    }
+    &.supplier {
+      background: var(--figma-info-25);
+      border-color: var(--figma-info-100);
+      color: var(--figma-info-700);
+    }
+    &.supplier .led {
+      background: var(--figma-info-500);
+    }
+    &.external {
+      background: var(--figma-success-25);
+      border-color: var(--figma-success-100);
+      color: var(--figma-success-700);
+    }
+    &.external .led {
+      background: var(--figma-success-500);
     }
   }
 
