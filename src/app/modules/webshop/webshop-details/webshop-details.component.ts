@@ -1381,19 +1381,6 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     return specs;
   }
 
-  private buildVideoObjects(): any[] | undefined {
-    if (!this.youTubeIds.length) return undefined;
-    return this.youTubeIds.slice(0, 3).map((id) => ({
-      '@type': 'VideoObject',
-      name: 'Servisna informacija',
-      embedUrl: `https://www.youtube.com/embed/${id}`,
-      potentialAction: {
-        '@type': 'WatchAction',
-        target: `https://www.youtube.com/watch?v=${id}`,
-      },
-    }));
-  }
-
   private buildRelatedProducts(roba: Roba): any[] | undefined {
     if (!roba.asociraniArtikli?.length) return undefined;
     const related = roba.asociraniArtikli.slice(0, 10).map((r) => {
@@ -1540,7 +1527,6 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
 
     // Build JSON-LD Product
     const additionalProps = this.buildAdditionalProperties(roba);
-    const videoObjects = this.buildVideoObjects();
     const related = this.buildRelatedProducts(roba);
 
     const offer = this.buildOffer(roba, price, inStock, url);
@@ -1560,7 +1546,6 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       url,
       description: description || `${brand} ${name}`,
       ...(additionalProps.length ? { additionalProperty: additionalProps } : {}),
-      ...(videoObjects ? { hasVideo: videoObjects } : {}),
       ...(related ? { isRelatedTo: related } : {}),
       ...(offer ? { offers: offer } : {}),
     };
