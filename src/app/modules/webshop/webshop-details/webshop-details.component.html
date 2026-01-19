@@ -157,7 +157,10 @@
                 <span class="discount-badge">-{{ discountValue }}%</span>
               </div>
               <div class="price">{{ displayPrice | rsdCurrency }}</div>
-              <div class="note">cena sa PDV-om</div>
+              <div class="note">cena po komadu</div>
+              <div *ngIf="hasValidPrice" class="total-price">
+                Ukupno: {{ totalPrice | rsdCurrency }}
+              </div>
               <div *ngIf="hasDiscount && savings" class="saving">
                 Ušteda {{ savings! | rsdCurrency }}
               </div>
@@ -168,16 +171,16 @@
                 [clearBtn]="false"
                 [disableInput]="isOutOfStock"
                 [customClass]="'qty'"
-                [max]="availableStock || 1"
-                [min]="1"
+                [max]="availableStock || quantityMin"
+                [min]="quantityMin"
                 [roundOff]="true"
                 [size]="sizeEnum.MEDIUM"
                 [type]="inputTypeEnum.QUANTITY"
                 [validators]="[
-                  { name: 'max', value: availableStock || 1 },
-                  { name: 'min', value: 1 }
+                  { name: 'max', value: availableStock || quantityMin },
+                  { name: 'min', value: quantityMin }
                 ]"
-                [step]="1"
+                [step]="quantityStep"
                 [value]="quantity"
                 (emitSelected)="modifyQuantity($event)"
                 ngDefaultControl

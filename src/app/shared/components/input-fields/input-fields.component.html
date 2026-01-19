@@ -205,7 +205,7 @@
         <button
           type="button"
           class="arrow-btn"
-          [disabled]="value >= max"
+          [disabled]="disableInput || readonly || quantityIncreaseDisabled"
           aria-label="Povećaj količinu"
           (click)="increaseQuantity()"
         >
@@ -219,7 +219,7 @@
         <button
           type="button"
           class="arrow-btn"
-          [disabled]="value <= 1"
+          [disabled]="disableInput || readonly || quantityDecreaseDisabled"
           aria-label="Smanji količinu"
           (click)="decreaseQuantity()"
         >

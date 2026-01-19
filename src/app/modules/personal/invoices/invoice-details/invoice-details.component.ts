@@ -334,6 +334,11 @@ export class InvoiceDetailsComponent implements OnInit {
       parts.push(`Kol: ${qty}`);
     }
 
+    const packagingUnit = pa.packagingUnit;
+    if (packagingUnit != null && Number.isFinite(packagingUnit) && packagingUnit > 1) {
+      parts.push(`Pak: ${packagingUnit}`);
+    }
+
     const eta = this.buildProviderEta(pa);
     if (eta) {
       parts.push(`ETA: ${eta}`);

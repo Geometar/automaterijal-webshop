@@ -12,6 +12,7 @@ export interface ProviderAvailabilityDto {
   purchasePrice?: number;
   price?: number;
   currency?: string;
+  packagingUnit?: number;
   leadTimeBusinessDays?: number;
   deliveryToCustomerBusinessDaysMin?: number;
   deliveryToCustomerBusinessDaysMax?: number;

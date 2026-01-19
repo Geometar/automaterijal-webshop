@@ -446,10 +446,21 @@ export class InputFieldsComponent implements AfterViewInit, OnChanges, OnInit {
     this.getInputErrorState();
 
     if (focusOut) {
-      let value = this.form?.controls['formCtrl']?.value;
+      const rawValue = this.form?.controls['formCtrl']?.value;
+      const isQuantity = this.type === InputTypeEnum.QUANTITY;
 
+      if (isQuantity) {
+        const normalized = this.normalizeQuantity(rawValue);
+        this.value = normalized;
+        this.emitSelected.emit(normalized);
+        this.form!.controls['formCtrl'].setValue(normalized);
+        this.form!.controls['formCtrl'].updateValueAndValidity();
+        return;
+      }
+
+      let value = rawValue;
       if (this.roundOff) value = Math.round(+value).toString();
-      const isNumber = this.type === InputTypeEnum.NUMBER || this.type === InputTypeEnum.QUANTITY;
+      const isNumber = this.type === InputTypeEnum.NUMBER;
 
       this.emitSelected.emit(isNumber ? +value : value);
       this.form!.controls['formCtrl'].setValue(value);
@@ -457,18 +468,100 @@ export class InputFieldsComponent implements AfterViewInit, OnChanges, OnInit {
     }
   }
 
+  get quantityIncreaseDisabled(): boolean {
+    if (this.type !== InputTypeEnum.QUANTITY) return true;
+    const current = this.normalizeQuantity(this.form?.controls['formCtrl']?.value ?? this.value);
+    const step = this.getQuantityStep();
+    const max = this.getQuantityMax();
+    return current + step > max;
+  }
+
+  get quantityDecreaseDisabled(): boolean {
+    if (this.type !== InputTypeEnum.QUANTITY) return true;
+    const current = this.normalizeQuantity(this.form?.controls['formCtrl']?.value ?? this.value);
+    const step = this.getQuantityStep();
+    const min = this.getQuantityMin();
+    return current - step < min;
+  }
+
   increaseQuantity(): void {
-    const value = +this.form?.controls['formCtrl'].value + 1;
+    if (this.type !== InputTypeEnum.QUANTITY) return;
+    const step = this.getQuantityStep();
+    const max = this.getQuantityMax();
+    const current = this.normalizeQuantity(this.form?.controls['formCtrl']?.value ?? this.value);
+    const next = Math.min(current + step, max);
+    if (next === current) return;
+    this.setQuantityValue(next);
+  }
+
+  decreaseQuantity(): void {
+    if (this.type !== InputTypeEnum.QUANTITY) return;
+    const step = this.getQuantityStep();
+    const min = this.getQuantityMin();
+    const current = this.normalizeQuantity(this.form?.controls['formCtrl']?.value ?? this.value);
+    const next = Math.max(current - step, min);
+    if (next === current) return;
+    this.setQuantityValue(next);
+  }
+
+  private setQuantityValue(value: number): void {
     this.value = value;
     this.form?.controls['formCtrl'].setValue(value);
     this.emitSelected.emit(value);
   }
 
-  decreaseQuantity(): void {
-    const value = this.form?.controls['formCtrl'].value - 1;
-    this.value = value;
-    this.form?.controls['formCtrl'].setValue(value);
-    this.emitSelected.emit(value);
+  private normalizeQuantity(raw: unknown): number {
+    const step = this.getQuantityStep();
+    const min = this.getQuantityMin();
+    const max = this.getQuantityMax();
+
+    let value = this.toNumber(raw);
+    if (!Number.isFinite(value)) value = min;
+
+    value = Math.floor(value);
+    if (value < min) value = min;
+
+    if (step > 1) {
+      value = Math.ceil(value / step) * step;
+    }
+
+    if (value > max) value = max;
+
+    if (value < min) value = min;
+    return value;
+  }
+
+  private getQuantityStep(): number {
+    const step = this.toNumber(this.step);
+    if (!Number.isFinite(step) || step <= 0) return 1;
+    return Math.max(1, Math.floor(step));
+  }
+
+  private getQuantityMin(): number {
+    const min = this.toNumber(this.min);
+    if (!Number.isFinite(min)) return 0;
+    return Math.max(0, Math.floor(min));
+  }
+
+  private getQuantityMax(): number {
+    const max = this.toNumber(this.max);
+    const step = this.getQuantityStep();
+    const fallback = MAX_VALUE;
+    if (!Number.isFinite(max)) return fallback;
+    const floored = Math.floor(max);
+    if (step <= 1) return floored;
+    return Math.floor(floored / step) * step;
+  }
+
+  private toNumber(raw: unknown): number {
+    if (typeof raw === 'number') return raw;
+    if (typeof raw === 'string') {
+      const trimmed = raw.trim();
+      if (!trimmed) return NaN;
+      const parsed = Number(trimmed.replace(',', '.'));
+      return parsed;
+    }
+    return Number(raw);
   }
 
   resetForm(): void {

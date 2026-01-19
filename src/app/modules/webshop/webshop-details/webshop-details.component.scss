@@ -526,6 +526,13 @@
     color: var(--text-500);
   }
 
+  .total-price {
+    margin-top: 6px;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--text-800, #1f2937);
+  }
+
   .saving {
     margin-top: 6px;
     color: var(--figma-accent-green-700);

@@ -259,15 +259,15 @@
         <table class="cart-summary__table">
           <tr>
             <td>{{ isAdmin ? 'Nabavno bez PDV-a:' : 'Bez PDV-a:' }}</td>
-            <td class="price">{{ bezPdv | rsdCurrency }}</td>
+            <td class="price cart-summary__value">{{ bezPdv | rsdCurrency }}</td>
           </tr>
           <tr>
             <td>PDV:</td>
-            <td class="price">{{ pdv | rsdCurrency }}</td>
+            <td class="price cart-summary__value">{{ pdv | rsdCurrency }}</td>
           </tr>
-          <tr>
+          <tr class="cart-summary__total">
             <td>{{ isAdmin ? 'Ukupno nabavno sa PDV-om:' : 'Ukupno sa PDV-om:' }}</td>
-            <td class="price">{{ total | rsdCurrency }}</td>
+            <td class="price cart-summary__value">{{ total | rsdCurrency }}</td>
           </tr>
         </table>
 

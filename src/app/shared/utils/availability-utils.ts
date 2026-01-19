@@ -38,6 +38,7 @@ export interface AvailabilityVm {
       sourceLabel: string | null;
       customerPriceLabel: string | null;
       purchasePriceLabel: string | null;
+      packagingUnitLabel: string | null;
     };
   };
 }
@@ -64,7 +65,8 @@ export function shouldShowProviderAvailability(
 }
 
 export function getPurchasableStock(
-  roba: Pick<Roba, 'availabilityStatus' | 'stanje' | 'providerAvailability'> | null | undefined
+  roba: Pick<Roba, 'availabilityStatus' | 'stanje' | 'providerAvailability'> | null | undefined,
+  opts?: { isAdmin?: boolean }
 ): number {
   const status = getAvailabilityStatus(roba);
   if (status === 'IN_STOCK') {
@@ -76,6 +78,11 @@ export function getPurchasableStock(
       Number(roba?.providerAvailability?.warehouseQuantity) ||
       Number(roba?.providerAvailability?.totalQuantity) ||
       0;
+    const packagingUnit = Number(roba?.providerAvailability?.packagingUnit);
+    if (Number.isFinite(packagingUnit) && packagingUnit > 1) {
+      const maxPieces = Math.floor(providerQty / packagingUnit) * packagingUnit;
+      return Math.max(0, maxPieces);
+    }
     return Math.max(0, providerQty);
   }
 
@@ -199,7 +206,7 @@ export function buildAvailabilityVm(
     tone = isStaff ? 'blue' : 'green';
   }
 
-  const purchasableStock = isTecDocOnly ? 0 : getPurchasableStock(roba as any);
+  const purchasableStock = isTecDocOnly ? 0 : getPurchasableStock(roba as any, { isAdmin });
   const displayPrice = getPurchasableUnitPrice(roba as any);
   const hasValidPrice = displayPrice > 0;
 
@@ -214,6 +221,9 @@ export function buildAvailabilityVm(
 
   const rabat = Number((roba as any)?.rabat) || 0;
   const showDiscount = !isTecDocOnly && rabat > 0 && rabat < 100 && displayPrice > 0;
+  const packagingUnit = Number(roba?.providerAvailability?.packagingUnit);
+  const packagingUnitLabel =
+    Number.isFinite(packagingUnit) && packagingUnit > 1 ? `${packagingUnit} kom` : null;
 
   return {
     status,
@@ -233,6 +243,7 @@ export function buildAvailabilityVm(
         sourceLabel,
         customerPriceLabel: isAdmin ? formatProviderPrice(roba?.providerAvailability) : null,
         purchasePriceLabel: isAdmin ? formatProviderPurchasePrice(roba?.providerAvailability) : null,
+        packagingUnitLabel,
       },
     },
   };

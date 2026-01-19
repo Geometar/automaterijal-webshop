@@ -41,4 +41,14 @@
       availability?.provider?.admin?.purchasePriceLabel
     }}</span>
   </div>
+  <div
+    class="provider-availability__row provider-availability__packaging"
+    [class.provider-availability__admin]="isStaff"
+    *ngIf="availability?.provider?.admin?.packagingUnitLabel"
+  >
+    Jedinica pakovanja:
+    <span class="provider-availability__value">{{
+      availability?.provider?.admin?.packagingUnitLabel
+    }}</span>
+  </div>
 </div>

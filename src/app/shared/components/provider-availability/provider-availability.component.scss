@@ -68,3 +68,14 @@
 .provider-availability--details .provider-availability__purchase .provider-availability__value {
   font-size: 13px;
 }
+
+.provider-availability__packaging {
+  margin-top: 8px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--bittersweet);
+  background: var(--figma-info-50);
+  color: var(--figma-info-700);
+  font-size: 12.5px;
+  font-weight: 800;
+}

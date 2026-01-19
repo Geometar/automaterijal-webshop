@@ -340,6 +340,18 @@
       color: var(--figma-grey-600);
     }
 
+    .price--unit {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--figma-grey-800);
+    }
+
+    .price--total {
+      margin-top: 6px;
+      font-weight: 900;
+      color: var(--figma-grey-900);
+    }
+
     .price {
       font-size: 21px;
       font-weight: 800;
@@ -390,6 +402,13 @@
     }
     .item-status.yellow .item-status__dot {
       background: var(--figma-accent-yellow-500);
+    }
+
+    .unit-price-label {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--figma-grey-600);
+      margin-top: 2px;
     }
 
     button {

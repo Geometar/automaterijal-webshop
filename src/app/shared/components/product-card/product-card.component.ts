@@ -145,12 +145,35 @@ export class AutomProductCardComponent implements OnInit, OnChanges {
   }
 
   private clampQuantity(value: number): number {
-    const min = 1;
-    const max = this.availableStock || 1;
+    const min = this.quantityMin;
+    const step = this.quantityStep;
+    const max = this.availableStock || min;
     if (!Number.isFinite(value)) return min;
     if (value < min) return min;
     if (value > max) return max;
-    return Math.floor(value); // ensure integer
+    const floored = Math.floor(value);
+    if (step <= 1) return floored;
+    const snapped = Math.ceil(floored / step) * step;
+    if (snapped > max) return max;
+    return snapped >= min ? snapped : min;
+  }
+
+  private get isProviderItem(): boolean {
+    return (
+      this.availabilityVm.status === 'AVAILABLE' && !!this.roba?.providerAvailability?.available
+    );
+  }
+
+  get quantityStep(): number {
+    if (!this.isProviderItem) {
+      return 1;
+    }
+    const unit = Number(this.roba?.providerAvailability?.packagingUnit);
+    return Number.isFinite(unit) && unit > 1 ? Math.floor(unit) : 1;
+  }
+
+  get quantityMin(): number {
+    return this.quantityStep;
   }
 
   private parseNumber(raw: unknown): number {

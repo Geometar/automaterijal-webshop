@@ -156,6 +156,7 @@ export class CartItem {
   providerCurrency?: string;
   providerCustomerPrice?: number;
   providerPurchasePrice?: number;
+  providerPackagingUnit?: number;
   providerLeadTimeBusinessDays?: number;
   providerDeliveryToCustomerBusinessDaysMin?: number;
   providerDeliveryToCustomerBusinessDaysMax?: number;

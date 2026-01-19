@@ -262,7 +262,7 @@ export class CartComponent implements OnInit, OnDestroy {
   sumTotal(): void {
     let totalNet = 0;
     this.roba
-      .map((roba: Roba) => roba.kolicina! * this.getUnitPriceForTotals(roba))
+      .map((roba: Roba) => (Number(roba.kolicina) || 0) * this.getUnitPriceForTotals(roba))
       .forEach((value: number) => (totalNet += value));
 
     if (this.isAdmin) {

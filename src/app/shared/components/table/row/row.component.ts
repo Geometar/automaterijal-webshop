@@ -70,7 +70,6 @@ export class RowComponent implements OnInit, OnChanges {
   @Output() removeEvent = new EventEmitter<string>();
 
   quantity: number = 1;
-  private readonly minQuantity = 1;
 
   // Enums
   buttonTheme = ButtonThemes;
@@ -183,7 +182,7 @@ export class RowComponent implements OnInit, OnChanges {
 
   modifyQuantity(quantity: number): void {
     if (this.isUnavailable) {
-      this.quantity = this.minQuantity;
+      this.quantity = this.quantityMin;
       return;
     }
 
@@ -322,6 +321,28 @@ export class RowComponent implements OnInit, OnChanges {
     return warehouse || 'Automaterijal Magacin';
   }
 
+  private get isProviderItem(): boolean {
+    return (
+      this.availabilityVm.status === 'AVAILABLE' && !!this.data?.providerAvailability?.available
+    );
+  }
+
+  get quantityStep(): number {
+    if (!this.isProviderItem) {
+      return 1;
+    }
+    const unit = Number(this.data?.providerAvailability?.packagingUnit);
+    return Number.isFinite(unit) && unit > 1 ? Math.floor(unit) : 1;
+  }
+
+  get selectedTotalPrice(): number {
+    return this.unitPrice * (this.quantity || 0);
+  }
+
+  get quantityMin(): number {
+    return this.quantityStep;
+  }
+
   get cartKey(): string | null {
     return this.data?.cartKey ?? this.cartStateService.getItemKey(this.data);
   }
@@ -404,11 +425,17 @@ export class RowComponent implements OnInit, OnChanges {
   }
 
   private clampQuantity(value: number): number {
-    if (!Number.isFinite(value)) return this.minQuantity;
-    if (value < this.minQuantity) return this.minQuantity;
-    const max = this.effectiveStock || this.minQuantity;
+    const min = this.quantityMin;
+    const step = this.quantityStep;
+    if (!Number.isFinite(value)) return min;
+    if (value < min) return min;
+    const max = this.effectiveStock || min;
     if (value > max) return max;
-    return Math.floor(value);
+    const floored = Math.floor(value);
+    if (step <= 1) return floored;
+    const snapped = Math.ceil(floored / step) * step;
+    if (snapped > max) return max;
+    return snapped >= min ? snapped : min;
   }
 
   get availabilityVm(): AvailabilityVm {

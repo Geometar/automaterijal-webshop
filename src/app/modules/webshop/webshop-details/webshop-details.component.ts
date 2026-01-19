@@ -773,10 +773,22 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   // ─────────────────────────────────────────────────────────────────────────────
 
   modifyQuantity(quantity: number): void {
-    const max = this.availableStock || 1;
-    if (quantity < 1) this.quantity = 1;
-    else if (quantity > max) this.quantity = max;
-    else this.quantity = quantity;
+    const min = this.quantityMin;
+    const step = this.quantityStep;
+    const max = this.availableStock || min;
+    let next = quantity;
+    if (next < min) next = min;
+    else if (next > max) next = max;
+    else next = quantity;
+
+    next = Math.floor(next);
+    if (step > 1) {
+      next = Math.ceil(next / step) * step;
+      if (next > max) next = max;
+      if (next < min) next = min;
+    }
+
+    this.quantity = next;
   }
 
   addToShopingCart(): void {
@@ -819,6 +831,28 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
 
   get availableStock(): number {
     return this.availabilityVm.purchasableStock;
+  }
+
+  private get isProviderItem(): boolean {
+    return (
+      this.availabilityVm.status === 'AVAILABLE' && !!this.data?.providerAvailability?.available
+    );
+  }
+
+  get quantityStep(): number {
+    if (!this.isProviderItem) {
+      return 1;
+    }
+    const unit = Number(this.data?.providerAvailability?.packagingUnit);
+    return Number.isFinite(unit) && unit > 1 ? Math.floor(unit) : 1;
+  }
+
+  get quantityMin(): number {
+    return this.quantityStep;
+  }
+
+  get totalPrice(): number {
+    return this.displayPrice * (this.quantity || 0);
   }
 
   get isOutOfStock(): boolean {

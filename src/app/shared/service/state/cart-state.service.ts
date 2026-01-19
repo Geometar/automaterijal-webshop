@@ -93,7 +93,24 @@ export class CartStateService {
     const unitPrice = getPurchasableUnitPrice(roba);
     const currentStock = getPurchasableStock(roba);
 
-    const qtyToAdd = Math.min(Math.max(1, Math.floor(quantity || 1)), currentStock || 0);
+    const packagingUnitRaw = Number(roba?.providerAvailability?.packagingUnit);
+    const step =
+      status === 'AVAILABLE' &&
+      Number.isFinite(packagingUnitRaw) &&
+      packagingUnitRaw > 1
+        ? Math.floor(packagingUnitRaw)
+        : 1;
+
+    let requested = Math.floor(quantity || step);
+    if (requested < step) {
+      requested = step;
+    }
+    if (step > 1) {
+      requested = Math.ceil(requested / step) * step;
+      if (requested < step) requested = step;
+    }
+
+    const qtyToAdd = Math.min(requested, currentStock || 0);
     if (unitPrice <= 0 || qtyToAdd <= 0) return;
 
     let cart = this.getAll();
@@ -101,7 +118,7 @@ export class CartStateService {
     let trackedItem: CartItem;
 
     if (existingItem) {
-      const max = Number(existingItem.stock) || (existingItem.quantity ?? 0) + qtyToAdd;
+      const max = (existingItem.quantity ?? 0) + (currentStock || 0);
       existingItem.quantity = Math.min((existingItem.quantity ?? 0) + qtyToAdd, max);
       existingItem.totalPrice = (existingItem.unitPrice ?? 0) * (existingItem.quantity ?? 0);
       trackedItem = existingItem;
@@ -284,6 +301,7 @@ export class CartStateService {
       providerCurrency: isProvider ? provider?.currency : undefined,
       providerCustomerPrice: isProvider ? provider?.price : undefined,
       providerPurchasePrice: isProvider && isAdmin ? provider?.purchasePrice : undefined,
+      providerPackagingUnit: isProvider ? provider?.packagingUnit : undefined,
       providerLeadTimeBusinessDays: isProvider ? provider?.leadTimeBusinessDays : undefined,
       providerDeliveryToCustomerBusinessDaysMin: isProvider ? provider?.deliveryToCustomerBusinessDaysMin : undefined,
       providerDeliveryToCustomerBusinessDaysMax: isProvider ? provider?.deliveryToCustomerBusinessDaysMax : undefined,
@@ -325,6 +343,7 @@ export class CartStateService {
         price: cartItem.providerCustomerPrice ?? cartItem.unitPrice,
         purchasePrice: cartItem.providerPurchasePrice,
         currency: cartItem.providerCurrency ?? 'RSD',
+        packagingUnit: cartItem.providerPackagingUnit,
         leadTimeBusinessDays: cartItem.providerLeadTimeBusinessDays,
         deliveryToCustomerBusinessDaysMin: cartItem.providerDeliveryToCustomerBusinessDaysMin,
         deliveryToCustomerBusinessDaysMax: cartItem.providerDeliveryToCustomerBusinessDaysMax,
