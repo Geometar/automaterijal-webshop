@@ -1013,6 +1013,73 @@
   margin-bottom: 10px;
 }
 
+.szakal-panel .spell-row {
+  grid-template-columns: 1.6fr 1fr;
+}
+
+.szakal-box {
+  padding: 18px;
+  border-radius: 14px;
+  border: 1px solid rgba(164, 59, 48, 0.25);
+  background: rgba(255, 255, 255, 0.65);
+}
+
+.szakal-box .label-title {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.szakal-box .label-sub {
+  display: block;
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
+.szakal-files {
+  margin-top: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.szakal-file {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(196, 154, 73, 0.12);
+  border: 1px solid rgba(196, 154, 73, 0.3);
+  color: var(--ink);
+}
+
+.szakal-file-main {
+  display: grid;
+  gap: 4px;
+}
+
+.szakal-file-main span {
+  color: var(--ink-soft);
+  font-size: 12px;
+  word-break: break-all;
+}
+
+.szakal-file-meta {
+  display: grid;
+  gap: 4px;
+  color: var(--ink-soft);
+  font-size: 12px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.szakal-empty {
+  margin-top: 12px;
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
 .file-chip {
   display: inline-flex;
   align-items: center;

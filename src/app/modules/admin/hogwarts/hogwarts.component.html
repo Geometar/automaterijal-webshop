@@ -530,6 +530,115 @@
         </ng-template>
       </article>
 
+      <article class="hogwarts-panel wide spellbook szakal-panel">
+        <div class="panel-header">
+          <div>
+            <p class="panel-eyebrow">Szakal Vault</p>
+            <h2>Szakal imports</h2>
+            <p class="panel-sub">Manual SFTP drop, then import master weekly and pricelists daily.</p>
+          </div>
+          <div class="panel-chip">
+            <autom-icon [source]="icons.DOWNLOAD"></autom-icon>
+            SFTP
+          </div>
+        </div>
+
+        <div class="spell-row">
+          <div class="szakal-box">
+            <span class="label-title">Detected files</span>
+            <span class="label-sub">
+              {{ szakalFiles?.dataDir || 'Data dir is not configured' }}
+            </span>
+            <div class="szakal-files" *ngIf="szakalFiles?.files?.length; else szakalEmpty">
+              <div class="szakal-file" *ngFor="let file of szakalFiles?.files">
+                <div class="szakal-file-main">
+                  <strong>{{ file.key }}</strong>
+                  <span>{{ file.path }}</span>
+                </div>
+                <div class="szakal-file-meta">
+                  <span>{{ file.sizeBytes ? (file.sizeBytes / 1024 / 1024 | number:'1.1-1') + ' MB' : '--' }}</span>
+                  <span *ngIf="file.lastModified">{{ file.lastModified | date:'dd.MM.yyyy HH:mm' }}</span>
+                </div>
+              </div>
+            </div>
+            <ng-template #szakalEmpty>
+              <div class="szakal-empty">No Szakal files detected.</div>
+            </ng-template>
+          </div>
+
+          <div class="cta-row">
+            <button
+              class="hogwarts-btn ghost"
+              type="button"
+              (click)="refreshSzakalFiles()"
+              [disabled]="szakalFilesLoading"
+            >
+              <autom-icon [source]="icons.REFRESH_CW"></autom-icon>
+              <span>{{ szakalFilesLoading ? 'Refreshing...' : 'Refresh files' }}</span>
+            </button>
+            <button
+              class="hogwarts-btn primary"
+              type="button"
+              (click)="importSzakalMaster()"
+              [disabled]="szakalLoading"
+            >
+              <autom-icon [source]="icons.FILE_TEXT"></autom-icon>
+              <span>{{ szakalLoading ? 'Importing...' : 'Import master' }}</span>
+            </button>
+            <button
+              class="hogwarts-btn primary"
+              type="button"
+              (click)="importSzakalPricelists()"
+              [disabled]="szakalLoading"
+            >
+              <autom-icon [source]="icons.CAST"></autom-icon>
+              <span>{{ szakalLoading ? 'Importing...' : 'Import pricelists' }}</span>
+            </button>
+            <button
+              class="hogwarts-btn ghost"
+              type="button"
+              (click)="importSzakalAll()"
+              [disabled]="szakalLoading"
+            >
+              <autom-icon [source]="icons.ZAP"></autom-icon>
+              <span>{{ szakalLoading ? 'Importing...' : 'Import all' }}</span>
+            </button>
+            <button
+              class="hogwarts-btn ghost"
+              type="button"
+              (click)="importSzakalBarcodes()"
+              [disabled]="szakalLoading"
+            >
+              <autom-icon [source]="icons.BARCODE"></autom-icon>
+              <span>{{ szakalLoading ? 'Importing...' : 'Import barcodes' }}</span>
+            </button>
+            <button
+              class="hogwarts-btn ghost"
+              type="button"
+              (click)="refreshSzakalStatus()"
+              [disabled]="szakalStatusLoading"
+            >
+              <autom-icon [source]="icons.REFRESH_CW"></autom-icon>
+              <span>{{ szakalStatusLoading ? 'Refreshing...' : 'Refresh status' }}</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="status" *ngIf="szakalStatusMessage">
+          <div class="status-badge" [ngClass]="szakalStatusType">
+            <autom-icon [source]="szakalStatusType === 'success' ? icons.CHECK : icons.ALERT_TRIANGLE"></autom-icon>
+            <span>{{ szakalStatusMessage }}</span>
+          </div>
+        </div>
+
+        <div class="hogwarts-meta" *ngIf="szakalStatus">
+          <span>Master rows: {{ szakalStatus.masterCount !== null && szakalStatus.masterCount !== undefined ? szakalStatus.masterCount : '--' }}</span>
+          <span *ngIf="szakalStatus.masterUpdatedAt">Master updated: {{ szakalStatus.masterUpdatedAt | date:'dd.MM.yyyy HH:mm' }}</span>
+          <span *ngFor="let pl of szakalStatus.priceLists">PL{{ pl.listNo }}: {{ pl.count }}</span>
+          <span *ngIf="szakalStatus.priceUpdatedAt">Pricelists updated: {{ szakalStatus.priceUpdatedAt | date:'dd.MM.yyyy HH:mm' }}</span>
+        </div>
+      </article>
+
       <article class="hogwarts-panel wide spellbook">
         <div class="panel-header">
           <div>

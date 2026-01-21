@@ -9,7 +9,7 @@ import {
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import { finalize } from 'rxjs';
+import { finalize, Observable } from 'rxjs';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { AutomIconComponent } from '../../../shared/components/autom-icon/autom-icon.component';
@@ -28,6 +28,10 @@ import {
   HogwartsRevenueOverviewResponse,
   HogwartsRevenueMetrics,
   HogwartsRevenuePeriodRow,
+  SzakalFilesSummary,
+  SzakalImportResult,
+  SzakalImportSummary,
+  SzakalStatusSummary,
 } from '../../../shared/service/hogwarts-admin.service';
 import { SnackbarService } from '../../../shared/service/utils/snackbar.service';
 import {
@@ -233,6 +237,13 @@ export class HogwartsComponent implements OnInit, OnDestroy {
   lastPath: string | null = null;
   lastModified: number | null = null;
   lastSizeBytes: number | null = null;
+  szakalLoading = false;
+  szakalFilesLoading = false;
+  szakalStatusLoading = false;
+  szakalStatusMessage = '';
+  szakalStatusType: 'success' | 'error' | '' = '';
+  szakalFiles: SzakalFilesSummary | null = null;
+  szakalStatus: SzakalStatusSummary | null = null;
 
   constructor(
     private febiPriceAdminService: FebiPriceAdminService,
@@ -246,6 +257,8 @@ export class HogwartsComponent implements OnInit, OnDestroy {
     this.loadMeta();
     this.loadOverview();
     this.loadRevenue();
+    this.refreshSzakalFiles();
+    this.refreshSzakalStatus();
     this.setInitialTriviaIndex();
     this.setInitialLessonIndex();
     this.setInitialLetterIndex();
@@ -892,5 +905,142 @@ export class HogwartsComponent implements OnInit, OnDestroy {
         // ignore; meta is optional
       },
     });
+  }
+
+  refreshSzakalFiles(): void {
+    if (this.szakalFilesLoading) {
+      return;
+    }
+    this.szakalFilesLoading = true;
+    this.hogwartsAdminService
+      .fetchSzakalFiles()
+      .pipe(finalize(() => (this.szakalFilesLoading = false)))
+      .subscribe({
+        next: (files: SzakalFilesSummary) => {
+          this.szakalFiles = files;
+          this.refreshUi();
+        },
+        error: (err) => this.handleSzakalError(err),
+      });
+  }
+
+  refreshSzakalStatus(): void {
+    if (this.szakalStatusLoading) {
+      return;
+    }
+    this.szakalStatusLoading = true;
+    this.hogwartsAdminService
+      .fetchSzakalStatus()
+      .pipe(finalize(() => (this.szakalStatusLoading = false)))
+      .subscribe({
+        next: (status: SzakalStatusSummary) => {
+          this.szakalStatus = status;
+          this.refreshUi();
+        },
+        error: (err) => this.handleSzakalError(err),
+      });
+  }
+
+  importSzakalMaster(): void {
+    this.runSzakalAction(
+      this.hogwartsAdminService.importSzakalMaster(),
+      'Master import completed'
+    );
+  }
+
+  importSzakalPricelists(): void {
+    this.runSzakalAction(
+      this.hogwartsAdminService.importSzakalPricelists(),
+      'Pricelists import completed'
+    );
+  }
+
+  importSzakalAll(): void {
+    this.runSzakalAction(
+      this.hogwartsAdminService.importSzakalAll(),
+      'Full import completed'
+    );
+  }
+
+  importSzakalBarcodes(): void {
+    if (this.szakalLoading) {
+      return;
+    }
+    this.szakalLoading = true;
+    this.hogwartsAdminService
+      .importSzakalBarcodes()
+      .pipe(finalize(() => (this.szakalLoading = false)))
+      .subscribe({
+        next: (result: SzakalImportResult) => {
+          const rows = result?.rows ?? 0;
+          this.setSzakalStatus(`Barcodes updated: ${rows}`, 'success');
+          this.snackbarService.showSuccess('Barcode import completed');
+          this.refreshSzakalStatus();
+        },
+        error: (err) => this.handleSzakalError(err),
+      });
+  }
+
+  private runSzakalAction(action: Observable<SzakalImportSummary>, message: string): void {
+    if (this.szakalLoading) {
+      return;
+    }
+    this.szakalLoading = true;
+    action
+      .pipe(finalize(() => (this.szakalLoading = false)))
+      .subscribe({
+        next: (summary) => {
+          this.setSzakalStatus(
+            `${message}${this.formatSzakalImportSummary(summary)}`,
+            'success'
+          );
+          this.snackbarService.showSuccess(message);
+          this.refreshSzakalStatus();
+        },
+        error: (err) => this.handleSzakalError(err),
+      });
+  }
+
+  private formatSzakalImportSummary(summary: SzakalImportSummary | null): string {
+    if (!summary) {
+      return '';
+    }
+    const masterRows =
+      summary.master && typeof summary.master.rows === 'number'
+        ? summary.master.rows
+        : null;
+    const priceRows =
+      summary.priceLists && summary.priceLists.length
+        ? summary.priceLists
+            .map((entry) => {
+              const listMatch = entry?.file?.match(/pricelist_([0-3])/i);
+              const listNo = listMatch ? listMatch[1] : '?';
+              return `PL${listNo}: ${entry?.rows ?? 0}`;
+            })
+            .join(', ')
+        : null;
+
+    const parts: string[] = [];
+    if (masterRows !== null) {
+      parts.push(`Master: ${masterRows}`);
+    }
+    if (priceRows) {
+      parts.push(`Pricelists: ${priceRows}`);
+    }
+    return parts.length ? ` (${parts.join(' | ')})` : '';
+  }
+
+  private handleSzakalError(error: any): void {
+    const message =
+      error?.error?.message ||
+      error?.message ||
+      'Szakal request failed.';
+    this.setSzakalStatus(message, 'error');
+    this.snackbarService.showError(message);
+  }
+
+  private setSzakalStatus(message: string, type: 'success' | 'error'): void {
+    this.szakalStatusMessage = message;
+    this.szakalStatusType = type;
   }
 }

@@ -112,6 +112,12 @@ function pluralizeBusinessDays(n: number): string {
 export function formatDeliveryEstimate(
   provider: ProviderAvailabilityDto | null | undefined
 ): string | null {
+  const providerKey = (provider?.provider || '').toString().trim().toLowerCase();
+  const warehouse = (provider?.warehouse || '').toString().trim().toUpperCase();
+  if (providerKey === 'szakal' && warehouse === 'PL3') {
+    return '> 3 dana';
+  }
+
   const min = Number(provider?.deliveryToCustomerBusinessDaysMin);
   const max = Number(provider?.deliveryToCustomerBusinessDaysMax);
 
