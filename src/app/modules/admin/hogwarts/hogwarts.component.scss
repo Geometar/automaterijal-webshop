@@ -395,6 +395,25 @@
   font-weight: 600;
 }
 
+.panel-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.panel-chip.action {
+  border: 1px solid rgba(31, 107, 74, 0.35);
+  background: rgba(31, 107, 74, 0.12);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.panel-chip.action:hover {
+  background: rgba(31, 107, 74, 0.2);
+  transform: translateY(-1px);
+}
+
 .panel-chip.subtle {
   background: rgba(44, 26, 15, 0.08);
   color: var(--ink-soft);
@@ -1076,6 +1095,219 @@
 
 .szakal-empty {
   margin-top: 12px;
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+.mapping-panel .spell-row {
+  grid-template-columns: 1fr 1fr;
+}
+
+.hogwarts-panel.mapping-panel {
+  overflow: visible;
+}
+
+.mapping-box {
+  padding: 18px;
+  border-radius: 14px;
+  border: 1px solid rgba(31, 107, 74, 0.25);
+  background: rgba(255, 255, 255, 0.65);
+  display: grid;
+  gap: 10px;
+}
+
+.mapping-box .label-title {
+  display: block;
+  font-weight: 700;
+}
+
+.mapping-box .label-sub {
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+.typeahead {
+  position: relative;
+}
+
+.typeahead-panel {
+  position: absolute;
+  inset-inline: 0;
+  margin-top: 6px;
+  max-height: 240px;
+  overflow: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(44, 26, 15, 0.2);
+  background: #fffdf7;
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.15);
+  z-index: 5;
+}
+
+.typeahead-option {
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  cursor: pointer;
+  color: inherit;
+}
+
+.typeahead-option:hover {
+  background: rgba(196, 154, 73, 0.15);
+}
+
+.typeahead-proid {
+  font-weight: 700;
+}
+
+.typeahead-name {
+  color: var(--ink-soft);
+  font-size: 12px;
+}
+
+.typeahead-empty {
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.text-input,
+.select-input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(44, 26, 15, 0.2);
+  background: #fffdf7;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.text-input:focus,
+.select-input:focus {
+  outline: none;
+  border-color: rgba(196, 154, 73, 0.6);
+  box-shadow: 0 0 0 3px rgba(196, 154, 73, 0.15);
+}
+
+.mapping-current {
+  color: var(--ink-soft);
+  font-size: 12px;
+}
+
+.mapping-popup .popup-container {
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(196, 154, 73, 0.35);
+  background: linear-gradient(160deg, rgba(255, 252, 242, 0.98), rgba(241, 228, 204, 0.96));
+}
+
+.mapping-popup .popup-container__header,
+.mapping-popup .popup-container__body {
+  border: 0;
+}
+
+.mapping-popup .popup-container__body {
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.mapping-popup__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 20px 12px;
+}
+
+.mapping-popup__header h3 {
+  margin: 6px 0;
+  font-family: 'Cinzel', 'Playfair Display', serif;
+  font-size: 20px;
+}
+
+.mapping-popup__body {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  gap: 16px;
+  padding: 0 20px 20px;
+}
+
+.mapping-close {
+  border: 0;
+  background: rgba(44, 26, 15, 0.08);
+  color: var(--ink);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mapping-toolbar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.mapping-toolbar .text-input {
+  flex: 1;
+  min-width: 220px;
+}
+
+.mapping-list {
+  display: grid;
+  gap: 10px;
+  overflow: auto;
+  flex: 1;
+  min-height: 0;
+  padding-right: 4px;
+}
+
+.mapping-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(44, 26, 15, 0.12);
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--figma-bg-dark);
+}
+
+.mapping-col {
+  display: grid;
+  gap: 2px;
+}
+
+.mapping-col.right {
+  text-align: right;
+}
+
+.mapping-proid {
+  font-weight: 700;
+}
+
+.mapping-name {
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.mapping-brandid {
+  font-weight: 700;
+}
+
+.mapping-list-state {
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px dashed rgba(44, 26, 15, 0.2);
+  text-align: center;
   color: var(--ink-soft);
   font-size: 13px;
 }

@@ -99,6 +99,12 @@ export interface SzakalFilesSummary {
   files: SzakalFileInfo[];
 }
 
+export interface TecDocBrandMapping {
+  proid: string;
+  brandId: number | null;
+  brandLogoId: string | null;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -139,5 +145,25 @@ export class HogwartsAdminService {
 
   importSzakalBarcodes(): Observable<SzakalImportResult> {
     return this.http.post<SzakalImportResult>(`${this.baseUrl}/szakal/import/barcodes`, {});
+  }
+
+  fetchTecdocBrandMapping(proid: string): Observable<TecDocBrandMapping> {
+    return this.http.get<TecDocBrandMapping>(`${this.baseUrl}/tecdoc-brand-mappings/${proid}`);
+  }
+
+  upsertTecdocBrandMapping(proid: string, brandId: number, brandLogoId?: string | null): Observable<TecDocBrandMapping> {
+    return this.http.put<TecDocBrandMapping>(
+      `${this.baseUrl}/tecdoc-brand-mappings/${proid}`,
+      { brandId, brandLogoId: brandLogoId ?? null }
+    );
+  }
+
+  deleteTecdocBrandMapping(proid: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/tecdoc-brand-mappings/${proid}`);
+  }
+
+  fetchTecdocBrandMappings(query?: string): Observable<TecDocBrandMapping[]> {
+    const q = query ? `?q=${encodeURIComponent(query)}` : '';
+    return this.http.get<TecDocBrandMapping[]>(`${this.baseUrl}/tecdoc-brand-mappings${q}`);
   }
 }
