@@ -11,6 +11,34 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { AccountService } from '../service/account.service';
 import { AccountStateService } from '../../service/state/account-state.service';
 
+let scheduledLogoutForToken: string | null = null;
+let logoutTimer: ReturnType<typeof setTimeout> | null = null;
+
+function decodeJwtPayload(token: string): any | null {
+  const parts = token.split('.');
+  if (parts.length < 2) return null;
+  const base64Url = parts[1];
+  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  try {
+    const json = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => `%${('00' + c.charCodeAt(0).toString(16)).slice(-2)}`)
+        .join('')
+    );
+    return JSON.parse(json);
+  } catch {
+    return null;
+  }
+}
+
+function getJwtExpiryMs(token: string): number | null {
+  const payload = decodeJwtPayload(token);
+  const expSeconds = payload?.exp;
+  if (typeof expSeconds !== 'number') return null;
+  return expSeconds * 1000;
+}
+
 export const authInterceptor: HttpInterceptorFn = (request, next) => {
   const accountService = inject(AccountService);
   const accountStateService = inject(AccountStateService);
@@ -38,6 +66,43 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
     ? localStorageService.retrieve('authenticationToken')
     : null;
 
+  const performLogout = (): void => {
+    if (isBrowser) {
+      localStorageService.clear('authenticationToken');
+      sessionStorage.clear();
+    }
+    if (logoutTimer) {
+      clearTimeout(logoutTimer);
+      logoutTimer = null;
+    }
+    scheduledLogoutForToken = null;
+    accountStateService.remove();
+    accountService.authenticate(null);
+    if (router.url !== '/login') {
+      router.navigate(['/login']);
+    }
+  };
+
+  if (token) {
+    const expiryMs = getJwtExpiryMs(token);
+    if (typeof expiryMs === 'number') {
+      const now = Date.now();
+      if (expiryMs <= now) {
+        performLogout();
+        return throwError(
+          () => new HttpErrorResponse({ status: 401, statusText: 'JWT expired' })
+        );
+      }
+
+      if (scheduledLogoutForToken !== token) {
+        if (logoutTimer) clearTimeout(logoutTimer);
+        scheduledLogoutForToken = token;
+        const delayMs = Math.max(0, expiryMs - now);
+        logoutTimer = setTimeout(() => performLogout(), delayMs);
+      }
+    }
+  }
+
   const modifiedRequest = request.clone({
     setHeaders: {
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -50,13 +115,7 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
       if (error.status === 401 || error.status === 403) {
         // Optional: check if backend returned a specific error message
         console.warn('Authentication expired or unauthorized. Logging out.');
-
-        if (isBrowser) {
-          localStorageService.clear('authenticationToken');  // Remove authentication token
-        }
-        accountStateService.remove(); // Remove logged in user
-        accountService.authenticate(null); // Clear authentication state
-        router.navigate(['/login']);   // Redirect to login
+        performLogout();
       }
 
       return throwError(() => error);
