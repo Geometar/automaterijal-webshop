@@ -74,7 +74,7 @@
             >Webshop</a
           >
         </li>
-        <li *ngIf="!loggedIn" class="navbar-item">
+        <li [hidden]="loggedIn" class="navbar-item">
           <a
             routerLink="/login"
             href="/login"
@@ -350,7 +350,7 @@
   </a>
 
   <a
-    *ngIf="!loggedIn"
+    [hidden]="loggedIn"
     class="action-btn"
     routerLink="/login"
     href="/login"
@@ -449,7 +449,7 @@
         Webshop
       </a>
     </li>
-    <li class="menu-category" *ngIf="!loggedIn">
+    <li class="menu-category" [hidden]="loggedIn">
       <a
         routerLink="/login"
         href="/login"
