@@ -1001,6 +1001,25 @@ export class HogwartsComponent implements OnInit, OnDestroy {
       });
   }
 
+  importSzakalOeLinks(): void {
+    if (this.szakalLoading) {
+      return;
+    }
+    this.szakalLoading = true;
+    this.hogwartsAdminService
+      .importSzakalOeLinks()
+      .pipe(finalize(() => (this.szakalLoading = false)))
+      .subscribe({
+        next: (result: SzakalImportResult) => {
+          const rows = result?.rows ?? 0;
+          this.setSzakalStatus(`OE links updated: ${rows}`, 'success');
+          this.snackbarService.showSuccess('OE links import completed');
+          this.refreshSzakalStatus();
+        },
+        error: (err) => this.handleSzakalError(err),
+      });
+  }
+
   private runSzakalAction(action: Observable<SzakalImportSummary>, message: string): void {
     if (this.szakalLoading) {
       return;

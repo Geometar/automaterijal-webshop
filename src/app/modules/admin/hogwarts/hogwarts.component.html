@@ -839,6 +839,17 @@
               <button
                 class="hogwarts-btn ghost"
                 type="button"
+                (click)="importSzakalOeLinks()"
+                [disabled]="szakalLoading"
+              >
+                <autom-icon [source]="icons.LINK"></autom-icon>
+                <span>{{
+                  szakalLoading ? "Importing..." : "Import OE links"
+                }}</span>
+              </button>
+              <button
+                class="hogwarts-btn ghost"
+                type="button"
                 (click)="refreshSzakalStatus()"
                 [disabled]="szakalStatusLoading"
               >

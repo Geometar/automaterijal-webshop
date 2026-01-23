@@ -147,6 +147,10 @@ export class HogwartsAdminService {
     return this.http.post<SzakalImportResult>(`${this.baseUrl}/szakal/import/barcodes`, {});
   }
 
+  importSzakalOeLinks(): Observable<SzakalImportResult> {
+    return this.http.post<SzakalImportResult>(`${this.baseUrl}/szakal/import/oe-links`, {});
+  }
+
   fetchTecdocBrandMapping(proid: string): Observable<TecDocBrandMapping> {
     return this.http.get<TecDocBrandMapping>(`${this.baseUrl}/tecdoc-brand-mappings/${proid}`);
   }
