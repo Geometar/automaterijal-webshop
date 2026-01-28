@@ -64,6 +64,47 @@ export interface HogwartsRevenueOverviewResponse {
   history: HogwartsRevenuePeriodRow[];
 }
 
+export interface SzakalImportResult {
+  file: string | null;
+  rows: number;
+  durationMs: number;
+}
+
+export interface SzakalImportSummary {
+  master: SzakalImportResult | null;
+  priceLists: SzakalImportResult[];
+}
+
+export interface SzakalPriceListStatus {
+  listNo: number;
+  count: number;
+}
+
+export interface SzakalStatusSummary {
+  masterCount: number | null;
+  masterUpdatedAt: number | null;
+  priceLists: SzakalPriceListStatus[];
+  priceUpdatedAt: number | null;
+}
+
+export interface SzakalFileInfo {
+  key: string;
+  path: string;
+  sizeBytes: number | null;
+  lastModified: number | null;
+}
+
+export interface SzakalFilesSummary {
+  dataDir: string | null;
+  files: SzakalFileInfo[];
+}
+
+export interface TecDocBrandMapping {
+  proid: string;
+  brandId: number | null;
+  brandLogoId: string | null;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -80,5 +121,53 @@ export class HogwartsAdminService {
     return this.http.get<HogwartsRevenueOverviewResponse>(
       `${this.baseUrl}/revenue-overview?days=${days}&years=${years}`
     );
+  }
+
+  fetchSzakalStatus(): Observable<SzakalStatusSummary> {
+    return this.http.get<SzakalStatusSummary>(`${this.baseUrl}/szakal/status`);
+  }
+
+  fetchSzakalFiles(): Observable<SzakalFilesSummary> {
+    return this.http.get<SzakalFilesSummary>(`${this.baseUrl}/szakal/files`);
+  }
+
+  importSzakalMaster(): Observable<SzakalImportSummary> {
+    return this.http.post<SzakalImportSummary>(`${this.baseUrl}/szakal/import/master`, {});
+  }
+
+  importSzakalPricelists(): Observable<SzakalImportSummary> {
+    return this.http.post<SzakalImportSummary>(`${this.baseUrl}/szakal/import/pricelists`, {});
+  }
+
+  importSzakalAll(): Observable<SzakalImportSummary> {
+    return this.http.post<SzakalImportSummary>(`${this.baseUrl}/szakal/import`, {});
+  }
+
+  importSzakalBarcodes(): Observable<SzakalImportResult> {
+    return this.http.post<SzakalImportResult>(`${this.baseUrl}/szakal/import/barcodes`, {});
+  }
+
+  importSzakalOeLinks(): Observable<SzakalImportResult> {
+    return this.http.post<SzakalImportResult>(`${this.baseUrl}/szakal/import/oe-links`, {});
+  }
+
+  fetchTecdocBrandMapping(proid: string): Observable<TecDocBrandMapping> {
+    return this.http.get<TecDocBrandMapping>(`${this.baseUrl}/tecdoc-brand-mappings/${proid}`);
+  }
+
+  upsertTecdocBrandMapping(proid: string, brandId: number, brandLogoId?: string | null): Observable<TecDocBrandMapping> {
+    return this.http.put<TecDocBrandMapping>(
+      `${this.baseUrl}/tecdoc-brand-mappings/${proid}`,
+      { brandId, brandLogoId: brandLogoId ?? null }
+    );
+  }
+
+  deleteTecdocBrandMapping(proid: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/tecdoc-brand-mappings/${proid}`);
+  }
+
+  fetchTecdocBrandMappings(query?: string): Observable<TecDocBrandMapping[]> {
+    const q = query ? `?q=${encodeURIComponent(query)}` : '';
+    return this.http.get<TecDocBrandMapping[]>(`${this.baseUrl}/tecdoc-brand-mappings${q}`);
   }
 }

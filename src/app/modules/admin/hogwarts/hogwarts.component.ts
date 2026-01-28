@@ -9,11 +9,12 @@ import {
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import { finalize } from 'rxjs';
+import { finalize, Observable } from 'rxjs';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { AutomIconComponent } from '../../../shared/components/autom-icon/autom-icon.component';
-import { IconsEnum } from '../../../shared/data-models/enums';
+import { PopupComponent } from '../../../shared/components/popup/popup.component';
+import { IconsEnum, PositionEnum, SizeEnum } from '../../../shared/data-models/enums';
 import {
   FebiPriceAdminService,
   PriceReloadResponse,
@@ -28,7 +29,14 @@ import {
   HogwartsRevenueOverviewResponse,
   HogwartsRevenueMetrics,
   HogwartsRevenuePeriodRow,
+  SzakalFilesSummary,
+  SzakalImportResult,
+  SzakalImportSummary,
+  SzakalStatusSummary,
+  TecDocBrandMapping,
 } from '../../../shared/service/hogwarts-admin.service';
+import { ManufactureService } from '../../../shared/service/manufacture.service';
+import { Manufacture } from '../../../shared/data-models/model/proizvodjac';
 import { SnackbarService } from '../../../shared/service/utils/snackbar.service';
 import {
   HOGWARTS_ARTICLES,
@@ -123,7 +131,7 @@ interface ReadingNookContent {
 @Component({
   selector: 'app-hogwarts',
   standalone: true,
-  imports: [CommonModule, AutomIconComponent, MatSnackBarModule],
+  imports: [CommonModule, AutomIconComponent, PopupComponent, MatSnackBarModule],
   templateUrl: './hogwarts.component.html',
   styleUrl: './hogwarts.component.scss',
   encapsulation: ViewEncapsulation.None,
@@ -132,6 +140,8 @@ export class HogwartsComponent implements OnInit, OnDestroy {
   @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;
 
   icons = IconsEnum;
+  positionEnum = PositionEnum;
+  sizeEnum = SizeEnum;
   readonly today = new Date();
   private destroyed = false;
   activeTab: 'common' | 'watchtower' = 'common';
@@ -233,10 +243,30 @@ export class HogwartsComponent implements OnInit, OnDestroy {
   lastPath: string | null = null;
   lastModified: number | null = null;
   lastSizeBytes: number | null = null;
+  szakalLoading = false;
+  szakalFilesLoading = false;
+  szakalStatusLoading = false;
+  szakalStatusMessage = '';
+  szakalStatusType: 'success' | 'error' | '' = '';
+  szakalFiles: SzakalFilesSummary | null = null;
+  szakalStatus: SzakalStatusSummary | null = null;
+  manufacturers: Manufacture[] = [];
+  manufacturerFilter = '';
+  selectedManufacturer: Manufacture | null = null;
+  selectedBrandId = '';
+  brandMappingLoading = false;
+  brandMappingMessage = '';
+  brandMappingType: 'success' | 'error' | '' = '';
+  manufacturerDropdownOpen = false;
+  mappingList: TecDocBrandMapping[] = [];
+  mappingListFilter = '';
+  mappingModalOpen = false;
+  mappingListLoading = false;
 
   constructor(
     private febiPriceAdminService: FebiPriceAdminService,
     private hogwartsAdminService: HogwartsAdminService,
+    private manufactureService: ManufactureService,
     private snackbarService: SnackbarService,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone
@@ -246,6 +276,9 @@ export class HogwartsComponent implements OnInit, OnDestroy {
     this.loadMeta();
     this.loadOverview();
     this.loadRevenue();
+    this.refreshSzakalFiles();
+    this.refreshSzakalStatus();
+    this.loadManufacturers();
     this.setInitialTriviaIndex();
     this.setInitialLessonIndex();
     this.setInitialLetterIndex();
@@ -892,5 +925,380 @@ export class HogwartsComponent implements OnInit, OnDestroy {
         // ignore; meta is optional
       },
     });
+  }
+
+  refreshSzakalFiles(): void {
+    if (this.szakalFilesLoading) {
+      return;
+    }
+    this.szakalFilesLoading = true;
+    this.hogwartsAdminService
+      .fetchSzakalFiles()
+      .pipe(finalize(() => (this.szakalFilesLoading = false)))
+      .subscribe({
+        next: (files: SzakalFilesSummary) => {
+          this.szakalFiles = files;
+          this.refreshUi();
+        },
+        error: (err) => this.handleSzakalError(err),
+      });
+  }
+
+  refreshSzakalStatus(): void {
+    if (this.szakalStatusLoading) {
+      return;
+    }
+    this.szakalStatusLoading = true;
+    this.hogwartsAdminService
+      .fetchSzakalStatus()
+      .pipe(finalize(() => (this.szakalStatusLoading = false)))
+      .subscribe({
+        next: (status: SzakalStatusSummary) => {
+          this.szakalStatus = status;
+          this.refreshUi();
+        },
+        error: (err) => this.handleSzakalError(err),
+      });
+  }
+
+  importSzakalMaster(): void {
+    this.runSzakalAction(
+      this.hogwartsAdminService.importSzakalMaster(),
+      'Master import completed'
+    );
+  }
+
+  importSzakalPricelists(): void {
+    this.runSzakalAction(
+      this.hogwartsAdminService.importSzakalPricelists(),
+      'Pricelists import completed'
+    );
+  }
+
+  importSzakalAll(): void {
+    this.runSzakalAction(
+      this.hogwartsAdminService.importSzakalAll(),
+      'Full import completed'
+    );
+  }
+
+  importSzakalBarcodes(): void {
+    if (this.szakalLoading) {
+      return;
+    }
+    this.szakalLoading = true;
+    this.hogwartsAdminService
+      .importSzakalBarcodes()
+      .pipe(finalize(() => (this.szakalLoading = false)))
+      .subscribe({
+        next: (result: SzakalImportResult) => {
+          const rows = result?.rows ?? 0;
+          this.setSzakalStatus(`Barcodes updated: ${rows}`, 'success');
+          this.snackbarService.showSuccess('Barcode import completed');
+          this.refreshSzakalStatus();
+        },
+        error: (err) => this.handleSzakalError(err),
+      });
+  }
+
+  importSzakalOeLinks(): void {
+    if (this.szakalLoading) {
+      return;
+    }
+    this.szakalLoading = true;
+    this.hogwartsAdminService
+      .importSzakalOeLinks()
+      .pipe(finalize(() => (this.szakalLoading = false)))
+      .subscribe({
+        next: (result: SzakalImportResult) => {
+          const rows = result?.rows ?? 0;
+          this.setSzakalStatus(`OE links updated: ${rows}`, 'success');
+          this.snackbarService.showSuccess('OE links import completed');
+          this.refreshSzakalStatus();
+        },
+        error: (err) => this.handleSzakalError(err),
+      });
+  }
+
+  private runSzakalAction(action: Observable<SzakalImportSummary>, message: string): void {
+    if (this.szakalLoading) {
+      return;
+    }
+    this.szakalLoading = true;
+    action
+      .pipe(finalize(() => (this.szakalLoading = false)))
+      .subscribe({
+        next: (summary) => {
+          this.setSzakalStatus(
+            `${message}${this.formatSzakalImportSummary(summary)}`,
+            'success'
+          );
+          this.snackbarService.showSuccess(message);
+          this.refreshSzakalStatus();
+        },
+        error: (err) => this.handleSzakalError(err),
+      });
+  }
+
+  private formatSzakalImportSummary(summary: SzakalImportSummary | null): string {
+    if (!summary) {
+      return '';
+    }
+    const masterRows =
+      summary.master && typeof summary.master.rows === 'number'
+        ? summary.master.rows
+        : null;
+    const priceRows =
+      summary.priceLists && summary.priceLists.length
+        ? summary.priceLists
+            .map((entry) => {
+              const listMatch = entry?.file?.match(/pricelist_([0-3])/i);
+              const listNo = listMatch ? listMatch[1] : '?';
+              return `PL${listNo}: ${entry?.rows ?? 0}`;
+            })
+            .join(', ')
+        : null;
+
+    const parts: string[] = [];
+    if (masterRows !== null) {
+      parts.push(`Master: ${masterRows}`);
+    }
+    if (priceRows) {
+      parts.push(`Pricelists: ${priceRows}`);
+    }
+    return parts.length ? ` (${parts.join(' | ')})` : '';
+  }
+
+  private handleSzakalError(error: any): void {
+    const message =
+      error?.error?.message ||
+      error?.message ||
+      'Szakal request failed.';
+    this.setSzakalStatus(message, 'error');
+    this.snackbarService.showError(message);
+  }
+
+  private setSzakalStatus(message: string, type: 'success' | 'error'): void {
+    this.szakalStatusMessage = message;
+    this.szakalStatusType = type;
+  }
+
+  get filteredManufacturers(): Manufacture[] {
+    const filter = this.manufacturerFilter.trim().toLowerCase();
+    if (!this.manufacturers.length) {
+      return [];
+    }
+    const results = filter
+      ? this.manufacturers.filter((m) => {
+          const name = (m?.naziv || '').toLowerCase();
+          const proid = (m?.proid || '').toLowerCase();
+          return name.includes(filter) || proid.includes(filter);
+        })
+      : this.manufacturers;
+    return results.slice(0, 200);
+  }
+
+  onManufacturerFilter(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.manufacturerFilter = input?.value ?? '';
+    this.manufacturerDropdownOpen = true;
+    this.refreshUi();
+  }
+
+  onManufacturerFocus(): void {
+    this.manufacturerDropdownOpen = true;
+  }
+
+  onManufacturerBlur(): void {
+    this.ngZone.runOutsideAngular(() => {
+      setTimeout(() => {
+        this.manufacturerDropdownOpen = false;
+        this.refreshUi();
+      }, 150);
+    });
+  }
+
+  onManufacturerKeydown(event: KeyboardEvent): void {
+    if (event.key !== 'Enter') {
+      return;
+    }
+    const value = this.manufacturerFilter.trim().toLowerCase();
+    if (!value) {
+      return;
+    }
+    const match =
+      this.manufacturers.find((m) => (m?.proid || '').toLowerCase() === value) ||
+      this.manufacturers.find((m) => (m?.naziv || '').toLowerCase() === value);
+    if (match) {
+      this.selectManufacturer(match);
+    }
+  }
+
+  onManufacturerSelect(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    const proid = select?.value?.trim();
+    const match =
+      this.manufacturers.find((m) => m?.proid === proid) || null;
+    if (match) {
+      this.selectManufacturer(match);
+    }
+  }
+
+  selectManufacturer(manufacturer: Manufacture): void {
+    this.selectedManufacturer = manufacturer;
+    this.manufacturerFilter = manufacturer?.proid
+      ? `${manufacturer.proid} - ${manufacturer.naziv ?? ''}`.trim()
+      : '';
+    this.manufacturerDropdownOpen = false;
+    this.loadBrandMapping();
+    this.refreshUi();
+  }
+
+  onBrandIdInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.selectedBrandId = input?.value ?? '';
+  }
+
+  saveBrandMapping(): void {
+    if (!this.selectedManufacturer?.proid) {
+      this.setBrandMappingStatus('Select manufacturer first.', 'error');
+      return;
+    }
+    const brandId = Number(this.selectedBrandId);
+    if (!Number.isFinite(brandId) || brandId <= 0) {
+      this.setBrandMappingStatus('BrandId must be a positive number.', 'error');
+      return;
+    }
+    this.brandMappingLoading = true;
+    this.hogwartsAdminService
+      .upsertTecdocBrandMapping(this.selectedManufacturer.proid, brandId)
+      .pipe(finalize(() => (this.brandMappingLoading = false)))
+      .subscribe({
+        next: (mapping) => {
+          this.selectedBrandId = mapping?.brandId?.toString() ?? '';
+          this.setBrandMappingStatus('Mapping saved.', 'success');
+          this.refreshBrandMappings();
+        },
+        error: (err) => this.handleBrandMappingError(err),
+      });
+  }
+
+  deleteBrandMapping(): void {
+    if (!this.selectedManufacturer?.proid) {
+      this.setBrandMappingStatus('Select manufacturer first.', 'error');
+      return;
+    }
+    this.brandMappingLoading = true;
+    this.hogwartsAdminService
+      .deleteTecdocBrandMapping(this.selectedManufacturer.proid)
+      .pipe(finalize(() => (this.brandMappingLoading = false)))
+      .subscribe({
+        next: () => {
+          this.selectedBrandId = '';
+          this.setBrandMappingStatus('Mapping deleted.', 'success');
+          this.refreshBrandMappings();
+        },
+        error: (err) => this.handleBrandMappingError(err),
+      });
+  }
+
+  private loadManufacturers(): void {
+    this.manufactureService.getAll().subscribe({
+      next: (manufacturers) => {
+        this.manufacturers = manufacturers || [];
+        this.refreshUi();
+      },
+      error: () => {
+        this.manufacturers = [];
+      },
+    });
+  }
+
+  private loadBrandMapping(): void {
+    const proid = this.selectedManufacturer?.proid;
+    if (!proid) {
+      this.selectedBrandId = '';
+      return;
+    }
+    this.brandMappingLoading = true;
+    this.hogwartsAdminService
+      .fetchTecdocBrandMapping(proid)
+      .pipe(finalize(() => (this.brandMappingLoading = false)))
+      .subscribe({
+        next: (mapping: TecDocBrandMapping) => {
+          this.selectedBrandId = mapping?.brandId?.toString() ?? '';
+          this.refreshUi();
+        },
+        error: () => {
+          this.selectedBrandId = '';
+        },
+      });
+  }
+
+  private handleBrandMappingError(error: any): void {
+    const message =
+      error?.error?.message ||
+      error?.message ||
+      'Brand mapping failed.';
+    this.setBrandMappingStatus(message, 'error');
+  }
+
+  private setBrandMappingStatus(message: string, type: 'success' | 'error'): void {
+    this.brandMappingMessage = message;
+    this.brandMappingType = type;
+  }
+
+  openMappingModal(): void {
+    this.mappingModalOpen = true;
+    this.refreshBrandMappings();
+  }
+
+  closeMappingModal(): void {
+    this.mappingModalOpen = false;
+  }
+
+  refreshBrandMappings(): void {
+    if (!this.mappingModalOpen && !this.mappingList.length) {
+      return;
+    }
+    this.mappingListLoading = true;
+    this.hogwartsAdminService
+      .fetchTecdocBrandMappings()
+      .pipe(finalize(() => (this.mappingListLoading = false)))
+      .subscribe({
+        next: (list) => {
+          this.mappingList = list || [];
+          this.refreshUi();
+        },
+        error: () => {
+          this.mappingList = [];
+        },
+      });
+  }
+
+  onMappingFilter(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.mappingListFilter = input?.value ?? '';
+  }
+
+  get filteredBrandMappings(): TecDocBrandMapping[] {
+    const needle = this.mappingListFilter.trim().toLowerCase();
+    if (!needle) {
+      return this.mappingList;
+    }
+    return this.mappingList.filter((entry) => {
+      const proid = (entry?.proid || '').toLowerCase();
+      const brandId = entry?.brandId != null ? entry.brandId.toString() : '';
+      const name = this.resolveManufacturerName(entry?.proid).toLowerCase();
+      return proid.includes(needle) || brandId.includes(needle) || name.includes(needle);
+    });
+  }
+
+  resolveManufacturerName(proid?: string | null): string {
+    if (!proid) {
+      return '';
+    }
+    const found = this.manufacturers.find((m) => m?.proid === proid);
+    return found?.naziv ?? '';
   }
 }

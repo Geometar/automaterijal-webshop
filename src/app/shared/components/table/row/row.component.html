@@ -119,6 +119,15 @@
       ></autom-meta-pill>
 
       <autom-meta-pill
+        *ngIf="availabilityVm.provider.noReturnable"
+        variant="warning"
+        size="md"
+        [label]="'Ne može povrat'"
+        [attr.title]="'Stavka je non-returnable i ne može se stornirati.'"
+        [ariaLabel]="'Ne može povrat'"
+      ></autom-meta-pill>
+
+      <autom-meta-pill
         *ngIf="showPriceOnly && isAdminCartView && warehouseLabel"
         variant="accent"
         size="md"

@@ -213,24 +213,26 @@
   .cart-summary__table {
     width: 100%;
     border-collapse: collapse;
+    margin-top: 6px;
   }
 
   .cart-summary__table td {
     font-size: 15px;
-    padding: 8px 0;
-    line-height: 1.45;
+    padding: 10px 0;
+    line-height: 1.6;
     vertical-align: middle;
   }
 
   .cart-summary__table td:first-child {
     color: var(--figma-grey-600);
     padding-right: 12px;
-    word-break: break-word;
+    overflow-wrap: anywhere;
   }
 
   .cart-summary__table td:last-child {
     text-align: right;
     white-space: nowrap;
+    width: 1%;
   }
 
   .cart-summary__value {

@@ -15,6 +15,7 @@ import {
 import { AutomIconComponent } from '../../shared/components/autom-icon/autom-icon.component';
 import { ButtonComponent } from '../../shared/components/button/button.component';
 import { InputFieldsComponent } from '../../shared/components/input-fields/input-fields.component';
+import { MetaPillComponent } from '../../shared/components/meta-pill/meta-pill.component';
 import { RadioButtonComponent } from '../../shared/components/radio-button/radio-button.component';
 import { RowComponent } from '../../shared/components/table/row/row.component';
 import { SelectComponent } from '../../shared/components/select/select.component';
@@ -69,6 +70,7 @@ import { Slika } from '../../shared/data-models/model/slika';
     CommonModule,
     FormsModule,
     InputFieldsComponent,
+    MetaPillComponent,
     RadioButtonComponent,
     ReactiveFormsModule,
     RouterLink,
@@ -297,6 +299,13 @@ export class CartComponent implements OnInit, OnDestroy {
         getAvailabilityStatus(r) === 'AVAILABLE' &&
         !!r?.providerAvailability?.available
     );
+  }
+
+  get hasNonReturnableItems(): boolean {
+    return (this.roba ?? []).some((item) => {
+      const provider = (item?.providerAvailability?.provider || '').trim().toLowerCase();
+      return provider === 'szakal' && !!item?.providerAvailability?.providerNoReturnable;
+    });
   }
 
   get cartItemCount(): number {
