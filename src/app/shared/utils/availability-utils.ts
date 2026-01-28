@@ -33,6 +33,7 @@ export interface AvailabilityVm {
     deliveryLabel: string | null;
     cutoffLabel: string | null;
     quantity: number | null;
+    noReturnable?: boolean;
     admin: {
       isAdmin: boolean;
       sourceLabel: string | null;
@@ -217,6 +218,8 @@ export function buildAvailabilityVm(
   const hasValidPrice = displayPrice > 0;
 
   const showProviderBox = !isTecDocOnly && status === 'AVAILABLE' && !!roba?.providerAvailability?.available;
+  const providerKey = (roba?.providerAvailability?.provider || '').toString().trim().toLowerCase();
+  const noReturnable = providerKey === 'szakal' && !!roba?.providerAvailability?.providerNoReturnable;
   const providerQty =
     Number(roba?.providerAvailability?.warehouseQuantity) ||
     Number(roba?.providerAvailability?.totalQuantity) ||
@@ -244,6 +247,7 @@ export function buildAvailabilityVm(
       deliveryLabel: formatDeliveryEstimate(roba?.providerAvailability),
       cutoffLabel: formatDispatchCutoff(roba?.providerAvailability?.nextDispatchCutoff),
       quantity: providerQty > 0 ? providerQty : null,
+      noReturnable,
       admin: {
         isAdmin,
         sourceLabel,

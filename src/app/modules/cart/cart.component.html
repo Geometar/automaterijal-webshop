@@ -288,6 +288,22 @@
           </ul>
         </div>
 
+        <div *ngIf="hasNonReturnableItems" class="checkout-info">
+          <p class="checkout-info__title">Napomena</p>
+          <autom-meta-pill
+            variant="warning"
+            size="md"
+            [label]="'Ne može povrat'"
+            [attr.title]="'Stavke označene kao non-returnable ne mogu se stornirati.'"
+            [ariaLabel]="'Ne može povrat'"
+          ></autom-meta-pill>
+        </div>
+
+        <div *ngIf="hasNonReturnableItems" class="free-shipping-info warning">
+          <autom-icon [source]="iconsEnum.INFO" class="info-icon"></autom-icon>
+          Stavke označene kao non-returnable ne mogu se stornirati.
+        </div>
+
         <autom-button
           class="autom-align__right order-btn"
           [type]="buttonTypes.PRIMARY"

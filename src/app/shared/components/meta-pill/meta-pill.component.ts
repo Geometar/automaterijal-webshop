@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { Params, RouterModule } from '@angular/router';
 
-type MetaPillVariant = 'neutral' | 'primary' | 'accent' | 'soft' | 'ghost';
+type MetaPillVariant = 'neutral' | 'primary' | 'accent' | 'soft' | 'ghost' | 'warning';
 type MetaPillSize = 'sm' | 'md' | 'lg';
 
 @Component({
