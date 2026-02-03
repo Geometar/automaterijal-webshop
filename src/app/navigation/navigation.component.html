@@ -348,22 +348,6 @@
     ></autom-icon>
     <span class="action-label">Dokumenta</span>
   </a>
-
-  <a
-    [hidden]="loggedIn"
-    class="action-btn"
-    routerLink="/login"
-    href="/login"
-    aria-label="Prijava"
-    [attr.aria-current]="currentUrl.includes('/login') ? 'page' : null"
-  >
-    <autom-icon
-      [ngClass]="currentUrl.includes('/login') ? 'icon-active' : null"
-      [color]="colorEnum.RICH_BLACK"
-      [source]="iconEnum.LOG_IN"
-    ></autom-icon>
-    <span class="action-label">Prijava</span>
-  </a>
 </div>
 
 <nav

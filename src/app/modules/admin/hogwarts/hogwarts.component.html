@@ -156,6 +156,203 @@
       </section>
 
       <section class="hogwarts-grid common-grid">
+        <article class="hogwarts-panel match-panel" *ngIf="dailyMatch as match">
+          <div class="panel-header">
+            <div>
+              <p class="panel-eyebrow">Pitch Report</p>
+              <h2>Daily Quidditch</h2>
+              <p class="panel-sub">One match, refreshed each day.</p>
+            </div>
+            <div class="panel-chip">
+              <autom-icon [source]="icons.FLAG"></autom-icon>
+              Match
+            </div>
+          </div>
+
+          <div class="match-scoreboard">
+            <div
+              class="match-team"
+              [class.winner]="match.home.score > match.away.score"
+              [style.--house-accent]="match.home.house.accent"
+            >
+              <div class="match-team-top">
+                <span class="match-house">{{ match.home.house.name }}</span>
+                <span class="match-mascot">{{ match.home.house.mascot }}</span>
+              </div>
+              <div class="match-score">{{ match.home.score }}</div>
+              <div class="match-meta">
+                <span>{{ match.home.goals }} goals</span>
+                <span class="match-seeker">Seeker: {{ match.home.seeker }}</span>
+                <span class="match-snitch" *ngIf="match.home.snitch">Snitch</span>
+              </div>
+            </div>
+            <div class="match-vs">VS</div>
+            <div
+              class="match-team"
+              [class.winner]="match.away.score > match.home.score"
+              [style.--house-accent]="match.away.house.accent"
+            >
+              <div class="match-team-top">
+                <span class="match-house">{{ match.away.house.name }}</span>
+                <span class="match-mascot">{{ match.away.house.mascot }}</span>
+              </div>
+              <div class="match-score">{{ match.away.score }}</div>
+              <div class="match-meta">
+                <span>{{ match.away.goals }} goals</span>
+                <span class="match-seeker">Seeker: {{ match.away.seeker }}</span>
+                <span class="match-snitch" *ngIf="match.away.snitch">Snitch</span>
+              </div>
+            </div>
+          </div>
+          <p class="match-summary">{{ match.summary }}</p>
+          <div class="match-stats">
+            <div class="match-stat">
+              <span>Total points</span>
+              <strong>{{ match.home.score + match.away.score }}</strong>
+            </div>
+            <div class="match-stat">
+              <span>Goal edge</span>
+              <strong>{{
+                match.home.goals > match.away.goals
+                  ? match.home.goals - match.away.goals
+                  : match.away.goals - match.home.goals
+              }}</strong>
+            </div>
+            <div class="match-stat">
+              <span>Snitch</span>
+              <strong>{{
+                match.home.snitch ? match.home.seeker : match.away.seeker
+              }}</strong>
+            </div>
+          </div>
+
+          <div class="match-lineups">
+            <div
+              class="lineup-team"
+              [style.--house-accent]="match.home.house.accent"
+            >
+              <div class="lineup-header">
+                <span class="lineup-house">{{ match.home.house.name }}</span>
+                <span class="lineup-label">Lineup</span>
+              </div>
+              <div class="lineup-role">
+                <span>Seeker</span>
+                <strong>{{ match.home.lineup.seeker }}</strong>
+              </div>
+              <div class="lineup-role">
+                <span>Keeper</span>
+                <strong>{{ match.home.lineup.keeper }}</strong>
+              </div>
+              <div class="lineup-role">
+                <span>Beaters</span>
+                <strong>{{ match.home.lineup.beaters.join(' & ') }}</strong>
+              </div>
+              <div class="lineup-role">
+                <span>Chasers</span>
+                <strong>{{ match.home.lineup.chasers.join(', ') }}</strong>
+              </div>
+              <div class="lineup-substitutes" *ngIf="match.home.substitutes.length">
+                <span>Substitutes</span>
+                <div class="lineup-chips">
+                  <span
+                    class="lineup-chip"
+                    *ngFor="let sub of match.home.substitutes"
+                    >{{ sub }}</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="lineup-team"
+              [style.--house-accent]="match.away.house.accent"
+            >
+              <div class="lineup-header">
+                <span class="lineup-house">{{ match.away.house.name }}</span>
+                <span class="lineup-label">Lineup</span>
+              </div>
+              <div class="lineup-role">
+                <span>Seeker</span>
+                <strong>{{ match.away.lineup.seeker }}</strong>
+              </div>
+              <div class="lineup-role">
+                <span>Keeper</span>
+                <strong>{{ match.away.lineup.keeper }}</strong>
+              </div>
+              <div class="lineup-role">
+                <span>Beaters</span>
+                <strong>{{ match.away.lineup.beaters.join(' & ') }}</strong>
+              </div>
+              <div class="lineup-role">
+                <span>Chasers</span>
+                <strong>{{ match.away.lineup.chasers.join(', ') }}</strong>
+              </div>
+              <div class="lineup-substitutes" *ngIf="match.away.substitutes.length">
+                <span>Substitutes</span>
+                <div class="lineup-chips">
+                  <span
+                    class="lineup-chip"
+                    *ngFor="let sub of match.away.substitutes"
+                    >{{ sub }}</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="match-bludgers">
+            <p class="stats-eyebrow">Bludger hits</p>
+            <div class="stats-list" *ngIf="dailyBludgerHits.length; else noHits">
+              <div class="stats-row" *ngFor="let hit of dailyBludgerHits">
+                <div class="stats-main">
+                  <p class="stats-title">{{ hit.by }}</p>
+                  <p class="stats-detail">{{ hit.detail }}</p>
+                </div>
+                <span class="stats-pill" [style.--house-accent]="hit.accent">{{
+                  hit.house
+                }}</span>
+              </div>
+            </div>
+            <ng-template #noHits>
+              <div class="stats-empty">No bludger reports today.</div>
+            </ng-template>
+          </div>
+        </article>
+
+        <article class="hogwarts-panel stats-panel">
+          <div class="panel-header">
+            <div>
+              <p class="panel-eyebrow">House Ledger</p>
+              <h2>Points & bludgers</h2>
+              <p class="panel-sub">Daily highlights from the castle.</p>
+            </div>
+            <div class="panel-chip subtle">
+              <autom-icon [source]="icons.AWARD"></autom-icon>
+              Ledger
+            </div>
+          </div>
+
+          <div class="stats-group">
+            <p class="stats-eyebrow">Points awarded</p>
+            <div class="stats-list" *ngIf="dailyPointAwards.length; else noPoints">
+              <div class="stats-row" *ngFor="let award of dailyPointAwards">
+                <div class="stats-main">
+                  <p class="stats-title">{{ award.by }}</p>
+                  <p class="stats-detail">{{ award.detail }}</p>
+                </div>
+                <span class="stats-pill" [style.--house-accent]="award.accent">{{
+                  award.house
+                }}</span>
+                <span class="stats-delta">+{{ award.points }}</span>
+              </div>
+            </div>
+            <ng-template #noPoints>
+              <div class="stats-empty">No points logged yet.</div>
+            </ng-template>
+          </div>
+
+        </article>
+
         <article class="hogwarts-panel ambience">
           <div class="panel-header">
             <div>
@@ -267,7 +464,7 @@
               <p class="panel-eyebrow">Daily Prophet</p>
               <h2>Stories & calm</h2>
               <p class="panel-sub">
-                Longform Hogwarts notes, rotating every 30 minutes.
+                Longform Hogwarts notes, refreshed daily.
               </p>
             </div>
             <div class="panel-chip subtle">
