@@ -7,6 +7,18 @@
 >
   <div
     class="provider-availability__row"
+    *ngIf="availability?.provider?.noReturnable && variant === 'details'"
+  >
+    <autom-meta-pill
+      variant="warning"
+      size="sm"
+      [label]="'Ne može povrat'"
+      [attr.title]="'Stavka je non-returnable i ne može se stornirati.'"
+      [ariaLabel]="'Ne može povrat'"
+    ></autom-meta-pill>
+  </div>
+  <div
+    class="provider-availability__row"
     *ngIf="availability?.provider?.deliveryLabel"
   >
     Isporuka: {{ availability?.provider?.deliveryLabel }}

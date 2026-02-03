@@ -513,6 +513,296 @@ export const HOGWARTS_STORIES: HogwartsStory[] = [
       'Some lessons do not give you a spell. They give you a different way to live in your day.',
     ],
   },
+  {
+    title: 'Clocktower Chimes',
+    body: [
+      'The clocktower does not shout. It speaks in soft chimes that roll through the courtyard like warm smoke.',
+      'Students learn to notice the gap between bells, the pause that tells you how fast the day is moving.',
+      'When the chimes echo at dusk, the castle feels like it is breathing out.',
+      'The tower is a steady heartbeat, a reminder that even a magical day is still measured.',
+      'If you listen closely, the chimes sound a little different in every season.',
+    ],
+  },
+  {
+    title: 'Greenhouse Morning',
+    body: [
+      'The greenhouses open early, before the sun has fully settled on the glass.',
+      'Herbs curl toward the light like sleepy hands, and the air smells like rain even when it is dry.',
+      'Professor Sprout moves among the pots with the calm confidence of someone who trusts roots.',
+      'Students learn that patience is a kind of magic, and plants reward the ones who do not rush.',
+      'By the end of class, your sleeves smell like earth and warmth.',
+    ],
+  },
+  {
+    title: 'Potion Steam',
+    body: [
+      'Potions class begins with silence, broken only by the scrape of cauldrons on stone.',
+      'Steam rises in ribbons, and each swirl feels like a secret you are allowed to witness.',
+      'The best brews are steady, not flashy. They ask for precision and respect.',
+      'A good potion smells honest: sharp herbs, metal, and the faint sweetness of success.',
+      'You leave with your mind sharper than your fingertips.',
+    ],
+  },
+  {
+    title: 'Prefect Rounds',
+    body: [
+      'Prefects walk the corridors like guardians of routine.',
+      'They know which doors creak and which shortcuts lead to nowhere.',
+      'Sometimes they let a small rule bend, when kindness matters more than perfection.',
+      'The castle trusts them with its late-night quiet.',
+      'In their footsteps, the hallways settle.',
+    ],
+  },
+  {
+    title: 'Hogsmeade Letters',
+    body: [
+      'Letters home from Hogsmeade smell faintly like butterbeer.',
+      'Students tuck receipts between pages like proof that the day really happened.',
+      'The village is loud and bright, but the letters are soft, full of small details.',
+      'They write about snow, about warmth, about how the castle looked in the distance.',
+      'Every letter feels like a pocket of light carried back.',
+    ],
+  },
+  {
+    title: 'Portrait Gossip',
+    body: [
+      'Portraits know more than they let on.',
+      'They trade stories in low voices, gossiping like a second set of teachers.',
+      'If you pause long enough, you can catch a hint about a hidden stair or a friendly ghost.',
+      'The portraits are old, but their curiosity is fresh.',
+      'They remind you that history is still listening.',
+    ],
+  },
+  {
+    title: 'Corridor Whispers',
+    body: [
+      'Some corridors hum with whispers even when no one is there.',
+      'It is just the castle settling, the old stone shifting its weight.',
+      'Students learn to walk softly, to be guests in a house that moves.',
+      'The hush becomes a teacher: pay attention, and the path appears.',
+      'Silence is never empty in Hogwarts.',
+    ],
+  },
+  {
+    title: 'Great Hall Echoes',
+    body: [
+      'After a feast, the Great Hall is a room of fading echoes.',
+      'You can almost hear the last laugh bouncing off the rafters.',
+      'The candles burn lower, and the tables seem to exhale.',
+      'It is a space that remembers joy even after the plates are gone.',
+      'The next morning, it wakes up ready to do it all again.',
+    ],
+  },
+  {
+    title: 'Duelling Club',
+    body: [
+      'Duelling club is less about winning and more about rhythm.',
+      'You learn to read a stance, to breathe before you speak.',
+      'Spells snap through the air like quick questions.',
+      'A good duel ends with respect and a clear lesson learned.',
+      'The club teaches courage without swagger.',
+    ],
+  },
+  {
+    title: 'Herbology Bench',
+    body: [
+      'At the long herbology bench, everyone finds their own pace.',
+      'Some students hum, some count, some whisper to their plants.',
+      'The soil is dark and forgiving, ready for another try.',
+      'Plants do not care about rank; they care about care.',
+      'That is the quiet lesson of the bench.',
+    ],
+  },
+  {
+    title: 'Astronomy Tower',
+    body: [
+      'The Astronomy Tower is a place for quiet bravery.',
+      'You climb high, and the air gets thinner and calmer.',
+      'Stars feel close enough to touch, and homework becomes a kind of prayer.',
+      'The castle below looks small and kind.',
+      'You go back down with a wider breath.',
+    ],
+  },
+  {
+    title: 'Boathouse Lights',
+    body: [
+      'At night the boathouse windows glow like lanterns.',
+      'The lake holds the light and smooths it into long streaks.',
+      'Students gather there when they need to think without being seen.',
+      'Water keeps secrets better than stone.',
+      'The boathouse is where whispers go to rest.',
+    ],
+  },
+  {
+    title: 'Transfiguration Notes',
+    body: [
+      'Transfiguration is a discipline of patience.',
+      'You cannot force a feather into a quill; you persuade it.',
+      'The notes are full of tiny corrections, the kind that matter.',
+      'When it works, the room feels briefly still.',
+      'Every success is a small, precise miracle.',
+    ],
+  },
+  {
+    title: "Keeper's Patience",
+    body: [
+      'Keepers learn to trust the moment between passes.',
+      'They see the whole pitch as a moving pattern.',
+      'Patience is a kind of reflex: wait, then move without doubt.',
+      'A calm keeper makes the whole team feel steady.',
+      'That steadiness wins more games than shouting ever could.',
+    ],
+  },
+  {
+    title: "Seeker's Focus",
+    body: [
+      'Seekers spend most of the match waiting.',
+      'They watch the wind, the sun, and the small flashes of movement.',
+      'Focus is a quiet muscle, strengthened by silence.',
+      'When the Snitch appears, all that waiting becomes flight.',
+      'It is a discipline dressed as luck.',
+    ],
+  },
+  {
+    title: 'Common Room Rain',
+    body: [
+      'When it rains, the common rooms smell like damp stone and firewood.',
+      'Windows fog with breath and soft laughter.',
+      'Students curl up with books that are as warm as blankets.',
+      'The storm outside makes the room feel even safer.',
+      'Rain teaches the castle to slow down.',
+    ],
+  },
+  {
+    title: 'Butterbeer Break',
+    body: [
+      'Butterbeer breaks are small celebrations.',
+      'A mug in your hands makes winter feel shorter.',
+      'Friends share stories that grow taller with each sip.',
+      'The sweetness is gentle, like a reward for simply making it through the week.',
+      'You return to the castle with lighter steps.',
+    ],
+  },
+  {
+    title: 'Charms Practice',
+    body: [
+      'Charms class is a chorus of whispered words.',
+      'Some spells land perfectly, others wobble like uncertain notes.',
+      'Professor Flitwick celebrates the effort as much as the result.',
+      'Practice turns mistakes into muscle memory.',
+      'Charmwork is confidence built slowly.',
+    ],
+  },
+  {
+    title: 'Defense Drill',
+    body: [
+      'Defense drills are loud, fast, and honest.',
+      'You learn which instincts are yours and which ones need training.',
+      'A shield charm is a promise to yourself: you are ready.',
+      'Every drill ends with a breath and a grin.',
+      'Preparedness becomes a habit.',
+    ],
+  },
+  {
+    title: 'Owl Post Delay',
+    body: [
+      'Sometimes the owls are late, and the whole hall looks up at every wing.',
+      'Waiting for a letter is a quiet kind of courage.',
+      'Students pretend not to care, then light up when the parcel arrives.',
+      'The delay makes the message feel heavier.',
+      'At Hogwarts, patience is always part of the mail.',
+    ],
+  },
+  {
+    title: 'Fireplace Stories',
+    body: [
+      'Stories by the fireplace take their time.',
+      'Each teller adds a small flourish, a detail no one can verify.',
+      'The fire pops like applause at the best parts.',
+      'Even the quiet students lean in closer.',
+      'The fire remembers every tale.',
+    ],
+  },
+  {
+    title: 'Lantern Walk',
+    body: [
+      'Lantern walks are for late study nights.',
+      'The light pools on the floor in soft circles.',
+      'Friends walk shoulder to shoulder, sharing tired smiles.',
+      'The castle feels gentler in lantern light.',
+      'You arrive at the dorm with your thoughts neatly folded.',
+    ],
+  },
+  {
+    title: 'Castle Laundry',
+    body: [
+      'The laundry is a hidden chorus of suds and steam.',
+      'House-elves keep it moving with quiet pride.',
+      'Warmth hangs in the air, along with the smell of clean linen.',
+      'It is the kind of magic that keeps life soft at the edges.',
+      'You leave grateful for unseen work.',
+    ],
+  },
+  {
+    title: 'Feast of Friday',
+    body: [
+      'Friday feasts feel like a collective sigh.',
+      'Assignments fade for a few hours, replaced by laughter and full plates.',
+      'The house tables glow with relief and conversation.',
+      'Even the professors seem a little lighter.',
+      'The weekend begins with bread and cheers.',
+    ],
+  },
+  {
+    title: 'Hallway Detour',
+    body: [
+      'A hallway detour can feel like a mistake until it becomes a story.',
+      'You find a window you never noticed, a statue with a grin.',
+      'The castle rewards curiosity with small surprises.',
+      'Sometimes the wrong path is just a slower right one.',
+      'You arrive late, but you arrive with a memory.',
+    ],
+  },
+  {
+    title: 'Ravenclaw Riddles',
+    body: [
+      'Ravenclaw riddles are kind and stubborn at once.',
+      'They do not want you to fail; they want you to think longer.',
+      'A good answer is elegant, like a spell cast with minimal motion.',
+      'The door opens with a quiet click, as if satisfied.',
+      'Wit is a key, not a show.',
+    ],
+  },
+  {
+    title: 'Hufflepuff Hearth',
+    body: [
+      'The Hufflepuff hearth smells like honey and tea.',
+      'Friends gather close, not because they have to but because it feels right.',
+      'Laughter comes softly, like a blanket being unfolded.',
+      'The room is a promise that effort is seen and shared.',
+      'Warmth is the house language.',
+    ],
+  },
+  {
+    title: 'Slytherin Strategy',
+    body: [
+      'Slytherin strategy is calm and deliberate.',
+      'Plans are written like chess moves, each one a quiet test.',
+      'Ambition here means focus, not noise.',
+      'They celebrate the win, then already plan the next.',
+      'The house respects precision.',
+    ],
+  },
+  {
+    title: 'Gryffindor Dares',
+    body: [
+      'Gryffindor dares begin as jokes and end as stories.',
+      'Courage shows up in small moments as often as big ones.',
+      'Someone says yes first, and everyone else follows.',
+      'The laughter after is its own kind of reward.',
+      'Bravery is contagious.',
+    ],
+  },
 ];
 
 export const HOGWARTS_LETTERS: HogwartsLetter[] = [

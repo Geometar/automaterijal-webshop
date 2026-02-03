@@ -8,14 +8,50 @@
   </div>
   <div class="secret-sigil" aria-hidden="true">
     <svg viewBox="0 0 160 160" role="presentation">
-      <circle cx="80" cy="80" r="62" fill="none" stroke="currentColor" stroke-width="2.2"/>
-      <circle cx="80" cy="80" r="46" fill="none" stroke="currentColor" stroke-width="1.4" stroke-dasharray="6 6"/>
-      <path d="M80 18v24M80 118v24M18 80h24M118 80h24" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-      <path d="M54 80l26-34 26 34-26 34Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-      <path d="M80 58l10 10-10 34-10-34Z" fill="currentColor" opacity="0.25"/>
-      <circle cx="80" cy="80" r="4" fill="currentColor"/>
-      <path d="M30 52c8-6 16-9 25-10M105 42c9 1 17 4 25 10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-      <path d="M30 108c8 6 16 9 25 10M105 118c9-1 17-4 25-10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      <circle
+        cx="80"
+        cy="80"
+        r="62"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.2"
+      />
+      <circle
+        cx="80"
+        cy="80"
+        r="46"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.4"
+        stroke-dasharray="6 6"
+      />
+      <path
+        d="M80 18v24M80 118v24M18 80h24M118 80h24"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+      />
+      <path
+        d="M54 80l26-34 26 34-26 34Z"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linejoin="round"
+      />
+      <path d="M80 58l10 10-10 34-10-34Z" fill="currentColor" opacity="0.25" />
+      <circle cx="80" cy="80" r="4" fill="currentColor" />
+      <path
+        d="M30 52c8-6 16-9 25-10M105 42c9 1 17 4 25 10"
+        stroke="currentColor"
+        stroke-width="1.4"
+        stroke-linecap="round"
+      />
+      <path
+        d="M30 108c8 6 16 9 25 10M105 118c9-1 17-4 25-10"
+        stroke="currentColor"
+        stroke-width="1.4"
+        stroke-linecap="round"
+      />
     </svg>
   </div>
 
@@ -29,12 +65,13 @@
           <p class="eyebrow">Super Admin Sanctum</p>
           <h1>Hogwarts Chamber</h1>
           <p class="lede">
-            Your private watchtower - a calm, warm, and magical view of the ERP heartbeat.
+            Your private watchtower - a calm, warm, and magical view of the ERP
+            heartbeat.
           </p>
           <div class="hero-meta">
             <span class="meta-pill">
               <autom-icon [source]="icons.CLOCK"></autom-icon>
-              {{ today | date:'dd.MM.yyyy' }}
+              {{ today | date: "dd.MM.yyyy" }}
             </span>
             <span class="meta-pill">
               <autom-icon [source]="icons.LOCK"></autom-icon>
@@ -49,9 +86,28 @@
       </div>
       <div class="sigil" aria-hidden="true">
         <svg viewBox="0 0 64 64">
-          <path d="M32 4 12 14v18c0 12 9 22 20 28 11-6 20-16 20-28V14Z" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
-          <path d="M22 30l5 6 15-14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M32 18v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path
+            d="M32 4 12 14v18c0 12 9 22 20 28 11-6 20-16 20-28V14Z"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M22 30l5 6 15-14"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M32 18v8"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
         </svg>
       </div>
     </header>
@@ -82,7 +138,11 @@
           <h2>Mood of the day</h2>
         </div>
         <div class="house-grid">
-          <article class="house-card" *ngFor="let house of housePoints" [style.--house-accent]="house.accent">
+          <article
+            class="house-card"
+            *ngFor="let house of housePoints"
+            [style.--house-accent]="house.accent"
+          >
             <div class="house-top">
               <span class="house-name">{{ house.name }}</span>
               <span class="house-mascot">{{ house.mascot }}</span>
@@ -96,6 +156,203 @@
       </section>
 
       <section class="hogwarts-grid common-grid">
+        <article class="hogwarts-panel match-panel" *ngIf="dailyMatch as match">
+          <div class="panel-header">
+            <div>
+              <p class="panel-eyebrow">Pitch Report</p>
+              <h2>Daily Quidditch</h2>
+              <p class="panel-sub">One match, refreshed each day.</p>
+            </div>
+            <div class="panel-chip">
+              <autom-icon [source]="icons.FLAG"></autom-icon>
+              Match
+            </div>
+          </div>
+
+          <div class="match-scoreboard">
+            <div
+              class="match-team"
+              [class.winner]="match.home.score > match.away.score"
+              [style.--house-accent]="match.home.house.accent"
+            >
+              <div class="match-team-top">
+                <span class="match-house">{{ match.home.house.name }}</span>
+                <span class="match-mascot">{{ match.home.house.mascot }}</span>
+              </div>
+              <div class="match-score">{{ match.home.score }}</div>
+              <div class="match-meta">
+                <span>{{ match.home.goals }} goals</span>
+                <span class="match-seeker">Seeker: {{ match.home.seeker }}</span>
+                <span class="match-snitch" *ngIf="match.home.snitch">Snitch</span>
+              </div>
+            </div>
+            <div class="match-vs">VS</div>
+            <div
+              class="match-team"
+              [class.winner]="match.away.score > match.home.score"
+              [style.--house-accent]="match.away.house.accent"
+            >
+              <div class="match-team-top">
+                <span class="match-house">{{ match.away.house.name }}</span>
+                <span class="match-mascot">{{ match.away.house.mascot }}</span>
+              </div>
+              <div class="match-score">{{ match.away.score }}</div>
+              <div class="match-meta">
+                <span>{{ match.away.goals }} goals</span>
+                <span class="match-seeker">Seeker: {{ match.away.seeker }}</span>
+                <span class="match-snitch" *ngIf="match.away.snitch">Snitch</span>
+              </div>
+            </div>
+          </div>
+          <p class="match-summary">{{ match.summary }}</p>
+          <div class="match-stats">
+            <div class="match-stat">
+              <span>Total points</span>
+              <strong>{{ match.home.score + match.away.score }}</strong>
+            </div>
+            <div class="match-stat">
+              <span>Goal edge</span>
+              <strong>{{
+                match.home.goals > match.away.goals
+                  ? match.home.goals - match.away.goals
+                  : match.away.goals - match.home.goals
+              }}</strong>
+            </div>
+            <div class="match-stat">
+              <span>Snitch</span>
+              <strong>{{
+                match.home.snitch ? match.home.seeker : match.away.seeker
+              }}</strong>
+            </div>
+          </div>
+
+          <div class="match-lineups">
+            <div
+              class="lineup-team"
+              [style.--house-accent]="match.home.house.accent"
+            >
+              <div class="lineup-header">
+                <span class="lineup-house">{{ match.home.house.name }}</span>
+                <span class="lineup-label">Lineup</span>
+              </div>
+              <div class="lineup-role">
+                <span>Seeker</span>
+                <strong>{{ match.home.lineup.seeker }}</strong>
+              </div>
+              <div class="lineup-role">
+                <span>Keeper</span>
+                <strong>{{ match.home.lineup.keeper }}</strong>
+              </div>
+              <div class="lineup-role">
+                <span>Beaters</span>
+                <strong>{{ match.home.lineup.beaters.join(' & ') }}</strong>
+              </div>
+              <div class="lineup-role">
+                <span>Chasers</span>
+                <strong>{{ match.home.lineup.chasers.join(', ') }}</strong>
+              </div>
+              <div class="lineup-substitutes" *ngIf="match.home.substitutes.length">
+                <span>Substitutes</span>
+                <div class="lineup-chips">
+                  <span
+                    class="lineup-chip"
+                    *ngFor="let sub of match.home.substitutes"
+                    >{{ sub }}</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="lineup-team"
+              [style.--house-accent]="match.away.house.accent"
+            >
+              <div class="lineup-header">
+                <span class="lineup-house">{{ match.away.house.name }}</span>
+                <span class="lineup-label">Lineup</span>
+              </div>
+              <div class="lineup-role">
+                <span>Seeker</span>
+                <strong>{{ match.away.lineup.seeker }}</strong>
+              </div>
+              <div class="lineup-role">
+                <span>Keeper</span>
+                <strong>{{ match.away.lineup.keeper }}</strong>
+              </div>
+              <div class="lineup-role">
+                <span>Beaters</span>
+                <strong>{{ match.away.lineup.beaters.join(' & ') }}</strong>
+              </div>
+              <div class="lineup-role">
+                <span>Chasers</span>
+                <strong>{{ match.away.lineup.chasers.join(', ') }}</strong>
+              </div>
+              <div class="lineup-substitutes" *ngIf="match.away.substitutes.length">
+                <span>Substitutes</span>
+                <div class="lineup-chips">
+                  <span
+                    class="lineup-chip"
+                    *ngFor="let sub of match.away.substitutes"
+                    >{{ sub }}</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="match-bludgers">
+            <p class="stats-eyebrow">Bludger hits</p>
+            <div class="stats-list" *ngIf="dailyBludgerHits.length; else noHits">
+              <div class="stats-row" *ngFor="let hit of dailyBludgerHits">
+                <div class="stats-main">
+                  <p class="stats-title">{{ hit.by }}</p>
+                  <p class="stats-detail">{{ hit.detail }}</p>
+                </div>
+                <span class="stats-pill" [style.--house-accent]="hit.accent">{{
+                  hit.house
+                }}</span>
+              </div>
+            </div>
+            <ng-template #noHits>
+              <div class="stats-empty">No bludger reports today.</div>
+            </ng-template>
+          </div>
+        </article>
+
+        <article class="hogwarts-panel stats-panel">
+          <div class="panel-header">
+            <div>
+              <p class="panel-eyebrow">House Ledger</p>
+              <h2>Points & bludgers</h2>
+              <p class="panel-sub">Daily highlights from the castle.</p>
+            </div>
+            <div class="panel-chip subtle">
+              <autom-icon [source]="icons.AWARD"></autom-icon>
+              Ledger
+            </div>
+          </div>
+
+          <div class="stats-group">
+            <p class="stats-eyebrow">Points awarded</p>
+            <div class="stats-list" *ngIf="dailyPointAwards.length; else noPoints">
+              <div class="stats-row" *ngFor="let award of dailyPointAwards">
+                <div class="stats-main">
+                  <p class="stats-title">{{ award.by }}</p>
+                  <p class="stats-detail">{{ award.detail }}</p>
+                </div>
+                <span class="stats-pill" [style.--house-accent]="award.accent">{{
+                  award.house
+                }}</span>
+                <span class="stats-delta">+{{ award.points }}</span>
+              </div>
+            </div>
+            <ng-template #noPoints>
+              <div class="stats-empty">No points logged yet.</div>
+            </ng-template>
+          </div>
+
+        </article>
+
         <article class="hogwarts-panel ambience">
           <div class="panel-header">
             <div>
@@ -113,15 +370,41 @@
             <div class="ambience-group">
               <span class="ambience-label">Candle glow</span>
               <div class="toggle-group">
-                <button class="toggle" type="button" (click)="setGlow('low')" [class.is-active]="glowLevel === 'low'">Low</button>
-                <button class="toggle" type="button" (click)="setGlow('medium')" [class.is-active]="glowLevel === 'medium'">Medium</button>
-                <button class="toggle" type="button" (click)="setGlow('high')" [class.is-active]="glowLevel === 'high'">High</button>
+                <button
+                  class="toggle"
+                  type="button"
+                  (click)="setGlow('low')"
+                  [class.is-active]="glowLevel === 'low'"
+                >
+                  Low
+                </button>
+                <button
+                  class="toggle"
+                  type="button"
+                  (click)="setGlow('medium')"
+                  [class.is-active]="glowLevel === 'medium'"
+                >
+                  Medium
+                </button>
+                <button
+                  class="toggle"
+                  type="button"
+                  (click)="setGlow('high')"
+                  [class.is-active]="glowLevel === 'high'"
+                >
+                  High
+                </button>
               </div>
             </div>
             <div class="ambience-group">
               <span class="ambience-label">Window rain</span>
-              <button class="toggle wide" type="button" (click)="toggleRain()" [class.is-active]="rainEnabled">
-                {{ rainEnabled ? 'On' : 'Off' }}
+              <button
+                class="toggle wide"
+                type="button"
+                (click)="toggleRain()"
+                [class.is-active]="rainEnabled"
+              >
+                {{ rainEnabled ? "On" : "Off" }}
               </button>
             </div>
           </div>
@@ -132,7 +415,9 @@
             <div>
               <p class="panel-eyebrow">Owl Post</p>
               <h2>Letters from the castle</h2>
-              <p class="panel-sub">Long letters, slow reading. Rotates every hour.</p>
+              <p class="panel-sub">
+                Long letters, slow reading. Rotates every hour.
+              </p>
             </div>
             <div class="panel-chip subtle">
               <autom-icon [source]="icons.MAIL"></autom-icon>
@@ -143,16 +428,26 @@
             <p class="letter-title">{{ activeLetter.title }}</p>
             <p class="letter-from">From {{ activeLetter.from }}</p>
             <div class="letter-preview">
-              <ng-container *ngFor="let paragraph of activeLetter.body; let i = index">
+              <ng-container
+                *ngFor="let paragraph of activeLetter.body; let i = index"
+              >
                 <p class="letter-body" *ngIf="i < 3">{{ paragraph }}</p>
               </ng-container>
             </div>
             <div class="letter-actions">
-              <button class="hogwarts-btn ghost small" type="button" (click)="openLetterNook()">
+              <button
+                class="hogwarts-btn ghost small"
+                type="button"
+                (click)="openLetterNook()"
+              >
                 <autom-icon [source]="icons.BOOK_OPEN"></autom-icon>
                 Read in nook
               </button>
-              <button class="hogwarts-btn ghost small" type="button" (click)="nextLetter()">
+              <button
+                class="hogwarts-btn ghost small"
+                type="button"
+                (click)="nextLetter()"
+              >
                 <autom-icon [source]="icons.REFRESH_CW"></autom-icon>
                 Next letter
               </button>
@@ -168,7 +463,9 @@
             <div>
               <p class="panel-eyebrow">Daily Prophet</p>
               <h2>Stories & calm</h2>
-              <p class="panel-sub">Longform Hogwarts notes, rotating every 30 minutes.</p>
+              <p class="panel-sub">
+                Longform Hogwarts notes, refreshed daily.
+              </p>
             </div>
             <div class="panel-chip subtle">
               <autom-icon [source]="icons.BOOK_OPEN"></autom-icon>
@@ -178,16 +475,27 @@
           <div class="trivia-card">
             <p class="trivia-title">{{ activeTrivia.title }}</p>
             <div class="trivia-story">
-              <p class="trivia-body" *ngFor="let paragraph of activeTrivia.body">
+              <p
+                class="trivia-body"
+                *ngFor="let paragraph of activeTrivia.body"
+              >
                 {{ paragraph }}
               </p>
             </div>
             <div class="trivia-actions">
-              <button class="hogwarts-btn ghost small" type="button" (click)="openStoryNook()">
+              <button
+                class="hogwarts-btn ghost small"
+                type="button"
+                (click)="openStoryNook()"
+              >
                 <autom-icon [source]="icons.BOOK_OPEN"></autom-icon>
                 Read in nook
               </button>
-              <button class="hogwarts-btn ghost small" type="button" (click)="nextTrivia()">
+              <button
+                class="hogwarts-btn ghost small"
+                type="button"
+                (click)="nextTrivia()"
+              >
                 <autom-icon [source]="icons.REFRESH_CW"></autom-icon>
                 Next story
               </button>
@@ -200,7 +508,9 @@
             <div>
               <p class="panel-eyebrow">Common Room Library</p>
               <h2>School notes</h2>
-              <p class="panel-sub">Rotates every 30 minutes. One lesson at a time.</p>
+              <p class="panel-sub">
+                Rotates every 30 minutes. One lesson at a time.
+              </p>
             </div>
             <div class="panel-chip subtle">
               <autom-icon [source]="icons.BOOK"></autom-icon>
@@ -209,7 +519,9 @@
           </div>
           <article class="library-card" *ngIf="activeLesson; else noLesson">
             <div class="library-header">
-              <span class="library-tag" *ngIf="activeLesson.tag">{{ activeLesson.tag }}</span>
+              <span class="library-tag" *ngIf="activeLesson.tag">{{
+                activeLesson.tag
+              }}</span>
               <h3>{{ activeLesson.title }}</h3>
               <p class="library-sub">{{ activeLesson.subtitle }}</p>
             </div>
@@ -217,11 +529,19 @@
               <p *ngFor="let paragraph of activeLesson.body">{{ paragraph }}</p>
             </div>
             <div class="library-actions">
-              <button class="hogwarts-btn ghost small" type="button" (click)="openLessonNook()">
+              <button
+                class="hogwarts-btn ghost small"
+                type="button"
+                (click)="openLessonNook()"
+              >
                 <autom-icon [source]="icons.BOOK_OPEN"></autom-icon>
                 Read in nook
               </button>
-              <button class="hogwarts-btn ghost small" type="button" (click)="nextLesson()">
+              <button
+                class="hogwarts-btn ghost small"
+                type="button"
+                (click)="nextLesson()"
+              >
                 <autom-icon [source]="icons.REFRESH_CW"></autom-icon>
                 Next lesson
               </button>
@@ -237,7 +557,9 @@
             <div>
               <p class="panel-eyebrow">Professor of Commerce</p>
               <h2>Selling, but gentle</h2>
-              <p class="panel-sub">One practical lesson per day, for calm confidence.</p>
+              <p class="panel-sub">
+                One practical lesson per day, for calm confidence.
+              </p>
             </div>
             <div class="panel-chip subtle">
               <autom-icon [source]="icons.PEN_TOOL"></autom-icon>
@@ -245,27 +567,45 @@
             </div>
           </div>
 
-          <div class="letter-card" *ngIf="activeCommerceLesson; else noCommerceLesson">
+          <div
+            class="letter-card"
+            *ngIf="activeCommerceLesson; else noCommerceLesson"
+          >
             <p class="letter-title">{{ activeCommerceLesson.title }}</p>
             <p class="letter-from">{{ activeCommerceLesson.subtitle }}</p>
             <div class="letter-preview">
-              <ng-container *ngFor="let paragraph of activeCommerceLesson.body; let i = index">
+              <ng-container
+                *ngFor="
+                  let paragraph of activeCommerceLesson.body;
+                  let i = index
+                "
+              >
                 <p class="letter-body" *ngIf="i < 3">{{ paragraph }}</p>
               </ng-container>
             </div>
             <div class="letter-actions">
-              <button class="hogwarts-btn ghost small" type="button" (click)="openCommerceNook()">
+              <button
+                class="hogwarts-btn ghost small"
+                type="button"
+                (click)="openCommerceNook()"
+              >
                 <autom-icon [source]="icons.BOOK_OPEN"></autom-icon>
                 Read in nook
               </button>
-              <button class="hogwarts-btn ghost small" type="button" (click)="nextCommerceLesson()">
+              <button
+                class="hogwarts-btn ghost small"
+                type="button"
+                (click)="nextCommerceLesson()"
+              >
                 <autom-icon [source]="icons.REFRESH_CW"></autom-icon>
                 Next lesson
               </button>
             </div>
           </div>
           <ng-template #noCommerceLesson>
-            <div class="letter-empty">No commerce lessons available right now.</div>
+            <div class="letter-empty">
+              No commerce lessons available right now.
+            </div>
           </ng-template>
         </article>
       </section>
@@ -273,350 +613,797 @@
 
     <ng-container *ngIf="activeTab === 'watchtower'">
       <section class="hogwarts-grid watchtower-grid">
-      <article class="hogwarts-panel wide">
-        <div class="panel-header">
-          <div>
-            <p class="panel-eyebrow">Owl Post Alerts</p>
-            <h2>ERP pickup + processing</h2>
-            <p class="panel-sub">Most critical signals: NOT_TAKEN_FOR_PROCESSING and PROCESSING_IN_PROGRESS.</p>
-          </div>
-          <div class="panel-chip">
-            <autom-icon [source]="icons.BELL"></autom-icon>
-            Active alerts
-          </div>
-        </div>
-        <div class="panel-note" *ngIf="overviewLoading">Refreshing signals...</div>
-        <div class="panel-note error" *ngIf="overviewError">{{ overviewError }}</div>
-
-        <div class="status-grid">
-          <article class="status-card" *ngFor="let card of statusCards" [ngClass]="card.severity">
-            <div class="status-top">
-              <div class="status-icon">
-                <autom-icon [source]="card.icon"></autom-icon>
-              </div>
-              <div>
-                <p class="status-eyebrow">{{ card.key }}</p>
-                <h3>{{ card.title }}</h3>
-                <p class="status-sub">{{ card.description }}</p>
-              </div>
-              <span class="status-badge" [ngClass]="card.severity">{{ card.badge }}</span>
+        <article class="hogwarts-panel wide">
+          <div class="panel-header">
+            <div>
+              <p class="panel-eyebrow">Owl Post Alerts</p>
+              <h2>ERP pickup + processing</h2>
+              <p class="panel-sub">
+                Most critical signals: NOT_TAKEN_FOR_PROCESSING and
+                PROCESSING_IN_PROGRESS.
+              </p>
             </div>
-            <div class="status-metrics">
-              <div class="metric">
-                <span class="metric-label">Count</span>
-                <span class="metric-value">{{ card.count }}</span>
-              </div>
-              <div class="metric">
-                <span class="metric-label">Oldest</span>
-                <span class="metric-value">{{ card.oldestLabel }}</span>
-              </div>
-              <div class="metric">
-                <span class="metric-label">p95</span>
-                <span class="metric-value">{{ card.p95Label }}</span>
-              </div>
-              <div class="metric">
-                <span class="metric-label">Updated {{ card.windowMinutes }}m</span>
-                <span class="metric-value">
-                  {{ card.updatedLastWindow !== null ? card.updatedLastWindow : '--' }}
-                </span>
-              </div>
+            <div class="panel-chip">
+              <autom-icon [source]="icons.BELL"></autom-icon>
+              Active alerts
             </div>
-            <div class="status-foot">
-              <autom-icon [source]="icons.ACTIVITY"></autom-icon>
-              <span>{{ card.trend }}</span>
+          </div>
+          <div class="panel-note" *ngIf="overviewLoading">
+            Refreshing signals...
+          </div>
+          <div class="panel-note error" *ngIf="overviewError">
+            {{ overviewError }}
+          </div>
+
+          <div class="status-grid">
+            <article
+              class="status-card"
+              *ngFor="let card of statusCards"
+              [ngClass]="card.severity"
+            >
+              <div class="status-top">
+                <div class="status-icon">
+                  <autom-icon [source]="card.icon"></autom-icon>
+                </div>
+                <div>
+                  <p class="status-eyebrow">{{ card.key }}</p>
+                  <h3>{{ card.title }}</h3>
+                  <p class="status-sub">{{ card.description }}</p>
+                </div>
+                <span class="status-badge" [ngClass]="card.severity">{{
+                  card.badge
+                }}</span>
+              </div>
+              <div class="status-metrics">
+                <div class="metric">
+                  <span class="metric-label">Count</span>
+                  <span class="metric-value">{{ card.count }}</span>
+                </div>
+                <div class="metric">
+                  <span class="metric-label">Oldest</span>
+                  <span class="metric-value">{{ card.oldestLabel }}</span>
+                </div>
+                <div class="metric">
+                  <span class="metric-label">p95</span>
+                  <span class="metric-value">{{ card.p95Label }}</span>
+                </div>
+                <div class="metric">
+                  <span class="metric-label"
+                    >Updated {{ card.windowMinutes }}m</span
+                  >
+                  <span class="metric-value">
+                    {{
+                      card.updatedLastWindow !== null
+                        ? card.updatedLastWindow
+                        : "--"
+                    }}
+                  </span>
+                </div>
+              </div>
+              <div class="status-foot">
+                <autom-icon [source]="icons.ACTIVITY"></autom-icon>
+                <span>{{ card.trend }}</span>
+              </div>
+            </article>
+          </div>
+        </article>
+
+        <article class="hogwarts-panel">
+          <div class="panel-header">
+            <div>
+              <p class="panel-eyebrow">Marauder's Map</p>
+              <h2>Oldest stuck orders</h2>
+              <p class="panel-sub">Quick look at orders that have stalled.</p>
             </div>
-          </article>
-        </div>
-      </article>
-
-      <article class="hogwarts-panel">
-        <div class="panel-header">
-          <div>
-            <p class="panel-eyebrow">Marauder's Map</p>
-            <h2>Oldest stuck orders</h2>
-            <p class="panel-sub">Quick look at orders that have stalled.</p>
-          </div>
-          <div class="panel-chip subtle">
-            <autom-icon [source]="icons.MAP"></autom-icon>
-            Stuck list
-          </div>
-        </div>
-
-        <div class="stuck-list" *ngIf="stuckOrders.length; else stuckEmpty">
-          <div class="stuck-row stuck-header">
-            <span>ID</span>
-            <span>Status</span>
-            <span>Age</span>
-            <span>Last update</span>
-            <span>Customer</span>
-            <span>Amount</span>
-          </div>
-          <div class="stuck-row" *ngFor="let order of stuckOrders">
-            <span class="stuck-id">{{ order.id }}</span>
-            <span class="stuck-status">{{ order.status }}</span>
-            <span>{{ order.ageLabel }}</span>
-            <span>{{ order.updatedAt }}</span>
-            <span>{{ order.customer }}</span>
-            <span>{{ order.total }}</span>
-          </div>
-        </div>
-        <ng-template #stuckEmpty>
-          <div class="stuck-empty">No stuck orders right now.</div>
-        </ng-template>
-      </article>
-
-      <article class="hogwarts-panel">
-        <div class="panel-header">
-          <div>
-            <p class="panel-eyebrow">Provider Wing</p>
-            <h2>Integrations</h2>
-            <p class="panel-sub">Provider health, error rate, and backlog.</p>
-          </div>
-          <div class="panel-chip subtle">
-            <autom-icon [source]="icons.CLOUD"></autom-icon>
-            Live
-          </div>
-        </div>
-
-        <div class="provider-grid">
-          <article class="provider-card" *ngFor="let provider of providers" [ngClass]="provider.severity">
-            <div class="provider-top">
-              <div>
-                <p class="provider-name">{{ provider.name }}</p>
-                <p class="provider-status">{{ provider.status }}</p>
-              </div>
-              <span class="provider-badge" [ngClass]="provider.severity">{{ provider.severity }}</span>
+            <div class="panel-chip subtle">
+              <autom-icon [source]="icons.MAP"></autom-icon>
+              Stuck list
             </div>
-            <div class="provider-metrics">
-              <div>
-                <span>Last order</span>
-                <strong>{{ provider.lastOrder }}</strong>
-              </div>
-              <div>
-                <span>Orders 10d</span>
-                <strong>{{ provider.ordersLast10d }}</strong>
-              </div>
-              <div>
-                <span>Backorders 10d</span>
-                <strong>{{ provider.backorderCount }}</strong>
-              </div>
-              <div>
-                <span>Messages 10d</span>
-                <strong>{{ provider.messageCount }}</strong>
-              </div>
+          </div>
+
+          <div class="stuck-list" *ngIf="stuckOrders.length; else stuckEmpty">
+            <div class="stuck-row stuck-header">
+              <span>ID</span>
+              <span>Status</span>
+              <span>Age</span>
+              <span>Last update</span>
+              <span>Customer</span>
+              <span>Amount</span>
             </div>
-            <div class="provider-error">
-              <autom-icon [source]="provider.alertIcon"></autom-icon>
-              <span>{{ provider.alertLabel }}</span>
+            <div class="stuck-row" *ngFor="let order of stuckOrders">
+              <span class="stuck-id">{{ order.id }}</span>
+              <span class="stuck-status">{{ order.status }}</span>
+              <span>{{ order.ageLabel }}</span>
+              <span>{{ order.updatedAt }}</span>
+              <span>{{ order.customer }}</span>
+              <span>{{ order.total }}</span>
             </div>
-          </article>
-          <div class="provider-empty" *ngIf="!providers.length">
-            No provider activity in the last 10 days.
           </div>
-        </div>
-      </article>
+          <ng-template #stuckEmpty>
+            <div class="stuck-empty">No stuck orders right now.</div>
+          </ng-template>
+        </article>
 
-      <article class="hogwarts-panel wide ledger">
-        <div class="panel-header">
-          <div>
-            <p class="panel-eyebrow">Vault Ledger</p>
-            <h2>Revenue & active partners</h2>
-            <p class="panel-sub">Last {{ revenueDays }} days, plus the same window across {{ revenueYears }} years.</p>
+        <article class="hogwarts-panel">
+          <div class="panel-header">
+            <div>
+              <p class="panel-eyebrow">Provider Wing</p>
+              <h2>Integrations</h2>
+              <p class="panel-sub">Provider health, error rate, and backlog.</p>
+            </div>
+            <div class="panel-chip subtle">
+              <autom-icon [source]="icons.CLOUD"></autom-icon>
+              Live
+            </div>
           </div>
-          <div class="panel-chip subtle">
-            <autom-icon [source]="icons.BOOK"></autom-icon>
-            Totals
-          </div>
-        </div>
 
-        <div class="panel-note" *ngIf="revenueLoading">Refreshing ledger...</div>
-        <div class="panel-note error" *ngIf="revenueError">{{ revenueError }}</div>
+          <div class="provider-grid">
+            <article
+              class="provider-card"
+              *ngFor="let provider of providers"
+              [ngClass]="provider.severity"
+            >
+              <div class="provider-top">
+                <div>
+                  <p class="provider-name">{{ provider.name }}</p>
+                  <p class="provider-status">{{ provider.status }}</p>
+                </div>
+                <span class="provider-badge" [ngClass]="provider.severity">{{
+                  provider.severity
+                }}</span>
+              </div>
+              <div class="provider-metrics">
+                <div>
+                  <span>Last order</span>
+                  <strong>{{ provider.lastOrder }}</strong>
+                </div>
+                <div>
+                  <span>Orders 10d</span>
+                  <strong>{{ provider.ordersLast10d }}</strong>
+                </div>
+                <div>
+                  <span>Backorders 10d</span>
+                  <strong>{{ provider.backorderCount }}</strong>
+                </div>
+                <div>
+                  <span>Messages 10d</span>
+                  <strong>{{ provider.messageCount }}</strong>
+                </div>
+              </div>
+              <div class="provider-error">
+                <autom-icon [source]="provider.alertIcon"></autom-icon>
+                <span>{{ provider.alertLabel }}</span>
+              </div>
+            </article>
+            <div class="provider-empty" *ngIf="!providers.length">
+              No provider activity in the last 10 days.
+            </div>
+          </div>
+        </article>
 
-        <div class="ledger-summary" *ngIf="revenueSummary">
-          <div class="metric">
-            <span class="metric-label">Orders</span>
-            <span class="metric-value">{{ revenueSummary.orders }}</span>
+        <article class="hogwarts-panel wide ledger">
+          <div class="panel-header">
+            <div>
+              <p class="panel-eyebrow">Vault Ledger</p>
+              <h2>Revenue & active partners</h2>
+              <p class="panel-sub">
+                Last {{ revenueDays }} days, plus the same window across
+                {{ revenueYears }} years.
+              </p>
+            </div>
+            <div class="panel-chip subtle">
+              <autom-icon [source]="icons.BOOK"></autom-icon>
+              Totals
+            </div>
           </div>
-          <div class="metric">
-            <span class="metric-label">Revenue</span>
-            <span class="metric-value">{{ revenueSummary.revenue }}</span>
-          </div>
-          <div class="metric">
-            <span class="metric-label">AOV</span>
-            <span class="metric-value">{{ revenueSummary.aov }}</span>
-          </div>
-          <div class="metric">
-            <span class="metric-label">Active partners</span>
-            <span class="metric-value">{{ revenueSummary.activePartners }}</span>
-          </div>
-          <div class="metric">
-            <span class="metric-label">Orders/partner</span>
-            <span class="metric-value">{{ revenueSummary.ordersPerPartner }}</span>
-          </div>
-        </div>
 
-        <div class="ledger-table" *ngIf="revenueHistory.length; else ledgerEmpty">
-          <div class="ledger-row ledger-header">
-            <button
-              class="ledger-sort"
-              type="button"
-              (click)="sortLedger('year')"
-              [class.is-active]="ledgerSort.column === 'year'"
-              [attr.data-dir]="ledgerSort.column === 'year' ? ledgerSort.direction : null"
-            >
-              Year
-            </button>
-            <button
-              class="ledger-sort"
-              type="button"
-              (click)="sortLedger('orders')"
-              [class.is-active]="ledgerSort.column === 'orders'"
-              [attr.data-dir]="ledgerSort.column === 'orders' ? ledgerSort.direction : null"
-            >
-              Orders
-            </button>
-            <button
-              class="ledger-sort"
-              type="button"
-              (click)="sortLedger('revenue')"
-              [class.is-active]="ledgerSort.column === 'revenue'"
-              [attr.data-dir]="ledgerSort.column === 'revenue' ? ledgerSort.direction : null"
-            >
-              Revenue
-            </button>
-            <button
-              class="ledger-sort"
-              type="button"
-              (click)="sortLedger('aov')"
-              [class.is-active]="ledgerSort.column === 'aov'"
-              [attr.data-dir]="ledgerSort.column === 'aov' ? ledgerSort.direction : null"
-            >
-              AOV
-            </button>
-            <button
-              class="ledger-sort"
-              type="button"
-              (click)="sortLedger('activePartners')"
-              [class.is-active]="ledgerSort.column === 'activePartners'"
-              [attr.data-dir]="ledgerSort.column === 'activePartners' ? ledgerSort.direction : null"
-            >
-              Active partners
-            </button>
-            <button
-              class="ledger-sort"
-              type="button"
-              (click)="sortLedger('ordersPerPartner')"
-              [class.is-active]="ledgerSort.column === 'ordersPerPartner'"
-              [attr.data-dir]="ledgerSort.column === 'ordersPerPartner' ? ledgerSort.direction : null"
-            >
-              Orders/partner
-            </button>
+          <div class="panel-note" *ngIf="revenueLoading">
+            Refreshing ledger...
           </div>
+          <div class="panel-note error" *ngIf="revenueError">
+            {{ revenueError }}
+          </div>
+
+          <div class="ledger-summary" *ngIf="revenueSummary">
+            <div class="metric">
+              <span class="metric-label">Orders</span>
+              <span class="metric-value">{{ revenueSummary.orders }}</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Revenue</span>
+              <span class="metric-value">{{ revenueSummary.revenue }}</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">AOV</span>
+              <span class="metric-value">{{ revenueSummary.aov }}</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Active partners</span>
+              <span class="metric-value">{{
+                revenueSummary.activePartners
+              }}</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Orders/partner</span>
+              <span class="metric-value">{{
+                revenueSummary.ordersPerPartner
+              }}</span>
+            </div>
+          </div>
+
           <div
-            class="ledger-row"
-            *ngFor="let row of revenueHistorySorted"
-            [class.is-current]="revenueCurrentYear !== null && row.year === revenueCurrentYear"
+            class="ledger-table"
+            *ngIf="revenueHistory.length; else ledgerEmpty"
           >
-            <span class="ledger-year">{{ row.year }}</span>
-            <span>{{ row.orders }}</span>
-            <span>{{ row.revenue }}</span>
-            <span>{{ row.aov }}</span>
-            <span>{{ row.activePartners }}</span>
-            <span>{{ row.ordersPerPartner }}</span>
-          </div>
-        </div>
-        <ng-template #ledgerEmpty>
-          <div class="ledger-empty">No revenue data for this window.</div>
-        </ng-template>
-      </article>
-
-      <article class="hogwarts-panel wide spellbook">
-        <div class="panel-header">
-          <div>
-            <p class="panel-eyebrow">Spellbook</p>
-            <h2>Febi price list</h2>
-            <p class="panel-sub">Upload and reload without restarting the app.</p>
-          </div>
-          <div class="panel-chip">
-            <autom-icon [source]="icons.FILE_TEXT"></autom-icon>
-            Grimoire
-          </div>
-        </div>
-
-        <div class="spell-row">
-          <label class="file-drop" [class.has-file]="uploadFile" [class.disabled]="loading">
-            <span class="label-title">Choose a new price list (.xlsx)</span>
-            <span class="label-sub">Latest grimoire with Febi prices</span>
-            <div class="file-chip" *ngIf="uploadFile; else filePlaceholder">
-              <autom-icon [source]="icons.FILE"></autom-icon>
-              <span>{{ uploadFile.name }}</span>
+            <div class="ledger-row ledger-header">
+              <button
+                class="ledger-sort"
+                type="button"
+                (click)="sortLedger('year')"
+                [class.is-active]="ledgerSort.column === 'year'"
+                [attr.data-dir]="
+                  ledgerSort.column === 'year' ? ledgerSort.direction : null
+                "
+              >
+                Year
+              </button>
+              <button
+                class="ledger-sort"
+                type="button"
+                (click)="sortLedger('orders')"
+                [class.is-active]="ledgerSort.column === 'orders'"
+                [attr.data-dir]="
+                  ledgerSort.column === 'orders' ? ledgerSort.direction : null
+                "
+              >
+                Orders
+              </button>
+              <button
+                class="ledger-sort"
+                type="button"
+                (click)="sortLedger('revenue')"
+                [class.is-active]="ledgerSort.column === 'revenue'"
+                [attr.data-dir]="
+                  ledgerSort.column === 'revenue' ? ledgerSort.direction : null
+                "
+              >
+                Revenue
+              </button>
+              <button
+                class="ledger-sort"
+                type="button"
+                (click)="sortLedger('aov')"
+                [class.is-active]="ledgerSort.column === 'aov'"
+                [attr.data-dir]="
+                  ledgerSort.column === 'aov' ? ledgerSort.direction : null
+                "
+              >
+                AOV
+              </button>
+              <button
+                class="ledger-sort"
+                type="button"
+                (click)="sortLedger('activePartners')"
+                [class.is-active]="ledgerSort.column === 'activePartners'"
+                [attr.data-dir]="
+                  ledgerSort.column === 'activePartners'
+                    ? ledgerSort.direction
+                    : null
+                "
+              >
+                Active partners
+              </button>
+              <button
+                class="ledger-sort"
+                type="button"
+                (click)="sortLedger('ordersPerPartner')"
+                [class.is-active]="ledgerSort.column === 'ordersPerPartner'"
+                [attr.data-dir]="
+                  ledgerSort.column === 'ordersPerPartner'
+                    ? ledgerSort.direction
+                    : null
+                "
+              >
+                Orders/partner
+              </button>
             </div>
-            <ng-template #filePlaceholder>
-              <div class="file-chip ghost">
-                <autom-icon [source]="icons.UPLOAD_CLOUD"></autom-icon>
-                <span>Choose file</span>
+            <div
+              class="ledger-row"
+              *ngFor="let row of revenueHistorySorted"
+              [class.is-current]="
+                revenueCurrentYear !== null && row.year === revenueCurrentYear
+              "
+            >
+              <span class="ledger-year">{{ row.year }}</span>
+              <span>{{ row.orders }}</span>
+              <span>{{ row.revenue }}</span>
+              <span>{{ row.aov }}</span>
+              <span>{{ row.activePartners }}</span>
+              <span>{{ row.ordersPerPartner }}</span>
+            </div>
+          </div>
+          <ng-template #ledgerEmpty>
+            <div class="ledger-empty">No revenue data for this window.</div>
+          </ng-template>
+        </article>
+
+        <article class="hogwarts-panel wide spellbook szakal-panel">
+          <div class="panel-header">
+            <div>
+              <p class="panel-eyebrow">Szakal Vault</p>
+              <h2>Szakal imports</h2>
+              <p class="panel-sub">
+                Manual SFTP drop, then import master weekly and pricelists
+                daily.
+              </p>
+            </div>
+            <div class="panel-chip">
+              <autom-icon [source]="icons.DOWNLOAD"></autom-icon>
+              SFTP
+            </div>
+          </div>
+
+          <div class="spell-row">
+            <div class="szakal-box">
+              <span class="label-title">Detected files</span>
+              <span class="label-sub">
+                {{ szakalFiles?.dataDir || "Data dir is not configured" }}
+              </span>
+              <div
+                class="szakal-files"
+                *ngIf="szakalFiles?.files?.length; else szakalEmpty"
+              >
+                <div
+                  class="szakal-file"
+                  *ngFor="let file of szakalFiles?.files"
+                >
+                  <div class="szakal-file-main">
+                    <strong>{{ file.key }}</strong>
+                    <span>{{ file.path }}</span>
+                  </div>
+                  <div class="szakal-file-meta">
+                    <span>{{
+                      file.sizeBytes
+                        ? (file.sizeBytes / 1024 / 1024 | number: "1.1-1") +
+                          " MB"
+                        : "--"
+                    }}</span>
+                    <span *ngIf="file.lastModified">{{
+                      file.lastModified | date: "dd.MM.yyyy HH:mm"
+                    }}</span>
+                  </div>
+                </div>
               </div>
-            </ng-template>
-            <input
-              #fileInput
-              id="hogwarts-file-input"
-              type="file"
-              accept=".xlsx"
-              [attr.disabled]="loading ? true : null"
-              (change)="onFileSelected($event)"
-            />
-          </label>
+              <ng-template #szakalEmpty>
+                <div class="szakal-empty">No Szakal files detected.</div>
+              </ng-template>
+            </div>
 
-          <div class="cta-row">
-            <button class="hogwarts-btn primary" [class.is-loading]="loading" (click)="castUpload()" [disabled]="loading">
-              <span class="spark"></span>
-              <autom-icon [source]="icons.CAST"></autom-icon>
-              <span>{{ loading ? 'Casting...' : 'Cast upload' }}</span>
-              <span class="btn-spinner" *ngIf="loading"></span>
-            </button>
-            <button class="hogwarts-btn ghost" [class.is-loading]="loading" (click)="recastFromDisk()" [disabled]="loading">
-              <autom-icon [source]="icons.REFRESH_CW"></autom-icon>
-              <span>{{ loading ? 'Recasting...' : 'Recast from disk' }}</span>
-              <span class="btn-spinner" *ngIf="loading"></span>
-            </button>
+            <div class="cta-row">
+              <button
+                class="hogwarts-btn ghost"
+                type="button"
+                (click)="refreshSzakalFiles()"
+                [disabled]="szakalFilesLoading"
+              >
+                <autom-icon [source]="icons.REFRESH_CW"></autom-icon>
+                <span>{{
+                  szakalFilesLoading ? "Refreshing..." : "Refresh files"
+                }}</span>
+              </button>
+              <button
+                class="hogwarts-btn primary"
+                type="button"
+                (click)="importSzakalMaster()"
+                [disabled]="szakalLoading"
+              >
+                <autom-icon [source]="icons.FILE_TEXT"></autom-icon>
+                <span>{{
+                  szakalLoading ? "Importing..." : "Import master"
+                }}</span>
+              </button>
+              <button
+                class="hogwarts-btn primary"
+                type="button"
+                (click)="importSzakalPricelists()"
+                [disabled]="szakalLoading"
+              >
+                <autom-icon [source]="icons.CAST"></autom-icon>
+                <span>{{
+                  szakalLoading ? "Importing..." : "Import pricelists"
+                }}</span>
+              </button>
+              <button
+                class="hogwarts-btn ghost"
+                type="button"
+                (click)="importSzakalAll()"
+                [disabled]="szakalLoading"
+              >
+                <autom-icon [source]="icons.ZAP"></autom-icon>
+                <span>{{ szakalLoading ? "Importing..." : "Import all" }}</span>
+              </button>
+              <button
+                class="hogwarts-btn ghost"
+                type="button"
+                (click)="importSzakalBarcodes()"
+                [disabled]="szakalLoading"
+              >
+                <autom-icon [source]="icons.BARCODE"></autom-icon>
+                <span>{{
+                  szakalLoading ? "Importing..." : "Import barcodes"
+                }}</span>
+              </button>
+              <button
+                class="hogwarts-btn ghost"
+                type="button"
+                (click)="importSzakalOeLinks()"
+                [disabled]="szakalLoading"
+              >
+                <autom-icon [source]="icons.LINK"></autom-icon>
+                <span>{{
+                  szakalLoading ? "Importing..." : "Import OE links"
+                }}</span>
+              </button>
+              <button
+                class="hogwarts-btn ghost"
+                type="button"
+                (click)="refreshSzakalStatus()"
+                [disabled]="szakalStatusLoading"
+              >
+                <autom-icon [source]="icons.REFRESH_CW"></autom-icon>
+                <span>{{
+                  szakalStatusLoading ? "Refreshing..." : "Refresh status"
+                }}</span>
+              </button>
+            </div>
           </div>
-        </div>
 
-        <div class="status" *ngIf="statusMessage">
-          <div class="status-badge" [ngClass]="statusType">
-            <autom-icon [source]="statusType === 'success' ? icons.CHECK : icons.ALERT_TRIANGLE"></autom-icon>
-            <span>{{ statusMessage }}</span>
+          <div class="status" *ngIf="szakalStatusMessage">
+            <div class="status-badge" [ngClass]="szakalStatusType">
+              <autom-icon
+                [source]="
+                  szakalStatusType === 'success'
+                    ? icons.CHECK
+                    : icons.ALERT_TRIANGLE
+                "
+              ></autom-icon>
+              <span>{{ szakalStatusMessage }}</span>
+            </div>
           </div>
-          <div class="hogwarts-meta">
-            <span *ngIf="lastCount !== null">Tomes indexed: {{ lastCount }}</span>
-            <span *ngIf="lastPath">Path: {{ lastPath }}</span>
-            <span *ngIf="lastModified">Last modified: {{ lastModified | date:'dd.MM.yyyy HH:mm' }}</span>
-            <span *ngIf="lastSizeBytes !== null">Size: {{ lastSizeBytes / 1024 | number:'1.0-1' }} KB</span>
-          </div>
-        </div>
 
-        <div class="casting" *ngIf="loading">
-          <div class="orb"></div>
-          <span>Casting spell...</span>
-        </div>
-      </article>
-    </section>
+          <div class="hogwarts-meta" *ngIf="szakalStatus">
+            <span
+              >Master rows:
+              {{
+                szakalStatus.masterCount !== null &&
+                szakalStatus.masterCount !== undefined
+                  ? szakalStatus.masterCount
+                  : "--"
+              }}</span
+            >
+            <span *ngIf="szakalStatus.masterUpdatedAt"
+              >Master updated:
+              {{
+                szakalStatus.masterUpdatedAt | date: "dd.MM.yyyy HH:mm"
+              }}</span
+            >
+            <span *ngFor="let pl of szakalStatus.priceLists"
+              >PL{{ pl.listNo }}: {{ pl.count }}</span
+            >
+            <span *ngIf="szakalStatus.priceUpdatedAt"
+              >Pricelists updated:
+              {{ szakalStatus.priceUpdatedAt | date: "dd.MM.yyyy HH:mm" }}</span
+            >
+          </div>
+        </article>
+
+        <article class="hogwarts-panel wide spellbook mapping-panel">
+          <div class="panel-header">
+            <div>
+              <p class="panel-eyebrow">TecDoc Mapping</p>
+              <h2>AM proizvođač → TecDoc brandId</h2>
+              <p class="panel-sub">
+                Ručni mapping za brendove koji nisu u enum-u.
+              </p>
+            </div>
+            <div class="panel-actions">
+              <div class="panel-chip">
+                <autom-icon [source]="icons.LINK"></autom-icon>
+                Mapping
+              </div>
+              <button
+                class="panel-chip action"
+                type="button"
+                (click)="openMappingModal()"
+              >
+                <autom-icon [source]="icons.LIST"></autom-icon>
+                View list
+              </button>
+            </div>
+          </div>
+
+          <div class="spell-row">
+            <div class="mapping-box">
+              <span class="label-title">AM proizvođač</span>
+              <span class="label-sub">Filter po nazivu ili proid-u</span>
+              <div class="typeahead">
+                <input
+                  class="text-input"
+                  type="text"
+                  placeholder="Npr. TRW ili 161"
+                  [value]="manufacturerFilter"
+                  (input)="onManufacturerFilter($event)"
+                  (focus)="onManufacturerFocus()"
+                  (blur)="onManufacturerBlur()"
+                  (keydown)="onManufacturerKeydown($event)"
+                />
+                <div class="typeahead-panel" *ngIf="manufacturerDropdownOpen">
+                  <button
+                    class="typeahead-option"
+                    type="button"
+                    *ngFor="let m of filteredManufacturers"
+                    (click)="selectManufacturer(m)"
+                  >
+                    <span class="typeahead-proid">{{ m.proid }}</span>
+                    <span class="typeahead-name">{{ m.naziv }}</span>
+                  </button>
+                  <div
+                    class="typeahead-empty"
+                    *ngIf="!filteredManufacturers.length"
+                  >
+                    Nema rezultata.
+                  </div>
+                </div>
+              </div>
+              <div class="mapping-current">
+                Selected: {{ selectedManufacturer?.proid || "--" }}
+                {{ selectedManufacturer?.naziv || "" }}
+              </div>
+            </div>
+
+            <div class="mapping-box">
+              <span class="label-title">TecDoc brandId</span>
+              <span class="label-sub">Unesi broj brenda iz TecDoc-a</span>
+              <input
+                class="text-input"
+                type="number"
+                placeholder="npr. 161"
+                [value]="selectedBrandId"
+                (input)="onBrandIdInput($event)"
+              />
+              <div class="cta-row">
+                <button
+                  class="hogwarts-btn primary"
+                  type="button"
+                  (click)="saveBrandMapping()"
+                  [disabled]="brandMappingLoading"
+                >
+                  <autom-icon [source]="icons.CHECK"></autom-icon>
+                  <span>{{
+                    brandMappingLoading ? "Saving..." : "Save mapping"
+                  }}</span>
+                </button>
+                <button
+                  class="hogwarts-btn ghost"
+                  type="button"
+                  (click)="deleteBrandMapping()"
+                  [disabled]="brandMappingLoading"
+                >
+                  <autom-icon [source]="icons.TRASH"></autom-icon>
+                  <span>{{
+                    brandMappingLoading ? "Deleting..." : "Delete mapping"
+                  }}</span>
+                </button>
+              </div>
+              <div class="status" *ngIf="brandMappingMessage">
+                <div class="status-badge" [ngClass]="brandMappingType">
+                  <autom-icon
+                    [source]="
+                      brandMappingType === 'success'
+                        ? icons.CHECK
+                        : icons.ALERT_TRIANGLE
+                    "
+                  ></autom-icon>
+                  <span>{{ brandMappingMessage }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="hogwarts-panel wide spellbook">
+          <div class="panel-header">
+            <div>
+              <p class="panel-eyebrow">Spellbook</p>
+              <h2>Febi price list</h2>
+              <p class="panel-sub">
+                Upload and reload without restarting the app.
+              </p>
+            </div>
+            <div class="panel-chip">
+              <autom-icon [source]="icons.FILE_TEXT"></autom-icon>
+              Grimoire
+            </div>
+          </div>
+
+          <div class="spell-row">
+            <label
+              class="file-drop"
+              [class.has-file]="uploadFile"
+              [class.disabled]="loading"
+            >
+              <span class="label-title">Choose a new price list (.xlsx)</span>
+              <span class="label-sub">Latest grimoire with Febi prices</span>
+              <div class="file-chip" *ngIf="uploadFile; else filePlaceholder">
+                <autom-icon [source]="icons.FILE"></autom-icon>
+                <span>{{ uploadFile.name }}</span>
+              </div>
+              <ng-template #filePlaceholder>
+                <div class="file-chip ghost">
+                  <autom-icon [source]="icons.UPLOAD_CLOUD"></autom-icon>
+                  <span>Choose file</span>
+                </div>
+              </ng-template>
+              <input
+                #fileInput
+                id="hogwarts-file-input"
+                type="file"
+                accept=".xlsx"
+                [attr.disabled]="loading ? true : null"
+                (change)="onFileSelected($event)"
+              />
+            </label>
+
+            <div class="cta-row">
+              <button
+                class="hogwarts-btn primary"
+                [class.is-loading]="loading"
+                (click)="castUpload()"
+                [disabled]="loading"
+              >
+                <span class="spark"></span>
+                <autom-icon [source]="icons.CAST"></autom-icon>
+                <span>{{ loading ? "Casting..." : "Cast upload" }}</span>
+                <span class="btn-spinner" *ngIf="loading"></span>
+              </button>
+              <button
+                class="hogwarts-btn ghost"
+                [class.is-loading]="loading"
+                (click)="recastFromDisk()"
+                [disabled]="loading"
+              >
+                <autom-icon [source]="icons.REFRESH_CW"></autom-icon>
+                <span>{{ loading ? "Recasting..." : "Recast from disk" }}</span>
+                <span class="btn-spinner" *ngIf="loading"></span>
+              </button>
+            </div>
+          </div>
+
+          <div class="status" *ngIf="statusMessage">
+            <div class="status-badge" [ngClass]="statusType">
+              <autom-icon
+                [source]="
+                  statusType === 'success' ? icons.CHECK : icons.ALERT_TRIANGLE
+                "
+              ></autom-icon>
+              <span>{{ statusMessage }}</span>
+            </div>
+            <div class="hogwarts-meta">
+              <span *ngIf="lastCount !== null"
+                >Tomes indexed: {{ lastCount }}</span
+              >
+              <span *ngIf="lastPath">Path: {{ lastPath }}</span>
+              <span *ngIf="lastModified"
+                >Last modified:
+                {{ lastModified | date: "dd.MM.yyyy HH:mm" }}</span
+              >
+              <span *ngIf="lastSizeBytes !== null"
+                >Size: {{ lastSizeBytes / 1024 | number: "1.0-1" }} KB</span
+              >
+            </div>
+          </div>
+
+          <div class="casting" *ngIf="loading">
+            <div class="orb"></div>
+            <span>Casting spell...</span>
+          </div>
+        </article>
+      </section>
     </ng-container>
   </div>
 
   <div class="reading-nook" *ngIf="readingNook">
     <div class="reading-backdrop" (click)="closeReadingNook()"></div>
     <article class="reading-panel">
-      <button class="reading-close" type="button" (click)="closeReadingNook()">Close</button>
+      <button class="reading-close" type="button" (click)="closeReadingNook()">
+        Close
+      </button>
       <div class="reading-header">
-        <span class="reading-tag" *ngIf="readingNook.tag">{{ readingNook.tag }}</span>
-        <span class="reading-source" *ngIf="readingNook.source">From {{ readingNook.source }}</span>
+        <span class="reading-tag" *ngIf="readingNook.tag">{{
+          readingNook.tag
+        }}</span>
+        <span class="reading-source" *ngIf="readingNook.source"
+          >From {{ readingNook.source }}</span
+        >
         <h2>{{ readingNook.title }}</h2>
-        <p class="reading-sub" *ngIf="readingNook.subtitle">{{ readingNook.subtitle }}</p>
+        <p class="reading-sub" *ngIf="readingNook.subtitle">
+          {{ readingNook.subtitle }}
+        </p>
       </div>
       <div class="reading-body">
         <p *ngFor="let paragraph of readingNook.body">{{ paragraph }}</p>
       </div>
     </article>
   </div>
+
+  <autom-popup
+    *ngIf="mappingModalOpen"
+    class="mapping-popup"
+    [visible]="mappingModalOpen"
+    [position]="positionEnum.CENTER"
+    [subPosition]="positionEnum.CENTER"
+    [width]="sizeEnum.LARGE"
+    [height]="sizeEnum.EXTRA_LARGE"
+    [rounded]="true"
+    (overlayEvent)="closeMappingModal()"
+  >
+    <div custom-header class="mapping-popup__header">
+      <div>
+        <p class="panel-eyebrow">TecDoc mappings</p>
+        <h3>Popunjeni brendovi</h3>
+        <p class="panel-sub">Ukupno: {{ mappingList.length }}</p>
+      </div>
+      <button class="mapping-close" type="button" (click)="closeMappingModal()">
+        Close
+      </button>
+    </div>
+
+    <div custom-body class="mapping-popup__body">
+      <div class="mapping-toolbar">
+        <input
+          class="text-input"
+          type="text"
+          placeholder="Filter po proid-u, nazivu ili brandId-u"
+          [value]="mappingListFilter"
+          (input)="onMappingFilter($event)"
+        />
+        <button
+          class="hogwarts-btn ghost small"
+          type="button"
+          (click)="refreshBrandMappings()"
+          [disabled]="mappingListLoading"
+        >
+          <autom-icon [source]="icons.REFRESH_CW"></autom-icon>
+          <span>{{ mappingListLoading ? "Loading..." : "Refresh" }}</span>
+        </button>
+      </div>
+
+      <div
+        class="mapping-list"
+        *ngIf="
+          !mappingListLoading && filteredBrandMappings.length;
+          else mappingListState
+        "
+      >
+        <div class="mapping-row" *ngFor="let entry of filteredBrandMappings">
+          <div class="mapping-col">
+            <span class="mapping-proid">{{ entry.proid }}</span>
+            <span class="mapping-name">{{
+              resolveManufacturerName(entry.proid)
+            }}</span>
+          </div>
+          <div class="mapping-col right">
+            <span class="mapping-brandid">{{ entry.brandId }}</span>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #mappingListState>
+        <div class="mapping-list-state" [class.loading]="mappingListLoading">
+          <span *ngIf="mappingListLoading">Ucitavam listu...</span>
+          <span *ngIf="!mappingListLoading">Nema podataka za prikaz.</span>
+        </div>
+      </ng-template>
+    </div>
+  </autom-popup>
 </section>

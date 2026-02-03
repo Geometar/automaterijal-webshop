@@ -74,7 +74,7 @@
             >Webshop</a
           >
         </li>
-        <li *ngIf="!loggedIn" class="navbar-item">
+        <li [hidden]="loggedIn" class="navbar-item">
           <a
             routerLink="/login"
             href="/login"
@@ -348,22 +348,6 @@
     ></autom-icon>
     <span class="action-label">Dokumenta</span>
   </a>
-
-  <a
-    *ngIf="!loggedIn"
-    class="action-btn"
-    routerLink="/login"
-    href="/login"
-    aria-label="Prijava"
-    [attr.aria-current]="currentUrl.includes('/login') ? 'page' : null"
-  >
-    <autom-icon
-      [ngClass]="currentUrl.includes('/login') ? 'icon-active' : null"
-      [color]="colorEnum.RICH_BLACK"
-      [source]="iconEnum.LOG_IN"
-    ></autom-icon>
-    <span class="action-label">Prijava</span>
-  </a>
 </div>
 
 <nav
@@ -449,7 +433,7 @@
         Webshop
       </a>
     </li>
-    <li class="menu-category" *ngIf="!loggedIn">
+    <li class="menu-category" [hidden]="loggedIn">
       <a
         routerLink="/login"
         href="/login"

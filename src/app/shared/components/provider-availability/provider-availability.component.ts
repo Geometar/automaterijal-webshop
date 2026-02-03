@@ -2,11 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 
 import { AvailabilityVm } from '../../utils/availability-utils';
+import { MetaPillComponent } from '../meta-pill/meta-pill.component';
 
 @Component({
   selector: 'autom-provider-availability',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MetaPillComponent],
   templateUrl: './provider-availability.component.html',
   styleUrl: './provider-availability.component.scss',
 })

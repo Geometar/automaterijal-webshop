@@ -33,6 +33,7 @@ export interface AvailabilityVm {
     deliveryLabel: string | null;
     cutoffLabel: string | null;
     quantity: number | null;
+    noReturnable?: boolean;
     admin: {
       isAdmin: boolean;
       sourceLabel: string | null;
@@ -112,6 +113,12 @@ function pluralizeBusinessDays(n: number): string {
 export function formatDeliveryEstimate(
   provider: ProviderAvailabilityDto | null | undefined
 ): string | null {
+  const providerKey = (provider?.provider || '').toString().trim().toLowerCase();
+  const warehouse = (provider?.warehouse || '').toString().trim().toUpperCase();
+  if (providerKey === 'szakal' && warehouse === 'PL3') {
+    return '> 3 dana';
+  }
+
   const min = Number(provider?.deliveryToCustomerBusinessDaysMin);
   const max = Number(provider?.deliveryToCustomerBusinessDaysMax);
 
@@ -211,6 +218,8 @@ export function buildAvailabilityVm(
   const hasValidPrice = displayPrice > 0;
 
   const showProviderBox = !isTecDocOnly && status === 'AVAILABLE' && !!roba?.providerAvailability?.available;
+  const providerKey = (roba?.providerAvailability?.provider || '').toString().trim().toLowerCase();
+  const noReturnable = providerKey === 'szakal' && !!roba?.providerAvailability?.providerNoReturnable;
   const providerQty =
     Number(roba?.providerAvailability?.warehouseQuantity) ||
     Number(roba?.providerAvailability?.totalQuantity) ||
@@ -238,6 +247,7 @@ export function buildAvailabilityVm(
       deliveryLabel: formatDeliveryEstimate(roba?.providerAvailability),
       cutoffLabel: formatDispatchCutoff(roba?.providerAvailability?.nextDispatchCutoff),
       quantity: providerQty > 0 ? providerQty : null,
+      noReturnable,
       admin: {
         isAdmin,
         sourceLabel,
