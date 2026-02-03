@@ -23,15 +23,18 @@ import { routes } from './app.routes';
 
 // Services
 import { AccountService } from './shared/auth/service/account.service';
+import { AuthServerProvider } from './shared/auth/service/auth-jwt.service';
 import { AccountStateService } from './shared/service/state/account-state.service';
 
 
 export const appInitializer = (
   accountService: AccountService,
-  accountStateService: AccountStateService
+  accountStateService: AccountStateService,
+  authServerProvider: AuthServerProvider
 ) => {
   return () => {
     const account = accountStateService.get();
+    const token = authServerProvider.getToken();
 
     if (account?.ppid) {
       // 🧠 Ručno ubacujemo postojeći korisnik iz sessionStorage u memoriju
@@ -39,7 +42,13 @@ export const appInitializer = (
       return Promise.resolve(); // ⬅️ Vrati odmah jer si već "ulogovan"
     }
 
-    // 🔄 U suprotnom, probaj da pozoveš API (npr. nakon token refresh)
+    // Ako nema tokena, ne zovi partner/read i ne salji na login.
+    if (!token) {
+      accountService.authenticate(null);
+      return Promise.resolve();
+    }
+
+    // 🔄 Ako token postoji, probaj da pozoveš API (npr. nakon token refresh)
     return accountService.identity().toPromise();
   };
 };
@@ -63,7 +72,7 @@ export const appConfig: ApplicationConfig = {
     { provide: LOCALE_ID, useValue: 'sr-Latn' }, {
       provide: APP_INITIALIZER,
       useFactory: appInitializer,
-      deps: [AccountService, AccountStateService],
+      deps: [AccountService, AccountStateService, AuthServerProvider],
       multi: true,
     }
   ],

@@ -112,8 +112,8 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
 
   return next(modifiedRequest).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401 || error.status === 403) {
-        // Optional: check if backend returned a specific error message
+      if ((error.status === 401 || error.status === 403) && token) {
+        // Only force logout when a token exists.
         console.warn('Authentication expired or unauthorized. Logging out.');
         performLogout();
       }
