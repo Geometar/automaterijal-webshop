@@ -66,6 +66,9 @@
       </p>
       <!-- Mali tekst: cena sa PDV-om -->
       <p class="price-note">Cena sa PDV-om</p>
+      <p *ngIf="availabilityVm.provider.coreCharge" class="price-note">
+        Kaucija: {{ availabilityVm.provider.coreCharge | rsdCurrency }}
+      </p>
 
       <!-- Ušteda (opciono, diskretno) -->
       <p *ngIf="showDiscount && savings" class="saving">

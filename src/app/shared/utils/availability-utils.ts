@@ -35,6 +35,7 @@ export interface AvailabilityVm {
     cutoffLabel: string | null;
     quantity: number | null;
     noReturnable?: boolean;
+    coreCharge?: number | null;
     admin: {
       isAdmin: boolean;
       sourceLabel: string | null;
@@ -305,6 +306,7 @@ export function buildAvailabilityVm(
       cutoffLabel: formatDispatchCutoff(roba?.providerAvailability?.nextDispatchCutoff),
       quantity: providerQty > 0 ? providerQty : null,
       noReturnable,
+      coreCharge: Number(roba?.providerAvailability?.coreCharge) || null,
       admin: {
         isAdmin,
         sourceLabel,

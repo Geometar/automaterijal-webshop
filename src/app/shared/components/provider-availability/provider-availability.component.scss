@@ -79,3 +79,20 @@
   font-size: 12.5px;
   font-weight: 800;
 }
+
+.provider-availability__core {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--figma-accent-orange-300, #fdba74);
+  background: var(--figma-accent-yellow-100);
+  color: var(--figma-bg-dark);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.provider-availability__core .provider-availability__value {
+  color: var(--figma-bg-dark);
+  font-size: 14px;
+  font-weight: 900;
+}

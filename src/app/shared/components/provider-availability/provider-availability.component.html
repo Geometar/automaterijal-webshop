@@ -36,6 +36,15 @@
     Poruči do: {{ availability?.provider?.cutoffLabel }}
   </div>
   <div
+    class="provider-availability__row provider-availability__core"
+    *ngIf="availability?.provider?.coreCharge"
+  >
+    Kaucija:
+    <span class="provider-availability__value">
+      {{ (availability?.provider?.coreCharge ?? 0) | rsdCurrency }}
+    </span>
+  </div>
+  <div
     class="provider-availability__row provider-availability__admin"
     *ngIf="availability?.provider?.admin?.sourceLabel"
   >
