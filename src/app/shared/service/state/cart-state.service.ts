@@ -10,7 +10,13 @@ import { CartItem, Roba } from '../../data-models/model/roba';
 // Services
 import { AccountStateService } from './account-state.service';
 import { AnalyticsService } from '../analytics.service';
-import { getAvailabilityStatus, getPurchasableStock, getPurchasableUnitPrice } from '../../utils/availability-utils';
+import {
+  getAvailabilityStatus,
+  getPurchasableStock,
+  getPurchasableUnitPrice,
+  resolveMinOrderQuantity,
+  resolvePackagingUnit,
+} from '../../utils/availability-utils';
 
 @Injectable({
   providedIn: 'root',
@@ -96,17 +102,16 @@ export class CartStateService {
     });
     const currentStock = getPurchasableStock(roba);
 
-    const packagingUnitRaw = Number(roba?.providerAvailability?.packagingUnit);
-    const step =
-      status === 'AVAILABLE' &&
-      Number.isFinite(packagingUnitRaw) &&
-      packagingUnitRaw > 1
-        ? Math.floor(packagingUnitRaw)
-        : 1;
+    const step = status === 'AVAILABLE'
+      ? resolvePackagingUnit(roba?.providerAvailability)
+      : 1;
+    const minOrder = status === 'AVAILABLE'
+      ? resolveMinOrderQuantity(roba?.providerAvailability)
+      : 1;
 
-    let requested = Math.floor(quantity || step);
-    if (requested < step) {
-      requested = step;
+    let requested = Math.floor(quantity || minOrder);
+    if (requested < minOrder) {
+      requested = minOrder;
     }
     if (step > 1) {
       requested = Math.ceil(requested / step) * step;
@@ -311,6 +316,7 @@ export class CartStateService {
       providerPurchasePrice: isProvider && isAdmin ? provider?.purchasePrice : undefined,
       providerNoReturnable: isProvider ? provider?.providerNoReturnable : undefined,
       providerPackagingUnit: isProvider ? provider?.packagingUnit : undefined,
+      providerMinOrderQuantity: isProvider ? provider?.minOrderQuantity : undefined,
       providerLeadTimeBusinessDays: isProvider ? provider?.leadTimeBusinessDays : undefined,
       providerDeliveryToCustomerBusinessDaysMin: isProvider ? provider?.deliveryToCustomerBusinessDaysMin : undefined,
       providerDeliveryToCustomerBusinessDaysMax: isProvider ? provider?.deliveryToCustomerBusinessDaysMax : undefined,
@@ -359,6 +365,7 @@ export class CartStateService {
         purchasePrice: cartItem.providerPurchasePrice,
         currency: cartItem.providerCurrency ?? 'RSD',
         packagingUnit: cartItem.providerPackagingUnit,
+        minOrderQuantity: cartItem.providerMinOrderQuantity,
         providerNoReturnable: cartItem.providerNoReturnable,
         leadTimeBusinessDays: cartItem.providerLeadTimeBusinessDays,
         deliveryToCustomerBusinessDaysMin: cartItem.providerDeliveryToCustomerBusinessDaysMin,

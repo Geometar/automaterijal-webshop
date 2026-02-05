@@ -18,6 +18,7 @@ export interface SzakalStockCheckResult {
   available?: boolean;
   availableQuantity?: number | null;
   orderQuantum?: number | null;
+  moq?: number | null;
   noReturnable?: boolean | null;
   stockToken?: string | null;
   purchasePrice?: number | null;

@@ -62,7 +62,9 @@ import { ProviderAvailabilityComponent } from '../../../shared/components/provid
 import { EmailService } from '../../../shared/service/email.service';
 import {
   AvailabilityVm,
-  buildAvailabilityVm
+  buildAvailabilityVm,
+  resolveMinOrderQuantity,
+  resolvePackagingUnit
 } from '../../../shared/utils/availability-utils';
 
 // Services
@@ -897,6 +899,9 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     if (result.orderQuantum != null && result.orderQuantum > 0) {
       data.providerAvailability.packagingUnit = result.orderQuantum;
     }
+    if (result.moq != null && result.moq > 0) {
+      data.providerAvailability.minOrderQuantity = result.moq;
+    }
     if (result.noReturnable != null) {
       data.providerAvailability.providerNoReturnable = result.noReturnable;
     }
@@ -963,12 +968,14 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     if (!this.isProviderItem) {
       return 1;
     }
-    const unit = Number(this.data?.providerAvailability?.packagingUnit);
-    return Number.isFinite(unit) && unit > 1 ? Math.floor(unit) : 1;
+    return resolvePackagingUnit(this.data?.providerAvailability);
   }
 
   get quantityMin(): number {
-    return this.quantityStep;
+    if (!this.isProviderItem) {
+      return 1;
+    }
+    return resolveMinOrderQuantity(this.data?.providerAvailability);
   }
 
   get totalPrice(): number {

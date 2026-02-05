@@ -634,6 +634,9 @@ export class CartComponent implements OnInit, OnDestroy {
       if (result.orderQuantum != null && result.orderQuantum > 0) {
         item.providerAvailability.packagingUnit = result.orderQuantum;
       }
+      if (result.moq != null && result.moq > 0) {
+        item.providerAvailability.minOrderQuantity = result.moq;
+      }
       if (result.noReturnable != null) {
         item.providerAvailability.providerNoReturnable = result.noReturnable;
       }

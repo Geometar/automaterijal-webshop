@@ -27,7 +27,9 @@ import { PictureService, ProductImageMeta } from '../../service/utils/picture.se
 import { SzakalStockCheckResult, SzakalStockService } from '../../service/szakal-stock.service';
 import {
   AvailabilityVm,
-  buildAvailabilityVm
+  buildAvailabilityVm,
+  resolveMinOrderQuantity,
+  resolvePackagingUnit
 } from '../../utils/availability-utils';
 
 @Component({
@@ -199,6 +201,9 @@ export class AutomProductCardComponent implements OnInit, OnChanges {
     if (result.orderQuantum != null && result.orderQuantum > 0) {
       roba.providerAvailability.packagingUnit = result.orderQuantum;
     }
+    if (result.moq != null && result.moq > 0) {
+      roba.providerAvailability.minOrderQuantity = result.moq;
+    }
     if (result.noReturnable != null) {
       roba.providerAvailability.providerNoReturnable = result.noReturnable;
     }
@@ -259,12 +264,14 @@ export class AutomProductCardComponent implements OnInit, OnChanges {
     if (!this.isProviderItem) {
       return 1;
     }
-    const unit = Number(this.roba?.providerAvailability?.packagingUnit);
-    return Number.isFinite(unit) && unit > 1 ? Math.floor(unit) : 1;
+    return resolvePackagingUnit(this.roba?.providerAvailability);
   }
 
   get quantityMin(): number {
-    return this.quantityStep;
+    if (!this.isProviderItem) {
+      return 1;
+    }
+    return resolveMinOrderQuantity(this.roba?.providerAvailability);
   }
 
   private parseNumber(raw: unknown): number {

@@ -160,6 +160,7 @@ export class CartItem {
   providerPurchasePrice?: number;
   providerNoReturnable?: boolean;
   providerPackagingUnit?: number;
+  providerMinOrderQuantity?: number;
   providerLeadTimeBusinessDays?: number;
   providerDeliveryToCustomerBusinessDaysMin?: number;
   providerDeliveryToCustomerBusinessDaysMax?: number;

@@ -1220,6 +1220,9 @@ export class WebshopComponent implements OnDestroy, OnInit {
     if (result.orderQuantum != null && result.orderQuantum > 0) {
       data.providerAvailability.packagingUnit = result.orderQuantum;
     }
+    if (result.moq != null && result.moq > 0) {
+      data.providerAvailability.minOrderQuantity = result.moq;
+    }
     if (result.noReturnable != null) {
       data.providerAvailability.providerNoReturnable = result.noReturnable;
     }

@@ -80,15 +80,39 @@ export function getPurchasableStock(
       Number(roba?.providerAvailability?.warehouseQuantity) ||
       Number(roba?.providerAvailability?.totalQuantity) ||
       0;
-    const packagingUnit = Number(roba?.providerAvailability?.packagingUnit);
-    if (Number.isFinite(packagingUnit) && packagingUnit > 1) {
-      const maxPieces = Math.floor(providerQty / packagingUnit) * packagingUnit;
-      return Math.max(0, maxPieces);
+    const packagingUnit = resolvePackagingUnit(roba?.providerAvailability);
+    const maxPieces =
+      packagingUnit > 1 ? Math.floor(providerQty / packagingUnit) * packagingUnit : providerQty;
+    const minOrder = resolveMinOrderQuantity(roba?.providerAvailability);
+    if (maxPieces < minOrder) {
+      return 0;
     }
-    return Math.max(0, providerQty);
+    return Math.max(0, maxPieces);
   }
 
   return 0;
+}
+
+export function resolvePackagingUnit(
+  provider: ProviderAvailabilityDto | null | undefined
+): number {
+  const unit = Number(provider?.packagingUnit);
+  return Number.isFinite(unit) && unit > 1 ? Math.floor(unit) : 1;
+}
+
+export function resolveMinOrderQuantity(
+  provider: ProviderAvailabilityDto | null | undefined
+): number {
+  const step = resolvePackagingUnit(provider);
+  const raw = Number(provider?.minOrderQuantity);
+  if (!Number.isFinite(raw) || raw <= 0) {
+    return step;
+  }
+  if (step <= 1) {
+    return Math.max(1, Math.floor(raw));
+  }
+  const min = Math.ceil(raw / step) * step;
+  return Math.max(step, min);
 }
 
 export function getPurchasableUnitPrice(

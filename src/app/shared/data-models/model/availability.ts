@@ -15,6 +15,7 @@ export interface ProviderAvailabilityDto {
   providerNoReturnable?: boolean;
   providerProductId?: string;
   providerStockToken?: string;
+  minOrderQuantity?: number;
   purchasePrice?: number;
   customerPrice?: number;
   realtimeChecked?: boolean;
