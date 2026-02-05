@@ -151,6 +151,8 @@ export class CartItem {
   source?: 'STOCK' | 'PROVIDER';
   provider?: string;
   providerArticleNumber?: string;
+  providerProductId?: string;
+  providerStockToken?: string;
   providerWarehouse?: string;
   providerWarehouseName?: string;
   providerCurrency?: string;
@@ -162,5 +164,9 @@ export class CartItem {
   providerDeliveryToCustomerBusinessDaysMin?: number;
   providerDeliveryToCustomerBusinessDaysMax?: number;
   providerNextDispatchCutoff?: string;
+  providerExpectedDelivery?: string;
+  providerCoreCharge?: number;
+  providerRealtimeChecked?: boolean;
+  providerRealtimeCheckedAt?: string;
   technicalDescription?: RobaTehnickiOpis[];
 }

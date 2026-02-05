@@ -54,26 +54,32 @@
 
   <!-- Cene -->
   <div class="product-price" aria-label="Cene">
-    <!-- Stara cena (diskretna, siva, precrtana) -->
-    <p *ngIf="showDiscount && oldPrice" class="old-price">
-      {{ oldPrice | rsdCurrency }}
-    </p>
+    <ng-container *ngIf="availabilityVm.priceVerified; else unverifiedPrice">
+      <!-- Stara cena (diskretna, siva, precrtana) -->
+      <p *ngIf="showDiscount && oldPrice" class="old-price">
+        {{ oldPrice | rsdCurrency }}
+      </p>
 
-    <!-- Finalna cena (primarna) -->
-    <p class="final-price">
-      {{ availabilityVm.displayPrice | rsdCurrency }}
-    </p>
-    <!-- Mali tekst: cena sa PDV-om -->
-    <p class="price-note">Cena sa PDV-om</p>
+      <!-- Finalna cena (primarna) -->
+      <p class="final-price">
+        {{ availabilityVm.displayPrice | rsdCurrency }}
+      </p>
+      <!-- Mali tekst: cena sa PDV-om -->
+      <p class="price-note">Cena sa PDV-om</p>
 
-    <!-- Ušteda (opciono, diskretno) -->
-    <p *ngIf="showDiscount && savings" class="saving">
-      Ušteda {{ savings | rsdCurrency }}
-    </p>
+      <!-- Ušteda (opciono, diskretno) -->
+      <p *ngIf="showDiscount && savings" class="saving">
+        Ušteda {{ savings | rsdCurrency }}
+      </p>
+    </ng-container>
+    <ng-template #unverifiedPrice>
+      <p class="final-price">Cena nije proverena</p>
+      <p class="price-note">Proveri pre poručivanja</p>
+    </ng-template>
   </div>
 
   <!-- Cena po jedinici (npr. /L) -->
-  <p *ngIf="unitPrice" class="unit-price">
+  <p *ngIf="unitPrice && availabilityVm.priceVerified" class="unit-price">
     ~ {{ unitPrice | rsdCurrency }} / L
   </p>
 

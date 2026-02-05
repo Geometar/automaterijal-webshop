@@ -90,7 +90,10 @@ export class CartStateService {
     if (!key) return;
 
     const status = getAvailabilityStatus(roba);
-    const unitPrice = getPurchasableUnitPrice(roba);
+    const unitPrice = getPurchasableUnitPrice(roba, {
+      isAdmin: this.accountStateService.isAdmin(),
+      isStaff: this.accountStateService.isEmployee(),
+    });
     const currentStock = getPurchasableStock(roba);
 
     const packagingUnitRaw = Number(roba?.providerAvailability?.packagingUnit);
@@ -274,7 +277,10 @@ export class CartStateService {
     const status = getAvailabilityStatus(roba);
     const provider = roba?.providerAvailability;
     const isProvider = status === 'AVAILABLE' && !!provider?.available;
-    const unitPrice = getPurchasableUnitPrice(roba);
+    const unitPrice = getPurchasableUnitPrice(roba, {
+      isAdmin: this.accountStateService.isAdmin(),
+      isStaff: this.accountStateService.isEmployee(),
+    });
     const stock = getPurchasableStock(roba);
     const isAdmin = this.accountStateService.isAdmin();
     const key = this.getItemKey(roba);
@@ -296,6 +302,8 @@ export class CartStateService {
       source: isProvider ? 'PROVIDER' : 'STOCK',
       provider: isProvider ? provider?.provider : undefined,
       providerArticleNumber: isProvider ? provider?.articleNumber : undefined,
+      providerProductId: isProvider ? provider?.providerProductId : undefined,
+      providerStockToken: isProvider ? provider?.providerStockToken : undefined,
       providerWarehouse: isProvider ? provider?.warehouse : undefined,
       providerWarehouseName: isProvider ? provider?.warehouseName : undefined,
       providerCurrency: isProvider ? provider?.currency : undefined,
@@ -307,6 +315,10 @@ export class CartStateService {
       providerDeliveryToCustomerBusinessDaysMin: isProvider ? provider?.deliveryToCustomerBusinessDaysMin : undefined,
       providerDeliveryToCustomerBusinessDaysMax: isProvider ? provider?.deliveryToCustomerBusinessDaysMax : undefined,
       providerNextDispatchCutoff: isProvider ? provider?.nextDispatchCutoff : undefined,
+      providerExpectedDelivery: isProvider ? provider?.expectedDelivery : undefined,
+      providerCoreCharge: isProvider ? provider?.coreCharge : undefined,
+      providerRealtimeChecked: isProvider ? provider?.realtimeChecked : undefined,
+      providerRealtimeCheckedAt: isProvider ? provider?.realtimeCheckedAt : undefined,
       technicalDescription: roba.technicalDescription
     };
   }
@@ -337,6 +349,8 @@ export class CartStateService {
         available: true,
         provider: cartItem.provider,
         articleNumber: cartItem.providerArticleNumber,
+        providerProductId: cartItem.providerProductId,
+        providerStockToken: cartItem.providerStockToken,
         warehouse: cartItem.providerWarehouse,
         warehouseName: cartItem.providerWarehouseName,
         warehouseQuantity: cartItem.stock ?? 0,
@@ -350,6 +364,10 @@ export class CartStateService {
         deliveryToCustomerBusinessDaysMin: cartItem.providerDeliveryToCustomerBusinessDaysMin,
         deliveryToCustomerBusinessDaysMax: cartItem.providerDeliveryToCustomerBusinessDaysMax,
         nextDispatchCutoff: cartItem.providerNextDispatchCutoff,
+        expectedDelivery: cartItem.providerExpectedDelivery,
+        coreCharge: cartItem.providerCoreCharge,
+        realtimeChecked: cartItem.providerRealtimeChecked,
+        realtimeCheckedAt: cartItem.providerRealtimeCheckedAt,
       };
     } else {
       retVal.stanje = cartItem.stock!;

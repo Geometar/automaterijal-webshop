@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
-import { catchError, finalize, forkJoin, Observable, of, Subject, takeUntil } from 'rxjs';
+import { catchError, finalize, forkJoin, Observable, of, Subject, take, takeUntil } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
@@ -76,6 +76,7 @@ import { SeoService } from '../../../shared/service/seo.service';
 import { TecdocService } from '../../../shared/service/tecdoc.service';
 import { SnackbarService } from '../../../shared/service/utils/snackbar.service';
 import { UrlHelperService } from '../../../shared/service/utils/url-helper.service';
+import { SzakalStockCheckResult, SzakalStockService } from '../../../shared/service/szakal-stock.service';
 
 // Utils
 import { StringUtils } from '../../../shared/utils/string-utils';
@@ -261,6 +262,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     private transferState: TransferState,
     private snackbarService: SnackbarService,
     private urlHelperService: UrlHelperService,
+    private szakalStockService: SzakalStockService,
     private analytics: AnalyticsService,
     @Inject(PLATFORM_ID) private platformId: Object,
   ) { }
@@ -368,6 +370,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     );
     this.prefillInquiryFields();
     this.inquirySent = false;
+    this.refreshSzakalRealtimeDetails();
   }
 
   fetchData(ref: { kind: 'ROBA' | 'TECDOC'; id: number; token: string }): void {
@@ -797,8 +800,125 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const providerKey = (this.data?.providerAvailability?.provider || '').toString().trim().toLowerCase();
+    if (providerKey === 'szakal') {
+      const token = this.data?.providerAvailability?.providerStockToken;
+      const glid = this.data?.providerAvailability?.providerProductId;
+      if (token || glid) {
+        this.szakalStockService
+          .check([{
+            token,
+            glid,
+            quantity: this.quantity,
+            brand: this.data?.proizvodjac?.proid,
+            group: this.data?.grupa,
+          }])
+          .pipe(take(1))
+          .subscribe({
+            next: (results) => {
+              const result = Array.isArray(results) ? results[0] : null;
+              if (!this.isSzakalResultAvailable(result, this.quantity)) {
+                const availableQty = Number(result?.availableQuantity) || 0;
+                const message = availableQty > 0
+                  ? `Trenutno dostupno: ${availableQty}`
+                  : 'Artikal trenutno nije dostupan za poručivanje';
+                this.snackbarService.showError(message);
+                return;
+              }
+              this.applySzakalRealtime(this.data, result);
+              this.cartStateService.addToCart(this.data, this.quantity);
+              this.snackbarService.showSuccess('Artikal je dodat u korpu');
+            },
+            error: () => {
+              this.snackbarService.showError('Provera dostupnosti nije uspela, pokušajte ponovo');
+            },
+          });
+        return;
+      }
+    }
+
     this.cartStateService.addToCart(this.data, this.quantity);
     this.snackbarService.showSuccess('Artikal je dodat u korpu');
+  }
+
+  private refreshSzakalRealtimeDetails(): void {
+    const providerKey = (this.data?.providerAvailability?.provider || '').toString().trim().toLowerCase();
+    if (providerKey !== 'szakal') {
+      return;
+    }
+    if (this.data?.providerAvailability?.realtimeChecked) {
+      return;
+    }
+    const token = this.data?.providerAvailability?.providerStockToken;
+    const glid = this.data?.providerAvailability?.providerProductId;
+    if (!token && !glid) {
+      return;
+    }
+
+    this.szakalStockService
+      .check([{
+        token,
+        glid,
+        quantity: Math.max(1, this.quantity || 1),
+        brand: this.data?.proizvodjac?.proid,
+        group: this.data?.grupa,
+      }])
+      .pipe(take(1), takeUntil(this.destroy$))
+      .subscribe({
+        next: (results) => {
+          const result = Array.isArray(results) ? results[0] : null;
+          this.applySzakalRealtime(this.data, result);
+        },
+      });
+  }
+
+  private isSzakalResultAvailable(result: SzakalStockCheckResult | null, requested: number): boolean {
+    if (!result || !result.available) {
+      return false;
+    }
+    const qty = Number(result.availableQuantity) || 0;
+    const req = Number(requested) || 1;
+    return qty >= req;
+  }
+
+  private applySzakalRealtime(data: Roba, result: SzakalStockCheckResult | null): void {
+    if (!data?.providerAvailability || !result) {
+      return;
+    }
+    data.providerAvailability.realtimeChecked = true;
+    data.providerAvailability.realtimeCheckedAt = new Date().toISOString();
+    if (typeof result.available === 'boolean') {
+      data.providerAvailability.available = result.available;
+    }
+    if (result.availableQuantity != null) {
+      data.providerAvailability.totalQuantity = result.availableQuantity;
+      data.providerAvailability.warehouseQuantity = result.availableQuantity;
+    }
+    if (result.orderQuantum != null && result.orderQuantum > 0) {
+      data.providerAvailability.packagingUnit = result.orderQuantum;
+    }
+    if (result.noReturnable != null) {
+      data.providerAvailability.providerNoReturnable = result.noReturnable;
+    }
+    if (result.stockToken) {
+      data.providerAvailability.providerStockToken = result.stockToken;
+    }
+    if (result.purchasePrice != null) {
+      data.providerAvailability.purchasePrice = result.purchasePrice;
+    }
+    if (result.customerPrice != null) {
+      data.providerAvailability.price = result.customerPrice;
+      data.cena = result.customerPrice;
+    }
+    if (result.currency) {
+      data.providerAvailability.currency = result.currency;
+    }
+    if (result.expectedDelivery) {
+      data.providerAvailability.expectedDelivery = result.expectedDelivery;
+    }
+    if (result.coreCharge != null) {
+      data.providerAvailability.coreCharge = result.coreCharge;
+    }
   }
 
   get hasValidPrice(): boolean {

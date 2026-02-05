@@ -13,7 +13,14 @@ export interface ProviderAvailabilityDto {
   price?: number;
   provider?: string;
   providerNoReturnable?: boolean;
+  providerProductId?: string;
+  providerStockToken?: string;
   purchasePrice?: number;
+  customerPrice?: number;
+  realtimeChecked?: boolean;
+  realtimeCheckedAt?: string;
+  expectedDelivery?: string;
+  coreCharge?: number;
   totalQuantity?: number;
   warehouse?: string;
   warehouseName?: string;

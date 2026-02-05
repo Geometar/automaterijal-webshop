@@ -1,6 +1,7 @@
 import { Component, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { take } from 'rxjs';
 
 // Component imports
 import { AutomIconComponent } from '../../autom-icon/autom-icon.component';
@@ -35,6 +36,7 @@ import { PictureService, ProductImageMeta } from '../../../service/utils/picture
 import { SnackbarService } from '../../../service/utils/snackbar.service';
 import { StringUtils } from '../../../utils/string-utils';
 import { UrlHelperService } from '../../../service/utils/url-helper.service';
+import { SzakalStockCheckResult, SzakalStockService } from '../../../service/szakal-stock.service';
 import {
   AvailabilityVm,
   buildAvailabilityVm,
@@ -130,6 +132,7 @@ export class RowComponent implements OnInit, OnChanges {
     private snackbarService: SnackbarService,
     private accountStateService: AccountStateService,
     private pictureService: PictureService,
+    private szakalStockService: SzakalStockService,
     private urlHelperService: UrlHelperService
   ) { }
 
@@ -199,13 +202,100 @@ export class RowComponent implements OnInit, OnChanges {
   }
 
   addToShoppingCart(data: Roba): void {
-    if (!this.canAddToCart || this.isUnavailable || !this.availabilityVm.hasValidPrice) {
+    const allowWithoutPrice = this.isSzakalUnverified;
+    if (!this.canAddToCart || this.isUnavailable || (!this.availabilityVm.hasValidPrice && !allowWithoutPrice)) {
       this.snackbarService.showError('Artikal trenutno nije dostupan za poručivanje');
       return;
     }
 
+    const providerKey = (data?.providerAvailability?.provider || '').toString().trim().toLowerCase();
+    if (providerKey === 'szakal') {
+      const token = data?.providerAvailability?.providerStockToken;
+      const glid = data?.providerAvailability?.providerProductId;
+      if (token || glid) {
+        this.szakalStockService
+          .check([{
+            token,
+            glid,
+            quantity: this.quantity,
+            brand: data?.proizvodjac?.proid,
+            group: data?.grupa,
+          }])
+          .pipe(take(1))
+          .subscribe({
+            next: (results) => {
+              const result = Array.isArray(results) ? results[0] : null;
+              if (!this.isSzakalResultAvailable(result, this.quantity)) {
+                const availableQty = Number(result?.availableQuantity) || 0;
+                const message = availableQty > 0
+                  ? `Trenutno dostupno: ${availableQty}`
+                  : 'Artikal trenutno nije dostupan za poručivanje';
+                this.snackbarService.showError(message);
+                return;
+              }
+              this.applySzakalRealtime(data, result);
+              this.cartStateService.addToCart(data, this.quantity);
+              this.snackbarService.showSuccess('Artikal je dodat u korpu');
+            },
+            error: () => {
+              this.snackbarService.showError('Provera dostupnosti nije uspela, pokušajte ponovo');
+            },
+          });
+        return;
+      }
+    }
+
     this.cartStateService.addToCart(data, this.quantity);
     this.snackbarService.showSuccess('Artikal je dodat u korpu');
+  }
+
+  private isSzakalResultAvailable(result: SzakalStockCheckResult | null, requested: number): boolean {
+    if (!result || !result.available) {
+      return false;
+    }
+    const qty = Number(result.availableQuantity) || 0;
+    const req = Number(requested) || 1;
+    return qty >= req;
+  }
+
+  private applySzakalRealtime(data: Roba, result: SzakalStockCheckResult | null): void {
+    if (!data?.providerAvailability || !result) {
+      return;
+    }
+    data.providerAvailability.realtimeChecked = true;
+    data.providerAvailability.realtimeCheckedAt = new Date().toISOString();
+    if (typeof result.available === 'boolean') {
+      data.providerAvailability.available = result.available;
+    }
+    if (result.availableQuantity != null) {
+      data.providerAvailability.totalQuantity = result.availableQuantity;
+      data.providerAvailability.warehouseQuantity = result.availableQuantity;
+    }
+    if (result.orderQuantum != null && result.orderQuantum > 0) {
+      data.providerAvailability.packagingUnit = result.orderQuantum;
+    }
+    if (result.noReturnable != null) {
+      data.providerAvailability.providerNoReturnable = result.noReturnable;
+    }
+    if (result.stockToken) {
+      data.providerAvailability.providerStockToken = result.stockToken;
+    }
+    if (result.purchasePrice != null) {
+      data.providerAvailability.purchasePrice = result.purchasePrice;
+    }
+    if (result.customerPrice != null) {
+      data.providerAvailability.price = result.customerPrice;
+      data.cena = result.customerPrice;
+    }
+    if (result.currency) {
+      data.providerAvailability.currency = result.currency;
+    }
+    if (result.expectedDelivery) {
+      data.providerAvailability.expectedDelivery = result.expectedDelivery;
+    }
+    if (result.coreCharge != null) {
+      data.providerAvailability.coreCharge = result.coreCharge;
+    }
   }
 
   isInCart(robaId: number): boolean {
@@ -444,6 +534,11 @@ export class RowComponent implements OnInit, OnChanges {
       isTecDocOnly: this.isTecDocOnly,
       isStaff: this.isStaff,
     });
+  }
+
+  private get isSzakalUnverified(): boolean {
+    const providerKey = (this.data?.providerAvailability?.provider || '').toString().trim().toLowerCase();
+    return providerKey === 'szakal' && !this.availabilityVm.priceVerified;
   }
 
   private sanitizeDomId(value: string): string {

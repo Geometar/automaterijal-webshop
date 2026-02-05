@@ -152,18 +152,24 @@
             ></autom-provider-availability>
 
             <div class="price-wrap">
-              <div class="price-row" *ngIf="hasDiscount">
-                <span class="old-price">{{ oldPrice! | rsdCurrency }}</span>
-                <span class="discount-badge">-{{ discountValue }}%</span>
-              </div>
-              <div class="price">{{ displayPrice | rsdCurrency }}</div>
-              <div class="note">cena po komadu</div>
-              <div *ngIf="hasValidPrice" class="total-price">
-                Ukupno: {{ totalPrice | rsdCurrency }}
-              </div>
-              <div *ngIf="hasDiscount && savings" class="saving">
-                Ušteda {{ savings! | rsdCurrency }}
-              </div>
+              <ng-container *ngIf="availabilityVm.priceVerified; else unverifiedPrice">
+                <div class="price-row" *ngIf="hasDiscount">
+                  <span class="old-price">{{ oldPrice! | rsdCurrency }}</span>
+                  <span class="discount-badge">-{{ discountValue }}%</span>
+                </div>
+                <div class="price">{{ displayPrice | rsdCurrency }}</div>
+                <div class="note">cena po komadu</div>
+                <div class="total-price">
+                  Ukupno: {{ totalPrice | rsdCurrency }}
+                </div>
+                <div *ngIf="hasDiscount && savings" class="saving">
+                  Ušteda {{ savings! | rsdCurrency }}
+                </div>
+              </ng-container>
+              <ng-template #unverifiedPrice>
+                <div class="price">Cena nije proverena</div>
+                <div class="note">Proveri dostupnost pre poručivanja</div>
+              </ng-template>
             </div>
 
             <div class="actions">

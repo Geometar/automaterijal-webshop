@@ -254,15 +254,14 @@
     </p>
 
     <!-- Finalna cena -->
-    <p *ngIf="!isTecDocOnly" class="price price--unit">
-      {{
-        availabilityVm.displayPrice
-          ? (availabilityVm.displayPrice | rsdCurrency)
-          : (0 | rsdCurrency)
-      }}
+    <p *ngIf="!isTecDocOnly && availabilityVm.priceVerified" class="price price--unit">
+      {{ availabilityVm.displayPrice | rsdCurrency }}
+    </p>
+    <p *ngIf="!isTecDocOnly && !availabilityVm.priceVerified" class="sub-price">
+      Cena nije proverena
     </p>
 
-    <p *ngIf="!isTecDocOnly" class="mobile-row autom-align__right">
+    <p *ngIf="!isTecDocOnly && availabilityVm.priceVerified" class="mobile-row autom-align__right">
       Cena po komadu (sa PDV-om)
     </p>
 
@@ -310,7 +309,7 @@
       />
     </div>
 
-    <p *ngIf="canAddToCart && !isUnavailable" class="price price--total">
+    <p *ngIf="canAddToCart && !isUnavailable && availabilityVm.priceVerified" class="price price--total">
       Ukupno: {{ selectedTotalPrice | rsdCurrency }}
     </p>
 
@@ -342,10 +341,11 @@
       {{ availabilityVm.displayPrice / (1 - data.rabat / 100) | rsdCurrency }}
     </p>
 
-    <p class="sub-price final-price">
-      {{
-        unitPrice ? (unitPrice | rsdCurrency) : (0 | rsdCurrency)
-      }}
+    <p *ngIf="availabilityVm.priceVerified" class="sub-price final-price">
+      {{ unitPrice | rsdCurrency }}
+    </p>
+    <p *ngIf="!availabilityVm.priceVerified" class="sub-price">
+      Cena nije proverena
     </p>
 
     <p *ngIf="!isAdminCartView && availabilityVm.showDiscount" class="small-explanation saving">
@@ -384,7 +384,8 @@
       ></autom-input-fields>
 
       <div>
-        <p class="price">{{ totalPrice | rsdCurrency }}</p>
+        <p *ngIf="availabilityVm.priceVerified" class="price">{{ totalPrice | rsdCurrency }}</p>
+        <p *ngIf="!availabilityVm.priceVerified" class="sub-price">Cena nije proverena</p>
         <p class="autom-align__right autom-margin__none">
           {{ isAdminCartView ? 'Ukupno bez PDV-a' : 'Ukupno sa PDV-om' }}
         </p>

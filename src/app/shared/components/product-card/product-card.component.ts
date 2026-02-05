@@ -2,6 +2,7 @@ import { CommonModule, CurrencyPipe } from '@angular/common';
 import { Component, Input, Output, EventEmitter, ViewEncapsulation, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { take } from 'rxjs';
 
 // Automaterijal imports
 import { AutomIconComponent } from '../autom-icon/autom-icon.component';
@@ -23,6 +24,7 @@ import { CartStateService } from '../../service/state/cart-state.service';
 import { SnackbarService } from '../../service/utils/snackbar.service';
 import { StringUtils } from '../../utils/string-utils';
 import { PictureService, ProductImageMeta } from '../../service/utils/picture.service';
+import { SzakalStockCheckResult, SzakalStockService } from '../../service/szakal-stock.service';
 import {
   AvailabilityVm,
   buildAvailabilityVm
@@ -66,6 +68,7 @@ export class AutomProductCardComponent implements OnInit, OnChanges {
   constructor(
     private accountStateService: AccountStateService,
     private cartStateService: CartStateService,
+    private szakalStockService: SzakalStockService,
     private snackbarService: SnackbarService,
     private router: Router,
     private pictureService: PictureService
@@ -124,11 +127,99 @@ export class AutomProductCardComponent implements OnInit, OnChanges {
     }
     if (this.roba && this.quantity > 0) {
       if (!this.hasValidPrice || this.isOutOfStock) {
-        this.snackbarService.showError('Artikal trenutno nije dostupan za poručivanje');
-        return;
+        if (!this.isSzakalUnverified || this.isOutOfStock) {
+          this.snackbarService.showError('Artikal trenutno nije dostupan za poručivanje');
+          return;
+        }
       }
+      const providerKey = (this.roba?.providerAvailability?.provider || '').toString().trim().toLowerCase();
+      if (providerKey === 'szakal') {
+        const token = this.roba?.providerAvailability?.providerStockToken;
+        const glid = this.roba?.providerAvailability?.providerProductId;
+        if (token || glid) {
+          this.szakalStockService
+            .check([{
+              token,
+              glid,
+              quantity: this.quantity,
+              brand: this.roba?.proizvodjac?.proid,
+              group: this.roba?.grupa,
+            }])
+            .pipe(take(1))
+            .subscribe({
+              next: (results) => {
+                const result = Array.isArray(results) ? results[0] : null;
+                if (!this.isSzakalResultAvailable(result, this.quantity)) {
+                  const availableQty = Number(result?.availableQuantity) || 0;
+                  const message = availableQty > 0
+                    ? `Trenutno dostupno: ${availableQty}`
+                    : 'Artikal trenutno nije dostupan za poručivanje';
+                  this.snackbarService.showError(message);
+                  return;
+                }
+                this.applySzakalRealtime(this.roba, result);
+                this.cartStateService.addToCart(this.roba, this.quantity);
+                this.snackbarService.showSuccess('Artikal je dodat u korpu');
+              },
+              error: () => {
+                this.snackbarService.showError('Provera dostupnosti nije uspela, pokušajte ponovo');
+              },
+            });
+          return;
+        }
+      }
+
       this.cartStateService.addToCart(this.roba, this.quantity);
       this.snackbarService.showSuccess('Artikal je dodat u korpu');
+    }
+  }
+
+  private isSzakalResultAvailable(result: SzakalStockCheckResult | null, requested: number): boolean {
+    if (!result || !result.available) {
+      return false;
+    }
+    const qty = Number(result.availableQuantity) || 0;
+    const req = Number(requested) || 1;
+    return qty >= req;
+  }
+
+  private applySzakalRealtime(roba: Roba, result: SzakalStockCheckResult | null): void {
+    if (!roba?.providerAvailability || !result) {
+      return;
+    }
+    roba.providerAvailability.realtimeChecked = true;
+    roba.providerAvailability.realtimeCheckedAt = new Date().toISOString();
+    if (typeof result.available === 'boolean') {
+      roba.providerAvailability.available = result.available;
+    }
+    if (result.availableQuantity != null) {
+      roba.providerAvailability.totalQuantity = result.availableQuantity;
+      roba.providerAvailability.warehouseQuantity = result.availableQuantity;
+    }
+    if (result.orderQuantum != null && result.orderQuantum > 0) {
+      roba.providerAvailability.packagingUnit = result.orderQuantum;
+    }
+    if (result.noReturnable != null) {
+      roba.providerAvailability.providerNoReturnable = result.noReturnable;
+    }
+    if (result.stockToken) {
+      roba.providerAvailability.providerStockToken = result.stockToken;
+    }
+    if (result.purchasePrice != null) {
+      roba.providerAvailability.purchasePrice = result.purchasePrice;
+    }
+    if (result.customerPrice != null) {
+      roba.providerAvailability.price = result.customerPrice;
+      roba.cena = result.customerPrice;
+    }
+    if (result.currency) {
+      roba.providerAvailability.currency = result.currency;
+    }
+    if (result.expectedDelivery) {
+      roba.providerAvailability.expectedDelivery = result.expectedDelivery;
+    }
+    if (result.coreCharge != null) {
+      roba.providerAvailability.coreCharge = result.coreCharge;
     }
   }
 
@@ -237,6 +328,9 @@ export class AutomProductCardComponent implements OnInit, OnChanges {
   get isOutOfStock(): boolean {
     // TecDoc-only is not treated as "out of stock" for the CTA visibility
     if (this.isTecDocOnly) return false;
+    if (this.isSzakalUnverified) {
+      return this.availableStock <= 0;
+    }
     return !this.hasValidPrice || this.availableStock <= 0;
   }
 
@@ -320,6 +414,11 @@ export class AutomProductCardComponent implements OnInit, OnChanges {
       isAdmin: this.isAdmin,
       isStaff: this.isAdmin || this.isEmployee,
     });
+  }
+
+  private get isSzakalUnverified(): boolean {
+    const providerKey = (this.roba?.providerAvailability?.provider || '').toString().trim().toLowerCase();
+    return providerKey === 'szakal' && !this.availabilityVm.priceVerified;
   }
 
   /* ------------------------- Compatibility --------------------------- */

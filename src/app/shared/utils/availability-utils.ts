@@ -27,6 +27,7 @@ export interface AvailabilityVm {
   purchasableStock: number;
   displayPrice: number;
   hasValidPrice: boolean;
+  priceVerified: boolean;
   showProviderBox: boolean;
   showDiscount: boolean;
   provider: {
@@ -91,12 +92,21 @@ export function getPurchasableStock(
 }
 
 export function getPurchasableUnitPrice(
-  roba: Pick<Roba, 'availabilityStatus' | 'cena' | 'providerAvailability'> | null | undefined
+  roba: Pick<Roba, 'availabilityStatus' | 'cena' | 'providerAvailability'> | null | undefined,
+  opts?: { isAdmin?: boolean; isStaff?: boolean }
 ): number {
   const status = getAvailabilityStatus(roba as any);
   if (status === 'AVAILABLE') {
     const p = Number(roba?.providerAvailability?.price);
-    return Number.isFinite(p) ? p : 0;
+    if (Number.isFinite(p) && p > 0) {
+      return p;
+    }
+    const allowFallback = !!opts?.isAdmin || !!opts?.isStaff;
+    if (allowFallback) {
+      const purchase = Number(roba?.providerAvailability?.purchasePrice);
+      return Number.isFinite(purchase) && purchase > 0 ? purchase : 0;
+    }
+    return 0;
   }
 
   const cena = Number((roba as any)?.cena);
@@ -113,6 +123,15 @@ function pluralizeBusinessDays(n: number): string {
 export function formatDeliveryEstimate(
   provider: ProviderAvailabilityDto | null | undefined
 ): string | null {
+  const expected = provider?.expectedDelivery;
+  if (expected) {
+    const date = new Date(expected);
+    if (!Number.isNaN(date.getTime())) {
+      const datePart = date.toLocaleDateString('sr-RS');
+      const timePart = date.toLocaleTimeString('sr-RS', { hour: '2-digit', minute: '2-digit' });
+      return `${datePart} ${timePart}`;
+    }
+  }
   const providerKey = (provider?.provider || '').toString().trim().toLowerCase();
   const warehouse = (provider?.warehouse || '').toString().trim().toUpperCase();
   if (providerKey === 'szakal' && warehouse === 'PL3') {
@@ -214,11 +233,24 @@ export function buildAvailabilityVm(
   }
 
   const purchasableStock = isTecDocOnly ? 0 : getPurchasableStock(roba as any, { isAdmin });
-  const displayPrice = getPurchasableUnitPrice(roba as any);
+  const displayPrice = getPurchasableUnitPrice(roba as any, {
+    isAdmin,
+    isStaff,
+  });
   const hasValidPrice = displayPrice > 0;
 
   const showProviderBox = !isTecDocOnly && status === 'AVAILABLE' && !!roba?.providerAvailability?.available;
   const providerKey = (roba?.providerAvailability?.provider || '').toString().trim().toLowerCase();
+  const isProvider = status === 'AVAILABLE' && !!roba?.providerAvailability?.available;
+  const realtimeFlag = roba?.providerAvailability?.realtimeChecked;
+  let priceVerified = true;
+  if (isProvider) {
+    if (realtimeFlag !== undefined && realtimeFlag !== null) {
+      priceVerified = !!realtimeFlag;
+    } else if (providerKey === 'szakal') {
+      priceVerified = false;
+    }
+  }
   const noReturnable = providerKey === 'szakal' && !!roba?.providerAvailability?.providerNoReturnable;
   const providerQty =
     Number(roba?.providerAvailability?.warehouseQuantity) ||
@@ -229,7 +261,7 @@ export function buildAvailabilityVm(
     : null;
 
   const rabat = Number((roba as any)?.rabat) || 0;
-  const showDiscount = !isTecDocOnly && rabat > 0 && rabat < 100 && displayPrice > 0;
+  const showDiscount = !isTecDocOnly && rabat > 0 && rabat < 100 && displayPrice > 0 && priceVerified;
   const packagingUnit = Number(roba?.providerAvailability?.packagingUnit);
   const packagingUnitLabel =
     Number.isFinite(packagingUnit) && packagingUnit > 1 ? `${packagingUnit} kom` : null;
@@ -241,6 +273,7 @@ export function buildAvailabilityVm(
     purchasableStock,
     displayPrice,
     hasValidPrice,
+    priceVerified,
     showProviderBox,
     showDiscount,
     provider: {

@@ -35,6 +35,7 @@ import { VehicleUrlService } from '../../shared/service/utils/vehicle-url.servic
 import { WebshopConfig } from '../../shared/data-models/interface';
 import { WebshopLogicService } from '../../shared/service/utils/webshop-logic.service';
 import { WebshopStateService } from '../../shared/service/state/webshop-state.service';
+import { SzakalStockCheckResult, SzakalStockService } from '../../shared/service/szakal-stock.service';
 
 // Utils
 import {
@@ -116,6 +117,8 @@ export class WebshopComponent implements OnDestroy, OnInit {
   private lastRouteRowsPerPage = 10;
   private hasProcessedRoute = false;
   private pendingSubgroupSelection: string[] | undefined;
+  private readonly szakalRealtimeLimit = 15;
+  private listCheckSeq = 0;
 
   constructor(
     private accountStateService: AccountStateService,
@@ -133,6 +136,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
     private tecdocService: TecdocService,
     private urlHelperService: UrlHelperService,
     private vehicleUrlService: VehicleUrlService,
+    private szakalStockService: SzakalStockService,
   ) { }
 
   /** Angular lifecycle hooks start */
@@ -223,6 +227,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
           this.currentState = this.state.SHOW_ARTICLES;
           this.emitListView(response.robaDto?.content);
           this.updateSeoTagsForState();
+          this.refreshSzakalRealtimeList(response.robaDto?.content || []);
         },
         error: (err: HttpErrorResponse) => {
           const error = err.error?.details || err.error;
@@ -261,6 +266,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
           );
           this.magacinData = response;
           this.emitListView(response.robaDto?.content);
+          this.refreshSzakalRealtimeList(response.robaDto?.content || []);
         },
         error: (err: HttpErrorResponse) => {
           const error = err.error?.details || err.error;
@@ -1138,6 +1144,103 @@ export class WebshopComponent implements OnDestroy, OnInit {
       this.seoService.setLinkRel('next', url.toString());
     } else {
       this.seoService.setLinkRel('next', null);
+    }
+  }
+
+  private refreshSzakalRealtimeList(items: Roba[]): void {
+    if (!Array.isArray(items) || !items.length) {
+      return;
+    }
+
+    const seq = ++this.listCheckSeq;
+    const candidates = items.filter((roba) => {
+      const provider = roba?.providerAvailability;
+      if (!provider?.available) return false;
+      const providerKey = (provider?.provider || '').toString().trim().toLowerCase();
+      if (providerKey !== 'szakal') return false;
+      if (provider?.realtimeChecked) return false;
+      return !!provider?.providerStockToken || !!provider?.providerProductId;
+    });
+
+    if (!candidates.length) {
+      return;
+    }
+
+    const prioritized = candidates
+      .map((roba) => {
+        const providerQty =
+          Number(roba?.providerAvailability?.warehouseQuantity) ||
+          Number(roba?.providerAvailability?.totalQuantity) ||
+          0;
+        return { roba, providerQty };
+      })
+      .sort((a, b) => a.providerQty - b.providerQty)
+      .slice(0, this.szakalRealtimeLimit)
+      .map((entry) => entry.roba);
+
+    const requestItems = prioritized.map((roba) => ({
+      token: roba?.providerAvailability?.providerStockToken,
+      glid: roba?.providerAvailability?.providerProductId,
+      quantity: 1,
+      brand: roba?.proizvodjac?.proid,
+      group: roba?.grupa,
+    }));
+
+    this.szakalStockService
+      .check(requestItems)
+      .pipe(takeUntil(this.destroy$), take(1))
+      .subscribe({
+        next: (results) => {
+          if (seq !== this.listCheckSeq) {
+            return;
+          }
+          results?.forEach((result, idx) => {
+            const target = prioritized[idx];
+            if (target) {
+              this.applySzakalRealtime(target, result);
+            }
+          });
+        },
+      });
+  }
+
+  private applySzakalRealtime(data: Roba, result: SzakalStockCheckResult | null): void {
+    if (!data?.providerAvailability || !result) {
+      return;
+    }
+    data.providerAvailability.realtimeChecked = true;
+    data.providerAvailability.realtimeCheckedAt = new Date().toISOString();
+    if (typeof result.available === 'boolean') {
+      data.providerAvailability.available = result.available;
+    }
+    if (result.availableQuantity != null) {
+      data.providerAvailability.totalQuantity = result.availableQuantity;
+      data.providerAvailability.warehouseQuantity = result.availableQuantity;
+    }
+    if (result.orderQuantum != null && result.orderQuantum > 0) {
+      data.providerAvailability.packagingUnit = result.orderQuantum;
+    }
+    if (result.noReturnable != null) {
+      data.providerAvailability.providerNoReturnable = result.noReturnable;
+    }
+    if (result.stockToken) {
+      data.providerAvailability.providerStockToken = result.stockToken;
+    }
+    if (result.purchasePrice != null) {
+      data.providerAvailability.purchasePrice = result.purchasePrice;
+    }
+    if (result.customerPrice != null) {
+      data.providerAvailability.price = result.customerPrice;
+      data.cena = result.customerPrice;
+    }
+    if (result.currency) {
+      data.providerAvailability.currency = result.currency;
+    }
+    if (result.expectedDelivery) {
+      data.providerAvailability.expectedDelivery = result.expectedDelivery;
+    }
+    if (result.coreCharge != null) {
+      data.providerAvailability.coreCharge = result.coreCharge;
     }
   }
 }

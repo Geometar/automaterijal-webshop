@@ -59,6 +59,7 @@ import { SeoService } from '../../shared/service/seo.service';
 import { SnackbarPosition, SnackbarService } from '../../shared/service/utils/snackbar.service';
 import { getAvailabilityStatus } from '../../shared/utils/availability-utils';
 import { Slika } from '../../shared/data-models/model/slika';
+import { SzakalStockService, SzakalStockCheckItem, SzakalStockCheckResult } from '../../shared/service/szakal-stock.service';
 
 
 @Component({
@@ -134,6 +135,7 @@ export class CartComponent implements OnInit, OnDestroy {
     private cartStateService: CartStateService,
     private fb: UntypedFormBuilder,
     private invoiceService: InvoiceService,
+    private szakalStockService: SzakalStockService,
     private router: Router,
     private pictureService: PictureService,
     private snackbarService: SnackbarService,
@@ -478,7 +480,6 @@ export class CartComponent implements OnInit, OnDestroy {
 
   submitInvoice(): void {
     this.invoiceSubmitted = true;
-    this.buildInvoiceFromForm();
     const cartItemsSnapshot = this.cartStateService.getAll();
     const accountSnapshot = this.accountStateService.get();
 
@@ -490,6 +491,45 @@ export class CartComponent implements OnInit, OnDestroy {
       );
     }
 
+    const szakalChecks = this.buildSzakalCheckItems();
+    if (szakalChecks.length) {
+      this.szakalStockService
+        .check(szakalChecks)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (results) => {
+            this.applySzakalResultsToCart(szakalChecks, results || []);
+            const failures = this.resolveSzakalFailures(szakalChecks, results || []);
+            if (failures.length) {
+              const preview = failures.slice(0, 3).join(', ');
+              const more = failures.length > 3 ? ` (+${failures.length - 3})` : '';
+              this.snackbarService.showAutoClose(
+                preview
+                  ? `Szakal provera: trenutno nije dostupno ${preview}${more}.`
+                  : 'Szakal provera: artikli trenutno nisu dostupni.',
+                SnackbarPosition.TOP
+              );
+              this.invoiceSubmitted = false;
+              return;
+            }
+            this.submitInvoiceInternal(cartItemsSnapshot, accountSnapshot);
+          },
+          error: () => {
+            this.snackbarService.showAutoClose(
+              'Provera dostupnosti nije uspela, pokušajte ponovo.',
+              SnackbarPosition.TOP
+            );
+            this.invoiceSubmitted = false;
+          },
+        });
+      return;
+    }
+
+    this.submitInvoiceInternal(cartItemsSnapshot, accountSnapshot);
+  }
+
+  private submitInvoiceInternal(cartItemsSnapshot: any[], accountSnapshot: any): void {
+    this.buildInvoiceFromForm();
     this.invoiceService
       .submit(this.invoice!)
       .pipe(
@@ -540,6 +580,115 @@ export class CartComponent implements OnInit, OnDestroy {
         },
         error: () => { },
       });
+  }
+
+  private buildSzakalCheckItems(): SzakalStockCheckItem[] {
+    return (this.roba ?? [])
+      .filter((item) => {
+        const provider = (item?.providerAvailability?.provider || '').toString().trim().toLowerCase();
+        return provider === 'szakal' && !!item?.providerAvailability?.available;
+      })
+      .map((item) => {
+        return {
+          token: item?.providerAvailability?.providerStockToken,
+          glid: item?.providerAvailability?.providerProductId,
+          quantity: Number(item?.kolicina) || 1,
+          brand: item?.proizvodjac?.proid,
+          group: item?.grupa,
+        } as SzakalStockCheckItem;
+      })
+      .filter((item) => !!item.token || !!item.glid);
+  }
+
+  private applySzakalResultsToCart(
+    requests: SzakalStockCheckItem[],
+    results: SzakalStockCheckResult[]
+  ): void {
+    const byToken = new Map<string, SzakalStockCheckResult>();
+    const byGlid = new Map<string, SzakalStockCheckResult>();
+    (results || []).forEach((result) => {
+      if (result?.token) {
+        byToken.set(result.token, result);
+      }
+      if (result?.glid) {
+        byGlid.set(result.glid, result);
+      }
+    });
+
+    (this.roba ?? []).forEach((item) => {
+      const token = item?.providerAvailability?.providerStockToken;
+      const glid = item?.providerAvailability?.providerProductId;
+      const result =
+        (token ? byToken.get(token) : undefined) ||
+        (glid ? byGlid.get(glid) : undefined);
+      if (!result || !item?.providerAvailability) {
+        return;
+      }
+      if (typeof result.available === 'boolean') {
+        item.providerAvailability.available = result.available;
+      }
+      if (result.availableQuantity != null) {
+        item.providerAvailability.totalQuantity = result.availableQuantity;
+        item.providerAvailability.warehouseQuantity = result.availableQuantity;
+      }
+      if (result.orderQuantum != null && result.orderQuantum > 0) {
+        item.providerAvailability.packagingUnit = result.orderQuantum;
+      }
+      if (result.noReturnable != null) {
+        item.providerAvailability.providerNoReturnable = result.noReturnable;
+      }
+      if (result.stockToken) {
+        item.providerAvailability.providerStockToken = result.stockToken;
+      }
+      if (result.purchasePrice != null) {
+        item.providerAvailability.purchasePrice = result.purchasePrice;
+      }
+      if (result.customerPrice != null) {
+        item.providerAvailability.price = result.customerPrice;
+        item.cena = result.customerPrice;
+      }
+      if (result.currency) {
+        item.providerAvailability.currency = result.currency;
+      }
+      if (result.expectedDelivery) {
+        item.providerAvailability.expectedDelivery = result.expectedDelivery;
+      }
+      if (result.coreCharge != null) {
+        item.providerAvailability.coreCharge = result.coreCharge;
+      }
+    });
+  }
+
+  private resolveSzakalFailures(
+    requests: SzakalStockCheckItem[],
+    results: SzakalStockCheckResult[]
+  ): string[] {
+    const failures: string[] = [];
+    const byToken = new Map<string, SzakalStockCheckResult>();
+    const byGlid = new Map<string, SzakalStockCheckResult>();
+    (results || []).forEach((result) => {
+      if (result?.token) {
+        byToken.set(result.token, result);
+      }
+      if (result?.glid) {
+        byGlid.set(result.glid, result);
+      }
+    });
+
+    (requests || []).forEach((req) => {
+      const result =
+        (req.token ? byToken.get(req.token) : undefined) ||
+        (req.glid ? byGlid.get(req.glid) : undefined);
+      const availableQty = Number(result?.availableQuantity) || 0;
+      const requested = Number(req.quantity) || 1;
+      const ok = !!result?.available && availableQty >= requested;
+      if (!ok) {
+        const label = req.token || req.glid || 'stavka';
+        failures.push(label);
+      }
+    });
+
+    return failures;
   }
 
   buildInvoiceFromForm(): void {
