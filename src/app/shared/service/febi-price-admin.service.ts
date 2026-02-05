@@ -17,6 +17,14 @@ export interface PriceFileInfoResponse {
   sizeBytes: number | null;
 }
 
+export interface PriceStatusResponse {
+  count: number;
+  dbUpdatedAt: number | null;
+  path: string | null;
+  lastModified: number | null;
+  sizeBytes: number | null;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -37,5 +45,9 @@ export class FebiPriceAdminService {
 
   fetchMeta(): Observable<PriceFileInfoResponse> {
     return this.http.get<PriceFileInfoResponse>(`${this.baseUrl}/meta`);
+  }
+
+  fetchStatus(): Observable<PriceStatusResponse> {
+    return this.http.get<PriceStatusResponse>(`${this.baseUrl}/status`);
   }
 }

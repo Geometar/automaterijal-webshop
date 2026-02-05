@@ -1217,7 +1217,7 @@
               <p class="panel-eyebrow">Spellbook</p>
               <h2>Febi price list</h2>
               <p class="panel-sub">
-                Upload and reload without restarting the app.
+                Upload and import into the database without restarting.
               </p>
             </div>
             <div class="panel-chip">
@@ -1276,6 +1276,15 @@
                 <span>{{ loading ? "Recasting..." : "Recast from disk" }}</span>
                 <span class="btn-spinner" *ngIf="loading"></span>
               </button>
+              <button
+                class="hogwarts-btn ghost"
+                type="button"
+                (click)="refreshFebiStatus()"
+                [disabled]="metaLoading"
+              >
+                <autom-icon [source]="icons.REFRESH_CW"></autom-icon>
+                <span>{{ metaLoading ? "Refreshing..." : "Refresh status" }}</span>
+              </button>
             </div>
           </div>
 
@@ -1288,19 +1297,30 @@
               ></autom-icon>
               <span>{{ statusMessage }}</span>
             </div>
-            <div class="hogwarts-meta">
-              <span *ngIf="lastCount !== null"
-                >Tomes indexed: {{ lastCount }}</span
-              >
-              <span *ngIf="lastPath">Path: {{ lastPath }}</span>
-              <span *ngIf="lastModified"
-                >Last modified:
-                {{ lastModified | date: "dd.MM.yyyy HH:mm" }}</span
-              >
-              <span *ngIf="lastSizeBytes !== null"
-                >Size: {{ lastSizeBytes / 1024 | number: "1.0-1" }} KB</span
-              >
-            </div>
+          </div>
+
+          <div
+            class="hogwarts-meta"
+            *ngIf="
+              lastCount !== null ||
+              dbUpdatedAt ||
+              lastPath ||
+              lastModified ||
+              lastSizeBytes !== null
+            "
+          >
+            <span *ngIf="lastCount !== null">DB rows: {{ lastCount }}</span>
+            <span *ngIf="dbUpdatedAt"
+              >DB updated: {{ dbUpdatedAt | date: "dd.MM.yyyy HH:mm" }}</span
+            >
+            <span *ngIf="lastPath">File path: {{ lastPath }}</span>
+            <span *ngIf="lastModified"
+              >File modified: {{ lastModified | date: "dd.MM.yyyy HH:mm" }}</span
+            >
+            <span *ngIf="lastSizeBytes !== null"
+              >File size:
+              {{ lastSizeBytes / 1024 | number: "1.0-1" }} KB</span
+            >
           </div>
 
           <div class="casting" *ngIf="loading">

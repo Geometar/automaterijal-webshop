@@ -18,7 +18,7 @@ import { IconsEnum, PositionEnum, SizeEnum } from '../../../shared/data-models/e
 import {
   FebiPriceAdminService,
   PriceReloadResponse,
-  PriceFileInfoResponse,
+  PriceStatusResponse,
 } from '../../../shared/service/febi-price-admin.service';
 import {
   HogwartsAdminService,
@@ -474,6 +474,8 @@ export class HogwartsComponent implements OnInit, OnDestroy {
   lastPath: string | null = null;
   lastModified: number | null = null;
   lastSizeBytes: number | null = null;
+  dbUpdatedAt: number | null = null;
+  metaLoading = false;
   szakalLoading = false;
   szakalFilesLoading = false;
   szakalStatusLoading = false;
@@ -1356,6 +1358,7 @@ export class HogwartsComponent implements OnInit, OnDestroy {
     this.lastPath = response?.path ?? null;
     this.lastModified = response?.lastModified ?? null;
     this.lastSizeBytes = response?.sizeBytes ?? null;
+    this.dbUpdatedAt = Date.now();
     this.setStatus(
       `${message}. Tomes indexed: ${this.lastCount ?? 0}${this.lastPath ? ` | Path: ${this.lastPath}` : ''}`,
       'success');
@@ -1364,6 +1367,7 @@ export class HogwartsComponent implements OnInit, OnDestroy {
     if (this.fileInput?.nativeElement) {
       this.fileInput.nativeElement.value = '';
     }
+    this.loadMeta();
   }
 
   private handleError(error: any): void {
@@ -1381,16 +1385,28 @@ export class HogwartsComponent implements OnInit, OnDestroy {
   }
 
   private loadMeta(): void {
-    this.febiPriceAdminService.fetchMeta().subscribe({
-      next: (info: PriceFileInfoResponse) => {
+    if (this.metaLoading) {
+      return;
+    }
+    this.metaLoading = true;
+    this.febiPriceAdminService.fetchStatus().subscribe({
+      next: (info: PriceStatusResponse) => {
+        this.lastCount = info?.count ?? this.lastCount;
+        this.dbUpdatedAt = info?.dbUpdatedAt ?? this.dbUpdatedAt;
         this.lastPath = info?.path ?? this.lastPath;
         this.lastModified = info?.lastModified ?? this.lastModified;
         this.lastSizeBytes = info?.sizeBytes ?? this.lastSizeBytes;
+        this.metaLoading = false;
       },
       error: () => {
+        this.metaLoading = false;
         // ignore; meta is optional
       },
     });
+  }
+
+  refreshFebiStatus(): void {
+    this.loadMeta();
   }
 
   refreshSzakalFiles(): void {
