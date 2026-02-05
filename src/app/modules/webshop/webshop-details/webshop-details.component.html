@@ -128,6 +128,10 @@
                 <li *ngIf="data.katbr">
                   <i class="dot"></i>Kat. broj: {{ data.katbr }}
                 </li>
+                <li *ngIf="availabilityVm.provider.coreCharge">
+                  <i class="dot"></i>
+                  Kaucija: {{ availabilityVm.provider.coreCharge | rsdCurrency }}
+                </li>
               </ul>
             </aside>
           </ng-template>
@@ -159,6 +163,9 @@
                 </div>
                 <div class="price">{{ displayPrice | rsdCurrency }}</div>
                 <div class="note">cena po komadu</div>
+                <div *ngIf="availabilityVm.provider.coreCharge" class="note note--core">
+                  Kaucija: {{ availabilityVm.provider.coreCharge | rsdCurrency }}
+                </div>
                 <div class="total-price">
                   Ukupno: {{ totalPrice | rsdCurrency }}
                 </div>
@@ -175,7 +182,7 @@
             <div class="actions">
               <autom-input-fields
                 [clearBtn]="false"
-                [disableInput]="isOutOfStock"
+                [disableInput]="isOutOfStock || requiresLoginForOrder"
                 [customClass]="'qty'"
                 [max]="availableStock || quantityMin"
                 [min]="quantityMin"
@@ -193,7 +200,8 @@
               ></autom-input-fields>
 
               <autom-button
-                [disabled]="isOutOfStock"
+                [disabled]="isOutOfStock || requiresLoginForOrder"
+                [theme]="requiresLoginForOrder ? buttonTheme.LIGHT_RED : buttonTheme.DEFAULT"
                 [iconPrefix]="true"
                 [iconSource]="iconEnum.SHOPPING_CART"
                 [iconColor]="colorEnum.INFO_25_FILL"
@@ -201,6 +209,9 @@
                 (clickEvent)="addToShopingCart()"
               ></autom-button>
             </div>
+            <p *ngIf="requiresLoginForOrder" class="login-note">
+              Dozvoljeno samo ulogovanim kupcima
+            </p>
 
             <div *ngIf="isOutOfStock" class="inquiry">
               <p class="inquiry__title" *ngIf="!inquirySent">

@@ -50,6 +50,9 @@
     </h3>
 
     <p class="product-katbr" *ngIf="roba.katbr">Kat. broj: {{ roba.katbr }}</p>
+    <p class="product-katbr product-katbr--core" *ngIf="availabilityVm.provider.coreCharge">
+      Kaucija: {{ availabilityVm.provider.coreCharge | rsdCurrency }}
+    </p>
   </div>
 
   <!-- Cene -->
@@ -66,9 +69,6 @@
       </p>
       <!-- Mali tekst: cena sa PDV-om -->
       <p class="price-note">Cena sa PDV-om</p>
-      <p *ngIf="availabilityVm.provider.coreCharge" class="price-note">
-        Kaucija: {{ availabilityVm.provider.coreCharge | rsdCurrency }}
-      </p>
 
       <!-- Ušteda (opciono, diskretno) -->
       <p *ngIf="showDiscount && savings" class="saving">
@@ -108,7 +108,7 @@
   <div class="product-actions" *ngIf="canAddToCart">
     <autom-input-fields
       [clearBtn]="false"
-      [disableInput]="isOutOfStock"
+      [disableInput]="isOutOfStock || requiresLoginForOrder"
       [customClass]="'quantity-size'"
       [max]="availableStock || quantityMin"
       [min]="quantityMin"
@@ -126,7 +126,8 @@
     ></autom-input-fields>
 
     <autom-button
-      [disabled]="isOutOfStock"
+      [disabled]="isOutOfStock || requiresLoginForOrder"
+      [theme]="requiresLoginForOrder ? buttonTheme.LIGHT_RED : buttonTheme.DEFAULT"
       [iconColor]="colorEnum.INFO_25_FILL"
       [iconPrefix]="true"
       [iconSource]="iconEnum.SHOPPING_CART"
@@ -134,4 +135,7 @@
       (clickEvent)="handleAddToCart($event)"
     ></autom-button>
   </div>
+  <p *ngIf="requiresLoginForOrder" class="product-actions-note">
+    Dozvoljeno samo ulogovanim kupcima
+  </p>
 </div>

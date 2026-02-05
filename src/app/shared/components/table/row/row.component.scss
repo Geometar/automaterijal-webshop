@@ -251,6 +251,25 @@
       margin: 0 0 14px;
     }
 
+    .product-meta__note {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--figma-grey-700);
+    }
+
+    .product-meta__note--core {
+      background: var(--figma-accent-yellow-100);
+      border: 1px solid var(--figma-accent-orange-300, #fdba74);
+      color: var(--figma-bg-dark);
+      padding: 4px 8px;
+      border-radius: 10px;
+      width: auto;
+      white-space: nowrap;
+    }
+
     .product-meta autom-meta-pill {
       display: inline-flex;
       max-width: 100%;
@@ -348,8 +367,10 @@
 
     .price--total {
       margin-top: 6px;
-      font-weight: 900;
-      color: var(--figma-grey-900);
+      font-weight: 800;
+      font-size: 15.5px;
+      color: var(--figma-grey-800);
+      letter-spacing: -0.01em;
     }
 
     .price {
@@ -368,6 +389,15 @@
       text-align: right;
       margin-top: 2px;
       margin-bottom: 6px;
+    }
+
+    .login-note {
+      margin-top: 6px;
+      margin-bottom: 2px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--figma-error-600);
+      text-align: right;
     }
 
     /* Status sa tačkicom */

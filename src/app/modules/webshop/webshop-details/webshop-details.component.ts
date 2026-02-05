@@ -797,6 +797,10 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   }
 
   addToShopingCart(): void {
+    if (this.requiresLoginForOrder) {
+      this.snackbarService.showError('Za ovaj artikal je potrebna prijava');
+      return;
+    }
     if (this.isOutOfStock) {
       this.snackbarService.showError('Artikal trenutno nije dostupan za poručivanje');
       return;
@@ -984,6 +988,13 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
 
   get isOutOfStock(): boolean {
     return this.availableStock <= 0;
+  }
+
+  get requiresLoginForOrder(): boolean {
+    if (this.loggedIn) return false;
+    const provider = this.data?.providerAvailability;
+    if (!provider?.available) return false;
+    return !!provider?.providerNoReturnable || (Number(provider?.coreCharge) || 0) > 0;
   }
 
   get inquiryContactTrim(): string {

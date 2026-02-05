@@ -62,6 +62,12 @@
         [value]="data.katbr"
         [ariaLabel]="'Kataloški broj ' + data.katbr"
       ></autom-meta-pill>
+      <div
+        class="product-meta__note product-meta__note--core"
+        *ngIf="availabilityVm.provider.coreCharge"
+      >
+        Kaucija: {{ availabilityVm.provider.coreCharge | rsdCurrency }}
+      </div>
 
       <ng-container *ngIf="categoryLabel as label">
         <ng-container
@@ -280,7 +286,7 @@
     >
       <autom-input-fields
         [clearBtn]="false"
-        [disableInput]="isUnavailable"
+        [disableInput]="isUnavailable || requiresLoginForOrder"
         [customClass]="'quantity-size'"
         [max]="effectiveStock || quantityMin"
         [min]="quantityMin"
@@ -300,7 +306,8 @@
       <autom-button
         mat-raised-button
         color="primary"
-        [disabled]="isUnavailable"
+        [disabled]="isUnavailable || requiresLoginForOrder"
+        [theme]="requiresLoginForOrder ? buttonTheme.LIGHT_RED : buttonTheme.DEFAULT"
         [iconColor]="colorEnum.INFO_25"
         [iconPrefix]="true"
         [iconSource]="iconEnum.SHOPPING_CART"
@@ -308,6 +315,9 @@
         (clickEvent)="addToShoppingCart(data)"
       />
     </div>
+    <p *ngIf="requiresLoginForOrder" class="login-note">
+      Dozvoljeno samo ulogovanim kupcima
+    </p>
 
     <p *ngIf="canAddToCart && !isUnavailable && availabilityVm.priceVerified" class="price price--total">
       Ukupno: {{ selectedTotalPrice | rsdCurrency }}

@@ -3,12 +3,11 @@ import { Component, Input } from '@angular/core';
 
 import { AvailabilityVm } from '../../utils/availability-utils';
 import { MetaPillComponent } from '../meta-pill/meta-pill.component';
-import { RsdCurrencyPipe } from '../../pipe/rsd-currency.pipe';
 
 @Component({
   selector: 'autom-provider-availability',
   standalone: true,
-  imports: [CommonModule, MetaPillComponent, RsdCurrencyPipe],
+  imports: [CommonModule, MetaPillComponent],
   templateUrl: './provider-availability.component.html',
   styleUrl: './provider-availability.component.scss',
 })

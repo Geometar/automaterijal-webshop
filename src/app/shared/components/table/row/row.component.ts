@@ -204,6 +204,10 @@ export class RowComponent implements OnInit, OnChanges {
   }
 
   addToShoppingCart(data: Roba): void {
+    if (this.requiresLoginForOrder) {
+      this.snackbarService.showError('Za ovaj artikal je potrebna prijava');
+      return;
+    }
     const allowWithoutPrice = this.isSzakalUnverified;
     if (!this.canAddToCart || this.isUnavailable || (!this.availabilityVm.hasValidPrice && !allowWithoutPrice)) {
       this.snackbarService.showError('Artikal trenutno nije dostupan za poručivanje');
@@ -314,6 +318,13 @@ export class RowComponent implements OnInit, OnChanges {
     }
     const id = this.data?.robaid;
     return id != null ? this.cartStateService.isInCart(id) : false;
+  }
+
+  get requiresLoginForOrder(): boolean {
+    if (this.loggedIn) return false;
+    const provider = this.data?.providerAvailability;
+    if (!provider?.available) return false;
+    return !!provider?.providerNoReturnable || (Number(provider?.coreCharge) || 0) > 0;
   }
 
   openImageZoom(url: string) {

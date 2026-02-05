@@ -13,7 +13,7 @@ import { InputFieldsComponent } from '../input-fields/input-fields.component';
 import { Roba } from '../../data-models/model/roba';
 
 // Enums
-import { ColorEnum, IconsEnum, InputTypeEnum, SizeEnum } from '../../data-models/enums';
+import { ButtonThemes, ColorEnum, IconsEnum, InputTypeEnum, SizeEnum } from '../../data-models/enums';
 
 // Pipes
 import { RsdCurrencyPipe } from '../../pipe/rsd-currency.pipe';
@@ -60,9 +60,11 @@ export class AutomProductCardComponent implements OnInit, OnChanges {
   colorEnum = ColorEnum;
   inputTypeEnum = InputTypeEnum;
   sizeEnum = SizeEnum;
+  buttonTheme = ButtonThemes;
 
   isAdmin = false;
   isEmployee = false;
+  loggedIn = false;
 
   // Quantity state
   quantity = 1;
@@ -81,6 +83,7 @@ export class AutomProductCardComponent implements OnInit, OnChanges {
   ngOnInit(): void {
     this.isAdmin = this.accountStateService.isAdmin();
     this.isEmployee = this.accountStateService.isEmployee();
+    this.loggedIn = this.accountStateService.isUserLoggedIn();
 
     // Initialize quantity from incoming data if present
     const incomingQty = this.roba?.kolicina ?? 0;
@@ -125,6 +128,10 @@ export class AutomProductCardComponent implements OnInit, OnChanges {
   handleAddToCart(event?: Event): void {
     event?.stopPropagation();
     if (!this.canAddToCart) {
+      return;
+    }
+    if (this.requiresLoginForOrder) {
+      this.snackbarService.showError('Za ovaj artikal je potrebna prijava');
       return;
     }
     if (this.roba && this.quantity > 0) {
@@ -339,6 +346,13 @@ export class AutomProductCardComponent implements OnInit, OnChanges {
       return this.availableStock <= 0;
     }
     return !this.hasValidPrice || this.availableStock <= 0;
+  }
+
+  get requiresLoginForOrder(): boolean {
+    if (this.loggedIn) return false;
+    const provider = this.roba?.providerAvailability;
+    if (!provider?.available) return false;
+    return !!provider?.providerNoReturnable || (Number(provider?.coreCharge) || 0) > 0;
   }
 
   get showDiscount(): boolean {
