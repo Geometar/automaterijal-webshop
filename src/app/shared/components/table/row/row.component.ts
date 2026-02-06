@@ -270,6 +270,7 @@ export class RowComponent implements OnInit, OnChanges {
     }
     data.providerAvailability.realtimeChecked = true;
     data.providerAvailability.realtimeCheckedAt = new Date().toISOString();
+    data.providerAvailability.realtimeChecking = false;
     if (typeof result.available === 'boolean') {
       data.providerAvailability.available = result.available;
     }
@@ -557,6 +558,12 @@ export class RowComponent implements OnInit, OnChanges {
   private get isSzakalUnverified(): boolean {
     const providerKey = (this.data?.providerAvailability?.provider || '').toString().trim().toLowerCase();
     return providerKey === 'szakal' && !this.availabilityVm.priceVerified;
+  }
+
+  get showRealtimeCheckingHint(): boolean {
+    const provider = this.data?.providerAvailability;
+    const providerKey = (provider?.provider || '').toString().trim().toLowerCase();
+    return providerKey === 'szakal' && !!provider?.realtimeChecking;
   }
 
   private sanitizeDomId(value: string): string {

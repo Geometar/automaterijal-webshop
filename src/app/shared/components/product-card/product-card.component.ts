@@ -198,6 +198,7 @@ export class AutomProductCardComponent implements OnInit, OnChanges {
     }
     roba.providerAvailability.realtimeChecked = true;
     roba.providerAvailability.realtimeCheckedAt = new Date().toISOString();
+    roba.providerAvailability.realtimeChecking = false;
     if (typeof result.available === 'boolean') {
       roba.providerAvailability.available = result.available;
     }
@@ -440,6 +441,12 @@ export class AutomProductCardComponent implements OnInit, OnChanges {
   private get isSzakalUnverified(): boolean {
     const providerKey = (this.roba?.providerAvailability?.provider || '').toString().trim().toLowerCase();
     return providerKey === 'szakal' && !this.availabilityVm.priceVerified;
+  }
+
+  get showRealtimeCheckingHint(): boolean {
+    const provider = this.roba?.providerAvailability;
+    const providerKey = (provider?.provider || '').toString().trim().toLowerCase();
+    return providerKey === 'szakal' && !!provider?.realtimeChecking;
   }
 
   /* ------------------------- Compatibility --------------------------- */

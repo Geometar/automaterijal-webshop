@@ -359,6 +359,14 @@
       color: var(--figma-grey-600);
     }
 
+    .realtime-hint {
+      color: var(--figma-info-700);
+      font-weight: 600;
+      margin-top: 4px;
+      margin-bottom: 0;
+      text-align: right;
+    }
+
     .price--unit {
       font-size: 18px;
       font-weight: 700;

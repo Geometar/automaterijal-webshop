@@ -205,6 +205,12 @@
       color: var(--figma-grey-600);
     }
 
+    .product-stock__sub--checking {
+      color: var(--figma-info-700);
+      font-style: italic;
+      margin-top: 4px;
+    }
+
     &.blue .product-stock__sub {
       color: var(--figma-info-700);
     }

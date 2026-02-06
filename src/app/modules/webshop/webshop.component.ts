@@ -1178,6 +1178,12 @@ export class WebshopComponent implements OnDestroy, OnInit {
       .slice(0, this.szakalRealtimeLimit)
       .map((entry) => entry.roba);
 
+    prioritized.forEach((roba) => {
+      if (roba?.providerAvailability) {
+        roba.providerAvailability.realtimeChecking = true;
+      }
+    });
+
     const requestItems = prioritized.map((roba) => ({
       token: roba?.providerAvailability?.providerStockToken,
       glid: roba?.providerAvailability?.providerProductId,
@@ -1201,6 +1207,13 @@ export class WebshopComponent implements OnDestroy, OnInit {
             }
           });
         },
+        error: () => {
+          prioritized.forEach((roba) => {
+            if (roba?.providerAvailability) {
+              roba.providerAvailability.realtimeChecking = false;
+            }
+          });
+        },
       });
   }
 
@@ -1210,6 +1223,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
     }
     data.providerAvailability.realtimeChecked = true;
     data.providerAvailability.realtimeCheckedAt = new Date().toISOString();
+    data.providerAvailability.realtimeChecking = false;
     if (typeof result.available === 'boolean') {
       data.providerAvailability.available = result.available;
     }

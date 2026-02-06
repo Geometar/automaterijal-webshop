@@ -50,7 +50,10 @@
     </h3>
 
     <p class="product-katbr" *ngIf="roba.katbr">Kat. broj: {{ roba.katbr }}</p>
-    <p class="product-katbr product-katbr--core" *ngIf="availabilityVm.provider.coreCharge">
+    <p
+      class="product-katbr product-katbr--core"
+      *ngIf="availabilityVm.provider.coreCharge"
+    >
       Kaucija: {{ availabilityVm.provider.coreCharge | rsdCurrency }}
     </p>
   </div>
@@ -93,7 +96,7 @@
       green: availabilityVm.tone === 'green',
       blue: availabilityVm.tone === 'blue',
       red: availabilityVm.tone === 'red',
-      yellow: availabilityVm.tone === 'yellow'
+      yellow: availabilityVm.tone === 'yellow',
     }"
   >
     <div class="product-stock__label">{{ availabilityVm.label }}</div>
@@ -101,6 +104,12 @@
       <span *ngIf="availabilityVm.provider.deliveryLabel"
         >Isporuka: {{ availabilityVm.provider.deliveryLabel }}</span
       >
+    </div>
+    <div
+      class="product-stock__sub product-stock__sub--checking"
+      *ngIf="showRealtimeCheckingHint"
+    >
+      Proveravaju se informacije...
     </div>
   </div>
 
@@ -117,7 +126,7 @@
       [type]="inputTypeEnum.QUANTITY"
       [validators]="[
         { name: 'max', value: availableStock || quantityMin },
-        { name: 'min', value: quantityMin }
+        { name: 'min', value: quantityMin },
       ]"
       [step]="quantityStep"
       [value]="quantity"
@@ -127,7 +136,9 @@
 
     <autom-button
       [disabled]="isOutOfStock || requiresLoginForOrder"
-      [theme]="requiresLoginForOrder ? buttonTheme.LIGHT_RED : buttonTheme.DEFAULT"
+      [theme]="
+        requiresLoginForOrder ? buttonTheme.LIGHT_RED : buttonTheme.DEFAULT
+      "
       [iconColor]="colorEnum.INFO_25_FILL"
       [iconPrefix]="true"
       [iconSource]="iconEnum.SHOPPING_CART"

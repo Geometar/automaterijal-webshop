@@ -539,6 +539,13 @@
     padding: 4px 8px;
   }
 
+  .note--checking {
+    margin-top: 8px;
+    color: var(--figma-info-700);
+    font-style: italic;
+    font-weight: 600;
+  }
+
   .login-note {
     margin-top: 6px;
     font-size: 12px;

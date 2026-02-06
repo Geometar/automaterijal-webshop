@@ -20,6 +20,7 @@ export interface ProviderAvailabilityDto {
   customerPrice?: number;
   realtimeChecked?: boolean;
   realtimeCheckedAt?: string;
+  realtimeChecking?: boolean;
   expectedDelivery?: string;
   coreCharge?: number;
   totalQuantity?: number;

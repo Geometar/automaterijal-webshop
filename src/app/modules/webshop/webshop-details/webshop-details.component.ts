@@ -893,6 +893,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     }
     data.providerAvailability.realtimeChecked = true;
     data.providerAvailability.realtimeCheckedAt = new Date().toISOString();
+    data.providerAvailability.realtimeChecking = false;
     if (typeof result.available === 'boolean') {
       data.providerAvailability.available = result.available;
     }
@@ -952,6 +953,12 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
 
   get showProviderAvailability(): boolean {
     return this.availabilityVm.showProviderBox;
+  }
+
+  get showRealtimeCheckingHint(): boolean {
+    const provider = this.data?.providerAvailability;
+    const providerKey = (provider?.provider || '').toString().trim().toLowerCase();
+    return providerKey === 'szakal' && !!provider?.realtimeChecking;
   }
 
   get providerDeliveryLabel(): string | null {

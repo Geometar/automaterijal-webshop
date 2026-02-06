@@ -118,7 +118,8 @@
                   <i class="dot"></i>Na stanju — spremno za brzu isporuku
                 </li>
                 <li *ngIf="availabilityStatus === 'AVAILABLE'">
-                  <i class="dot"></i>{{ availabilityLabel }}<span *ngIf="providerDeliveryLabel">
+                  <i class="dot"></i>{{ availabilityLabel
+                  }}<span *ngIf="providerDeliveryLabel">
                     — isporuka {{ providerDeliveryLabel }}</span
                   >
                 </li>
@@ -130,7 +131,8 @@
                 </li>
                 <li *ngIf="availabilityVm.provider.coreCharge">
                   <i class="dot"></i>
-                  Kaucija: {{ availabilityVm.provider.coreCharge | rsdCurrency }}
+                  Kaucija:
+                  {{ availabilityVm.provider.coreCharge | rsdCurrency }}
                 </li>
               </ul>
             </aside>
@@ -141,11 +143,18 @@
             <div
               class="stock"
               [class.ok]="hasValidPrice && availabilityStatus === 'IN_STOCK'"
-              [class.supplier]="hasValidPrice && availabilityStatus === 'AVAILABLE' && isStaff"
-              [class.external]="hasValidPrice && availabilityStatus === 'AVAILABLE' && !isStaff"
-              [class.nope]="!hasValidPrice || availabilityStatus === 'OUT_OF_STOCK'"
+              [class.supplier]="
+                hasValidPrice && availabilityStatus === 'AVAILABLE' && isStaff
+              "
+              [class.external]="
+                hasValidPrice && availabilityStatus === 'AVAILABLE' && !isStaff
+              "
+              [class.nope]="
+                !hasValidPrice || availabilityStatus === 'OUT_OF_STOCK'
+              "
             >
-              {{ availabilityLabel }}<span class="led" aria-hidden="true"></span>
+              {{ availabilityLabel
+              }}<span class="led" aria-hidden="true"></span>
             </div>
 
             <autom-provider-availability
@@ -155,16 +164,26 @@
               variant="details"
             ></autom-provider-availability>
 
+            <div *ngIf="showRealtimeCheckingHint" class="note note--checking">
+              Proveravaju se informacije...
+            </div>
+
             <div class="price-wrap">
-              <ng-container *ngIf="availabilityVm.priceVerified; else unverifiedPrice">
+              <ng-container
+                *ngIf="availabilityVm.priceVerified; else unverifiedPrice"
+              >
                 <div class="price-row" *ngIf="hasDiscount">
                   <span class="old-price">{{ oldPrice! | rsdCurrency }}</span>
                   <span class="discount-badge">-{{ discountValue }}%</span>
                 </div>
                 <div class="price">{{ displayPrice | rsdCurrency }}</div>
                 <div class="note">cena po komadu</div>
-                <div *ngIf="availabilityVm.provider.coreCharge" class="note note--core">
-                  Kaucija: {{ availabilityVm.provider.coreCharge | rsdCurrency }}
+                <div
+                  *ngIf="availabilityVm.provider.coreCharge"
+                  class="note note--core"
+                >
+                  Kaucija:
+                  {{ availabilityVm.provider.coreCharge | rsdCurrency }}
                 </div>
                 <div class="total-price">
                   Ukupno: {{ totalPrice | rsdCurrency }}
@@ -191,7 +210,7 @@
                 [type]="inputTypeEnum.QUANTITY"
                 [validators]="[
                   { name: 'max', value: availableStock || quantityMin },
-                  { name: 'min', value: quantityMin }
+                  { name: 'min', value: quantityMin },
                 ]"
                 [step]="quantityStep"
                 [value]="quantity"
@@ -201,7 +220,11 @@
 
               <autom-button
                 [disabled]="isOutOfStock || requiresLoginForOrder"
-                [theme]="requiresLoginForOrder ? buttonTheme.LIGHT_RED : buttonTheme.DEFAULT"
+                [theme]="
+                  requiresLoginForOrder
+                    ? buttonTheme.LIGHT_RED
+                    : buttonTheme.DEFAULT
+                "
                 [iconPrefix]="true"
                 [iconSource]="iconEnum.SHOPPING_CART"
                 [iconColor]="colorEnum.INFO_25_FILL"
@@ -217,8 +240,8 @@
               <p class="inquiry__title" *ngIf="!inquirySent">
                 {{
                   showProviderAvailability
-                    ? 'Dostupno u eksternom magacinu — pošalji upit za nabavku'
-                    : 'Nema na stanju? Pošalji upit za nabavku'
+                    ? "Dostupno u eksternom magacinu — pošalji upit za nabavku"
+                    : "Nema na stanju? Pošalji upit za nabavku"
                 }}
               </p>
               <p class="inquiry__title success" *ngIf="inquirySent">
@@ -265,20 +288,30 @@
                     [iconPrefix]="true"
                     [iconSource]="iconEnum.MAIL"
                     [label]="'Pošalji upit'"
-                    [disabled]="inquirySending || (!loggedIn && !inquiryContactTrim)"
+                    [disabled]="
+                      inquirySending || (!loggedIn && !inquiryContactTrim)
+                    "
                     [theme]="buttonTheme.DEFAULT"
                     [type]="buttonType.PRIMARY"
-                  (clickEvent)="sendInquiry()"
-                ></autom-button>
-                <span class="inquiry__hint">
-                    Odgovaramo na {{ loggedIn && inquiryContact ? 'email sa naloga' : 'email koji ostaviš' }}.
+                    (clickEvent)="sendInquiry()"
+                  ></autom-button>
+                  <span class="inquiry__hint">
+                    Odgovaramo na
+                    {{
+                      loggedIn && inquiryContact
+                        ? "email sa naloga"
+                        : "email koji ostaviš"
+                    }}.
                   </span>
                 </div>
               </ng-container>
 
               <ng-template #inquirySentBlock>
                 <div class="inquiry__sent-note">
-                  <autom-icon [source]="iconEnum.CHECK_CIRCLE" class="ok-icon"></autom-icon>
+                  <autom-icon
+                    [source]="iconEnum.CHECK_CIRCLE"
+                    class="ok-icon"
+                  ></autom-icon>
                   Upit je primljen. Bićeš kontaktiran na {{ inquiryContact }}.
                 </div>
               </ng-template>
