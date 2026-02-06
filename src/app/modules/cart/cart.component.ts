@@ -498,25 +498,50 @@ export class CartComponent implements OnInit, OnDestroy {
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (results) => {
-            this.applySzakalResultsToCart(szakalChecks, results || []);
-            const failures = this.resolveSzakalFailures(szakalChecks, results || []);
-            if (failures.length) {
-              const preview = failures.slice(0, 3).join(', ');
-              const more = failures.length > 3 ? ` (+${failures.length - 3})` : '';
-              this.snackbarService.showAutoClose(
-                preview
-                  ? `Szakal provera: trenutno nije dostupno ${preview}${more}.`
-                  : 'Szakal provera: artikli trenutno nisu dostupni.',
-                SnackbarPosition.TOP
-              );
-              this.invoiceSubmitted = false;
+            const primary = results || [];
+            this.applySzakalResultsToCart(szakalChecks, primary);
+            const failedRequests = this.resolveSzakalFailureRequests(szakalChecks, primary);
+            if (!failedRequests.length) {
+              this.submitInvoiceInternal(cartItemsSnapshot, accountSnapshot);
               return;
             }
-            this.submitInvoiceInternal(cartItemsSnapshot, accountSnapshot);
+
+            // Retry once for currently failing lines (token may have rotated moments ago).
+            this.szakalStockService
+              .check(failedRequests)
+              .pipe(takeUntil(this.destroy$))
+              .subscribe({
+                next: (retryResults) => {
+                  const merged = this.mergeSzakalResults(primary, retryResults || []);
+                  this.applySzakalResultsToCart(szakalChecks, merged);
+
+                  const finalFailedRequests = this.resolveSzakalFailureRequests(szakalChecks, merged);
+                  if (finalFailedRequests.length) {
+                    const labels = finalFailedRequests.map((r) => r.token || r.glid || 'stavka');
+                    const preview = labels.slice(0, 3).join(', ');
+                    const more = labels.length > 3 ? ` (+${labels.length - 3})` : '';
+                    this.snackbarService.showAutoClose(
+                      this.buildSzakalUnavailableMessage(preview, more),
+                      SnackbarPosition.TOP
+                    );
+                    this.invoiceSubmitted = false;
+                    return;
+                  }
+
+                  this.submitInvoiceInternal(cartItemsSnapshot, accountSnapshot);
+                },
+                error: () => {
+                  this.snackbarService.showAutoClose(
+                    this.buildSzakalCheckFailedMessage(),
+                    SnackbarPosition.TOP
+                  );
+                  this.invoiceSubmitted = false;
+                },
+              });
           },
           error: () => {
             this.snackbarService.showAutoClose(
-              'Provera dostupnosti nije uspela, pokušajte ponovo.',
+              this.buildSzakalCheckFailedMessage(),
               SnackbarPosition.TOP
             );
             this.invoiceSubmitted = false;
@@ -586,7 +611,7 @@ export class CartComponent implements OnInit, OnDestroy {
     return (this.roba ?? [])
       .filter((item) => {
         const provider = (item?.providerAvailability?.provider || '').toString().trim().toLowerCase();
-        return provider === 'szakal' && !!item?.providerAvailability?.available;
+        return provider === 'szakal';
       })
       .map((item) => {
         return {
@@ -598,6 +623,26 @@ export class CartComponent implements OnInit, OnDestroy {
         } as SzakalStockCheckItem;
       })
       .filter((item) => !!item.token || !!item.glid);
+  }
+
+  private mergeSzakalResults(
+    primary: SzakalStockCheckResult[],
+    retry: SzakalStockCheckResult[]
+  ): SzakalStockCheckResult[] {
+    const merged = [...(primary || [])];
+    (retry || []).forEach((retryResult) => {
+      const idx = merged.findIndex((existing) => {
+        const sameToken = !!retryResult?.token && !!existing?.token && retryResult.token === existing.token;
+        const sameGlid = !!retryResult?.glid && !!existing?.glid && retryResult.glid === existing.glid;
+        return sameToken || sameGlid;
+      });
+      if (idx >= 0) {
+        merged[idx] = retryResult;
+      } else {
+        merged.push(retryResult);
+      }
+    });
+    return merged;
   }
 
   private applySzakalResultsToCart(
@@ -692,6 +737,34 @@ export class CartComponent implements OnInit, OnDestroy {
     });
 
     return failures;
+  }
+
+  private resolveSzakalFailureRequests(
+    requests: SzakalStockCheckItem[],
+    results: SzakalStockCheckResult[]
+  ): SzakalStockCheckItem[] {
+    const failedKeys = new Set(this.resolveSzakalFailures(requests, results));
+    return (requests || []).filter((req) => {
+      const label = req.token || req.glid || 'stavka';
+      return failedKeys.has(label);
+    });
+  }
+
+  private buildSzakalUnavailableMessage(preview: string, more: string): string {
+    if (this.isAdmin) {
+      return preview
+        ? `Szakal provera: trenutno nije dostupno ${preview}${more}.`
+        : 'Szakal provera: artikli trenutno nisu dostupni.';
+    }
+    return preview
+      ? `Provera eksternog magacina: trenutno nije dostupno ${preview}${more}.`
+      : 'Provera eksternog magacina: artikli trenutno nisu dostupni.';
+  }
+
+  private buildSzakalCheckFailedMessage(): string {
+    return this.isAdmin
+      ? 'Szakal provera dostupnosti nije uspela, pokušajte ponovo.'
+      : 'Provera eksternog magacina nije uspela, pokušajte ponovo.';
   }
 
   buildInvoiceFromForm(): void {
