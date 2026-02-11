@@ -9,18 +9,24 @@
   font-size: 12px;
   font-weight: 600;
   line-height: 1.35;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .provider-availability--row {
-  margin: 10px 0 6px;
-  padding: 10px 12px;
+  margin: 8px 0 6px;
+  padding: 9px 11px;
   border-radius: 12px;
   text-align: right;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .provider-availability--details {
-  margin: 12px 0 0;
-  padding: 12px 12px;
+  margin: 10px 0 0;
+  padding: 10px 12px;
   border-radius: 14px;
 }
 
@@ -31,7 +37,7 @@
 }
 
 .provider-availability__row + .provider-availability__row {
-  margin-top: 4px;
+  margin-top: 3px;
 }
 
 .provider-availability__value {
@@ -78,4 +84,94 @@
   color: var(--figma-info-700);
   font-size: 12.5px;
   font-weight: 800;
+}
+
+.provider-availability__split {
+  margin-top: 6px !important;
+  padding-top: 6px;
+  border-top: 1px dashed rgba(148, 163, 184, 0.45);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.provider-availability__split-title {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 800;
+  opacity: 0.85;
+}
+
+.provider-availability__split-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  max-width: 100%;
+}
+
+.provider-availability__split-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 800;
+  line-height: 1.2;
+  white-space: normal;
+  text-align: center;
+  max-width: 100%;
+}
+
+.provider-availability__split-chip--local {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.provider-availability__split-chip--external {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.provider-availability--customer .provider-availability__split-chip--external {
+  background: #fde68a;
+  color: #92400e;
+}
+
+.provider-availability--row .provider-availability__split {
+  align-items: flex-end;
+}
+
+.provider-availability--row .provider-availability__split-chips {
+  justify-content: flex-end;
+}
+
+.provider-availability--details .provider-availability__split {
+  align-items: flex-start;
+}
+
+.provider-availability--details .provider-availability__split-chips {
+  justify-content: flex-start;
+}
+
+@media (max-width: 991px) {
+  .provider-availability--row {
+    text-align: center;
+  }
+
+  .provider-availability--details {
+    text-align: center;
+  }
+
+  .provider-availability--row .provider-availability__split,
+  .provider-availability--details .provider-availability__split {
+    align-items: center;
+  }
+
+  .provider-availability__split-chips {
+    justify-content: center;
+  }
 }

@@ -27,6 +27,8 @@ export class Invoice {
   partner?: string;
   /** Partner identifier (used by admin screens). */
   ppid?: number;
+  /** Client-generated key used to deduplicate checkout retries. */
+  idempotencyKey?: string;
   status?: ValueHelp;
   vremePorucivanja?: string;
   providerOptions?: ProviderOrderOption[];

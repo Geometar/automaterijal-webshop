@@ -485,6 +485,24 @@
     }
   }
 
+  .warehouse-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-700);
+  }
+
+  .warehouse-breakdown--admin {
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid var(--figma-info-100);
+    background: var(--figma-info-25);
+    color: var(--figma-info-700);
+  }
+
   .price-wrap {
     margin: 14px 0 12px;
 
@@ -880,6 +898,30 @@
 
   .buy-card .actions {
     grid-template-columns: 1fr;
+  }
+
+  .buy-card {
+    position: static;
+    top: auto;
+    padding: 16px;
+  }
+
+  .buy-card .stock {
+    justify-content: center;
+  }
+
+  .buy-card .warehouse-breakdown {
+    align-items: center;
+    text-align: center;
+  }
+
+  .buy-card .price-wrap,
+  .buy-card .price,
+  .buy-card .note,
+  .buy-card .total-price,
+  .buy-card .saving,
+  .buy-card .login-note {
+    text-align: center;
   }
 
   .documentation {

@@ -205,6 +205,21 @@
       color: var(--figma-grey-600);
     }
 
+    .product-stock__sub--warehouse {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-top: 4px;
+    }
+
+    .product-stock__sub--warehouse-admin {
+      padding: 6px 8px;
+      border-radius: 10px;
+      border: 1px solid var(--figma-info-100);
+      background: var(--figma-info-25);
+      color: var(--figma-info-700);
+    }
+
     .product-stock__sub--checking {
       color: var(--figma-info-700);
       font-style: italic;

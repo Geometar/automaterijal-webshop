@@ -157,8 +157,7 @@
       <autom-meta-pill
         *ngIf="
           showPriceOnly &&
-          !isAdminCartView &&
-          availabilityVm.showProviderBox &&
+          data?.providerAvailability?.available &&
           availabilityVm.provider.deliveryLabel
         "
         variant="soft"
@@ -168,6 +167,20 @@
         [attr.title]="'Procena isporuke za ovaj artikal.'"
         [ariaLabel]="'Isporuka ' + availabilityVm.provider.deliveryLabel"
       ></autom-meta-pill>
+    </div>
+
+    <div
+      class="warehouse-breakdown warehouse-breakdown--admin"
+      *ngIf="isAdmin && availabilityVm.provider.warehouseSplit.enabled"
+    >
+      <span *ngIf="availabilityVm.provider.warehouseSplit.sabacQuantity > 0">
+        Magacin Šabac:
+        {{ availabilityVm.provider.warehouseSplit.sabacQuantity | number : '1.0-0' }}
+      </span>
+      <span *ngIf="availabilityVm.provider.warehouseSplit.beogradQuantity > 0">
+        {{ availabilityVm.provider.warehouseSplit.beogradLabel }}:
+        {{ availabilityVm.provider.warehouseSplit.beogradQuantity | number : '1.0-0' }}
+      </span>
     </div>
 
     <p *ngIf="isEmployee">
@@ -230,8 +243,8 @@
   <!-- Add to basket Section -->
   <div class="pricing-container" *ngIf="showAddToBasket">
     <!-- Status -->
-    <div [ngClass]="['item-status', availabilityVm.tone]">
-      <span class="item-status__text">{{ availabilityVm.label }}</span>
+    <div [ngClass]="['item-status', currentAvailabilityTone]">
+      <span class="item-status__text">{{ currentAvailabilityLabel }}</span>
       <span class="item-status__dot" aria-hidden="true"></span>
     </div>
 
@@ -258,6 +271,11 @@
     <autom-provider-availability
       [availability]="availabilityVm"
       [isStaff]="isStaff"
+      [forceShow]="shouldForceProviderAvailabilityBox"
+      [mixedWarehouse]="showMixedWarehouseSplitHint"
+      [mixedLocalQuantity]="mixedLocalSelectionQuantity"
+      [mixedExternalQuantity]="mixedExternalSelectionQuantity"
+      [mixedExternalLabel]="mixedWarehouseExternalLabel"
       variant="row"
     ></autom-provider-availability>
     <!-- Stara cena -->

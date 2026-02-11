@@ -11,11 +11,15 @@ import { CartItem, Roba } from '../../data-models/model/roba';
 import { AccountStateService } from './account-state.service';
 import { AnalyticsService } from '../analytics.service';
 import {
+  clampCombinedWarehouseQuantity,
   getAvailabilityStatus,
+  getProviderAvailableQuantity,
   getPurchasableStock,
   getPurchasableUnitPrice,
+  isFebiProvider,
   resolveMinOrderQuantity,
   resolvePackagingUnit,
+  splitCombinedWarehouseQuantity,
 } from '../../utils/availability-utils';
 
 @Injectable({
@@ -96,50 +100,71 @@ export class CartStateService {
     if (!key) return;
 
     const status = getAvailabilityStatus(roba);
+    const isFebiCombined = isFebiProvider(roba?.providerAvailability);
     const unitPrice = getPurchasableUnitPrice(roba, {
       isAdmin: this.accountStateService.isAdmin(),
       isStaff: this.accountStateService.isEmployee(),
     });
     const currentStock = getPurchasableStock(roba);
 
-    const step = status === 'AVAILABLE'
-      ? resolvePackagingUnit(roba?.providerAvailability)
-      : 1;
-    const minOrder = status === 'AVAILABLE'
-      ? resolveMinOrderQuantity(roba?.providerAvailability)
-      : 1;
-
-    let requested = Math.floor(quantity || minOrder);
-    if (requested < minOrder) {
-      requested = minOrder;
-    }
-    if (step > 1) {
-      requested = Math.ceil(requested / step) * step;
-      if (requested < step) requested = step;
+    let requested = Math.floor(quantity || 1);
+    if (requested < 1) {
+      requested = 1;
     }
 
-    const qtyToAdd = Math.min(requested, currentStock || 0);
-    if (unitPrice <= 0 || qtyToAdd <= 0) return;
+    if (!isFebiCombined) {
+      const step =
+        status === 'AVAILABLE' ? resolvePackagingUnit(roba?.providerAvailability) : 1;
+      const minOrder =
+        status === 'AVAILABLE' ? resolveMinOrderQuantity(roba?.providerAvailability) : 1;
+
+      if (requested < minOrder) {
+        requested = minOrder;
+      }
+      if (step > 1) {
+        requested = Math.ceil(requested / step) * step;
+        if (requested < step) requested = step;
+      }
+    }
 
     let cart = this.getAll();
     const existingItem = cart.find((item) => item.key === key);
+    const existingQuantity = Math.max(0, Number(existingItem?.quantity) || 0);
+    let targetQuantity = existingQuantity;
+
+    if (isFebiCombined) {
+      targetQuantity = this.clampCombinedTargetQuantity(
+        roba,
+        existingItem,
+        existingQuantity + requested
+      );
+    } else {
+      const qtyToAdd = Math.min(requested, currentStock || 0);
+      const max = existingQuantity + (currentStock || 0);
+      targetQuantity = Math.min(existingQuantity + qtyToAdd, max);
+    }
+
+    const qtyToAdd = Math.max(0, targetQuantity - existingQuantity);
+    if (unitPrice <= 0 || qtyToAdd <= 0) return;
+
     let trackedItem: CartItem;
 
     if (existingItem) {
-      const max = (existingItem.quantity ?? 0) + (currentStock || 0);
-      existingItem.quantity = Math.min((existingItem.quantity ?? 0) + qtyToAdd, max);
+      existingItem.quantity = targetQuantity;
       existingItem.totalPrice = (existingItem.unitPrice ?? 0) * (existingItem.quantity ?? 0);
       trackedItem = existingItem;
     } else {
       const newItem: CartItem = this.mapToCartItem(roba);
-      newItem.quantity = qtyToAdd;
-      newItem.totalPrice = (newItem.unitPrice ?? 0) * qtyToAdd;
+      newItem.quantity = targetQuantity;
+      newItem.totalPrice = (newItem.unitPrice ?? 0) * (newItem.quantity ?? 0);
       cart.push(newItem);
       trackedItem = newItem;
     }
 
     // ✅ Smanjuje stanje (lokalno u UI)
-    if (status === 'IN_STOCK') {
+    if (isFebiProvider(roba?.providerAvailability)) {
+      this.reduceFromCombinedWarehouses(roba, qtyToAdd);
+    } else if (status === 'IN_STOCK') {
       roba.stanje = this.calculateNewStock(roba.stanje, qtyToAdd);
     } else if (status === 'AVAILABLE' && roba?.providerAvailability) {
       const pa = roba.providerAvailability;
@@ -208,7 +233,9 @@ export class CartStateService {
       if (cartItem) {
         const status = getAvailabilityStatus(roba);
         const qty = cartItem.quantity ?? 0;
-        if (status === 'AVAILABLE' && roba?.providerAvailability) {
+        if (isFebiProvider(roba?.providerAvailability)) {
+          this.reduceFromCombinedWarehouses(roba, qty);
+        } else if (status === 'AVAILABLE' && roba?.providerAvailability) {
           const pa = roba.providerAvailability;
           if (pa.warehouseQuantity != null) {
             pa.warehouseQuantity = this.calculateNewStock(pa.warehouseQuantity, qty);
@@ -234,7 +261,9 @@ export class CartStateService {
     if (cartItem) {
       const status = getAvailabilityStatus(roba);
       const qty = cartItem.quantity ?? 0;
-      if (status === 'AVAILABLE' && roba?.providerAvailability) {
+      if (isFebiProvider(roba?.providerAvailability)) {
+        this.reduceFromCombinedWarehouses(roba, qty);
+      } else if (status === 'AVAILABLE' && roba?.providerAvailability) {
         const pa = roba.providerAvailability;
         if (pa.warehouseQuantity != null) {
           pa.warehouseQuantity = this.calculateNewStock(pa.warehouseQuantity, qty);
@@ -281,7 +310,9 @@ export class CartStateService {
   private mapToCartItem(roba: any): CartItem {
     const status = getAvailabilityStatus(roba);
     const provider = roba?.providerAvailability;
+    const isFebi = isFebiProvider(provider);
     const isProvider = status === 'AVAILABLE' && !!provider?.available;
+    const hasProviderSnapshot = !!provider?.available && (isProvider || isFebi);
     const unitPrice = getPurchasableUnitPrice(roba, {
       isAdmin: this.accountStateService.isAdmin(),
       isStaff: this.accountStateService.isEmployee(),
@@ -289,6 +320,10 @@ export class CartStateService {
     const stock = getPurchasableStock(roba);
     const isAdmin = this.accountStateService.isAdmin();
     const key = this.getItemKey(roba);
+    const localStock = Math.max(0, Number(roba?.stanje) || 0);
+    const providerAvailableQuantity = hasProviderSnapshot
+      ? getProviderAvailableQuantity(provider)
+      : 0;
 
     return {
       key: key ?? undefined,
@@ -300,31 +335,33 @@ export class CartStateService {
       partNumber: roba.katbr || '',
       quantity: roba.kolicina || 1,
       robaId: roba?.robaid ?? null,
+      localStock,
+      providerAvailableQuantity: hasProviderSnapshot ? providerAvailableQuantity : undefined,
       tecDocArticleId: roba?.tecDocArticleId ?? undefined,
       stock: stock || 0,
       totalPrice: unitPrice * (roba.kolicina || 1),
       unitPrice,
       source: isProvider ? 'PROVIDER' : 'STOCK',
-      provider: isProvider ? provider?.provider : undefined,
-      providerArticleNumber: isProvider ? provider?.articleNumber : undefined,
-      providerProductId: isProvider ? provider?.providerProductId : undefined,
-      providerStockToken: isProvider ? provider?.providerStockToken : undefined,
-      providerWarehouse: isProvider ? provider?.warehouse : undefined,
-      providerWarehouseName: isProvider ? provider?.warehouseName : undefined,
-      providerCurrency: isProvider ? provider?.currency : undefined,
-      providerCustomerPrice: isProvider ? provider?.price : undefined,
-      providerPurchasePrice: isProvider && isAdmin ? provider?.purchasePrice : undefined,
-      providerNoReturnable: isProvider ? provider?.providerNoReturnable : undefined,
-      providerPackagingUnit: isProvider ? provider?.packagingUnit : undefined,
-      providerMinOrderQuantity: isProvider ? provider?.minOrderQuantity : undefined,
-      providerLeadTimeBusinessDays: isProvider ? provider?.leadTimeBusinessDays : undefined,
-      providerDeliveryToCustomerBusinessDaysMin: isProvider ? provider?.deliveryToCustomerBusinessDaysMin : undefined,
-      providerDeliveryToCustomerBusinessDaysMax: isProvider ? provider?.deliveryToCustomerBusinessDaysMax : undefined,
-      providerNextDispatchCutoff: isProvider ? provider?.nextDispatchCutoff : undefined,
-      providerExpectedDelivery: isProvider ? provider?.expectedDelivery : undefined,
-      providerCoreCharge: isProvider ? provider?.coreCharge : undefined,
-      providerRealtimeChecked: isProvider ? provider?.realtimeChecked : undefined,
-      providerRealtimeCheckedAt: isProvider ? provider?.realtimeCheckedAt : undefined,
+      provider: hasProviderSnapshot ? provider?.provider : undefined,
+      providerArticleNumber: hasProviderSnapshot ? provider?.articleNumber : undefined,
+      providerProductId: hasProviderSnapshot ? provider?.providerProductId : undefined,
+      providerStockToken: hasProviderSnapshot ? provider?.providerStockToken : undefined,
+      providerWarehouse: hasProviderSnapshot ? provider?.warehouse : undefined,
+      providerWarehouseName: hasProviderSnapshot ? provider?.warehouseName : undefined,
+      providerCurrency: hasProviderSnapshot ? provider?.currency : undefined,
+      providerCustomerPrice: hasProviderSnapshot ? provider?.price : undefined,
+      providerPurchasePrice: hasProviderSnapshot && isAdmin ? provider?.purchasePrice : undefined,
+      providerNoReturnable: hasProviderSnapshot ? provider?.providerNoReturnable : undefined,
+      providerPackagingUnit: hasProviderSnapshot ? provider?.packagingUnit : undefined,
+      providerMinOrderQuantity: hasProviderSnapshot ? provider?.minOrderQuantity : undefined,
+      providerLeadTimeBusinessDays: hasProviderSnapshot ? provider?.leadTimeBusinessDays : undefined,
+      providerDeliveryToCustomerBusinessDaysMin: hasProviderSnapshot ? provider?.deliveryToCustomerBusinessDaysMin : undefined,
+      providerDeliveryToCustomerBusinessDaysMax: hasProviderSnapshot ? provider?.deliveryToCustomerBusinessDaysMax : undefined,
+      providerNextDispatchCutoff: hasProviderSnapshot ? provider?.nextDispatchCutoff : undefined,
+      providerExpectedDelivery: hasProviderSnapshot ? provider?.expectedDelivery : undefined,
+      providerCoreCharge: hasProviderSnapshot ? provider?.coreCharge : undefined,
+      providerRealtimeChecked: hasProviderSnapshot ? provider?.realtimeChecked : undefined,
+      providerRealtimeCheckedAt: hasProviderSnapshot ? provider?.realtimeCheckedAt : undefined,
       technicalDescription: roba.technicalDescription
     };
   }
@@ -348,19 +385,33 @@ export class CartStateService {
     retVal.robaid = (cartItem.robaId ?? undefined) as any;
     retVal.tecDocArticleId = cartItem.tecDocArticleId ?? undefined;
     retVal.slika = cartItem.image;
+    const hasProviderSnapshot =
+      !!cartItem.provider ||
+      !!cartItem.providerArticleNumber ||
+      !!cartItem.providerProductId ||
+      !!cartItem.providerStockToken ||
+      !!cartItem.providerWarehouse ||
+      !!cartItem.providerWarehouseName;
+    const providerAvailableQuantity = Math.max(
+      0,
+      Number(cartItem.providerAvailableQuantity) || 0
+    );
+    const providerStillAvailable =
+      providerAvailableQuantity > 0 ||
+      (cartItem.source === 'PROVIDER' && (Number(cartItem.stock) || 0) > 0);
     if (cartItem.source === 'PROVIDER') {
       retVal.stanje = 0;
       retVal.availabilityStatus = 'AVAILABLE';
       retVal.providerAvailability = {
-        available: true,
+        available: providerStillAvailable,
         provider: cartItem.provider,
         articleNumber: cartItem.providerArticleNumber,
         providerProductId: cartItem.providerProductId,
         providerStockToken: cartItem.providerStockToken,
         warehouse: cartItem.providerWarehouse,
         warehouseName: cartItem.providerWarehouseName,
-        warehouseQuantity: cartItem.stock ?? 0,
-        totalQuantity: cartItem.stock ?? 0,
+        warehouseQuantity: providerAvailableQuantity || cartItem.stock || 0,
+        totalQuantity: providerAvailableQuantity || cartItem.stock || 0,
         price: cartItem.providerCustomerPrice ?? cartItem.unitPrice,
         purchasePrice: cartItem.providerPurchasePrice,
         currency: cartItem.providerCurrency ?? 'RSD',
@@ -377,10 +428,101 @@ export class CartStateService {
         realtimeCheckedAt: cartItem.providerRealtimeCheckedAt,
       };
     } else {
-      retVal.stanje = cartItem.stock!;
+      retVal.stanje = Math.max(0, Number(cartItem.localStock) || Number(cartItem.stock) || 0);
+      if (hasProviderSnapshot) {
+        retVal.providerAvailability = {
+          available: providerStillAvailable,
+          provider: cartItem.provider,
+          articleNumber: cartItem.providerArticleNumber,
+          providerProductId: cartItem.providerProductId,
+          providerStockToken: cartItem.providerStockToken,
+          warehouse: cartItem.providerWarehouse,
+          warehouseName: cartItem.providerWarehouseName,
+          warehouseQuantity: providerAvailableQuantity,
+          totalQuantity: providerAvailableQuantity,
+          price: cartItem.providerCustomerPrice,
+          purchasePrice: cartItem.providerPurchasePrice,
+          currency: cartItem.providerCurrency ?? 'RSD',
+          packagingUnit: cartItem.providerPackagingUnit,
+          minOrderQuantity: cartItem.providerMinOrderQuantity,
+          providerNoReturnable: cartItem.providerNoReturnable,
+          leadTimeBusinessDays: cartItem.providerLeadTimeBusinessDays,
+          deliveryToCustomerBusinessDaysMin: cartItem.providerDeliveryToCustomerBusinessDaysMin,
+          deliveryToCustomerBusinessDaysMax: cartItem.providerDeliveryToCustomerBusinessDaysMax,
+          nextDispatchCutoff: cartItem.providerNextDispatchCutoff,
+          expectedDelivery: cartItem.providerExpectedDelivery,
+          coreCharge: cartItem.providerCoreCharge,
+          realtimeChecked: cartItem.providerRealtimeChecked,
+          realtimeCheckedAt: cartItem.providerRealtimeCheckedAt,
+        };
+      }
     }
     retVal.tehnickiOpis = cartItem.technicalDescription;
     return retVal;
+  }
+
+  private clampCombinedTargetQuantity(
+    roba: any,
+    existingItem: CartItem | undefined,
+    target: number
+  ): number {
+    const localSnapshot = Math.max(
+      0,
+      Number(existingItem?.localStock ?? roba?.stanje) || 0
+    );
+    const providerSnapshotQuantity = Math.max(
+      0,
+      Number(existingItem?.providerAvailableQuantity) ||
+        getProviderAvailableQuantity(roba?.providerAvailability)
+    );
+    const providerSnapshot = roba?.providerAvailability
+      ? {
+          ...roba.providerAvailability,
+          warehouseQuantity: providerSnapshotQuantity,
+          totalQuantity: providerSnapshotQuantity,
+        }
+      : undefined;
+    const snapshotRoba = {
+      ...roba,
+      stanje: localSnapshot,
+      providerAvailability: providerSnapshot,
+    };
+    const snapshotMax = Math.max(0, getPurchasableStock(snapshotRoba));
+
+    return clampCombinedWarehouseQuantity({
+      requestedQty: target,
+      maxStock: snapshotMax,
+      localQty: localSnapshot,
+      provider: providerSnapshot,
+      minQuantity: 1,
+    });
+  }
+
+  private reduceFromCombinedWarehouses(roba: any, quantity: number): void {
+    const requested = Math.max(0, Number(quantity) || 0);
+    if (requested <= 0) {
+      return;
+    }
+
+    const local = Math.max(0, Number(roba?.stanje) || 0);
+    const split = splitCombinedWarehouseQuantity(
+      requested,
+      local,
+      roba?.providerAvailability
+    );
+    roba.stanje = Math.max(0, local - split.localQuantity);
+    const externalTaken = split.externalQuantity;
+    if (externalTaken <= 0) {
+      return;
+    }
+
+    if (!roba?.providerAvailability) {
+      return;
+    }
+    const providerQty = getProviderAvailableQuantity(roba.providerAvailability);
+    const nextQty = Math.max(0, providerQty - externalTaken);
+    roba.providerAvailability.warehouseQuantity = nextQty;
+    roba.providerAvailability.totalQuantity = nextQty;
   }
 
   private normalizeCart(cart: CartItem[]): CartItem[] {

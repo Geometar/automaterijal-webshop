@@ -61,10 +61,16 @@ import { TextAreaComponent } from '../../../shared/components/text-area/text-are
 import { ProviderAvailabilityComponent } from '../../../shared/components/provider-availability/provider-availability.component';
 import { EmailService } from '../../../shared/service/email.service';
 import {
+  AvailabilityTone,
   AvailabilityVm,
   buildAvailabilityVm,
+  clampCombinedWarehouseQuantity,
+  resolveCombinedAvailabilityLabel,
+  resolveCombinedAvailabilityTone,
   resolveMinOrderQuantity,
-  resolvePackagingUnit
+  resolvePackagingUnit,
+  splitCombinedWarehouseQuantity,
+  shouldForceCombinedProviderAvailabilityBox,
 } from '../../../shared/utils/availability-utils';
 
 // Services
@@ -781,18 +787,34 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     const min = this.quantityMin;
     const step = this.quantityStep;
     const max = this.availableStock || min;
+    const localQty = Math.max(0, Number(this.availabilityVm.provider.warehouseSplit.sabacQuantity) || 0);
+    const isCombined = this.availabilityVm.provider.warehouseSplit.enabled;
+    if (!Number.isFinite(quantity)) {
+      this.quantity = min;
+      return;
+    }
+
+    if (isCombined) {
+      this.quantity = clampCombinedWarehouseQuantity({
+        requestedQty: quantity,
+        maxStock: max,
+        localQty,
+        provider: this.data?.providerAvailability,
+        minQuantity: min,
+      });
+      return;
+    }
+
     let next = quantity;
     if (next < min) next = min;
     else if (next > max) next = max;
     else next = quantity;
-
     next = Math.floor(next);
     if (step > 1) {
       next = Math.ceil(next / step) * step;
       if (next > max) next = max;
       if (next < min) next = min;
     }
-
     this.quantity = next;
   }
 
@@ -945,6 +967,73 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
 
   get availabilityLabel(): string {
     return this.availabilityVm.label;
+  }
+
+  private get localWarehouseQuantity(): number {
+    return Math.max(
+      0,
+      Number(this.availabilityVm.provider.warehouseSplit.sabacQuantity) || 0
+    );
+  }
+
+  get currentAvailabilityTone(): AvailabilityTone {
+    return resolveCombinedAvailabilityTone({
+      combinedEnabled: this.availabilityVm.provider.warehouseSplit.enabled,
+      requestedQty: this.quantity,
+      localQty: this.localWarehouseQuantity,
+      isOutOfStock: this.isOutOfStock,
+      defaultTone: this.availabilityVm.tone,
+    });
+  }
+
+  get currentAvailabilityLabel(): string {
+    return resolveCombinedAvailabilityLabel({
+      combinedEnabled: this.availabilityVm.provider.warehouseSplit.enabled,
+      tone: this.currentAvailabilityTone,
+      defaultLabel: this.availabilityVm.label,
+    });
+  }
+
+  get shouldForceProviderAvailabilityBox(): boolean {
+    return shouldForceCombinedProviderAvailabilityBox({
+      combinedEnabled: this.availabilityVm.provider.warehouseSplit.enabled,
+      hasProviderDeliveryLabel: !!this.availabilityVm.provider.deliveryLabel,
+      tone: this.currentAvailabilityTone,
+    });
+  }
+
+  get mixedLocalSelectionQuantity(): number {
+    const requested = Math.max(1, Number(this.quantity) || 1);
+    return splitCombinedWarehouseQuantity(
+      requested,
+      this.localWarehouseQuantity,
+      this.data?.providerAvailability
+    ).localQuantity;
+  }
+
+  get mixedExternalSelectionQuantity(): number {
+    const requested = Math.max(1, Number(this.quantity) || 1);
+    return splitCombinedWarehouseQuantity(
+      requested,
+      this.localWarehouseQuantity,
+      this.data?.providerAvailability
+    ).externalQuantity;
+  }
+
+  get showMixedWarehouseSplitHint(): boolean {
+    if (!this.availabilityVm.provider.warehouseSplit.enabled) {
+      return false;
+    }
+    const requested = Math.max(1, Number(this.quantity) || 1);
+    return splitCombinedWarehouseQuantity(
+      requested,
+      this.localWarehouseQuantity,
+      this.data?.providerAvailability
+    ).hasMixed;
+  }
+
+  get mixedWarehouseExternalLabel(): string {
+    return 'Magacin Beograd';
   }
 
   get isStaff(): boolean {

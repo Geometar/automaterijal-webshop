@@ -142,25 +142,37 @@
           <aside class="buy-card card">
             <div
               class="stock"
-              [class.ok]="hasValidPrice && availabilityStatus === 'IN_STOCK'"
-              [class.supplier]="
-                hasValidPrice && availabilityStatus === 'AVAILABLE' && isStaff
-              "
-              [class.external]="
-                hasValidPrice && availabilityStatus === 'AVAILABLE' && !isStaff
-              "
-              [class.nope]="
-                !hasValidPrice || availabilityStatus === 'OUT_OF_STOCK'
-              "
+              [class.ok]="currentAvailabilityTone === 'green'"
+              [class.supplier]="currentAvailabilityTone === 'blue' && isStaff"
+              [class.external]="currentAvailabilityTone === 'blue' && !isStaff"
+              [class.nope]="currentAvailabilityTone === 'red'"
             >
-              {{ availabilityLabel
+              {{ currentAvailabilityLabel
               }}<span class="led" aria-hidden="true"></span>
+            </div>
+            <div
+              class="warehouse-breakdown warehouse-breakdown--admin"
+              *ngIf="isAdmin && availabilityVm.provider.warehouseSplit.enabled"
+            >
+              <span *ngIf="availabilityVm.provider.warehouseSplit.sabacQuantity > 0">
+                Magacin Šabac:
+                {{ availabilityVm.provider.warehouseSplit.sabacQuantity | number : '1.0-0' }}
+              </span>
+              <span *ngIf="availabilityVm.provider.warehouseSplit.beogradQuantity > 0">
+                {{ availabilityVm.provider.warehouseSplit.beogradLabel }}:
+                {{ availabilityVm.provider.warehouseSplit.beogradQuantity | number : '1.0-0' }}
+              </span>
             </div>
 
             <autom-provider-availability
               [availability]="availabilityVm"
               [isStaff]="isStaff"
               [showQuantity]="availabilityVm.provider.admin.isAdmin"
+              [forceShow]="shouldForceProviderAvailabilityBox"
+              [mixedWarehouse]="showMixedWarehouseSplitHint"
+              [mixedLocalQuantity]="mixedLocalSelectionQuantity"
+              [mixedExternalQuantity]="mixedExternalSelectionQuantity"
+              [mixedExternalLabel]="mixedWarehouseExternalLabel"
               variant="details"
             ></autom-provider-availability>
 

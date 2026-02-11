@@ -47,6 +47,28 @@
             [showCloseBtn]="true"
             (removeEvent)="removeFromBasketHandler($event)"
           ></row>
+          <div
+            *ngIf="isMixedWarehouseItem(row)"
+            class="cart-split-info"
+            [class.cart-split-info--admin]="isAdmin"
+            [class.cart-split-info--customer]="!isAdmin"
+          >
+            <span class="cart-split-info__header">
+              <span class="cart-split-info__square" aria-hidden="true"></span>
+              <span class="cart-split-info__text">Isporuka iz više magacina</span>
+            </span>
+            <span class="cart-split-info__chips" aria-label="Podela količine po magacinima">
+              <span class="cart-split-info__chip cart-split-info__chip--local">
+                Šabac {{ getMixedLocalQuantity(row) | number : '1.0-0' }} kom
+              </span>
+              <span class="cart-split-info__chip cart-split-info__chip--external">
+                {{ getMixedExternalLabel(row) }} {{ getMixedExternalQuantity(row) | number : '1.0-0' }} kom
+              </span>
+            </span>
+            <span class="cart-split-info__meta" *ngIf="getMixedDeliveryHint(row) as deliveryHint">
+              {{ deliveryHint }}
+            </span>
+          </div>
         </div>
       </div>
     </div>

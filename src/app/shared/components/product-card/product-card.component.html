@@ -93,13 +93,26 @@
   <div
     class="product-stock"
     [ngClass]="{
-      green: availabilityVm.tone === 'green',
-      blue: availabilityVm.tone === 'blue',
-      red: availabilityVm.tone === 'red',
-      yellow: availabilityVm.tone === 'yellow',
+      green: currentAvailabilityTone === 'green',
+      blue: currentAvailabilityTone === 'blue',
+      red: currentAvailabilityTone === 'red',
+      yellow: currentAvailabilityTone === 'yellow',
     }"
   >
-    <div class="product-stock__label">{{ availabilityVm.label }}</div>
+    <div class="product-stock__label">{{ currentAvailabilityLabel }}</div>
+    <div
+      class="product-stock__sub product-stock__sub--warehouse product-stock__sub--warehouse-admin"
+      *ngIf="isAdmin && availabilityVm.provider.warehouseSplit.enabled"
+    >
+      <span *ngIf="availabilityVm.provider.warehouseSplit.sabacQuantity > 0">
+        Magacin Šabac:
+        {{ availabilityVm.provider.warehouseSplit.sabacQuantity | number : '1.0-0' }}
+      </span>
+      <span *ngIf="availabilityVm.provider.warehouseSplit.beogradQuantity > 0">
+        {{ availabilityVm.provider.warehouseSplit.beogradLabel }}:
+        {{ availabilityVm.provider.warehouseSplit.beogradQuantity | number : '1.0-0' }}
+      </span>
+    </div>
     <div class="product-stock__sub" *ngIf="availabilityVm.showProviderBox">
       <span *ngIf="availabilityVm.provider.deliveryLabel"
         >Isporuka: {{ availabilityVm.provider.deliveryLabel }}</span

@@ -57,9 +57,28 @@ import { InvoiceService } from '../../shared/service/invoice.service';
 import { PictureService } from '../../shared/service/utils/picture.service';
 import { SeoService } from '../../shared/service/seo.service';
 import { SnackbarPosition, SnackbarService } from '../../shared/service/utils/snackbar.service';
-import { getAvailabilityStatus } from '../../shared/utils/availability-utils';
+import {
+  formatDeliveryEstimate,
+  formatDispatchCutoff,
+  getAvailabilityStatus,
+  isFebiProvider,
+  splitCombinedWarehouseQuantity,
+} from '../../shared/utils/availability-utils';
 import { Slika } from '../../shared/data-models/model/slika';
 import { SzakalStockService, SzakalStockCheckItem, SzakalStockCheckResult } from '../../shared/service/szakal-stock.service';
+
+interface CheckoutConflictItemPayload {
+  catalogNumber?: string;
+  articleName?: string;
+  requestedQuantity?: number;
+  maxOrderableQuantity?: number;
+  message?: string;
+}
+
+interface CheckoutConflictDetailsPayload {
+  code?: string;
+  items?: CheckoutConflictItemPayload[];
+}
 
 
 @Component({
@@ -128,6 +147,7 @@ export class CartComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
   private hasTrackedCartView = false;
+  private submitRequestKey: string | null = null;
 
   constructor(
     private accountStateService: AccountStateService,
@@ -296,11 +316,7 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   get hasProviderOnlyItems(): boolean {
-    return (this.roba ?? []).some(
-      (r) =>
-        getAvailabilityStatus(r) === 'AVAILABLE' &&
-        !!r?.providerAvailability?.available
-    );
+    return (this.roba ?? []).some((item) => this.requiresExternalWarehouse(item));
   }
 
   get hasNonReturnableItems(): boolean {
@@ -322,11 +338,7 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   get cartProviderCount(): number {
-    return (this.roba ?? []).filter(
-      (r) =>
-        getAvailabilityStatus(r) === 'AVAILABLE' &&
-        !!r?.providerAvailability?.available
-    ).length;
+    return (this.roba ?? []).filter((item) => this.requiresExternalWarehouse(item)).length;
   }
 
   get cartOutOfStockCount(): number {
@@ -340,8 +352,7 @@ export class CartComponent implements OnInit, OnDestroy {
       const provider = (item?.providerAvailability?.provider || '').trim().toLowerCase();
       return (
         provider === this.febiProviderKey &&
-        getAvailabilityStatus(item) === 'AVAILABLE' &&
-        !!item?.providerAvailability?.available
+        this.requiresExternalWarehouse(item)
       );
     });
   }
@@ -352,16 +363,70 @@ export class CartComponent implements OnInit, OnDestroy {
 
   get shouldShowMixedDeliveryInfo(): boolean {
     const items = this.roba ?? [];
-    if (items.length < 2) {
+    if (!items.length) {
       return false;
     }
+    const hasExternalPart = items.some((item) => this.requiresExternalWarehouse(item));
+    const hasSabacPart = items.some((item) => this.resolveSabacFulfillment(item) > 0);
+    return hasExternalPart && hasSabacPart;
+  }
 
-    const hasProvider = items.some(
-      (r) => getAvailabilityStatus(r) === 'AVAILABLE' && !!r?.providerAvailability?.available
-    );
-    const hasStock = items.some((r) => getAvailabilityStatus(r) === 'IN_STOCK');
+  getMixedLocalQuantity(item: Roba | null | undefined): number {
+    const requested = Math.max(0, Number(item?.kolicina) || 0);
+    const sabacSnapshot = Math.max(0, Number(item?.stanje) || 0);
+    return splitCombinedWarehouseQuantity(
+      requested,
+      sabacSnapshot,
+      item?.providerAvailability
+    ).localQuantity;
+  }
 
-    return hasProvider && hasStock;
+  getMixedExternalQuantity(item: Roba | null | undefined): number {
+    const requested = Math.max(0, Number(item?.kolicina) || 0);
+    const sabacSnapshot = Math.max(0, Number(item?.stanje) || 0);
+    return splitCombinedWarehouseQuantity(
+      requested,
+      sabacSnapshot,
+      item?.providerAvailability
+    ).externalQuantity;
+  }
+
+  isMixedWarehouseItem(item: Roba | null | undefined): boolean {
+    if (!item?.providerAvailability?.available) {
+      return false;
+    }
+    return this.getMixedLocalQuantity(item) > 0 && this.getMixedExternalQuantity(item) > 0;
+  }
+
+  getMixedExternalLabel(item: Roba | null | undefined): string {
+    if (this.isAdmin && isFebiProvider(item?.providerAvailability)) {
+      return 'Magacin Beograd (FEBI)';
+    }
+    if (isFebiProvider(item?.providerAvailability)) {
+      return 'Magacin Beograd';
+    }
+    if (this.isAdmin) {
+      return 'Eksterni magacin';
+    }
+    return 'Eksterni magacin';
+  }
+
+  getMixedDeliveryHint(item: Roba | null | undefined): string | null {
+    if (!this.requiresExternalWarehouse(item)) {
+      return null;
+    }
+    const estimate = formatDeliveryEstimate(item?.providerAvailability);
+    const cutoff = formatDispatchCutoff(item?.providerAvailability?.nextDispatchCutoff);
+    if (estimate && cutoff) {
+      return `Isporuka: ${estimate} • Poruči do: ${cutoff}`;
+    }
+    if (estimate) {
+      return `Isporuka: ${estimate}`;
+    }
+    if (cutoff) {
+      return `Poruči do: ${cutoff}`;
+    }
+    return null;
   }
 
   get deliveryEstimateLabel(): string | null {
@@ -377,8 +442,7 @@ export class CartComponent implements OnInit, OnDestroy {
 
     for (const item of items) {
       const p = item?.providerAvailability;
-      const isProvider =
-        getAvailabilityStatus(item) === 'AVAILABLE' && !!p?.available;
+      const isProvider = this.requiresExternalWarehouse(item);
 
       if (!isProvider) {
         continue;
@@ -554,7 +618,7 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   private submitInvoiceInternal(cartItemsSnapshot: any[], accountSnapshot: any): void {
-    this.buildInvoiceFromForm();
+    this.buildInvoiceFromForm(this.getOrCreateSubmitRequestKey());
     this.invoiceService
       .submit(this.invoice!)
       .pipe(
@@ -602,9 +666,119 @@ export class CartComponent implements OnInit, OnDestroy {
           this.router.navigateByUrl('/webshop');
           this.hasTrackedCartView = false;
           this.cartStateService.resetCart();
+          this.resetSubmitRequestKey();
         },
-        error: () => { },
+        error: (error: any) => {
+          if (!this.shouldKeepSubmitRequestKey(error)) {
+            this.resetSubmitRequestKey();
+          }
+          this.snackbarService.showAutoClose(
+            this.extractSubmitErrorMessage(error),
+            SnackbarPosition.TOP
+          );
+        },
       });
+  }
+
+  private requiresExternalWarehouse(item: Roba | null | undefined): boolean {
+    if (!item?.providerAvailability?.available) {
+      return false;
+    }
+    const requested = Math.max(0, Number(item.kolicina) || 0);
+    if (requested <= 0) {
+      return false;
+    }
+    const sabac = Math.max(0, Number(item.stanje) || 0);
+    return (
+      splitCombinedWarehouseQuantity(
+        requested,
+        sabac,
+        item?.providerAvailability
+      ).externalQuantity > 0
+    );
+  }
+
+  private resolveSabacFulfillment(item: Roba | null | undefined): number {
+    const requested = Math.max(0, Number(item?.kolicina) || 0);
+    if (requested <= 0) {
+      return 0;
+    }
+    const sabac = Math.max(0, Number(item?.stanje) || 0);
+    return splitCombinedWarehouseQuantity(
+      requested,
+      sabac,
+      item?.providerAvailability
+    ).localQuantity;
+  }
+
+  private extractSubmitErrorMessage(error: any): string {
+    const structured = this.buildConflictMessageFromPayload(error?.error?.details);
+    if (structured) {
+      return structured;
+    }
+
+    const fallback = 'Porudžbinu trenutno nije moguće potvrditi. Proverite količine i pokušajte ponovo.';
+    const reason = error?.error?.error;
+    const message = error?.error?.message || error?.message;
+    const raw =
+      (typeof reason === 'string' && reason.trim()) ||
+      (typeof message === 'string' && message.trim()) ||
+      '';
+    if (!raw) {
+      return fallback;
+    }
+
+    const cleaned = raw
+      .replace(/^\d+\s+[A-Z_]+\s+"?/i, '')
+      .replace(/^Error:\s*/i, '')
+      .replace(/^"+|"+$/g, '')
+      .trim();
+
+    return cleaned || fallback;
+  }
+
+  private buildConflictMessageFromPayload(rawDetails: any): string | null {
+    const details = rawDetails as CheckoutConflictDetailsPayload | undefined;
+    if (!details || details.code !== 'CHECKOUT_PROVIDER_UNAVAILABLE') {
+      return null;
+    }
+
+    const items = Array.isArray(details.items) ? details.items : [];
+    if (!items.length) {
+      return null;
+    }
+
+    const preview = items
+      .slice(0, 3)
+      .map((item) => this.formatConflictItem(item))
+      .filter(Boolean)
+      .join(', ');
+    const more = items.length > 3 ? ` (+${items.length - 3})` : '';
+    if (!preview) {
+      return null;
+    }
+
+    return `Neke stavke vise nisu dostupne u trazenoj kolicini: ${preview}${more}. Smanjite kolicinu ili uklonite stavku i potvrdite ponovo.`;
+  }
+
+  private formatConflictItem(item: CheckoutConflictItemPayload | null | undefined): string {
+    if (!item) {
+      return '';
+    }
+    const label =
+      (item.catalogNumber || '').toString().trim() ||
+      (item.articleName || '').toString().trim() ||
+      'stavka';
+    const requested = Math.max(0, Number(item.requestedQuantity) || 0);
+    const maxOrderable = Math.max(0, Number(item.maxOrderableQuantity) || 0);
+    const reason = (item.message || '').toString().trim();
+    if (requested <= 0) {
+      return reason ? `${label} (${reason})` : label;
+    }
+    if (reason) {
+      return `${label} (${reason}; trazeno ${requested}, dostupno ${maxOrderable})`;
+    }
+    return `${label} (trazeno ${requested}, dostupno ${maxOrderable})`;
   }
 
   private buildSzakalCheckItems(): SzakalStockCheckItem[] {
@@ -767,7 +941,7 @@ export class CartComponent implements OnInit, OnDestroy {
       : 'Provera eksternog magacina nije uspela, pokušajte ponovo.';
   }
 
-  buildInvoiceFromForm(): void {
+  buildInvoiceFromForm(idempotencyKey?: string): void {
     this.invoice = new Invoice();
 
     const isAnon = !this.loggedIn;
@@ -808,6 +982,36 @@ export class CartComponent implements OnInit, OnDestroy {
     if (providerOptions.length) {
       this.invoice.providerOptions = providerOptions;
     }
+    if (idempotencyKey) {
+      this.invoice.idempotencyKey = idempotencyKey;
+    }
+  }
+
+  private getOrCreateSubmitRequestKey(): string {
+    if (this.submitRequestKey) {
+      return this.submitRequestKey;
+    }
+    this.submitRequestKey = this.generateSubmitRequestKey();
+    return this.submitRequestKey;
+  }
+
+  private resetSubmitRequestKey(): void {
+    this.submitRequestKey = null;
+  }
+
+  private shouldKeepSubmitRequestKey(error: any): boolean {
+    const status = Number(error?.status);
+    return status === 0 || status === 408 || status === 429 || status >= 500;
+  }
+
+  private generateSubmitRequestKey(): string {
+    const cryptoLike = (globalThis as any)?.crypto;
+    if (cryptoLike?.randomUUID) {
+      return cryptoLike.randomUUID();
+    }
+    const timestamp = Date.now().toString(36);
+    const random = Math.floor(Math.random() * 1_000_000_000).toString(36);
+    return `checkout-${timestamp}-${random}`;
   }
 
   createValueHelp(id: number): ValueHelp {

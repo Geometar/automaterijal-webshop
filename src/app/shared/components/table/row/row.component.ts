@@ -38,11 +38,17 @@ import { StringUtils } from '../../../utils/string-utils';
 import { UrlHelperService } from '../../../service/utils/url-helper.service';
 import { SzakalStockCheckResult, SzakalStockService } from '../../../service/szakal-stock.service';
 import {
+  AvailabilityTone,
   AvailabilityVm,
   buildAvailabilityVm,
+  clampCombinedWarehouseQuantity,
   EXTERNAL_WAREHOUSE_LABEL,
+  resolveCombinedAvailabilityLabel,
+  resolveCombinedAvailabilityTone,
   resolveMinOrderQuantity,
-  resolvePackagingUnit
+  resolvePackagingUnit,
+  splitCombinedWarehouseQuantity,
+  shouldForceCombinedProviderAvailabilityBox,
 } from '../../../utils/availability-utils';
 
 @Component({
@@ -537,8 +543,20 @@ export class RowComponent implements OnInit, OnChanges {
     const min = this.quantityMin;
     const step = this.quantityStep;
     if (!Number.isFinite(value)) return min;
-    if (value < min) return min;
     const max = this.effectiveStock || min;
+    const localQty = Math.max(0, Number(this.availabilityVm.provider.warehouseSplit.sabacQuantity) || 0);
+    const isCombined = this.availabilityVm.provider.warehouseSplit.enabled;
+    if (isCombined) {
+      return clampCombinedWarehouseQuantity({
+        requestedQty: value,
+        maxStock: max,
+        localQty,
+        provider: this.data?.providerAvailability,
+        minQuantity: min,
+      });
+    }
+
+    if (value < min) return min;
     if (value > max) return max;
     const floored = Math.floor(value);
     if (step <= 1) return floored;
@@ -553,6 +571,73 @@ export class RowComponent implements OnInit, OnChanges {
       isTecDocOnly: this.isTecDocOnly,
       isStaff: this.isStaff,
     });
+  }
+
+  private get localWarehouseQuantity(): number {
+    return Math.max(
+      0,
+      Number(this.availabilityVm.provider.warehouseSplit.sabacQuantity) || 0
+    );
+  }
+
+  get currentAvailabilityTone(): AvailabilityTone {
+    return resolveCombinedAvailabilityTone({
+      combinedEnabled: this.availabilityVm.provider.warehouseSplit.enabled,
+      requestedQty: this.quantity,
+      localQty: this.localWarehouseQuantity,
+      isOutOfStock: this.isUnavailable,
+      defaultTone: this.availabilityVm.tone,
+    });
+  }
+
+  get currentAvailabilityLabel(): string {
+    return resolveCombinedAvailabilityLabel({
+      combinedEnabled: this.availabilityVm.provider.warehouseSplit.enabled,
+      tone: this.currentAvailabilityTone,
+      defaultLabel: this.availabilityVm.label,
+    });
+  }
+
+  get shouldForceProviderAvailabilityBox(): boolean {
+    return shouldForceCombinedProviderAvailabilityBox({
+      combinedEnabled: this.availabilityVm.provider.warehouseSplit.enabled,
+      hasProviderDeliveryLabel: !!this.availabilityVm.provider.deliveryLabel,
+      tone: this.currentAvailabilityTone,
+    });
+  }
+
+  get mixedLocalSelectionQuantity(): number {
+    const requested = Math.max(1, Number(this.quantity) || 1);
+    return splitCombinedWarehouseQuantity(
+      requested,
+      this.localWarehouseQuantity,
+      this.data?.providerAvailability
+    ).localQuantity;
+  }
+
+  get mixedExternalSelectionQuantity(): number {
+    const requested = Math.max(1, Number(this.quantity) || 1);
+    return splitCombinedWarehouseQuantity(
+      requested,
+      this.localWarehouseQuantity,
+      this.data?.providerAvailability
+    ).externalQuantity;
+  }
+
+  get showMixedWarehouseSplitHint(): boolean {
+    if (!this.availabilityVm.provider.warehouseSplit.enabled) {
+      return false;
+    }
+    const requested = Math.max(1, Number(this.quantity) || 1);
+    return splitCombinedWarehouseQuantity(
+      requested,
+      this.localWarehouseQuantity,
+      this.data?.providerAvailability
+    ).hasMixed;
+  }
+
+  get mixedWarehouseExternalLabel(): string {
+    return 'Magacin Beograd';
   }
 
   private get isSzakalUnverified(): boolean {

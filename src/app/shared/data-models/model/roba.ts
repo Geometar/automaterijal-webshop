@@ -144,6 +144,8 @@ export class CartItem {
   partNumber?: string;
   quantity?: number;
   robaId?: number | null;
+  localStock?: number;
+  providerAvailableQuantity?: number;
   tecDocArticleId?: number;
   stock?: number;
   totalPrice?: number;

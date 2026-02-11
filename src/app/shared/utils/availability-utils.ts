@@ -6,6 +6,7 @@ export type AvailabilityTone = 'green' | 'blue' | 'red' | 'yellow';
 export const EXTERNAL_WAREHOUSE_LABEL = 'Eksterni magacin';
 export const EXTERNAL_AVAILABILITY_LABEL_STAFF = 'Dostupno (eksterni magacin)';
 export const EXTERNAL_AVAILABILITY_LABEL_CUSTOMER = 'Na stanju (eksterni magacin)';
+export const FEBI_PROVIDER_KEY = 'febi-stock';
 
 export function getExternalAvailabilityLabel(isStaff: boolean): string {
   return isStaff
@@ -18,6 +19,25 @@ export function isProviderSource(
   provider?: ProviderAvailabilityDto | null
 ): boolean {
   return source === 'PROVIDER' || !!provider?.available;
+}
+
+export function isFebiProvider(provider: ProviderAvailabilityDto | null | undefined): boolean {
+  const key = (provider?.provider || '').toString().trim().toLowerCase();
+  return key === FEBI_PROVIDER_KEY;
+}
+
+export function getProviderAvailableQuantity(
+  provider: ProviderAvailabilityDto | null | undefined
+): number {
+  const warehouse = Number(provider?.warehouseQuantity);
+  const total = Number(provider?.totalQuantity);
+  const resolved =
+    Number.isFinite(warehouse) && warehouse > 0
+      ? warehouse
+      : Number.isFinite(total) && total > 0
+      ? total
+      : 0;
+  return Math.max(0, resolved);
 }
 
 export interface AvailabilityVm {
@@ -42,6 +62,13 @@ export interface AvailabilityVm {
       customerPriceLabel: string | null;
       purchasePriceLabel: string | null;
       packagingUnitLabel: string | null;
+    };
+    warehouseSplit: {
+      enabled: boolean;
+      sabacQuantity: number;
+      beogradQuantity: number;
+      beogradLabel: string;
+      totalQuantity: number;
     };
   };
 }
@@ -71,16 +98,40 @@ export function getPurchasableStock(
   roba: Pick<Roba, 'availabilityStatus' | 'stanje' | 'providerAvailability'> | null | undefined,
   opts?: { isAdmin?: boolean }
 ): number {
+  const localQty = Math.max(0, Number(roba?.stanje) || 0);
+  const febiProviderQty = getProviderAvailableQuantity(roba?.providerAvailability);
+  if (
+    isFebiProvider(roba?.providerAvailability) &&
+    !!roba?.providerAvailability?.available &&
+    febiProviderQty > 0
+  ) {
+    const packagingUnit = resolvePackagingUnit(roba?.providerAvailability);
+    const providerMax =
+      packagingUnit > 1
+        ? Math.floor(febiProviderQty / packagingUnit) * packagingUnit
+        : febiProviderQty;
+    const minOrder = resolveMinOrderQuantity(roba?.providerAvailability);
+    if (providerMax < minOrder) {
+      return localQty;
+    }
+    const constrainedExternal = packagingUnit > 1 || minOrder > 1;
+    if (constrainedExternal) {
+      // For MOQ/packaging-constrained providers, quantities above local stock
+      // should follow provider buckets directly (e.g. 1 -> 20 -> 40), not local+bucket.
+      return Math.max(localQty, providerMax);
+    }
+    // FEBI combined mode: local and external stock can be combined.
+    // External part still follows MOQ/packaging constraints.
+    return Math.max(0, localQty + Math.max(0, providerMax));
+  }
+
   const status = getAvailabilityStatus(roba);
   if (status === 'IN_STOCK') {
-    return Math.max(0, Number(roba?.stanje) || 0);
+    return localQty;
   }
 
   if (status === 'AVAILABLE') {
-    const providerQty =
-      Number(roba?.providerAvailability?.warehouseQuantity) ||
-      Number(roba?.providerAvailability?.totalQuantity) ||
-      0;
+    const providerQty = getProviderAvailableQuantity(roba?.providerAvailability);
     const packagingUnit = resolvePackagingUnit(roba?.providerAvailability);
     const maxPieces =
       packagingUnit > 1 ? Math.floor(providerQty / packagingUnit) * packagingUnit : providerQty;
@@ -114,6 +165,165 @@ export function resolveMinOrderQuantity(
   }
   const min = Math.ceil(raw / step) * step;
   return Math.max(step, min);
+}
+
+export interface CombinedWarehouseSplit {
+  localQuantity: number;
+  externalQuantity: number;
+  hasMixed: boolean;
+}
+
+export function splitCombinedWarehouseQuantity(
+  requestedQty: number,
+  localQty: number,
+  provider?: ProviderAvailabilityDto | null | undefined
+): CombinedWarehouseSplit {
+  const requested = Math.max(0, Number(requestedQty) || 0);
+  const local = Math.max(0, Number(localQty) || 0);
+  const step = Math.max(1, resolvePackagingUnit(provider));
+  const min = Math.max(1, resolveMinOrderQuantity(provider));
+  const constrainedExternal = step > 1 || min > 1;
+  if (requested > local && constrainedExternal) {
+    const providerOnlyEligible =
+      requested >= min && (step <= 1 || requested % step === 0);
+    if (providerOnlyEligible) {
+      return {
+        localQuantity: 0,
+        externalQuantity: requested,
+        hasMixed: false,
+      };
+    }
+  }
+  const localQuantity = Math.min(requested, local);
+  const externalQuantity = Math.max(0, requested - localQuantity);
+  return {
+    localQuantity,
+    externalQuantity,
+    hasMixed: localQuantity > 0 && externalQuantity > 0,
+  };
+}
+
+export function resolveCombinedAvailabilityTone(input: {
+  combinedEnabled: boolean;
+  requestedQty: number;
+  localQty: number;
+  isOutOfStock: boolean;
+  defaultTone: AvailabilityTone;
+}): AvailabilityTone {
+  if (!input?.combinedEnabled) {
+    return input?.defaultTone ?? 'red';
+  }
+  if (input?.isOutOfStock) {
+    return 'red';
+  }
+  const requested = Math.max(1, Number(input?.requestedQty) || 1);
+  const local = Math.max(0, Number(input?.localQty) || 0);
+  return requested > local ? 'blue' : 'green';
+}
+
+export function resolveCombinedAvailabilityLabel(input: {
+  combinedEnabled: boolean;
+  tone: AvailabilityTone;
+  defaultLabel: string;
+}): string {
+  if (!input?.combinedEnabled) {
+    return input?.defaultLabel || 'Nema na stanju';
+  }
+  return input?.tone === 'blue' ? 'Na stanju (više magacina)' : 'Na stanju';
+}
+
+export function shouldForceCombinedProviderAvailabilityBox(input: {
+  combinedEnabled: boolean;
+  hasProviderDeliveryLabel: boolean;
+  tone: AvailabilityTone;
+}): boolean {
+  return (
+    !!input?.combinedEnabled &&
+    !!input?.hasProviderDeliveryLabel &&
+    input?.tone === 'blue'
+  );
+}
+
+export function clampCombinedWarehouseQuantity(input: {
+  requestedQty: number;
+  maxStock: number;
+  localQty: number;
+  provider: ProviderAvailabilityDto | null | undefined;
+  minQuantity?: number;
+}): number {
+  const fallbackMin = Math.max(1, Math.floor(Number(input?.minQuantity) || 1));
+  const requestedQty = Number(input?.requestedQty);
+  if (!Number.isFinite(requestedQty)) {
+    return fallbackMin;
+  }
+
+  const maxStock = Math.max(0, Number(input?.maxStock) || 0);
+  if (maxStock <= 0) {
+    return 0;
+  }
+
+  const localQty = Math.max(0, Number(input?.localQty) || 0);
+  const bounded = Math.max(1, Math.min(Math.floor(requestedQty), maxStock));
+  if (bounded <= localQty) {
+    return bounded;
+  }
+
+  const providerStep = Math.max(1, resolvePackagingUnit(input?.provider));
+  const providerMin = Math.max(1, resolveMinOrderQuantity(input?.provider));
+  const constrainedExternal = providerStep > 1 || providerMin > 1;
+  if (constrainedExternal) {
+    const providerAvailable = Math.max(0, getProviderAvailableQuantity(input?.provider));
+    const providerMax =
+      providerStep > 1
+        ? Math.floor(providerAvailable / providerStep) * providerStep
+        : providerAvailable;
+    if (providerMax < providerMin) {
+      return localQty > 0 ? Math.floor(Math.min(localQty, maxStock)) : Math.floor(maxStock);
+    }
+
+    let providerOnly = Math.max(providerMin, bounded);
+    if (providerStep > 1) {
+      providerOnly = Math.ceil(providerOnly / providerStep) * providerStep;
+    }
+
+    if (providerOnly <= providerMax) {
+      return Math.min(providerOnly, Math.floor(maxStock));
+    }
+
+    let capped = providerMax;
+    if (providerStep > 1) {
+      capped = Math.floor(capped / providerStep) * providerStep;
+    }
+    if (capped >= providerMin) {
+      return Math.min(capped, Math.floor(maxStock));
+    }
+
+    return localQty > 0 ? Math.floor(Math.min(localQty, maxStock)) : Math.floor(maxStock);
+  }
+
+  const externalRaw = Math.max(0, bounded - localQty);
+  let external = Math.max(providerMin, externalRaw);
+  if (providerStep > 1) {
+    external = Math.ceil(external / providerStep) * providerStep;
+  }
+  let next = localQty + external;
+  if (next <= maxStock) {
+    return next;
+  }
+
+  const providerMaxRaw = Math.max(0, Math.floor(maxStock - localQty));
+  if (providerMaxRaw < providerMin) {
+    return localQty > 0 ? Math.floor(localQty) : Math.floor(maxStock);
+  }
+
+  let capped = providerMaxRaw;
+  if (providerStep > 1) {
+    capped = Math.floor(capped / providerStep) * providerStep;
+  }
+  if (capped < providerMin) {
+    return localQty > 0 ? Math.floor(localQty) : Math.floor(maxStock);
+  }
+  return localQty + capped;
 }
 
 export function getPurchasableUnitPrice(
@@ -277,13 +487,17 @@ export function buildAvailabilityVm(
     }
   }
   const noReturnable = providerKey === 'szakal' && !!roba?.providerAvailability?.providerNoReturnable;
-  const providerQty =
-    Number(roba?.providerAvailability?.warehouseQuantity) ||
-    Number(roba?.providerAvailability?.totalQuantity) ||
-    0;
+  const providerQty = getProviderAvailableQuantity(roba?.providerAvailability);
+  const localQty = Math.max(0, Number(roba?.stanje) || 0);
   const sourceLabel = isAdmin
     ? roba?.providerAvailability?.warehouseName ?? EXTERNAL_WAREHOUSE_LABEL
     : null;
+  const warehouseSplitEnabled =
+    !isTecDocOnly &&
+    isFebiProvider(roba?.providerAvailability) &&
+    !!roba?.providerAvailability?.available &&
+    (localQty > 0 || providerQty > 0);
+  const beogradLabel = isAdmin ? 'FEBI (Magacin Beograd)' : 'Magacin Beograd';
 
   const rabat = Number((roba as any)?.rabat) || 0;
   const showDiscount = !isTecDocOnly && rabat > 0 && rabat < 100 && displayPrice > 0 && priceVerified;
@@ -313,6 +527,13 @@ export function buildAvailabilityVm(
         customerPriceLabel: isAdmin ? formatProviderPrice(roba?.providerAvailability) : null,
         purchasePriceLabel: isAdmin ? formatProviderPurchasePrice(roba?.providerAvailability) : null,
         packagingUnitLabel,
+      },
+      warehouseSplit: {
+        enabled: warehouseSplitEnabled,
+        sabacQuantity: localQty,
+        beogradQuantity: providerQty,
+        beogradLabel,
+        totalQuantity: localQty + providerQty,
       },
     },
   };

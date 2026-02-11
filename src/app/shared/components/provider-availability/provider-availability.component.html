@@ -23,6 +23,17 @@
   >
     Isporuka: {{ availability?.provider?.deliveryLabel }}
   </div>
+  <div class="provider-availability__row provider-availability__split" *ngIf="showMixedSplit">
+    <span class="provider-availability__split-title">Isporuka iz više magacina</span>
+    <span class="provider-availability__split-chips" aria-label="Podela količine po magacinima">
+      <span class="provider-availability__split-chip provider-availability__split-chip--local">
+        Šabac {{ mixedLocalQuantity | number : '1.0-0' }} kom
+      </span>
+      <span class="provider-availability__split-chip provider-availability__split-chip--external">
+        {{ mixedExternalLabel }} {{ mixedExternalQuantity | number : '1.0-0' }} kom
+      </span>
+    </span>
+  </div>
   <div
     class="provider-availability__row"
     *ngIf="showQuantity && availability?.provider?.quantity"

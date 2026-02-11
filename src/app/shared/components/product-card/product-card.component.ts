@@ -26,8 +26,12 @@ import { StringUtils } from '../../utils/string-utils';
 import { PictureService, ProductImageMeta } from '../../service/utils/picture.service';
 import { SzakalStockCheckResult, SzakalStockService } from '../../service/szakal-stock.service';
 import {
+  AvailabilityTone,
   AvailabilityVm,
   buildAvailabilityVm,
+  clampCombinedWarehouseQuantity,
+  resolveCombinedAvailabilityLabel,
+  resolveCombinedAvailabilityTone,
   resolveMinOrderQuantity,
   resolvePackagingUnit
 } from '../../utils/availability-utils';
@@ -253,6 +257,18 @@ export class AutomProductCardComponent implements OnInit, OnChanges {
     const step = this.quantityStep;
     const max = this.availableStock || min;
     if (!Number.isFinite(value)) return min;
+    const localQty = Math.max(0, Number(this.availabilityVm.provider.warehouseSplit.sabacQuantity) || 0);
+    const isCombined = this.availabilityVm.provider.warehouseSplit.enabled;
+    if (isCombined) {
+      return clampCombinedWarehouseQuantity({
+        requestedQty: value,
+        maxStock: max,
+        localQty,
+        provider: this.roba?.providerAvailability,
+        minQuantity: min,
+      });
+    }
+
     if (value < min) return min;
     if (value > max) return max;
     const floored = Math.floor(value);
@@ -410,6 +426,31 @@ export class AutomProductCardComponent implements OnInit, OnChanges {
     }
 
     return String(raw).trim();
+  }
+
+  private get localWarehouseQuantity(): number {
+    return Math.max(
+      0,
+      Number(this.availabilityVm.provider.warehouseSplit.sabacQuantity) || 0
+    );
+  }
+
+  get currentAvailabilityTone(): AvailabilityTone {
+    return resolveCombinedAvailabilityTone({
+      combinedEnabled: this.availabilityVm.provider.warehouseSplit.enabled,
+      requestedQty: this.quantity,
+      localQty: this.localWarehouseQuantity,
+      isOutOfStock: this.isOutOfStock,
+      defaultTone: this.availabilityVm.tone,
+    });
+  }
+
+  get currentAvailabilityLabel(): string {
+    return resolveCombinedAvailabilityLabel({
+      combinedEnabled: this.availabilityVm.provider.warehouseSplit.enabled,
+      tone: this.currentAvailabilityTone,
+      defaultLabel: this.availabilityVm.label,
+    });
   }
 
   /* ------------------------- Unit price (L) -------------------------- */
