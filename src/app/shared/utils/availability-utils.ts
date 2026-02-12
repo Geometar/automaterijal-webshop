@@ -203,6 +203,92 @@ export function splitCombinedWarehouseQuantity(
   };
 }
 
+export function isAdminExternalProviderOrderFlow(input: {
+  isAdmin: boolean;
+  provider: ProviderAvailabilityDto | null | undefined;
+}): boolean {
+  return !!input?.isAdmin && !!input?.provider?.available;
+}
+
+export function resolveFlowLocalWarehouseQuantity(input: {
+  isAdmin: boolean;
+  provider: ProviderAvailabilityDto | null | undefined;
+  localQty: number;
+}): number {
+  if (isAdminExternalProviderOrderFlow(input)) {
+    return 0;
+  }
+  return Math.max(0, Number(input?.localQty) || 0);
+}
+
+export function resolveFlowStockQuantity(input: {
+  isAdmin: boolean;
+  provider: ProviderAvailabilityDto | null | undefined;
+  defaultStock: number;
+}): number {
+  if (isAdminExternalProviderOrderFlow(input)) {
+    return getProviderAvailableQuantity(input?.provider);
+  }
+  return Math.max(0, Number(input?.defaultStock) || 0);
+}
+
+export function resolveFlowAvailabilityLabel(input: {
+  isAdmin: boolean;
+  isStaff: boolean;
+  isOutOfStock: boolean;
+  provider: ProviderAvailabilityDto | null | undefined;
+  fallbackLabel: string;
+}): string {
+  if (isAdminExternalProviderOrderFlow(input) && !input?.isOutOfStock) {
+    return getExternalAvailabilityLabel(!!input?.isStaff);
+  }
+  return input?.fallbackLabel || 'Nema na stanju';
+}
+
+export function splitWarehouseQuantityForFlow(input: {
+  requestedQty: number;
+  localQty: number;
+  isAdmin: boolean;
+  provider: ProviderAvailabilityDto | null | undefined;
+}): CombinedWarehouseSplit {
+  const localForFlow = resolveFlowLocalWarehouseQuantity({
+    isAdmin: !!input?.isAdmin,
+    provider: input?.provider,
+    localQty: Number(input?.localQty) || 0,
+  });
+  return splitCombinedWarehouseQuantity(
+    Number(input?.requestedQty) || 0,
+    localForFlow,
+    input?.provider
+  );
+}
+
+export function requiresExternalWarehouseForFlow(input: {
+  requestedQty: number;
+  localQty: number;
+  isAdmin: boolean;
+  provider: ProviderAvailabilityDto | null | undefined;
+}): boolean {
+  if (!input?.provider?.available) {
+    return false;
+  }
+  if (isAdminExternalProviderOrderFlow(input)) {
+    return true;
+  }
+  const requested = Math.max(0, Number(input?.requestedQty) || 0);
+  if (requested <= 0) {
+    return false;
+  }
+  return (
+    splitWarehouseQuantityForFlow({
+      requestedQty: requested,
+      localQty: input?.localQty,
+      isAdmin: !!input?.isAdmin,
+      provider: input?.provider,
+    }).externalQuantity > 0
+  );
+}
+
 export function resolveCombinedAvailabilityTone(input: {
   combinedEnabled: boolean;
   requestedQty: number;

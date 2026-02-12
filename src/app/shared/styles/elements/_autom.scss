@@ -142,6 +142,21 @@
   font-weight: bold;
 }
 
+.snackbar-error-persistent {
+  .mdc-snackbar__surface,
+  .mat-mdc-snackbar-surface {
+    min-height: 96px !important;
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
+  }
+
+  .mdc-snackbar__label,
+  .mat-mdc-snack-bar-label {
+    white-space: pre-line !important;
+    line-height: 1.45 !important;
+  }
+}
+
 /* Auto-close Snackbar */
 .snackbar-auto {
   background-color: #323232 !important; /* Dark background */

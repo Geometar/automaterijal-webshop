@@ -89,6 +89,46 @@
     }
   }
 
+  .status-outcome {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    margin-right: 8px;
+    padding: 4px 8px;
+  }
+
+  .status-outcome--pass {
+    background: var(--figma-success-100);
+    border-color: var(--figma-success-300);
+    color: var(--figma-success-700);
+  }
+
+  .status-outcome--fail {
+    background: var(--figma-error-50);
+    border-color: var(--figma-error-300);
+    color: var(--figma-error-700);
+  }
+
+  .status-outcome--pending {
+    background: var(--figma-accent-yellow-100);
+    border-color: var(--figma-accent-yellow-300);
+    color: var(--figma-accent-yellow-700);
+  }
+
+  .status-outcome__icon {
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .status-outcome__text {
+    color: var(--figma-grey-700);
+  }
+
   .invoices-wrapper {
     padding: 0;
   }

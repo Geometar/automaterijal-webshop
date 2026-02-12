@@ -1,6 +1,9 @@
 import {
   clampCombinedWarehouseQuantity,
   getPurchasableStock,
+  requiresExternalWarehouseForFlow,
+  resolveFlowStockQuantity,
+  splitWarehouseQuantityForFlow,
   splitCombinedWarehouseQuantity,
 } from './availability-utils';
 
@@ -69,5 +72,39 @@ describe('availability-utils (FEBI combined)', () => {
     });
 
     expect(stock).toBe(9);
+  });
+
+  it('uses provider-only split for admin external flow', () => {
+    const split = splitWarehouseQuantityForFlow({
+      requestedQty: 2,
+      localQty: 2,
+      isAdmin: true,
+      provider: febiConstrainedProvider as any,
+    });
+
+    expect(split.localQuantity).toBe(0);
+    expect(split.externalQuantity).toBe(2);
+    expect(split.hasMixed).toBeFalse();
+  });
+
+  it('treats admin provider requests as external requirement', () => {
+    const required = requiresExternalWarehouseForFlow({
+      requestedQty: 2,
+      localQty: 2,
+      isAdmin: true,
+      provider: febiConstrainedProvider as any,
+    });
+
+    expect(required).toBeTrue();
+  });
+
+  it('uses provider stock as effective stock for admin provider flow', () => {
+    const stock = resolveFlowStockQuantity({
+      isAdmin: true,
+      provider: febiConstrainedProvider as any,
+      defaultStock: 999,
+    });
+
+    expect(stock).toBe(50);
   });
 });

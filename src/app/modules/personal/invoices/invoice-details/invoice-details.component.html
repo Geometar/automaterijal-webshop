@@ -40,7 +40,21 @@
         <table class="invoice-table">
           <tr>
             <td>Status:</td>
-            <td>{{ data?.status?.naziv ?? '—' }}</td>
+            <td>
+              <ng-container *ngIf="isAdmin; else plainStatusText">
+                <span
+                  class="status-outcome"
+                  [class.status-outcome--pass]="statusOutcome === 'pass'"
+                  [class.status-outcome--fail]="statusOutcome === 'fail'"
+                  [class.status-outcome--pending]="statusOutcome === 'pending'"
+                >
+                  <span class="status-outcome__icon">{{ statusOutcomeIcon }}</span>
+                  <span class="status-outcome__label">{{ statusOutcomeLabel }}</span>
+                </span>
+                <span class="status-outcome__text">{{ data?.status?.naziv ?? '—' }}</span>
+              </ng-container>
+              <ng-template #plainStatusText>{{ data?.status?.naziv ?? '—' }}</ng-template>
+            </td>
           </tr>
           <tr>
             <td>Datum:</td>

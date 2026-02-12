@@ -71,6 +71,11 @@
     text-align: center;
   }
 
+  .mat-mdc-header-cell.mat-column-providerCallBadge,
+  .mat-mdc-cell.mat-column-providerCallBadge {
+    text-align: center;
+  }
+
   @media (max-width: 991px) {
     &__filter-group {
       flex-direction: column;

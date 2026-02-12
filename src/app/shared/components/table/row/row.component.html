@@ -311,7 +311,7 @@
     </p>
 
     <div
-      class="mobile-quantity-cart util__flex--center"
+      class="mobile-quantity-cart"
       *ngIf="canAddToCart && !isUnavailable"
     >
       <autom-input-fields
@@ -352,7 +352,12 @@
     </p>
 
     <p
-      *ngIf="canAddToCart && !isUnavailable && availabilityVm.priceVerified"
+      *ngIf="
+        canAddToCart &&
+        !isUnavailable &&
+        availabilityVm.priceVerified &&
+        showSelectedTotalPrice
+      "
       class="price price--total"
     >
       Ukupno: {{ selectedTotalPrice | rsdCurrency }}

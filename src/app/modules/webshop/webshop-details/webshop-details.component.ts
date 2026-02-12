@@ -65,11 +65,15 @@ import {
   AvailabilityVm,
   buildAvailabilityVm,
   clampCombinedWarehouseQuantity,
+  isAdminExternalProviderOrderFlow,
+  resolveFlowAvailabilityLabel,
+  resolveFlowLocalWarehouseQuantity,
+  resolveFlowStockQuantity,
   resolveCombinedAvailabilityLabel,
   resolveCombinedAvailabilityTone,
   resolveMinOrderQuantity,
   resolvePackagingUnit,
-  splitCombinedWarehouseQuantity,
+  splitWarehouseQuantityForFlow,
   shouldForceCombinedProviderAvailabilityBox,
 } from '../../../shared/utils/availability-utils';
 
@@ -787,7 +791,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     const min = this.quantityMin;
     const step = this.quantityStep;
     const max = this.availableStock || min;
-    const localQty = Math.max(0, Number(this.availabilityVm.provider.warehouseSplit.sabacQuantity) || 0);
+    const localQty = this.localWarehouseQuantity;
     const isCombined = this.availabilityVm.provider.warehouseSplit.enabled;
     if (!Number.isFinite(quantity)) {
       this.quantity = min;
@@ -970,10 +974,11 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   }
 
   private get localWarehouseQuantity(): number {
-    return Math.max(
-      0,
-      Number(this.availabilityVm.provider.warehouseSplit.sabacQuantity) || 0
-    );
+    return resolveFlowLocalWarehouseQuantity({
+      isAdmin: this.isAdmin,
+      provider: this.data?.providerAvailability,
+      localQty: Number(this.availabilityVm.provider.warehouseSplit.sabacQuantity) || 0,
+    });
   }
 
   get currentAvailabilityTone(): AvailabilityTone {
@@ -987,10 +992,17 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   }
 
   get currentAvailabilityLabel(): string {
-    return resolveCombinedAvailabilityLabel({
+    const fallbackLabel = resolveCombinedAvailabilityLabel({
       combinedEnabled: this.availabilityVm.provider.warehouseSplit.enabled,
       tone: this.currentAvailabilityTone,
       defaultLabel: this.availabilityVm.label,
+    });
+    return resolveFlowAvailabilityLabel({
+      isAdmin: this.isAdmin,
+      isStaff: this.isStaff,
+      isOutOfStock: this.isOutOfStock,
+      provider: this.data?.providerAvailability,
+      fallbackLabel,
     });
   }
 
@@ -1003,33 +1015,33 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   }
 
   get mixedLocalSelectionQuantity(): number {
-    const requested = Math.max(1, Number(this.quantity) || 1);
-    return splitCombinedWarehouseQuantity(
-      requested,
-      this.localWarehouseQuantity,
-      this.data?.providerAvailability
-    ).localQuantity;
+    return splitWarehouseQuantityForFlow({
+      requestedQty: Math.max(1, Number(this.quantity) || 1),
+      localQty: this.localWarehouseQuantity,
+      isAdmin: this.isAdmin,
+      provider: this.data?.providerAvailability,
+    }).localQuantity;
   }
 
   get mixedExternalSelectionQuantity(): number {
-    const requested = Math.max(1, Number(this.quantity) || 1);
-    return splitCombinedWarehouseQuantity(
-      requested,
-      this.localWarehouseQuantity,
-      this.data?.providerAvailability
-    ).externalQuantity;
+    return splitWarehouseQuantityForFlow({
+      requestedQty: Math.max(1, Number(this.quantity) || 1),
+      localQty: this.localWarehouseQuantity,
+      isAdmin: this.isAdmin,
+      provider: this.data?.providerAvailability,
+    }).externalQuantity;
   }
 
   get showMixedWarehouseSplitHint(): boolean {
     if (!this.availabilityVm.provider.warehouseSplit.enabled) {
       return false;
     }
-    const requested = Math.max(1, Number(this.quantity) || 1);
-    return splitCombinedWarehouseQuantity(
-      requested,
-      this.localWarehouseQuantity,
-      this.data?.providerAvailability
-    ).hasMixed;
+    return splitWarehouseQuantityForFlow({
+      requestedQty: Math.max(1, Number(this.quantity) || 1),
+      localQty: this.localWarehouseQuantity,
+      isAdmin: this.isAdmin,
+      provider: this.data?.providerAvailability,
+    }).hasMixed;
   }
 
   get mixedWarehouseExternalLabel(): string {
@@ -1055,13 +1067,24 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   }
 
   get availableStock(): number {
-    return this.availabilityVm.purchasableStock;
+    return resolveFlowStockQuantity({
+      isAdmin: this.isAdmin,
+      provider: this.data?.providerAvailability,
+      defaultStock: this.availabilityVm.purchasableStock,
+    });
   }
 
   private get isProviderItem(): boolean {
-    return (
+    return this.isAdminExternalProviderFlow || (
       this.availabilityVm.status === 'AVAILABLE' && !!this.data?.providerAvailability?.available
     );
+  }
+
+  private get isAdminExternalProviderFlow(): boolean {
+    return isAdminExternalProviderOrderFlow({
+      isAdmin: this.isAdmin,
+      provider: this.data?.providerAvailability,
+    });
   }
 
   get quantityStep(): number {

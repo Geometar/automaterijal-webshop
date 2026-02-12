@@ -75,6 +75,25 @@ export class SnackbarService {
   }
 
   /**
+   * Displays a persistent error message until user dismisses it.
+   * Useful for checkout conflicts where user needs time to read guidance.
+   */
+  showPersistentError(
+    message: string,
+    verticalPosition?: SnackbarPosition,
+    action: string = 'Zatvori',
+    horizontalPosition: SnackbarHorizontalPosition = SnackbarHorizontalPosition.CENTER
+  ): void {
+    const config: MatSnackBarConfig = {
+      duration: undefined,
+      horizontalPosition,
+      verticalPosition: this.getVerticalPosition(verticalPosition),
+      panelClass: ['snackbar-error', 'snackbar-error-persistent']
+    };
+    this.snackBar.open(message, action, config);
+  }
+
+  /**
    * Displays a success message with a green background.
    * @param message The success message to display
    */

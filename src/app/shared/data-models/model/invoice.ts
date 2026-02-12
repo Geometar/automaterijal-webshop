@@ -25,6 +25,8 @@ export class Invoice {
   napomena?: string;
   orderId?: number;
   partner?: string;
+  /** True when at least one external provider call was executed for this order. */
+  providerCall?: boolean | null;
   /** Partner identifier (used by admin screens). */
   ppid?: number;
   /** Client-generated key used to deduplicate checkout retries. */

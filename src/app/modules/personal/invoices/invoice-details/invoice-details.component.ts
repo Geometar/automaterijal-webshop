@@ -20,6 +20,7 @@ import {
   EXTERNAL_WAREHOUSE_LABEL,
   isProviderSource
 } from '../../../../shared/utils/availability-utils';
+import { OrderOutcome, orderOutcomeIcon, resolveOrderOutcome } from '../../../../shared/utils/order-status-utils';
 
 // Enums
 import {
@@ -65,6 +66,7 @@ export class InvoiceDetailsComponent implements OnInit {
   // Data
   data: Invoice | null = null;
   noteHtml: string | null = null;
+  statusOutcome: OrderOutcome | null = null;
 
   // Enums
   colorEnum = ColorEnum;
@@ -138,6 +140,7 @@ export class InvoiceDetailsComponent implements OnInit {
       .subscribe({
         next: (invoice: Invoice) => {
           this.data = invoice;
+          this.statusOutcome = this.resolveInvoiceOutcome(invoice);
           this.noteHtml = this.buildNoteHtml(invoice?.napomena);
           const items: InvoiceItem[] = invoice.detalji!;
           this.decorateInvoiceItems(items);
@@ -165,6 +168,7 @@ export class InvoiceDetailsComponent implements OnInit {
       .subscribe({
         next: (invoice: Invoice) => {
           this.data = invoice;
+          this.statusOutcome = this.resolveInvoiceOutcome(invoice);
           this.noteHtml = this.buildNoteHtml(invoice?.napomena);
           const items: InvoiceItem[] = invoice.detalji!;
           this.decorateInvoiceItems(items);
@@ -218,6 +222,19 @@ export class InvoiceDetailsComponent implements OnInit {
   // End of: Events
   get isInternalOrderView(): boolean {
     return this.isInternalOrder(this.data);
+  }
+
+  get statusOutcomeLabel(): string {
+    if (this.statusOutcome === 'pass') return 'Prošlo';
+    if (this.statusOutcome === 'fail') return 'Neuspešno';
+    return 'U toku';
+  }
+
+  get statusOutcomeIcon(): string {
+    if (!this.statusOutcome) {
+      return '…';
+    }
+    return orderOutcomeIcon(this.statusOutcome);
   }
 
   private configureColumns(invoice?: Invoice | null): void {
@@ -308,6 +325,15 @@ export class InvoiceDetailsComponent implements OnInit {
       return invoice.internalOrder;
     }
     return Number(invoice?.internalOrder) === 1;
+  }
+
+  private resolveInvoiceOutcome(invoice?: Invoice | null): OrderOutcome {
+    return resolveOrderOutcome({
+      statusId: invoice?.status?.id,
+      statusName: invoice?.status?.naziv,
+      orderedAmount: invoice?.iznosNarucen,
+      confirmedAmount: invoice?.iznosPotvrdjen,
+    });
   }
 
   private buildProviderInfo(item: InvoiceItem): string {

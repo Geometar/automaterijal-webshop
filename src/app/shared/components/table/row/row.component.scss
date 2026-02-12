@@ -27,6 +27,11 @@
 }
 .mobile-quantity-cart {
   margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  width: 100%;
 }
 
 /* ---------- States / utility ---------- */
@@ -97,8 +102,6 @@
     font-size: 13px;
     border: 1px solid #bbf7d0;
   }
-
-  
 }
 
 .inquiry-trigger {
@@ -190,7 +193,9 @@
       font-weight: 600 !important;
       margin: 0 0 6px !important;
       color: var(--figma-grey-900) !important;
-      transition: color 0.15s ease, text-decoration-color 0.15s ease;
+      transition:
+        color 0.15s ease,
+        text-decoration-color 0.15s ease;
 
       .product-name-fragment {
         color: var(--figma-primary-700) !important;
@@ -211,7 +216,9 @@
         color: var(--figma-grey-500) !important;
         font-size: 15px !important;
         text-decoration: none;
-        transition: transform 0.15s ease, color 0.15s ease;
+        transition:
+          transform 0.15s ease,
+          color 0.15s ease;
       }
 
       .product-link__brand {
@@ -265,9 +272,9 @@
     .warehouse-breakdown--admin {
       padding: 6px 8px;
       border-radius: 10px;
-      border: 1px solid var(--figma-info-100);
-      background: var(--figma-info-25);
-      color: var(--figma-info-700);
+      border: 1px solid var(--cultured);
+      background: var(--figma-accent-green-25);
+      color: var(--figma-bg-dark);
     }
 
     .product-meta__note {
@@ -293,7 +300,9 @@
       display: inline-flex;
       max-width: 100%;
       &.clickable-placeholder {
-        transition: transform 0.12s ease, box-shadow 0.12s ease;
+        transition:
+          transform 0.12s ease,
+          box-shadow 0.12s ease;
         cursor: pointer;
         @media (hover: hover) and (pointer: fine) {
           &:hover {
@@ -305,7 +314,7 @@
     }
 
     .product-meta__sku .meta-pill__value {
-      font-family: 'SFMono-Regular', 'JetBrains Mono', 'Fira Code', monospace;
+      font-family: "SFMono-Regular", "JetBrains Mono", "Fira Code", monospace;
       font-weight: 600;
       letter-spacing: 0.03em;
     }
@@ -361,11 +370,18 @@
     min-width: 280px;
     max-width: 360px;
     margin-left: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
     text-align: left;
+
+    p {
+      margin: 0;
+    }
 
     .sub-price {
       font-size: 15px;
-      margin-bottom: 2px;
       text-align: right;
       color: var(--figma-grey-600);
       font-weight: 600;
@@ -378,8 +394,7 @@
     .small-explanation {
       font-size: 11px;
       font-style: italic;
-      position: relative;
-      bottom: 5px;
+      margin-top: -2px;
       color: var(--figma-grey-600);
     }
 
@@ -395,10 +410,15 @@
       font-size: 18px;
       font-weight: 700;
       color: var(--figma-grey-800);
+      margin-top: 2px;
     }
 
     .price--total {
-      margin-top: 6px;
+      margin-top: 8px;
+      padding: 5px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--figma-grey-150, #dbe2ec);
+      background: var(--figma-neutral-25, #f8fafc);
       font-weight: 800;
       font-size: 15.5px;
       color: var(--figma-grey-800);
@@ -408,9 +428,9 @@
     .price {
       font-size: 21px;
       font-weight: 800;
-      margin-bottom: 2px;
       text-align: right;
       color: var(--figma-grey-900);
+      line-height: 1.2;
     }
 
     /* diskretno istaknuta ušteda */
@@ -420,12 +440,10 @@
       color: var(--figma-success-700);
       text-align: right;
       margin-top: 2px;
-      margin-bottom: 6px;
     }
 
     .login-note {
       margin-top: 6px;
-      margin-bottom: 2px;
       font-size: 12px;
       font-weight: 700;
       color: var(--figma-error-600);
@@ -440,7 +458,7 @@
       gap: 10px;
       font-size: 12px;
       text-align: right;
-      width: 250px;
+      width: 100%;
       color: var(--figma-grey-700);
       white-space: nowrap;
     }
@@ -673,35 +691,36 @@
     min-width: 0;
     max-width: none;
     flex: 1 1 auto;
-    text-align: center;
+    text-align: right;
     padding: 0 10px;
 
     .item-status {
-      width: auto !important;
+      width: 100% !important;
       font-size: 12px !important;
       padding: 0 !important;
-      text-align: center !important;
+      text-align: right !important;
       position: relative !important;
-      justify-content: center !important;
+      justify-content: flex-end !important;
     }
 
     .price,
     .sub-price,
     .small-explanation,
     .saving {
-      text-align: center !important;
+      text-align: right !important;
     }
 
     .util__flex--center {
-      flex-direction: column;
-      gap: 12px;
+      flex-direction: row;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
     .helper-article {
       margin: 10px 0;
       width: 100%;
     }
-
   }
 
   .spec-toggle-btn {
@@ -716,10 +735,13 @@
   }
 
   .mobile-row {
-    text-align: center !important;
+    text-align: right !important;
   }
   .mobile-quantity-cart {
     flex-direction: row !important;
+    justify-content: flex-end;
+    width: 100%;
+    margin-top: 6px;
   }
 }
 

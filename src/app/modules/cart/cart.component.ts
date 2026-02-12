@@ -62,7 +62,8 @@ import {
   formatDispatchCutoff,
   getAvailabilityStatus,
   isFebiProvider,
-  splitCombinedWarehouseQuantity,
+  requiresExternalWarehouseForFlow,
+  splitWarehouseQuantityForFlow,
 } from '../../shared/utils/availability-utils';
 import { Slika } from '../../shared/data-models/model/slika';
 import { SzakalStockService, SzakalStockCheckItem, SzakalStockCheckResult } from '../../shared/service/szakal-stock.service';
@@ -372,30 +373,33 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   getMixedLocalQuantity(item: Roba | null | undefined): number {
-    const requested = Math.max(0, Number(item?.kolicina) || 0);
-    const sabacSnapshot = Math.max(0, Number(item?.stanje) || 0);
-    return splitCombinedWarehouseQuantity(
-      requested,
-      sabacSnapshot,
-      item?.providerAvailability
-    ).localQuantity;
+    return splitWarehouseQuantityForFlow({
+      requestedQty: Math.max(0, Number(item?.kolicina) || 0),
+      localQty: Math.max(0, Number(item?.stanje) || 0),
+      isAdmin: this.isAdmin,
+      provider: item?.providerAvailability,
+    }).localQuantity;
   }
 
   getMixedExternalQuantity(item: Roba | null | undefined): number {
-    const requested = Math.max(0, Number(item?.kolicina) || 0);
-    const sabacSnapshot = Math.max(0, Number(item?.stanje) || 0);
-    return splitCombinedWarehouseQuantity(
-      requested,
-      sabacSnapshot,
-      item?.providerAvailability
-    ).externalQuantity;
+    return splitWarehouseQuantityForFlow({
+      requestedQty: Math.max(0, Number(item?.kolicina) || 0),
+      localQty: Math.max(0, Number(item?.stanje) || 0),
+      isAdmin: this.isAdmin,
+      provider: item?.providerAvailability,
+    }).externalQuantity;
   }
 
   isMixedWarehouseItem(item: Roba | null | undefined): boolean {
     if (!item?.providerAvailability?.available) {
       return false;
     }
-    return this.getMixedLocalQuantity(item) > 0 && this.getMixedExternalQuantity(item) > 0;
+    return splitWarehouseQuantityForFlow({
+      requestedQty: Math.max(0, Number(item?.kolicina) || 0),
+      localQty: Math.max(0, Number(item?.stanje) || 0),
+      isAdmin: this.isAdmin,
+      provider: item?.providerAvailability,
+    }).hasMixed;
   }
 
   getMixedExternalLabel(item: Roba | null | undefined): string {
@@ -672,6 +676,14 @@ export class CartComponent implements OnInit, OnDestroy {
           if (!this.shouldKeepSubmitRequestKey(error)) {
             this.resetSubmitRequestKey();
           }
+          const persistentConflict = this.buildPersistentConflictToastMessage(error);
+          if (persistentConflict) {
+            this.snackbarService.showPersistentError(
+              persistentConflict,
+              SnackbarPosition.TOP
+            );
+            return;
+          }
           this.snackbarService.showAutoClose(
             this.extractSubmitErrorMessage(error),
             SnackbarPosition.TOP
@@ -681,34 +693,21 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   private requiresExternalWarehouse(item: Roba | null | undefined): boolean {
-    if (!item?.providerAvailability?.available) {
-      return false;
-    }
-    const requested = Math.max(0, Number(item.kolicina) || 0);
-    if (requested <= 0) {
-      return false;
-    }
-    const sabac = Math.max(0, Number(item.stanje) || 0);
-    return (
-      splitCombinedWarehouseQuantity(
-        requested,
-        sabac,
-        item?.providerAvailability
-      ).externalQuantity > 0
-    );
+    return requiresExternalWarehouseForFlow({
+      requestedQty: Math.max(0, Number(item?.kolicina) || 0),
+      localQty: Math.max(0, Number(item?.stanje) || 0),
+      isAdmin: this.isAdmin,
+      provider: item?.providerAvailability,
+    });
   }
 
   private resolveSabacFulfillment(item: Roba | null | undefined): number {
-    const requested = Math.max(0, Number(item?.kolicina) || 0);
-    if (requested <= 0) {
-      return 0;
-    }
-    const sabac = Math.max(0, Number(item?.stanje) || 0);
-    return splitCombinedWarehouseQuantity(
-      requested,
-      sabac,
-      item?.providerAvailability
-    ).localQuantity;
+    return splitWarehouseQuantityForFlow({
+      requestedQty: Math.max(0, Number(item?.kolicina) || 0),
+      localQty: Math.max(0, Number(item?.stanje) || 0),
+      isAdmin: this.isAdmin,
+      provider: item?.providerAvailability,
+    }).localQuantity;
   }
 
   private extractSubmitErrorMessage(error: any): string {
@@ -735,6 +734,61 @@ export class CartComponent implements OnInit, OnDestroy {
       .trim();
 
     return cleaned || fallback;
+  }
+
+  private buildPersistentConflictToastMessage(error: any): string | null {
+    const status = Number(error?.status);
+    const details = error?.error?.details as CheckoutConflictDetailsPayload | undefined;
+    const hasConflictCode = details?.code === 'CHECKOUT_PROVIDER_UNAVAILABLE';
+    if (status !== 409 && !hasConflictCode) {
+      return null;
+    }
+
+    const items = Array.isArray(details?.items) ? details?.items : [];
+    if (!items.length) {
+      return (
+        'Porudzbinu trenutno nije moguce potvrditi.\n' +
+        'Neke stavke vise nisu dostupne u trazenoj kolicini.\n' +
+        'Smanjite kolicinu ili uklonite stavku pa potvrdite ponovo.'
+      );
+    }
+
+    const lines = items
+      .slice(0, 4)
+      .map((item) => this.formatConflictToastLine(item))
+      .filter(Boolean)
+      .map((line) => `- ${line}`);
+    const moreLine =
+      items.length > 4 ? `- +${items.length - 4} dodatnih stavki nije potvrdjeno.` : null;
+
+    return [
+      'Porudzbinu trenutno nije moguce potvrditi.',
+      'Neke stavke vise nisu dostupne u trazenoj kolicini:',
+      ...lines,
+      ...(moreLine ? [moreLine] : []),
+      'Predlog: smanjite kolicinu ili uklonite stavku, pa kliknite potvrdu ponovo.',
+    ].join('\n');
+  }
+
+  private formatConflictToastLine(item: CheckoutConflictItemPayload | null | undefined): string {
+    if (!item) {
+      return 'stavka';
+    }
+    const label =
+      (item.catalogNumber || '').toString().trim() ||
+      (item.articleName || '').toString().trim() ||
+      'stavka';
+    const requested = Math.max(0, Number(item.requestedQuantity) || 0);
+    const maxOrderable = Math.max(0, Number(item.maxOrderableQuantity) || 0);
+    const reason = (item.message || '').toString().trim();
+
+    if (reason && requested > 0) {
+      return `${label}: ${reason} (trazeno ${requested}, dostupno ${maxOrderable})`;
+    }
+    if (requested > 0) {
+      return `${label}: trazeno ${requested}, dostupno ${maxOrderable}`;
+    }
+    return reason ? `${label}: ${reason}` : label;
   }
 
   private buildConflictMessageFromPayload(rawDetails: any): string | null {

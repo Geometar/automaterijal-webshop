@@ -43,11 +43,15 @@ import {
   buildAvailabilityVm,
   clampCombinedWarehouseQuantity,
   EXTERNAL_WAREHOUSE_LABEL,
+  isAdminExternalProviderOrderFlow,
+  resolveFlowAvailabilityLabel,
+  resolveFlowLocalWarehouseQuantity,
+  resolveFlowStockQuantity,
   resolveCombinedAvailabilityLabel,
   resolveCombinedAvailabilityTone,
   resolveMinOrderQuantity,
   resolvePackagingUnit,
-  splitCombinedWarehouseQuantity,
+  splitWarehouseQuantityForFlow,
   shouldForceCombinedProviderAvailabilityBox,
 } from '../../../utils/availability-utils';
 
@@ -396,11 +400,22 @@ export class RowComponent implements OnInit, OnChanges {
   }
 
   get effectiveStock(): number {
-    return this.availabilityVm.purchasableStock;
+    return resolveFlowStockQuantity({
+      isAdmin: this.isAdmin,
+      provider: this.data?.providerAvailability,
+      defaultStock: this.availabilityVm.purchasableStock,
+    });
   }
 
   get isAdminCartView(): boolean {
     return this.isAdmin && this.showPriceOnly;
+  }
+
+  private get isAdminExternalProviderFlow(): boolean {
+    return isAdminExternalProviderOrderFlow({
+      isAdmin: this.isAdmin,
+      provider: this.data?.providerAvailability,
+    });
   }
 
   get isStaff(): boolean {
@@ -435,7 +450,7 @@ export class RowComponent implements OnInit, OnChanges {
   }
 
   private get isProviderItem(): boolean {
-    return (
+    return this.isAdminExternalProviderFlow || (
       this.availabilityVm.status === 'AVAILABLE' && !!this.data?.providerAvailability?.available
     );
   }
@@ -449,6 +464,10 @@ export class RowComponent implements OnInit, OnChanges {
 
   get selectedTotalPrice(): number {
     return this.unitPrice * (this.quantity || 0);
+  }
+
+  get showSelectedTotalPrice(): boolean {
+    return (this.quantity || 0) > 1;
   }
 
   get quantityMin(): number {
@@ -544,7 +563,7 @@ export class RowComponent implements OnInit, OnChanges {
     const step = this.quantityStep;
     if (!Number.isFinite(value)) return min;
     const max = this.effectiveStock || min;
-    const localQty = Math.max(0, Number(this.availabilityVm.provider.warehouseSplit.sabacQuantity) || 0);
+    const localQty = this.localWarehouseQuantity;
     const isCombined = this.availabilityVm.provider.warehouseSplit.enabled;
     if (isCombined) {
       return clampCombinedWarehouseQuantity({
@@ -574,10 +593,11 @@ export class RowComponent implements OnInit, OnChanges {
   }
 
   private get localWarehouseQuantity(): number {
-    return Math.max(
-      0,
-      Number(this.availabilityVm.provider.warehouseSplit.sabacQuantity) || 0
-    );
+    return resolveFlowLocalWarehouseQuantity({
+      isAdmin: this.isAdmin,
+      provider: this.data?.providerAvailability,
+      localQty: Number(this.availabilityVm.provider.warehouseSplit.sabacQuantity) || 0,
+    });
   }
 
   get currentAvailabilityTone(): AvailabilityTone {
@@ -591,10 +611,17 @@ export class RowComponent implements OnInit, OnChanges {
   }
 
   get currentAvailabilityLabel(): string {
-    return resolveCombinedAvailabilityLabel({
+    const fallbackLabel = resolveCombinedAvailabilityLabel({
       combinedEnabled: this.availabilityVm.provider.warehouseSplit.enabled,
       tone: this.currentAvailabilityTone,
       defaultLabel: this.availabilityVm.label,
+    });
+    return resolveFlowAvailabilityLabel({
+      isAdmin: this.isAdmin,
+      isStaff: this.isStaff,
+      isOutOfStock: this.isUnavailable,
+      provider: this.data?.providerAvailability,
+      fallbackLabel,
     });
   }
 
@@ -607,33 +634,33 @@ export class RowComponent implements OnInit, OnChanges {
   }
 
   get mixedLocalSelectionQuantity(): number {
-    const requested = Math.max(1, Number(this.quantity) || 1);
-    return splitCombinedWarehouseQuantity(
-      requested,
-      this.localWarehouseQuantity,
-      this.data?.providerAvailability
-    ).localQuantity;
+    return splitWarehouseQuantityForFlow({
+      requestedQty: Math.max(1, Number(this.quantity) || 1),
+      localQty: this.localWarehouseQuantity,
+      isAdmin: this.isAdmin,
+      provider: this.data?.providerAvailability,
+    }).localQuantity;
   }
 
   get mixedExternalSelectionQuantity(): number {
-    const requested = Math.max(1, Number(this.quantity) || 1);
-    return splitCombinedWarehouseQuantity(
-      requested,
-      this.localWarehouseQuantity,
-      this.data?.providerAvailability
-    ).externalQuantity;
+    return splitWarehouseQuantityForFlow({
+      requestedQty: Math.max(1, Number(this.quantity) || 1),
+      localQty: this.localWarehouseQuantity,
+      isAdmin: this.isAdmin,
+      provider: this.data?.providerAvailability,
+    }).externalQuantity;
   }
 
   get showMixedWarehouseSplitHint(): boolean {
     if (!this.availabilityVm.provider.warehouseSplit.enabled) {
       return false;
     }
-    const requested = Math.max(1, Number(this.quantity) || 1);
-    return splitCombinedWarehouseQuantity(
-      requested,
-      this.localWarehouseQuantity,
-      this.data?.providerAvailability
-    ).hasMixed;
+    return splitWarehouseQuantityForFlow({
+      requestedQty: Math.max(1, Number(this.quantity) || 1),
+      localQty: this.localWarehouseQuantity,
+      isAdmin: this.isAdmin,
+      provider: this.data?.providerAvailability,
+    }).hasMixed;
   }
 
   get mixedWarehouseExternalLabel(): string {

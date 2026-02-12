@@ -25,6 +25,10 @@ import { TableFlatComponent } from '../../../shared/components/table-flat/table-
 import { InvoiceService } from '../../../shared/service/invoice.service';
 import { UrlHelperService } from '../../../shared/service/utils/url-helper.service';
 
+type AdminInvoiceRow = Invoice & {
+  providerCallBadge?: boolean | null;
+};
+
 export const AdminInvoicesHeader: HeaderData = {
   titleInfo: {
     title: 'Sve porudžbenice',
@@ -62,6 +66,16 @@ export class AdminInvoicesComponent implements OnInit, OnDestroy {
       },
     },
     { key: 'partner', header: 'Partner', type: CellType.TEXT },
+    {
+      key: 'providerCallBadge',
+      header: 'Provider poziv',
+      type: CellType.BADGE,
+      badgeLabels: {
+        trueLabel: 'Da',
+        falseLabel: 'Ne',
+        nullLabel: 'Ne',
+      },
+    },
     { key: 'status.naziv', header: 'Status', type: CellType.TEXT },
     {
       key: 'vremePorucivanja',
@@ -75,7 +89,7 @@ export class AdminInvoicesComponent implements OnInit, OnDestroy {
   ];
 
   displayedColumns: string[] = this.columns.map((col) => col.key);
-  dataSource = new MatTableDataSource<Invoice>();
+  dataSource = new MatTableDataSource<AdminInvoiceRow>();
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   loading = false;
@@ -91,7 +105,7 @@ export class AdminInvoicesComponent implements OnInit, OnDestroy {
   inputTypeEnum = InputTypeEnum;
   private destroy$ = new Subject<void>();
 
-  private allInvoices: Invoice[] = [];
+  private allInvoices: AdminInvoiceRow[] = [];
   private clientPaged = false;
 
   constructor(
@@ -140,7 +154,7 @@ export class AdminInvoicesComponent implements OnInit, OnDestroy {
           if (isPaginatedResponse<Invoice>(response)) {
             this.clientPaged = false;
             this.allInvoices = [];
-            this.dataSource.data = response.content;
+            this.dataSource.data = (response.content ?? []).map((row) => this.decorateInvoice(row));
             this.totalItems = response.totalElements;
             this.pageIndex = response.number;
             this.rowsPerPage = response.size;
@@ -148,8 +162,8 @@ export class AdminInvoicesComponent implements OnInit, OnDestroy {
           }
 
           this.clientPaged = true;
-          this.allInvoices = response;
-          this.totalItems = response.length;
+          this.allInvoices = (response ?? []).map((row) => this.decorateInvoice(row));
+          this.totalItems = this.allInvoices.length;
           this.applyClientPaging();
         },
       });
@@ -210,5 +224,12 @@ export class AdminInvoicesComponent implements OnInit, OnDestroy {
     const start = this.pageIndex * this.rowsPerPage;
     const end = start + this.rowsPerPage;
     this.dataSource.data = (this.allInvoices ?? []).slice(start, end);
+  }
+
+  private decorateInvoice(invoice: Invoice): AdminInvoiceRow {
+    return {
+      ...invoice,
+      providerCallBadge: invoice?.providerCall === true,
+    };
   }
 }

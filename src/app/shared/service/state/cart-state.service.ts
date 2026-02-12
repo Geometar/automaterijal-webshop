@@ -163,7 +163,11 @@ export class CartStateService {
 
     // ✅ Smanjuje stanje (lokalno u UI)
     if (isFebiProvider(roba?.providerAvailability)) {
-      this.reduceFromCombinedWarehouses(roba, qtyToAdd);
+      this.reduceFromCombinedWarehouses(
+        roba,
+        qtyToAdd,
+        this.accountStateService.isAdmin()
+      );
     } else if (status === 'IN_STOCK') {
       roba.stanje = this.calculateNewStock(roba.stanje, qtyToAdd);
     } else if (status === 'AVAILABLE' && roba?.providerAvailability) {
@@ -234,7 +238,11 @@ export class CartStateService {
         const status = getAvailabilityStatus(roba);
         const qty = cartItem.quantity ?? 0;
         if (isFebiProvider(roba?.providerAvailability)) {
-          this.reduceFromCombinedWarehouses(roba, qty);
+          this.reduceFromCombinedWarehouses(
+            roba,
+            qty,
+            this.accountStateService.isAdmin()
+          );
         } else if (status === 'AVAILABLE' && roba?.providerAvailability) {
           const pa = roba.providerAvailability;
           if (pa.warehouseQuantity != null) {
@@ -262,7 +270,11 @@ export class CartStateService {
       const status = getAvailabilityStatus(roba);
       const qty = cartItem.quantity ?? 0;
       if (isFebiProvider(roba?.providerAvailability)) {
-        this.reduceFromCombinedWarehouses(roba, qty);
+        this.reduceFromCombinedWarehouses(
+          roba,
+          qty,
+          this.accountStateService.isAdmin()
+        );
       } else if (status === 'AVAILABLE' && roba?.providerAvailability) {
         const pa = roba.providerAvailability;
         if (pa.warehouseQuantity != null) {
@@ -498,20 +510,22 @@ export class CartStateService {
     });
   }
 
-  private reduceFromCombinedWarehouses(roba: any, quantity: number): void {
+  private reduceFromCombinedWarehouses(
+    roba: any,
+    quantity: number,
+    adminExternalOnly = false
+  ): void {
     const requested = Math.max(0, Number(quantity) || 0);
     if (requested <= 0) {
       return;
     }
 
     const local = Math.max(0, Number(roba?.stanje) || 0);
-    const split = splitCombinedWarehouseQuantity(
-      requested,
-      local,
-      roba?.providerAvailability
-    );
-    roba.stanje = Math.max(0, local - split.localQuantity);
-    const externalTaken = split.externalQuantity;
+    const split = splitCombinedWarehouseQuantity(requested, local, roba?.providerAvailability);
+    if (!adminExternalOnly) {
+      roba.stanje = Math.max(0, local - split.localQuantity);
+    }
+    const externalTaken = adminExternalOnly ? requested : split.externalQuantity;
     if (externalTaken <= 0) {
       return;
     }
