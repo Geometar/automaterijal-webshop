@@ -955,6 +955,8 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     if (result.coreCharge != null) {
       data.providerAvailability.coreCharge = result.coreCharge;
     }
+
+    this.cartStateService.updateStockForItem(data);
   }
 
   get hasValidPrice(): boolean {
@@ -1099,6 +1101,15 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       return 1;
     }
     return resolveMinOrderQuantity(this.data?.providerAvailability);
+  }
+
+  get cartKey(): string | null {
+    return this.data?.cartKey ?? this.cartStateService.getItemKey(this.data);
+  }
+
+  get isInCartItem(): boolean {
+    const key = this.cartKey;
+    return key ? this.cartStateService.isInCartKey(key) : false;
   }
 
   get totalPrice(): number {

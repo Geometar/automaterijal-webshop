@@ -1259,5 +1259,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
     if (result.coreCharge != null) {
       data.providerAvailability.coreCharge = result.coreCharge;
     }
+
+    this.cartStateService.updateStockForItem(data);
   }
 }

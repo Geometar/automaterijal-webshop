@@ -312,7 +312,7 @@
 
     <div
       class="mobile-quantity-cart"
-      *ngIf="canAddToCart && !isUnavailable"
+      *ngIf="canAddToCart && (!isUnavailable || isInCartItem)"
     >
       <autom-input-fields
         [clearBtn]="false"

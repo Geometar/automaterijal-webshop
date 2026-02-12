@@ -238,6 +238,8 @@ export class AutomProductCardComponent implements OnInit, OnChanges {
     if (result.coreCharge != null) {
       roba.providerAvailability.coreCharge = result.coreCharge;
     }
+
+    this.cartStateService.updateStockForItem(roba);
   }
 
   modifyQuantity(value: number): void {

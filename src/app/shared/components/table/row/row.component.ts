@@ -316,6 +316,8 @@ export class RowComponent implements OnInit, OnChanges {
     if (result.coreCharge != null) {
       data.providerAvailability.coreCharge = result.coreCharge;
     }
+
+    this.cartStateService.updateStockForItem(data);
   }
 
   isInCart(robaId: number): boolean {
@@ -504,7 +506,7 @@ export class RowComponent implements OnInit, OnChanges {
   }
 
   get shouldShowInquiry(): boolean {
-    return this.isUnavailable || this.isTecDocOnly;
+    return (this.isUnavailable || this.isTecDocOnly) && !this.isInCartItem;
   }
 
   openInquiryPopup(): void {

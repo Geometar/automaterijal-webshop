@@ -210,6 +210,20 @@
               </ng-template>
             </div>
 
+            <div
+              *ngIf="isInCartItem"
+              class="note note--in-cart"
+              role="status"
+              aria-live="polite"
+            >
+              <autom-icon
+                [color]="colorEnum.GREEN_700"
+                [source]="iconEnum.SHOPPING_BAG"
+                [tooltip]="{ tooltipText: 'Artikal je u korpi' }"
+              ></autom-icon>
+              Artikal je već dodat u korpu
+            </div>
+
             <div class="actions">
               <autom-input-fields
                 [clearBtn]="false"
@@ -248,7 +262,7 @@
               Dozvoljeno samo ulogovanim kupcima
             </p>
 
-            <div *ngIf="isOutOfStock" class="inquiry">
+            <div *ngIf="isOutOfStock && !isInCartItem" class="inquiry">
               <p class="inquiry__title" *ngIf="!inquirySent">
                 {{
                   showProviderAvailability
