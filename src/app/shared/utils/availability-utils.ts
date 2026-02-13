@@ -8,6 +8,31 @@ export const EXTERNAL_WAREHOUSE_LABEL = 'Eksterni magacin';
 export const EXTERNAL_AVAILABILITY_LABEL_STAFF = 'Dostupno (eksterni magacin)';
 export const EXTERNAL_AVAILABILITY_LABEL_CUSTOMER = 'Na stanju (eksterni magacin)';
 export const FEBI_PROVIDER_KEY = 'febi-stock';
+const DELIVERY_FORMAT_TIME_ZONE = 'Europe/Belgrade';
+const DELIVERY_FORMAT_LOCALE = 'sr-Latn-RS';
+const DAY_MS = 24 * 60 * 60 * 1000;
+const BELGRADE_DATE_FORMATTER = new Intl.DateTimeFormat(DELIVERY_FORMAT_LOCALE, {
+  timeZone: DELIVERY_FORMAT_TIME_ZONE,
+  year: 'numeric',
+  month: 'numeric',
+  day: 'numeric',
+});
+const BELGRADE_TIME_FORMATTER = new Intl.DateTimeFormat(DELIVERY_FORMAT_LOCALE, {
+  timeZone: DELIVERY_FORMAT_TIME_ZONE,
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: false,
+});
+const BELGRADE_WEEKDAY_FORMATTER = new Intl.DateTimeFormat(DELIVERY_FORMAT_LOCALE, {
+  timeZone: DELIVERY_FORMAT_TIME_ZONE,
+  weekday: 'long',
+});
+const BELGRADE_DATE_PARTS_FORMATTER = new Intl.DateTimeFormat('en-CA', {
+  timeZone: DELIVERY_FORMAT_TIME_ZONE,
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+});
 
 export function getExternalAvailabilityLabel(isStaff: boolean): string {
   return isStaff
@@ -528,6 +553,51 @@ function pluralizeBusinessDays(n: number): string {
   return 'radnih dana';
 }
 
+interface LocalDateParts {
+  year: number;
+  month: number;
+  day: number;
+}
+
+function readBelgradeLocalDateParts(date: Date): LocalDateParts {
+  const parts = BELGRADE_DATE_PARTS_FORMATTER.formatToParts(date);
+  let year = 0;
+  let month = 0;
+  let day = 0;
+
+  for (const part of parts) {
+    if (part.type === 'year') {
+      year = Number(part.value);
+    } else if (part.type === 'month') {
+      month = Number(part.value);
+    } else if (part.type === 'day') {
+      day = Number(part.value);
+    }
+  }
+
+  return { year, month, day };
+}
+
+function weekStartUtcMs(parts: LocalDateParts): number {
+  const dateUtc = Date.UTC(parts.year, parts.month - 1, parts.day);
+  const dayOfWeek = new Date(dateUtc).getUTCDay(); // 0=Sunday..6=Saturday
+  const mondayBased = (dayOfWeek + 6) % 7; // 0=Monday..6=Sunday
+  return dateUtc - mondayBased * DAY_MS;
+}
+
+function isSameBelgradeWeek(left: Date, right: Date): boolean {
+  const leftParts = readBelgradeLocalDateParts(left);
+  const rightParts = readBelgradeLocalDateParts(right);
+  return weekStartUtcMs(leftParts) === weekStartUtcMs(rightParts);
+}
+
+function capitalizeFirst(value: string): string {
+  if (!value) {
+    return value;
+  }
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
 export function formatDeliveryEstimate(
   provider: ProviderAvailabilityDto | null | undefined
 ): string | null {
@@ -535,8 +605,12 @@ export function formatDeliveryEstimate(
   if (expected) {
     const date = new Date(expected);
     if (!Number.isNaN(date.getTime())) {
-      const datePart = date.toLocaleDateString('sr-RS');
-      const timePart = date.toLocaleTimeString('sr-RS', { hour: '2-digit', minute: '2-digit' });
+      const timePart = BELGRADE_TIME_FORMATTER.format(date);
+      if (isSameBelgradeWeek(date, new Date())) {
+        const weekdayPart = capitalizeFirst(BELGRADE_WEEKDAY_FORMATTER.format(date));
+        return `${weekdayPart} ${timePart}`;
+      }
+      const datePart = BELGRADE_DATE_FORMATTER.format(date);
       return `${datePart} ${timePart}`;
     }
   }

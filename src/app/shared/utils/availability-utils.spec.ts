@@ -1,5 +1,6 @@
 import {
   clampCombinedWarehouseQuantity,
+  formatDeliveryEstimate,
   getPurchasableStock,
   requiresExternalWarehouseForFlow,
   resolveFlowStockQuantity,
@@ -106,5 +107,33 @@ describe('availability-utils (FEBI combined)', () => {
     });
 
     expect(stock).toBe(50);
+  });
+});
+
+describe('formatDeliveryEstimate', () => {
+  beforeEach(() => {
+    jasmine.clock().install();
+    jasmine.clock().mockDate(new Date('2026-02-18T10:00:00+01:00'));
+  });
+
+  afterEach(() => {
+    jasmine.clock().uninstall();
+  });
+
+  it('formats same-week expected delivery as weekday and time', () => {
+    const label = formatDeliveryEstimate({
+      expectedDelivery: '2026-02-20T13:00:00Z',
+    } as any);
+
+    expect(label).toBe('Petak 14:00');
+  });
+
+  it('formats next-week expected delivery as date and time', () => {
+    const label = formatDeliveryEstimate({
+      expectedDelivery: '2026-02-24T13:00:00Z',
+    } as any);
+
+    expect(label).toContain('14:00');
+    expect(label).toMatch(/24\.\s*2\.\s*2026\./);
   });
 });
