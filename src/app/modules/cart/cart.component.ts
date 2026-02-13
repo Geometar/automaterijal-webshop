@@ -58,10 +58,12 @@ import { PictureService } from '../../shared/service/utils/picture.service';
 import { SeoService } from '../../shared/service/seo.service';
 import { SnackbarPosition, SnackbarService } from '../../shared/service/utils/snackbar.service';
 import {
+  applySzakalRealtimeAvailability,
   formatDeliveryEstimate,
   formatDispatchCutoff,
   getAvailabilityStatus,
   isFebiProvider,
+  isSzakalStockResultAvailable,
   requiresExternalWarehouseForFlow,
   splitWarehouseQuantityForFlow,
 } from '../../shared/utils/availability-utils';
@@ -897,41 +899,10 @@ export class CartComponent implements OnInit, OnDestroy {
       if (!result || !item?.providerAvailability) {
         return;
       }
-      if (typeof result.available === 'boolean') {
-        item.providerAvailability.available = result.available;
-      }
-      if (result.availableQuantity != null) {
-        item.providerAvailability.totalQuantity = result.availableQuantity;
-        item.providerAvailability.warehouseQuantity = result.availableQuantity;
-      }
-      if (result.orderQuantum != null && result.orderQuantum > 0) {
-        item.providerAvailability.packagingUnit = result.orderQuantum;
-      }
-      if (result.moq != null && result.moq > 0) {
-        item.providerAvailability.minOrderQuantity = result.moq;
-      }
-      if (result.noReturnable != null) {
-        item.providerAvailability.providerNoReturnable = result.noReturnable;
-      }
-      if (result.stockToken) {
-        item.providerAvailability.providerStockToken = result.stockToken;
-      }
-      if (result.purchasePrice != null) {
-        item.providerAvailability.purchasePrice = result.purchasePrice;
-      }
-      if (result.customerPrice != null) {
-        item.providerAvailability.price = result.customerPrice;
-        item.cena = result.customerPrice;
-      }
-      if (result.currency) {
-        item.providerAvailability.currency = result.currency;
-      }
-      if (result.expectedDelivery) {
-        item.providerAvailability.expectedDelivery = result.expectedDelivery;
-      }
-      if (result.coreCharge != null) {
-        item.providerAvailability.coreCharge = result.coreCharge;
-      }
+      applySzakalRealtimeAvailability(item, result, {
+        markRealtimeChecked: false,
+        clearRealtimeChecking: false,
+      });
     });
   }
 
@@ -955,9 +926,8 @@ export class CartComponent implements OnInit, OnDestroy {
       const result =
         (req.token ? byToken.get(req.token) : undefined) ||
         (req.glid ? byGlid.get(req.glid) : undefined);
-      const availableQty = Number(result?.availableQuantity) || 0;
       const requested = Number(req.quantity) || 1;
-      const ok = !!result?.available && availableQty >= requested;
+      const ok = isSzakalStockResultAvailable(result, requested);
       if (!ok) {
         const label = req.token || req.glid || 'stavka';
         failures.push(label);

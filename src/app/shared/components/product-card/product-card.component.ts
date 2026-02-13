@@ -28,8 +28,10 @@ import { SzakalStockCheckResult, SzakalStockService } from '../../service/szakal
 import {
   AvailabilityTone,
   AvailabilityVm,
+  applySzakalRealtimeAvailability,
   buildAvailabilityVm,
   clampCombinedWarehouseQuantity,
+  isSzakalStockResultAvailable,
   resolveCombinedAvailabilityLabel,
   resolveCombinedAvailabilityTone,
   resolveMinOrderQuantity,
@@ -188,57 +190,13 @@ export class AutomProductCardComponent implements OnInit, OnChanges {
   }
 
   private isSzakalResultAvailable(result: SzakalStockCheckResult | null, requested: number): boolean {
-    if (!result || !result.available) {
-      return false;
-    }
-    const qty = Number(result.availableQuantity) || 0;
-    const req = Number(requested) || 1;
-    return qty >= req;
+    return isSzakalStockResultAvailable(result, requested);
   }
 
   private applySzakalRealtime(roba: Roba, result: SzakalStockCheckResult | null): void {
-    if (!roba?.providerAvailability || !result) {
+    if (!applySzakalRealtimeAvailability(roba, result)) {
       return;
     }
-    roba.providerAvailability.realtimeChecked = true;
-    roba.providerAvailability.realtimeCheckedAt = new Date().toISOString();
-    roba.providerAvailability.realtimeChecking = false;
-    if (typeof result.available === 'boolean') {
-      roba.providerAvailability.available = result.available;
-    }
-    if (result.availableQuantity != null) {
-      roba.providerAvailability.totalQuantity = result.availableQuantity;
-      roba.providerAvailability.warehouseQuantity = result.availableQuantity;
-    }
-    if (result.orderQuantum != null && result.orderQuantum > 0) {
-      roba.providerAvailability.packagingUnit = result.orderQuantum;
-    }
-    if (result.moq != null && result.moq > 0) {
-      roba.providerAvailability.minOrderQuantity = result.moq;
-    }
-    if (result.noReturnable != null) {
-      roba.providerAvailability.providerNoReturnable = result.noReturnable;
-    }
-    if (result.stockToken) {
-      roba.providerAvailability.providerStockToken = result.stockToken;
-    }
-    if (result.purchasePrice != null) {
-      roba.providerAvailability.purchasePrice = result.purchasePrice;
-    }
-    if (result.customerPrice != null) {
-      roba.providerAvailability.price = result.customerPrice;
-      roba.cena = result.customerPrice;
-    }
-    if (result.currency) {
-      roba.providerAvailability.currency = result.currency;
-    }
-    if (result.expectedDelivery) {
-      roba.providerAvailability.expectedDelivery = result.expectedDelivery;
-    }
-    if (result.coreCharge != null) {
-      roba.providerAvailability.coreCharge = result.coreCharge;
-    }
-
     this.cartStateService.updateStockForItem(roba);
   }
 

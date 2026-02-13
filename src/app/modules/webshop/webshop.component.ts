@@ -43,6 +43,7 @@ import {
   hasActiveFilterQuery,
   normalizeRobotsTag,
 } from '../../shared/utils/seo-utils';
+import { applySzakalRealtimeAvailability } from '../../shared/utils/availability-utils';
 import { StringUtils } from '../../shared/utils/string-utils';
 
 export enum WebShopState {
@@ -1200,10 +1201,39 @@ export class WebshopComponent implements OnDestroy, OnInit {
           if (seq !== this.listCheckSeq) {
             return;
           }
-          results?.forEach((result, idx) => {
-            const target = prioritized[idx];
+          const byToken = new Map<string, Roba[]>();
+          const byGlid = new Map<string, Roba[]>();
+          prioritized.forEach((roba) => {
+            const token = (roba?.providerAvailability?.providerStockToken || '').toString().trim();
+            const glid = (roba?.providerAvailability?.providerProductId || '').toString().trim();
+            if (token) {
+              const list = byToken.get(token) || [];
+              list.push(roba);
+              byToken.set(token, list);
+            }
+            if (glid) {
+              const list = byGlid.get(glid) || [];
+              list.push(roba);
+              byGlid.set(glid, list);
+            }
+          });
+
+          const updated = new Set<Roba>();
+          (results || []).forEach((result) => {
+            const token = (result?.token || '').toString().trim();
+            const glid = (result?.glid || '').toString().trim();
+            const target =
+              this.takeFirstRobaByKey(byToken, token) ||
+              this.takeFirstRobaByKey(byGlid, glid);
             if (target) {
+              updated.add(target);
               this.applySzakalRealtime(target, result);
+            }
+          });
+
+          prioritized.forEach((roba) => {
+            if (!updated.has(roba) && roba?.providerAvailability) {
+              roba.providerAvailability.realtimeChecking = false;
             }
           });
         },
@@ -1218,48 +1248,26 @@ export class WebshopComponent implements OnDestroy, OnInit {
   }
 
   private applySzakalRealtime(data: Roba, result: SzakalStockCheckResult | null): void {
-    if (!data?.providerAvailability || !result) {
+    if (!applySzakalRealtimeAvailability(data, result)) {
       return;
     }
-    data.providerAvailability.realtimeChecked = true;
-    data.providerAvailability.realtimeCheckedAt = new Date().toISOString();
-    data.providerAvailability.realtimeChecking = false;
-    if (typeof result.available === 'boolean') {
-      data.providerAvailability.available = result.available;
-    }
-    if (result.availableQuantity != null) {
-      data.providerAvailability.totalQuantity = result.availableQuantity;
-      data.providerAvailability.warehouseQuantity = result.availableQuantity;
-    }
-    if (result.orderQuantum != null && result.orderQuantum > 0) {
-      data.providerAvailability.packagingUnit = result.orderQuantum;
-    }
-    if (result.moq != null && result.moq > 0) {
-      data.providerAvailability.minOrderQuantity = result.moq;
-    }
-    if (result.noReturnable != null) {
-      data.providerAvailability.providerNoReturnable = result.noReturnable;
-    }
-    if (result.stockToken) {
-      data.providerAvailability.providerStockToken = result.stockToken;
-    }
-    if (result.purchasePrice != null) {
-      data.providerAvailability.purchasePrice = result.purchasePrice;
-    }
-    if (result.customerPrice != null) {
-      data.providerAvailability.price = result.customerPrice;
-      data.cena = result.customerPrice;
-    }
-    if (result.currency) {
-      data.providerAvailability.currency = result.currency;
-    }
-    if (result.expectedDelivery) {
-      data.providerAvailability.expectedDelivery = result.expectedDelivery;
-    }
-    if (result.coreCharge != null) {
-      data.providerAvailability.coreCharge = result.coreCharge;
-    }
-
     this.cartStateService.updateStockForItem(data);
+  }
+
+  private takeFirstRobaByKey(map: Map<string, Roba[]>, key: string): Roba | null {
+    if (!key) {
+      return null;
+    }
+    const list = map.get(key);
+    if (!list?.length) {
+      return null;
+    }
+    const roba = list.shift() || null;
+    if (!list.length) {
+      map.delete(key);
+    } else {
+      map.set(key, list);
+    }
+    return roba;
   }
 }

@@ -1,5 +1,6 @@
 import { AvailabilityStatus, ProviderAvailabilityDto } from '../data-models/model/availability';
 import { Roba } from '../data-models/model/roba';
+import { SzakalStockCheckResult } from '../service/szakal-stock.service';
 
 export type AvailabilityTone = 'green' | 'blue' | 'red' | 'yellow';
 
@@ -38,6 +39,92 @@ export function getProviderAvailableQuantity(
       ? total
       : 0;
   return Math.max(0, resolved);
+}
+
+export function isSzakalStockResultAvailable(
+  result: SzakalStockCheckResult | null | undefined,
+  requested: number
+): boolean {
+  if (!result || !result.available) {
+    return false;
+  }
+  const qty = Math.max(0, Number(result.availableQuantity) || 0);
+  const req = Math.max(1, Number(requested) || 1);
+  return qty >= req;
+}
+
+export interface ApplySzakalRealtimeOptions {
+  markRealtimeChecked?: boolean;
+  clearRealtimeChecking?: boolean;
+  checkedAtIso?: string;
+}
+
+export function applySzakalRealtimeAvailability(
+  roba: Pick<Roba, 'providerAvailability' | 'cena'> | null | undefined,
+  result: SzakalStockCheckResult | null | undefined,
+  options?: ApplySzakalRealtimeOptions
+): boolean {
+  if (!roba?.providerAvailability || !result) {
+    return false;
+  }
+
+  const provider = roba.providerAvailability;
+  const shouldMarkChecked = options?.markRealtimeChecked !== false;
+  const shouldClearChecking = options?.clearRealtimeChecking !== false;
+
+  if (shouldMarkChecked) {
+    provider.realtimeChecked = true;
+    provider.realtimeCheckedAt = options?.checkedAtIso || new Date().toISOString();
+  }
+  if (shouldClearChecking) {
+    provider.realtimeChecking = false;
+  }
+  if (typeof result.available === 'boolean') {
+    provider.available = result.available;
+  }
+  if (result.availableQuantity != null) {
+    const incomingQty = Math.max(0, Number(result.availableQuantity) || 0);
+    if (provider.available === false) {
+      provider.totalQuantity = 0;
+      provider.warehouseQuantity = 0;
+    } else {
+      const currentTotal = Math.max(0, Number(provider.totalQuantity) || 0);
+      const currentWarehouse = Math.max(0, Number(provider.warehouseQuantity) || 0);
+      const mergedQty = Math.max(incomingQty, currentTotal, currentWarehouse);
+      provider.totalQuantity = mergedQty;
+      provider.warehouseQuantity = mergedQty;
+    }
+  }
+  if (result.orderQuantum != null && result.orderQuantum > 0) {
+    provider.packagingUnit = result.orderQuantum;
+  }
+  if (result.moq != null && result.moq > 0) {
+    provider.minOrderQuantity = result.moq;
+  }
+  if (result.noReturnable != null) {
+    provider.providerNoReturnable = result.noReturnable;
+  }
+  if (result.stockToken) {
+    provider.providerStockToken = result.stockToken;
+  }
+  if (result.purchasePrice != null) {
+    provider.purchasePrice = result.purchasePrice;
+  }
+  if (result.customerPrice != null) {
+    provider.price = result.customerPrice;
+    roba.cena = result.customerPrice;
+  }
+  if (result.currency) {
+    provider.currency = result.currency;
+  }
+  if (result.expectedDelivery) {
+    provider.expectedDelivery = result.expectedDelivery;
+  }
+  if (result.coreCharge != null) {
+    provider.coreCharge = result.coreCharge;
+  }
+
+  return true;
 }
 
 export interface AvailabilityVm {
