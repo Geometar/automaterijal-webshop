@@ -421,7 +421,10 @@ export class CartComponent implements OnInit, OnDestroy {
     if (!this.requiresExternalWarehouse(item)) {
       return null;
     }
-    const estimate = formatDeliveryEstimate(item?.providerAvailability);
+    const estimate = formatDeliveryEstimate(
+      item?.providerAvailability,
+      Math.max(1, Math.floor(Number(item?.kolicina) || 1))
+    );
     const cutoff = formatDispatchCutoff(item?.providerAvailability?.nextDispatchCutoff);
     if (estimate && cutoff) {
       return `Isporuka: ${estimate} • Poruči do: ${cutoff}`;

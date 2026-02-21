@@ -60,6 +60,29 @@ describe('CartStateService (FEBI combined)', () => {
     };
   }
 
+  function cityAwareRoba() {
+    return {
+      robaid: 202,
+      cena: 100,
+      kolicina: 1,
+      stanje: 0,
+      availabilityStatus: 'AVAILABLE',
+      katbr: 'G-202',
+      naziv: 'Test city-aware artikal',
+      proizvodjac: { proid: 'BOSCH', naziv: 'BOSCH' },
+      providerAvailability: {
+        provider: 'gazela',
+        available: true,
+        articleNumber: 'A-202',
+        cityBranchAware: true,
+        cityWarehouseQuantity: 2,
+        warehouseQuantity: 2,
+        totalQuantity: 10,
+        price: 100,
+      },
+    };
+  }
+
   it('snaps first add to FEBI provider bucket without consuming local stock', () => {
     const roba = febiRoba();
 
@@ -82,5 +105,53 @@ describe('CartStateService (FEBI combined)', () => {
 
     expect(cart.length).toBe(1);
     expect(cart[0].quantity).toBe(40);
+  });
+
+  it('decrements city warehouse quantity for city-aware providers', () => {
+    const roba = cityAwareRoba();
+
+    service.addToCart(roba, 3);
+
+    expect(roba.providerAvailability.cityWarehouseQuantity).toBe(0);
+    expect(roba.providerAvailability.warehouseQuantity).toBe(0);
+    expect(roba.providerAvailability.totalQuantity).toBe(7);
+  });
+
+  it('updateStockFromCart decrements city-aware quantities using cart snapshot', () => {
+    const roba = cityAwareRoba();
+    const key = service.getItemKey(roba) as string;
+    localStorage.store('cartItems', [
+      {
+        key,
+        quantity: 2,
+        unitPrice: 100,
+        totalPrice: 200,
+      },
+    ]);
+
+    service.updateStockFromCart([roba]);
+
+    expect(roba.providerAvailability.cityWarehouseQuantity).toBe(0);
+    expect(roba.providerAvailability.warehouseQuantity).toBe(0);
+    expect(roba.providerAvailability.totalQuantity).toBe(8);
+  });
+
+  it('updateStockForItem decrements city-aware quantities for single item refresh', () => {
+    const roba = cityAwareRoba();
+    const key = service.getItemKey(roba) as string;
+    localStorage.store('cartItems', [
+      {
+        key,
+        quantity: 1,
+        unitPrice: 100,
+        totalPrice: 100,
+      },
+    ]);
+
+    service.updateStockForItem(roba);
+
+    expect(roba.providerAvailability.cityWarehouseQuantity).toBe(1);
+    expect(roba.providerAvailability.warehouseQuantity).toBe(1);
+    expect(roba.providerAvailability.totalQuantity).toBe(9);
   });
 });

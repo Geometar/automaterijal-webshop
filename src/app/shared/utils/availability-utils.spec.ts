@@ -136,4 +136,40 @@ describe('formatDeliveryEstimate', () => {
     expect(label).toContain('14:00');
     expect(label).toMatch(/24\.\s*2\.\s*2026\./);
   });
+
+  it('formats same-day delivery when city branch has enough stock', () => {
+    const label = formatDeliveryEstimate({
+      cityBranchAware: true,
+      cityWarehouseQuantity: 3,
+      fallbackDeliveryBusinessDaysMin: 1,
+      fallbackDeliveryBusinessDaysMax: 2,
+    } as any);
+
+    expect(label).toBe('Tokom dana');
+  });
+
+  it('formats city-aware fallback delivery when city branch stock is not enough', () => {
+    const label = formatDeliveryEstimate({
+      cityBranchAware: true,
+      cityWarehouseQuantity: 0,
+      fallbackDeliveryBusinessDaysMin: 1,
+      fallbackDeliveryBusinessDaysMax: 2,
+    } as any);
+
+    expect(label).toBe('1–2 radna dana');
+  });
+
+  it('formats city-aware fallback delivery when requested qty exceeds city branch stock', () => {
+    const label = formatDeliveryEstimate(
+      {
+        cityBranchAware: true,
+        cityWarehouseQuantity: 2,
+        fallbackDeliveryBusinessDaysMin: 1,
+        fallbackDeliveryBusinessDaysMax: 2,
+      } as any,
+      3
+    );
+
+    expect(label).toBe('1–2 radna dana');
+  });
 });

@@ -166,6 +166,10 @@ export class CartItem {
   providerLeadTimeBusinessDays?: number;
   providerDeliveryToCustomerBusinessDaysMin?: number;
   providerDeliveryToCustomerBusinessDaysMax?: number;
+  providerCityBranchAware?: boolean;
+  providerCityWarehouseQuantity?: number;
+  providerFallbackDeliveryBusinessDaysMin?: number;
+  providerFallbackDeliveryBusinessDaysMax?: number;
   providerNextDispatchCutoff?: string;
   providerExpectedDelivery?: string;
   providerCoreCharge?: number;

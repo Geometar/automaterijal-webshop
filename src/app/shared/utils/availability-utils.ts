@@ -57,6 +57,12 @@ export function getProviderAvailableQuantity(
 ): number {
   const warehouse = Number(provider?.warehouseQuantity);
   const total = Number(provider?.totalQuantity);
+  if (provider?.cityBranchAware) {
+    const aggregated = Number.isFinite(total) && total > 0 ? total : 0;
+    if (aggregated > 0) {
+      return Math.max(0, aggregated);
+    }
+  }
   const resolved =
     Number.isFinite(warehouse) && warehouse > 0
       ? warehouse
@@ -599,8 +605,27 @@ function capitalizeFirst(value: string): string {
 }
 
 export function formatDeliveryEstimate(
-  provider: ProviderAvailabilityDto | null | undefined
+  provider: ProviderAvailabilityDto | null | undefined,
+  requestedQty?: number
 ): string | null {
+  if (provider?.cityBranchAware) {
+    const requested = Math.max(1, Math.floor(Number(requestedQty) || 1));
+    const cityQty = Math.max(
+      0,
+      Number(provider?.cityWarehouseQuantity ?? provider?.warehouseQuantity) || 0
+    );
+    if (cityQty >= requested) {
+      return 'Tokom dana';
+    }
+    const fallbackMin = Number(provider?.fallbackDeliveryBusinessDaysMin);
+    const fallbackMax = Number(provider?.fallbackDeliveryBusinessDaysMax);
+    const fallbackLabel = formatBusinessDaysRange(fallbackMin, fallbackMax);
+    if (fallbackLabel) {
+      return fallbackLabel;
+    }
+  }
+
+  const providerKey = (provider?.provider || '').toString().trim().toLowerCase();
   const expected = provider?.expectedDelivery;
   if (expected) {
     const date = new Date(expected);
@@ -614,7 +639,6 @@ export function formatDeliveryEstimate(
       return `${datePart} ${timePart}`;
     }
   }
-  const providerKey = (provider?.provider || '').toString().trim().toLowerCase();
   const warehouse = (provider?.warehouse || '').toString().trim().toUpperCase();
   if (providerKey === 'szakal' && warehouse === 'PL3') {
     return '> 3 dana';
@@ -623,9 +647,9 @@ export function formatDeliveryEstimate(
   const min = Number(provider?.deliveryToCustomerBusinessDaysMin);
   const max = Number(provider?.deliveryToCustomerBusinessDaysMax);
 
-  if (Number.isFinite(min) && Number.isFinite(max) && min > 0 && max > 0) {
-    if (min === max) return `${min} ${pluralizeBusinessDays(min)}`;
-    return `${min}–${max} ${pluralizeBusinessDays(max)}`;
+  const rangeLabel = formatBusinessDaysRange(min, max);
+  if (rangeLabel) {
+    return rangeLabel;
   }
 
   const lead = Number(provider?.leadTimeBusinessDays);
@@ -634,6 +658,16 @@ export function formatDeliveryEstimate(
   }
 
   return null;
+}
+
+function formatBusinessDaysRange(min: number, max: number): string | null {
+  if (!Number.isFinite(min) || !Number.isFinite(max) || min <= 0 || max <= 0) {
+    return null;
+  }
+  if (min === max) {
+    return `${min} ${pluralizeBusinessDays(min)}`;
+  }
+  return `${min}–${max} ${pluralizeBusinessDays(max)}`;
 }
 
 export function formatProviderPrice(provider: ProviderAvailabilityDto | null | undefined): string | null {
@@ -691,7 +725,10 @@ export function formatDispatchCutoff(cutoffIso: string | null | undefined): stri
 }
 
 export function buildAvailabilityVm(
-  roba: Pick<Roba, 'availabilityStatus' | 'stanje' | 'cena' | 'rabat' | 'providerAvailability'> | null | undefined,
+  roba: Pick<
+    Roba,
+    'availabilityStatus' | 'stanje' | 'cena' | 'rabat' | 'providerAvailability' | 'kolicina'
+  > | null | undefined,
   opts?: { isAdmin?: boolean; isTecDocOnly?: boolean; isStaff?: boolean }
 ): AvailabilityVm {
   const isAdmin = !!opts?.isAdmin;
@@ -763,7 +800,10 @@ export function buildAvailabilityVm(
     showProviderBox,
     showDiscount,
     provider: {
-      deliveryLabel: formatDeliveryEstimate(roba?.providerAvailability),
+      deliveryLabel: formatDeliveryEstimate(
+        roba?.providerAvailability,
+        Math.max(1, Math.floor(Number(roba?.kolicina) || 1))
+      ),
       cutoffLabel: formatDispatchCutoff(roba?.providerAvailability?.nextDispatchCutoff),
       quantity: providerQty > 0 ? providerQty : null,
       noReturnable,

@@ -27,4 +27,8 @@ export interface ProviderAvailabilityDto {
   warehouse?: string;
   warehouseName?: string;
   warehouseQuantity?: number;
+  cityBranchAware?: boolean;
+  cityWarehouseQuantity?: number;
+  fallbackDeliveryBusinessDaysMin?: number;
+  fallbackDeliveryBusinessDaysMax?: number;
 }

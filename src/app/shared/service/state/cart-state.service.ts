@@ -178,6 +178,7 @@ export class CartStateService {
       if (pa.totalQuantity != null) {
         pa.totalQuantity = this.calculateNewStock(pa.totalQuantity, qtyToAdd);
       }
+      this.reduceCityWarehouseQuantity(pa, qtyToAdd);
     }
 
     if (!this.isBrowser) {
@@ -251,6 +252,7 @@ export class CartStateService {
           if (pa.totalQuantity != null) {
             pa.totalQuantity = this.calculateNewStock(pa.totalQuantity, qty);
           }
+          this.reduceCityWarehouseQuantity(pa, qty);
         } else {
           roba.stanje = this.calculateNewStock(roba.stanje, qty);
         }
@@ -283,6 +285,7 @@ export class CartStateService {
         if (pa.totalQuantity != null) {
           pa.totalQuantity = this.calculateNewStock(pa.totalQuantity, qty);
         }
+        this.reduceCityWarehouseQuantity(pa, qty);
       } else {
         roba.stanje = this.calculateNewStock(roba.stanje, qty);
       }
@@ -369,6 +372,10 @@ export class CartStateService {
       providerLeadTimeBusinessDays: hasProviderSnapshot ? provider?.leadTimeBusinessDays : undefined,
       providerDeliveryToCustomerBusinessDaysMin: hasProviderSnapshot ? provider?.deliveryToCustomerBusinessDaysMin : undefined,
       providerDeliveryToCustomerBusinessDaysMax: hasProviderSnapshot ? provider?.deliveryToCustomerBusinessDaysMax : undefined,
+      providerCityBranchAware: hasProviderSnapshot ? provider?.cityBranchAware : undefined,
+      providerCityWarehouseQuantity: hasProviderSnapshot ? provider?.cityWarehouseQuantity : undefined,
+      providerFallbackDeliveryBusinessDaysMin: hasProviderSnapshot ? provider?.fallbackDeliveryBusinessDaysMin : undefined,
+      providerFallbackDeliveryBusinessDaysMax: hasProviderSnapshot ? provider?.fallbackDeliveryBusinessDaysMax : undefined,
       providerNextDispatchCutoff: hasProviderSnapshot ? provider?.nextDispatchCutoff : undefined,
       providerExpectedDelivery: hasProviderSnapshot ? provider?.expectedDelivery : undefined,
       providerCoreCharge: hasProviderSnapshot ? provider?.coreCharge : undefined,
@@ -433,6 +440,10 @@ export class CartStateService {
         leadTimeBusinessDays: cartItem.providerLeadTimeBusinessDays,
         deliveryToCustomerBusinessDaysMin: cartItem.providerDeliveryToCustomerBusinessDaysMin,
         deliveryToCustomerBusinessDaysMax: cartItem.providerDeliveryToCustomerBusinessDaysMax,
+        cityBranchAware: cartItem.providerCityBranchAware,
+        cityWarehouseQuantity: cartItem.providerCityWarehouseQuantity,
+        fallbackDeliveryBusinessDaysMin: cartItem.providerFallbackDeliveryBusinessDaysMin,
+        fallbackDeliveryBusinessDaysMax: cartItem.providerFallbackDeliveryBusinessDaysMax,
         nextDispatchCutoff: cartItem.providerNextDispatchCutoff,
         expectedDelivery: cartItem.providerExpectedDelivery,
         coreCharge: cartItem.providerCoreCharge,
@@ -461,6 +472,10 @@ export class CartStateService {
           leadTimeBusinessDays: cartItem.providerLeadTimeBusinessDays,
           deliveryToCustomerBusinessDaysMin: cartItem.providerDeliveryToCustomerBusinessDaysMin,
           deliveryToCustomerBusinessDaysMax: cartItem.providerDeliveryToCustomerBusinessDaysMax,
+          cityBranchAware: cartItem.providerCityBranchAware,
+          cityWarehouseQuantity: cartItem.providerCityWarehouseQuantity,
+          fallbackDeliveryBusinessDaysMin: cartItem.providerFallbackDeliveryBusinessDaysMin,
+          fallbackDeliveryBusinessDaysMax: cartItem.providerFallbackDeliveryBusinessDaysMax,
           nextDispatchCutoff: cartItem.providerNextDispatchCutoff,
           expectedDelivery: cartItem.providerExpectedDelivery,
           coreCharge: cartItem.providerCoreCharge,
@@ -537,6 +552,18 @@ export class CartStateService {
     const nextQty = Math.max(0, providerQty - externalTaken);
     roba.providerAvailability.warehouseQuantity = nextQty;
     roba.providerAvailability.totalQuantity = nextQty;
+    this.reduceCityWarehouseQuantity(roba.providerAvailability, externalTaken);
+  }
+
+  private reduceCityWarehouseQuantity(provider: any, quantity: number): void {
+    if (!provider?.cityBranchAware) {
+      return;
+    }
+    const current = Math.max(
+      0,
+      Number(provider.cityWarehouseQuantity ?? provider.warehouseQuantity) || 0
+    );
+    provider.cityWarehouseQuantity = this.calculateNewStock(current, quantity);
   }
 
   private normalizeCart(cart: CartItem[]): CartItem[] {
