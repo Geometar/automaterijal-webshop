@@ -179,6 +179,7 @@ export interface AvailabilityVm {
       sourceLabel: string | null;
       customerPriceLabel: string | null;
       purchasePriceLabel: string | null;
+      marginLabel: string | null;
       packagingUnitLabel: string | null;
     };
     warehouseSplit: {
@@ -727,7 +728,13 @@ export function formatDispatchCutoff(cutoffIso: string | null | undefined): stri
 export function buildAvailabilityVm(
   roba: Pick<
     Roba,
-    'availabilityStatus' | 'stanje' | 'cena' | 'rabat' | 'providerAvailability' | 'kolicina'
+    | 'availabilityStatus'
+    | 'stanje'
+    | 'cena'
+    | 'rabat'
+    | 'providerAvailability'
+    | 'kolicina'
+    | 'pricingMarginPercent'
   > | null | undefined,
   opts?: { isAdmin?: boolean; isTecDocOnly?: boolean; isStaff?: boolean }
 ): AvailabilityVm {
@@ -813,6 +820,7 @@ export function buildAvailabilityVm(
         sourceLabel,
         customerPriceLabel: isAdmin ? formatProviderPrice(roba?.providerAvailability) : null,
         purchasePriceLabel: isAdmin ? formatProviderPurchasePrice(roba?.providerAvailability) : null,
+        marginLabel: isAdmin ? formatPricingMarginPercent(roba?.pricingMarginPercent) : null,
         packagingUnitLabel,
       },
       warehouseSplit: {
@@ -824,4 +832,15 @@ export function buildAvailabilityVm(
       },
     },
   };
+}
+
+function formatPricingMarginPercent(value: number | null | undefined): string | null {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric) || numeric <= 0) {
+    return null;
+  }
+
+  const percent = numeric * 100;
+  const rounded = Math.round(percent * 10) / 10;
+  return `${rounded.toLocaleString('sr-RS', { maximumFractionDigits: 1 })}%`;
 }

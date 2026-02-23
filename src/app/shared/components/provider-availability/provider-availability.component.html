@@ -65,6 +65,15 @@
     }}</span>
   </div>
   <div
+    class="provider-availability__row provider-availability__margin"
+    *ngIf="availability?.provider?.admin?.marginLabel"
+  >
+    Marža:
+    <span class="provider-availability__value">{{
+      availability?.provider?.admin?.marginLabel
+    }}</span>
+  </div>
+  <div
     class="provider-availability__row provider-availability__packaging"
     [class.provider-availability__admin]="isStaff"
     *ngIf="availability?.provider?.admin?.packagingUnitLabel"

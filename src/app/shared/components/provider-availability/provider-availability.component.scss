@@ -75,6 +75,17 @@
   font-size: 13px;
 }
 
+.provider-availability__margin {
+  margin-top: 4px;
+  color: var(--figma-primary-700);
+  font-size: 12.5px;
+  font-weight: 800;
+}
+
+.provider-availability__margin .provider-availability__value {
+  color: var(--figma-primary-800);
+}
+
 .provider-availability__packaging {
   margin-top: 8px;
   padding: 6px 8px;

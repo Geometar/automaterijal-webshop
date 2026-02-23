@@ -118,6 +118,7 @@ export class Roba {
   podGrupaNaziv?: string;
   proizvodjac?: Manufacture;
   proizvodjacLogo?: string | ArrayBuffer;
+  pricingMarginPercent?: number;
   providerAvailability?: ProviderAvailabilityDto;
   rabat: number = 0;
   robaid?: number;
