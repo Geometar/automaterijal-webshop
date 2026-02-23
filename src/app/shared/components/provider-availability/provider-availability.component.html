@@ -69,7 +69,10 @@
     *ngIf="availability?.provider?.admin?.marginLabel"
   >
     Marža:
-    <span class="provider-availability__value">{{
+    <span
+      class="provider-availability__value provider-availability__margin-value"
+      [attr.title]="availability?.provider?.admin?.marginLabel"
+    >{{
       availability?.provider?.admin?.marginLabel
     }}</span>
   </div>

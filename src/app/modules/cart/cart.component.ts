@@ -445,7 +445,10 @@ export class CartComponent implements OnInit, OnDestroy {
       item?.providerAvailability,
       Math.max(1, Math.floor(Number(item?.kolicina) || 1))
     );
-    const cutoff = formatDispatchCutoff(item?.providerAvailability?.nextDispatchCutoff);
+    const cutoff = formatDispatchCutoff(
+      item?.providerAvailability?.nextDispatchCutoff,
+      item?.providerAvailability?.provider
+    );
     if (estimate && cutoff) {
       return `Isporuka: ${estimate} • Poruči do: ${cutoff}`;
     }

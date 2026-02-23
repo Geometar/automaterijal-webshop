@@ -1,6 +1,7 @@
 import {
   clampCombinedWarehouseQuantity,
   formatDeliveryEstimate,
+  formatDispatchCutoff,
   getPurchasableStock,
   requiresExternalWarehouseForFlow,
   resolveFlowStockQuantity,
@@ -171,5 +172,19 @@ describe('formatDeliveryEstimate', () => {
     );
 
     expect(label).toBe('1–2 radna dana');
+  });
+});
+
+describe('formatDispatchCutoff', () => {
+  it('returns gazela default cutoff when provider cutoff is missing', () => {
+    const cutoff = formatDispatchCutoff(null, 'gazela');
+
+    expect(cutoff).toBe('16:00');
+  });
+
+  it('uses gazela fixed cutoff even when provider sends explicit value', () => {
+    const cutoff = formatDispatchCutoff('15:30', 'gazela');
+
+    expect(cutoff).toBe('16:00');
   });
 });

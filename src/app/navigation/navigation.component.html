@@ -120,6 +120,13 @@
                 </div>
               </button>
 
+              <button mat-menu-item routerLink="/admin/provider-backlog">
+                <div class="menu-item-align">
+                  <autom-icon [source]="iconEnum.BOOK"></autom-icon>
+                  <span>Backlog provajder artikala</span>
+                </div>
+              </button>
+
               <button mat-menu-item routerLink="/blog/admin">
                 <div class="menu-item-align">
                   <autom-icon [source]="iconEnum.FILE_TEXT"></autom-icon>
@@ -490,6 +497,16 @@
     >
       <autom-icon [source]="iconEnum.BOOK"></autom-icon>
       Sve porudžbenice
+    </a>
+    <a
+      routerLink="/admin/provider-backlog"
+      href="/admin/provider-backlog"
+      [ngClass]="currentUrl.includes('/admin/provider-backlog') ? 'nav-active' : null"
+      class="menu-title autom-padding--vertical__xxs"
+      (click)="closeMobileSidebar()"
+    >
+      <autom-icon [source]="iconEnum.BOOK"></autom-icon>
+      Backlog provajder artikala
     </a>
     <a
       routerLink="/sales-reports"

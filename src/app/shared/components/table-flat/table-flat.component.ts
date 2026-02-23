@@ -61,6 +61,23 @@ export class TableFlatComponent implements OnChanges {
     this.rowClick.emit(row);
   }
 
+  toTitle(value: unknown): string | null {
+    if (value === null || value === undefined) {
+      return null;
+    }
+    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+      return String(value);
+    }
+    return null;
+  }
+
+  cellTitle(row: any, column: AutomTableColumn): string | null {
+    if (column.type === CellType.IMG) {
+      return null;
+    }
+    return this.toTitle(this.getNestedValue(row, column.key));
+  }
+
   onPageChange(event: PageEvent): void {
     this.pageChange.emit(event);
   }

@@ -1,4 +1,27 @@
 .invoices {
+  &__actions {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 4px;
+  }
+
+  &__action-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--figma-primary-200);
+    color: var(--figma-primary-700);
+    text-decoration: none;
+    font-weight: 600;
+    background: var(--figma-accent-green-25);
+  }
+
+  &__action-link:hover {
+    background: var(--figma-primary-100);
+  }
+
   &__filter {
     display: flex;
     gap: 32px;
@@ -77,6 +100,16 @@
   }
 
   @media (max-width: 991px) {
+    &__actions {
+      justify-content: stretch;
+      width: 100%;
+    }
+
+    &__action-link {
+      width: 100%;
+      justify-content: center;
+    }
+
     &__filter-group {
       flex-direction: column;
       align-items: stretch;

@@ -45,6 +45,7 @@ export class Invoice {
  * Represents an individual invoice item (stavka fakture).
  */
 export class InvoiceItem {
+  webOrderItemId?: number;
   availabilityStatus?: AvailabilityStatus;
   availabilityLabel?: string;
   cena?: number;
@@ -69,7 +70,13 @@ export class InvoiceItem {
   providerDeliveryParty?: string;
   providerMessage?: string;
   providerInfo?: string;
+  providerItemStatus?: 'NIJE_PREUZETA' | 'ZAVRSENA' | 'NEUSPESNA' | null;
+  providerStatusUpdatedByPpid?: number | null;
+  providerStatusUpdatedAt?: string | null;
+  providerStatusReason?: string | null;
   providerResponse?: string;
+  providerActionCompleteLabel?: string;
+  providerActionFailLabel?: string;
   rabat?: number;
   robaId?: number;
   tecDocArticleId?: number;

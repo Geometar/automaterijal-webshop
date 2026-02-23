@@ -1,0 +1,112 @@
+<section class="header-margin--top provider-backlog">
+  <autom-header
+    [headerData]="headerData"
+    [headingLevel]="headingLevelEnum.H2"
+  ></autom-header>
+
+  <div class="provider-backlog__filters">
+    <span class="provider-backlog__segment-label">Status stavke</span>
+    <div class="provider-backlog__segment" role="group" aria-label="Status stavke">
+      <button
+        type="button"
+        class="provider-backlog__segment-btn"
+        [class.is-active]="statusFilter === 'NIJE_PREUZETA'"
+        (click)="onStatusFilterChange('NIJE_PREUZETA')"
+      >
+        Nije preuzeta
+      </button>
+      <button
+        type="button"
+        class="provider-backlog__segment-btn"
+        [class.is-active]="statusFilter === 'ZAVRSENA'"
+        (click)="onStatusFilterChange('ZAVRSENA')"
+      >
+        Zavrsena
+      </button>
+      <button
+        type="button"
+        class="provider-backlog__segment-btn"
+        [class.is-active]="statusFilter === 'NEUSPESNA'"
+        (click)="onStatusFilterChange('NEUSPESNA')"
+      >
+        Neuspesna
+      </button>
+    </div>
+  </div>
+
+  <autom-table-flat
+    [columns]="columns"
+    [displayedColumns]="displayedColumns"
+    [dataSource]="dataSource"
+    [loading]="loading"
+    [pagination]="{
+      length: totalItems,
+      pageIndex: pageIndex,
+      pageSize: rowsPerPage,
+      pageSizeOptions: [10, 20, 50, 100]
+    }"
+    (pageChange)="onPageChange($event)"
+  ></autom-table-flat>
+
+  <autom-popup
+    *ngIf="showStatusPopup"
+    class="provider-backlog__popup"
+    [height]="sizeEnum.AUTO"
+    [loading]="statusPopupLoading"
+    [position]="positionEnum.CENTER"
+    [rounded]="true"
+    [subPosition]="positionEnum.CENTER"
+    [width]="sizeEnum.MEDIUM"
+    (overlayEvent)="closeStatusPopup()"
+  >
+    <div custom-body class="confirmation-container provider-backlog__confirm">
+      <div class="confirmation-container__icon">
+        <autom-icon
+          class="confirmation-container__icon--circle"
+          [color]="colorEnum.YELLOW_700"
+          [source]="iconEnum.ALERT_TRIANGLE"
+        ></autom-icon>
+      </div>
+      <div class="confirmation-container__main">
+        <div class="confirmation-container__header">
+          <h3 class="h3">{{ popupTitle }}</h3>
+        </div>
+        <div class="confirmation-container__body">
+          <p>{{ popupDescription }}</p>
+          <p class="provider-backlog__confirm-meta">
+            Porudzbenica: <strong>{{ pendingStatusRow?.invoiceId || '-' }}</strong>
+            |
+            Artikl: <strong>{{ pendingStatusRow?.catalogNumber || pendingStatusRow?.articleName }}</strong>
+          </p>
+          <autom-text-area
+            *ngIf="pendingStatusAction === 'NEUSPESNA'"
+            [counter]="true"
+            [label]="'Razlog'"
+            [maxLength]="500"
+            [required]="true"
+            [rows]="4"
+            [value]="pendingStatusReason"
+            (emitSelected)="pendingStatusReason = $event"
+          ></autom-text-area>
+        </div>
+        <div class="confirmation-container__footer">
+          <autom-button
+            [disabled]="statusPopupLoading"
+            [label]="'Odustani'"
+            [theme]="buttonThemes.LIGHT_GREY"
+            [type]="buttonTypes.TERNARY"
+            (clickEvent)="closeStatusPopup()"
+          ></autom-button>
+
+          <autom-button
+            [disabled]="statusPopupLoading"
+            [label]="popupConfirmLabel"
+            [theme]="pendingStatusAction === 'NEUSPESNA' ? buttonThemes.LIGHT_RED : buttonThemes.DEFAULT"
+            [type]="buttonTypes.PRIMARY"
+            (clickEvent)="confirmStatusPopup()"
+          ></autom-button>
+        </div>
+      </div>
+    </div>
+  </autom-popup>
+</section>

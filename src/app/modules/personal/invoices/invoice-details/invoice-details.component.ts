@@ -8,8 +8,11 @@ import { MatTableDataSource } from '@angular/material/table';
 
 // Component imports
 import { AutomIconComponent } from '../../../../shared/components/autom-icon/autom-icon.component';
+import { ButtonComponent } from '../../../../shared/components/button/button.component';
+import { PopupComponent } from '../../../../shared/components/popup/popup.component';
 import { SpinnerComponent } from '../../../../shared/components/spinner/spinner.component';
 import { TableFlatComponent } from '../../../../shared/components/table-flat/table-flat.component';
+import { TextAreaComponent } from '../../../../shared/components/text-area/text-area.component';
 import { RsdCurrencyPipe } from '../../../../shared/pipe/rsd-currency.pipe';
 
 // Data models
@@ -27,22 +30,35 @@ import {
   AutomTableColumn,
   CellType,
 } from '../../../../shared/data-models/enums/table.enum';
-import { ColorEnum, IconsEnum } from '../../../../shared/data-models/enums';
+import {
+  ButtonThemes,
+  ButtonTypes,
+  ColorEnum,
+  IconsEnum,
+  PositionEnum,
+  SizeEnum,
+} from '../../../../shared/data-models/enums';
 
 // Service
 import { AccountStateService } from '../../../../shared/service/state/account-state.service';
 import { InvoiceService } from '../../../../shared/service/invoice.service';
 import { PictureService } from '../../../../shared/service/utils/picture.service';
+import { SnackbarService } from '../../../../shared/service/utils/snackbar.service';
+
+type ProviderItemStatusCode = 'NIJE_PREUZETA' | 'ZAVRSENA' | 'NEUSPESNA';
 
 @Component({
   selector: 'app-invoice-details',
   standalone: true,
   imports: [
     AutomIconComponent,
+    ButtonComponent,
     CommonModule,
+    PopupComponent,
     RsdCurrencyPipe,
     SpinnerComponent,
     TableFlatComponent,
+    TextAreaComponent,
   ],
   providers: [CurrencyPipe],
   templateUrl: './invoice-details.component.html',
@@ -71,6 +87,10 @@ export class InvoiceDetailsComponent implements OnInit {
   // Enums
   colorEnum = ColorEnum;
   iconEnum = IconsEnum;
+  buttonThemes = ButtonThemes;
+  buttonTypes = ButtonTypes;
+  positionEnum = PositionEnum;
+  sizeEnum = SizeEnum;
   isAdmin = false;
   isEmployee = false;
   readonly febiProviderKey = 'febi-stock';
@@ -83,6 +103,12 @@ export class InvoiceDetailsComponent implements OnInit {
 
   // Misc loading
   loading = false;
+  updatingProviderItems = new Set<number>();
+  showProviderStatusPopup = false;
+  providerStatusPopupLoading = false;
+  popupProviderItem: InvoiceItem | null = null;
+  popupProviderStatus: Exclude<ProviderItemStatusCode, 'NIJE_PREUZETA'> | null = null;
+  popupProviderReason = '';
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
@@ -92,6 +118,7 @@ export class InvoiceDetailsComponent implements OnInit {
     private accountStateService: AccountStateService,
     private invoiceService: InvoiceService,
     private pictureService: PictureService,
+    private snackbarService: SnackbarService,
     private route: ActivatedRoute,
     private router: Router
   ) { }
@@ -146,7 +173,7 @@ export class InvoiceDetailsComponent implements OnInit {
           this.data = invoice;
           this.statusOutcome = this.resolveInvoiceOutcome(invoice);
           this.noteHtml = this.buildNoteHtml(invoice?.napomena);
-          const items: InvoiceItem[] = invoice.detalji!;
+          const items: InvoiceItem[] = invoice.detalji ?? [];
           this.decorateInvoiceItems(items);
           this.configureColumns(invoice);
 
@@ -174,7 +201,7 @@ export class InvoiceDetailsComponent implements OnInit {
           this.data = invoice;
           this.statusOutcome = this.resolveInvoiceOutcome(invoice);
           this.noteHtml = this.buildNoteHtml(invoice?.napomena);
-          const items: InvoiceItem[] = invoice.detalji!;
+          const items: InvoiceItem[] = invoice.detalji ?? [];
           this.decorateInvoiceItems(items);
           this.configureColumns(invoice);
 
@@ -221,6 +248,20 @@ export class InvoiceDetailsComponent implements OnInit {
     this.router.navigate(['/webshop'], {
       queryParams: { searchTerm, filterBy: 'searchTerm' },
     });
+  }
+
+  onProviderItemCompleted(item: InvoiceItem): void {
+    if (!this.canUpdateProviderItemStatus(item)) {
+      return;
+    }
+    this.openProviderStatusPopup(item, 'ZAVRSENA');
+  }
+
+  onProviderItemFailed(item: InvoiceItem): void {
+    if (!this.canUpdateProviderItemStatus(item)) {
+      return;
+    }
+    this.openProviderStatusPopup(item, 'NEUSPESNA');
   }
 
   // End of: Events
@@ -273,6 +314,20 @@ export class InvoiceDetailsComponent implements OnInit {
     if (this.isAdmin) {
       next.push(
         { key: 'status.naziv', header: 'Status stavke', type: CellType.TEXT },
+        {
+          key: 'providerActionCompleteLabel',
+          header: 'Zavrsi',
+          type: CellType.LINK,
+          callback: (row) => this.onProviderItemCompleted(row),
+          disableLink: (row) => !this.canUpdateProviderItemStatus(row),
+        },
+        {
+          key: 'providerActionFailLabel',
+          header: 'Neuspesno',
+          type: CellType.LINK,
+          callback: (row) => this.onProviderItemFailed(row),
+          disableLink: (row) => !this.canUpdateProviderItemStatus(row),
+        },
         { key: 'availabilityLabel', header: 'Dostupnost', type: CellType.TEXT },
         { key: 'providerInfo', header: 'Provider info', type: CellType.TEXT },
         { key: 'providerResponse', header: 'Odgovor providera', type: CellType.TEXT }
@@ -289,6 +344,7 @@ export class InvoiceDetailsComponent implements OnInit {
     );
 
     items.forEach((invoiceArticle: InvoiceItem) => {
+      this.syncProviderStatusPresentation(invoiceArticle);
       invoiceArticle.izvorLabel = this.resolveSourceLabel(invoiceArticle);
       invoiceArticle.availabilityLabel = this.buildAvailabilityLabel(
         invoiceArticle.availabilityStatus,
@@ -298,7 +354,178 @@ export class InvoiceDetailsComponent implements OnInit {
       invoiceArticle.providerInfo = this.buildProviderInfo(invoiceArticle);
       invoiceArticle.providerResponse = this.buildProviderResponse(invoiceArticle);
       invoiceArticle.nabavnaCena = this.resolvePurchasePrice(invoiceArticle);
+      const pendingProvider =
+        this.isProviderItem(invoiceArticle) &&
+        this.normalizeProviderStatus(invoiceArticle.providerItemStatus) === 'NIJE_PREUZETA';
+      invoiceArticle.providerActionCompleteLabel = pendingProvider ? 'Zavrsi' : '—';
+      invoiceArticle.providerActionFailLabel = pendingProvider ? 'Neuspesno' : '—';
     });
+  }
+
+  private syncProviderStatusPresentation(item: InvoiceItem): void {
+    if (!this.isProviderItem(item)) {
+      return;
+    }
+    const statusCode = this.normalizeProviderStatus(item?.providerItemStatus);
+    item.providerItemStatus = statusCode;
+    if (!item.status) {
+      item.status = {};
+    }
+    item.status.naziv = this.providerStatusLabel(statusCode);
+  }
+
+  private normalizeProviderStatus(value: string | null | undefined): ProviderItemStatusCode {
+    if (value === 'ZAVRSENA' || value === 'NEUSPESNA' || value === 'NIJE_PREUZETA') {
+      return value;
+    }
+    return 'NIJE_PREUZETA';
+  }
+
+  private providerStatusLabel(status: ProviderItemStatusCode): string {
+    if (status === 'ZAVRSENA') {
+      return 'Zavrsena';
+    }
+    if (status === 'NEUSPESNA') {
+      return 'Neuspesna';
+    }
+    return 'Nije preuzeta';
+  }
+
+  private isProviderItem(item: InvoiceItem | null | undefined): boolean {
+    return isProviderSource(item?.izvor, item?.providerAvailability);
+  }
+
+  private canUpdateProviderItemStatus(item: InvoiceItem | null | undefined): boolean {
+    if (!this.isAdmin || !this.isProviderItem(item)) {
+      return false;
+    }
+    const itemId = Number(item?.webOrderItemId);
+    if (!Number.isFinite(itemId) || itemId <= 0) {
+      return false;
+    }
+    const status = this.normalizeProviderStatus(item?.providerItemStatus);
+    if (status !== 'NIJE_PREUZETA') {
+      return false;
+    }
+    return !this.updatingProviderItems.has(itemId);
+  }
+
+  private updateProviderItemStatus(
+    item: InvoiceItem,
+    status: Exclude<ProviderItemStatusCode, 'NIJE_PREUZETA'>,
+    reason: string | null,
+    onSuccess?: () => void,
+    onComplete?: () => void
+  ): void {
+    const itemId = Number(item?.webOrderItemId);
+    if (!Number.isFinite(itemId) || itemId <= 0) {
+      this.snackbarService.showError('Nije moguce promeniti status stavke.');
+      onComplete?.();
+      return;
+    }
+
+    this.updatingProviderItems.add(itemId);
+    this.invoiceService
+      .updateAdminProviderItemStatus(itemId, status, reason)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.updatingProviderItems.delete(itemId);
+          onComplete?.();
+        })
+      )
+      .subscribe({
+        next: () => {
+          item.providerItemStatus = status;
+          this.syncProviderStatusPresentation(item);
+          item.providerResponse = this.buildProviderResponse(item);
+          const pendingProvider =
+            this.isProviderItem(item) &&
+            this.normalizeProviderStatus(item.providerItemStatus) === 'NIJE_PREUZETA';
+          item.providerActionCompleteLabel = pendingProvider ? 'Zavrsi' : '—';
+          item.providerActionFailLabel = pendingProvider ? 'Neuspesno' : '—';
+          this.dataSource.data = [...this.dataSource.data];
+          this.snackbarService.showSuccess(
+            status === 'ZAVRSENA'
+              ? 'Stavka je oznacena kao Zavrsena.'
+              : 'Stavka je oznacena kao Neuspesna.'
+          );
+          onSuccess?.();
+        },
+        error: (err: HttpErrorResponse) => {
+          const details =
+            (err?.error?.message as string) ||
+            (err?.error?.details as string) ||
+            'Promena statusa nije uspela.';
+          this.snackbarService.showError(details);
+        },
+      });
+  }
+
+  openProviderStatusPopup(
+    item: InvoiceItem,
+    status: Exclude<ProviderItemStatusCode, 'NIJE_PREUZETA'>
+  ): void {
+    this.popupProviderItem = item;
+    this.popupProviderStatus = status;
+    this.popupProviderReason = '';
+    this.showProviderStatusPopup = true;
+  }
+
+  closeProviderStatusPopup(force = false): void {
+    if (this.providerStatusPopupLoading && !force) {
+      return;
+    }
+    this.showProviderStatusPopup = false;
+    this.popupProviderItem = null;
+    this.popupProviderStatus = null;
+    this.popupProviderReason = '';
+  }
+
+  confirmProviderStatusPopup(): void {
+    if (!this.popupProviderItem || !this.popupProviderStatus) {
+      return;
+    }
+    const reason =
+      this.popupProviderStatus === 'NEUSPESNA'
+        ? (this.popupProviderReason || '').trim()
+        : null;
+    if (this.popupProviderStatus === 'NEUSPESNA' && !reason) {
+      this.snackbarService.showError('Razlog je obavezan.');
+      return;
+    }
+
+    this.providerStatusPopupLoading = true;
+    this.updateProviderItemStatus(
+      this.popupProviderItem,
+      this.popupProviderStatus,
+      reason,
+      () => {
+        this.closeProviderStatusPopup(true);
+      },
+      () => {
+        this.providerStatusPopupLoading = false;
+      },
+    );
+  }
+
+  get providerPopupTitle(): string {
+    return this.popupProviderStatus === 'NEUSPESNA'
+      ? 'Označi stavku kao neuspešnu'
+      : 'Označi stavku kao završenu';
+  }
+
+  get providerPopupDescription(): string {
+    if (this.popupProviderStatus === 'NEUSPESNA') {
+      return 'Unesi razlog zbog kog stavka nije uspešno realizovana.';
+    }
+    return 'Potvrdi da je stavka uspešno obrađena i završena.';
+  }
+
+  get providerPopupConfirmLabel(): string {
+    return this.popupProviderStatus === 'NEUSPESNA'
+      ? 'Potvrdi neuspešno'
+      : 'Potvrdi završeno';
   }
 
   private resolveSourceLabel(item: InvoiceItem): string {

@@ -180,6 +180,12 @@ export const routes: Routes = [
     canActivate: [adminGuard]
   },
   {
+    path: 'admin/provider-backlog',
+    loadComponent: () =>
+      import('./modules/admin/provider-backlog/provider-backlog.component').then((m) => m.ProviderBacklogComponent),
+    canActivate: [adminGuard]
+  },
+  {
     path: 'admin/invoices/:id',
     loadComponent: () =>
       import('./modules/personal/invoices/invoice-details/invoice-details.component').then((m) => m.InvoiceDetailsComponent),

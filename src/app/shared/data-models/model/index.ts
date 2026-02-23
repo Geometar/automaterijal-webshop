@@ -9,6 +9,7 @@ export * from './page';
 export * from './partner-card';
 export * from './partner';
 export * from './proizvodjac';
+export * from './provider-backlog';
 export * from './sales-report';
 export * from './tecdoc';
 export * from './webshop';

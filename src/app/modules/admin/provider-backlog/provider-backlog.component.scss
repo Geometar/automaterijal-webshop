@@ -1,0 +1,110 @@
+.provider-backlog {
+  &__filters {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 8px 16px 16px;
+  }
+
+  &__segment-label {
+    color: var(--figma-primary-700);
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  &__segment {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px;
+    border-radius: 999px;
+    border: 1px solid var(--figma-primary-200);
+    background-color: var(--figma-accent-green-25);
+    flex-wrap: wrap;
+  }
+
+  &__segment-btn {
+    border: none;
+    background: transparent;
+    color: var(--figma-primary-700);
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  &__segment-btn:hover {
+    background-color: var(--figma-primary-100);
+  }
+
+  &__segment-btn.is-active {
+    background-color: var(--figma-primary-600);
+    color: var(--figma-base-white);
+  }
+
+  &__segment-btn:focus-visible {
+    outline: 2px solid var(--figma-primary-400);
+    outline-offset: 2px;
+  }
+
+  .mat-mdc-header-cell.mat-column-providerMessage,
+  .mat-mdc-cell.mat-column-providerMessage,
+  .mat-mdc-header-cell.mat-column-providerStatusReason,
+  .mat-mdc-cell.mat-column-providerStatusReason {
+    min-width: 220px;
+  }
+
+  .mat-mdc-header-cell.mat-column-articleName,
+  .mat-mdc-cell.mat-column-articleName {
+    min-width: 180px;
+    max-width: 220px;
+  }
+
+  .mat-mdc-header-cell.mat-column-partnerName,
+  .mat-mdc-cell.mat-column-partnerName {
+    min-width: 170px;
+    max-width: 220px;
+  }
+
+  .mat-mdc-cell.mat-column-articleName,
+  .mat-mdc-cell.mat-column-partnerName,
+  .mat-mdc-cell.mat-column-providerStatusReason,
+  .mat-mdc-cell.mat-column-providerMessage {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mat-mdc-header-cell.mat-column-providerMessage,
+  .mat-mdc-cell.mat-column-providerMessage {
+    min-width: 260px;
+    max-width: 320px;
+  }
+
+  .mat-mdc-header-cell.mat-column-providerActionCompleteLabel,
+  .mat-mdc-cell.mat-column-providerActionCompleteLabel,
+  .mat-mdc-header-cell.mat-column-providerActionFailLabel,
+  .mat-mdc-cell.mat-column-providerActionFailLabel {
+    width: 110px;
+    text-align: center;
+  }
+
+  .mat-mdc-header-cell.mat-column-deliveryEtaLabel,
+  .mat-mdc-cell.mat-column-deliveryEtaLabel {
+    min-width: 130px;
+  }
+
+  &__confirm {
+    p {
+      margin: 0 0 10px;
+      color: var(--figma-grey-700);
+    }
+  }
+
+  &__confirm-meta {
+    margin-bottom: 14px;
+    font-size: 13px;
+    color: var(--figma-grey-600);
+  }
+}

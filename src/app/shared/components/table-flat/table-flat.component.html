@@ -11,7 +11,7 @@
           [matColumnDef]="column.key"
         >
           <th mat-header-cell *matHeaderCellDef>{{ column.header }}</th>
-          <td mat-cell *matCellDef="let row">
+          <td mat-cell *matCellDef="let row" [attr.title]="cellTitle(row, column)">
             <ng-container [ngSwitch]="column.type">
               <ng-container *ngSwitchCase="CellType.IMG">
                 <img
@@ -23,7 +23,11 @@
               </ng-container>
               <ng-container *ngSwitchCase="CellType.LINK">
                 <a
-                  class="invoice-link"
+                  [ngClass]="[
+                    'invoice-link',
+                    'invoice-link--' + column.key,
+                    column.disableLink?.(row) ? 'disabled' : ''
+                  ]"
                   [class.disabled]="column.disableLink?.(row)"
                   [style.pointer-events]="column.disableLink?.(row) ? 'none' : 'auto'"
                   [style.opacity]="column.disableLink?.(row) ? 0.6 : 1"
@@ -107,7 +111,11 @@
               <ng-container *ngSwitchCase="CellType.LINK"
                 ><ng-container *ngSwitchCase="CellType.LINK">
                   <a
-                    class="invoice-link"
+                    [ngClass]="[
+                      'invoice-link',
+                      'invoice-link--' + column.key,
+                      column.disableLink?.(row) ? 'disabled' : ''
+                    ]"
                     [class.disabled]="column.disableLink?.(row)"
                     [style.pointer-events]="column.disableLink?.(row) ? 'none' : 'auto'"
                     [style.opacity]="column.disableLink?.(row) ? 0.6 : 1"

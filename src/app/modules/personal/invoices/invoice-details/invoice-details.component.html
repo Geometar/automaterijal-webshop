@@ -130,6 +130,65 @@
     }"
   ></autom-table-flat>
 
+  <autom-popup
+    *ngIf="showProviderStatusPopup"
+    class="invoice-details__popup"
+    [height]="sizeEnum.AUTO"
+    [loading]="providerStatusPopupLoading"
+    [position]="positionEnum.CENTER"
+    [rounded]="true"
+    [subPosition]="positionEnum.CENTER"
+    [width]="sizeEnum.MEDIUM"
+    (overlayEvent)="closeProviderStatusPopup()"
+  >
+    <div custom-body class="confirmation-container invoice-details__confirm">
+      <div class="confirmation-container__icon">
+        <autom-icon
+          class="confirmation-container__icon--circle"
+          [color]="colorEnum.YELLOW_700"
+          [source]="iconEnum.ALERT_TRIANGLE"
+        ></autom-icon>
+      </div>
+      <div class="confirmation-container__main">
+        <div class="confirmation-container__header">
+          <h3 class="h3">{{ providerPopupTitle }}</h3>
+        </div>
+        <div class="confirmation-container__body">
+          <p>{{ providerPopupDescription }}</p>
+          <p class="invoice-details__confirm-meta">
+            Artikl: <strong>{{ popupProviderItem?.kataloskiBroj || popupProviderItem?.naziv }}</strong>
+          </p>
+          <autom-text-area
+            *ngIf="popupProviderStatus === 'NEUSPESNA'"
+            [counter]="true"
+            [label]="'Razlog'"
+            [maxLength]="500"
+            [required]="true"
+            [rows]="4"
+            [value]="popupProviderReason"
+            (emitSelected)="popupProviderReason = $event"
+          ></autom-text-area>
+        </div>
+        <div class="confirmation-container__footer">
+          <autom-button
+            [disabled]="providerStatusPopupLoading"
+            [label]="'Odustani'"
+            [theme]="buttonThemes.LIGHT_GREY"
+            [type]="buttonTypes.TERNARY"
+            (clickEvent)="closeProviderStatusPopup()"
+          ></autom-button>
+          <autom-button
+            [disabled]="providerStatusPopupLoading"
+            [label]="providerPopupConfirmLabel"
+            [theme]="popupProviderStatus === 'NEUSPESNA' ? buttonThemes.LIGHT_RED : buttonThemes.DEFAULT"
+            [type]="buttonTypes.PRIMARY"
+            (clickEvent)="confirmProviderStatusPopup()"
+          ></autom-button>
+        </div>
+      </div>
+    </div>
+  </autom-popup>
+
   <div *ngIf="loading" class="spinner">
     <spinner></spinner>
   </div>

@@ -86,6 +86,19 @@
   color: var(--figma-primary-800);
 }
 
+.provider-availability__margin-value {
+  display: inline-block;
+  filter: blur(4px);
+  -webkit-filter: blur(4px);
+  transition: filter 0.18s ease, -webkit-filter 0.18s ease;
+}
+
+.provider-availability__margin:hover .provider-availability__margin-value,
+.provider-availability__margin:focus-within .provider-availability__margin-value {
+  filter: none;
+  -webkit-filter: none;
+}
+
 .provider-availability__packaging {
   margin-top: 8px;
   padding: 6px 8px;

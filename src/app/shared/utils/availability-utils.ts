@@ -8,6 +8,8 @@ export const EXTERNAL_WAREHOUSE_LABEL = 'Eksterni magacin';
 export const EXTERNAL_AVAILABILITY_LABEL_STAFF = 'Dostupno (eksterni magacin)';
 export const EXTERNAL_AVAILABILITY_LABEL_CUSTOMER = 'Na stanju (eksterni magacin)';
 export const FEBI_PROVIDER_KEY = 'febi-stock';
+export const GAZELA_PROVIDER_KEY = 'gazela';
+export const GAZELA_DEFAULT_DISPATCH_CUTOFF = '16:00';
 const DELIVERY_FORMAT_TIME_ZONE = 'Europe/Belgrade';
 const DELIVERY_FORMAT_LOCALE = 'sr-Latn-RS';
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -700,7 +702,15 @@ function formatMoney(value: unknown, currency: unknown): string | null {
   }
 }
 
-export function formatDispatchCutoff(cutoffIso: string | null | undefined): string | null {
+export function formatDispatchCutoff(
+  cutoffIso: string | null | undefined,
+  providerKey?: string | null
+): string | null {
+  const normalizedProviderKey = (providerKey || '').toString().trim().toLowerCase();
+  if (normalizedProviderKey === GAZELA_PROVIDER_KEY) {
+    return GAZELA_DEFAULT_DISPATCH_CUTOFF;
+  }
+
   const raw = (cutoffIso || '').trim();
   if (!raw) return null;
 
@@ -811,7 +821,10 @@ export function buildAvailabilityVm(
         roba?.providerAvailability,
         Math.max(1, Math.floor(Number(roba?.kolicina) || 1))
       ),
-      cutoffLabel: formatDispatchCutoff(roba?.providerAvailability?.nextDispatchCutoff),
+      cutoffLabel: formatDispatchCutoff(
+        roba?.providerAvailability?.nextDispatchCutoff,
+        roba?.providerAvailability?.provider
+      ),
       quantity: providerQty > 0 ? providerQty : null,
       noReturnable,
       coreCharge: Number(roba?.providerAvailability?.coreCharge) || null,

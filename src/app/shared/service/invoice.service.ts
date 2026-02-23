@@ -1,7 +1,7 @@
 import { environment } from '../../../environment/environment';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Invoice, PaginatedResponse } from '../data-models/model';
+import { Invoice, PaginatedResponse, ProviderBacklogItem } from '../data-models/model';
 import { catchError, Observable, throwError } from 'rxjs';
 import { Roba } from '../data-models/model/roba';
 import { ServiceHelpersService } from './utils/service-helpers.service';
@@ -94,5 +94,39 @@ export class InvoiceService {
       .pipe(
         catchError((error: any) => throwError(error))
       );
+  }
+
+  public updateAdminProviderItemStatus(
+    itemId: number,
+    status: 'ZAVRSENA' | 'NEUSPESNA',
+    reason?: string | null
+  ): Observable<void> {
+    const fullUrl = DOMAIN_URL + INVOICE_URL + '/admin/provider-items/' + itemId + '/status';
+    return this.http
+      .patch<void>(fullUrl, {
+        status,
+        reason: reason?.trim() || null,
+      })
+      .pipe(catchError((error: any) => throwError(error)));
+  }
+
+  public getAdminProviderBacklog(
+    page: number,
+    pageSize: number,
+    status: 'NIJE_PREUZETA' | 'ZAVRSENA' | 'NEUSPESNA' | '' = ''
+  ): Observable<PaginatedResponse<ProviderBacklogItem>> {
+    const parameterObject = {} as any;
+    parameterObject['page'] = page;
+    parameterObject['pageSize'] = pageSize;
+    if (status) {
+      parameterObject['status'] = status;
+    }
+
+    const parametersString = this.helperService.formatQueryParameters(parameterObject);
+    const fullUrl = DOMAIN_URL + INVOICE_URL + '/admin/provider-backlog' + parametersString;
+
+    return this.http
+      .get<PaginatedResponse<ProviderBacklogItem>>(fullUrl)
+      .pipe(catchError((error: any) => throwError(error)));
   }
 }

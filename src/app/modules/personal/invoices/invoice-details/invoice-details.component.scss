@@ -198,6 +198,25 @@
   .mat-column-status\.naziv {
     min-width: 160px;
   }
+
+  .mat-column-providerActionCompleteLabel,
+  .mat-column-providerActionFailLabel {
+    width: 110px;
+    text-align: center;
+  }
+
+  &__confirm {
+    p {
+      margin: 0 0 10px;
+      color: var(--figma-grey-700);
+    }
+  }
+
+  &__confirm-meta {
+    margin-bottom: 14px;
+    font-size: 13px;
+    color: var(--figma-grey-600);
+  }
 }
 
 @media (max-width: 991px) {

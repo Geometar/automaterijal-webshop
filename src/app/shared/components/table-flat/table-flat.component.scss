@@ -112,6 +112,48 @@ td.mat-mdc-cell {
   }
 }
 
+.invoice-link--providerActionCompleteLabel,
+.invoice-link--providerActionFailLabel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 82px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-weight: 600;
+  text-decoration: none !important;
+}
+
+.invoice-link--providerActionCompleteLabel {
+  border: 1px solid var(--figma-success-500);
+  background-color: var(--figma-success-50);
+  color: var(--figma-success-700);
+}
+
+.invoice-link--providerActionCompleteLabel:hover {
+  background-color: var(--figma-success-100);
+  color: var(--figma-success-700);
+}
+
+.invoice-link--providerActionFailLabel {
+  border: 1px solid var(--figma-error-500);
+  background-color: var(--figma-error-50);
+  color: var(--figma-error-700);
+}
+
+.invoice-link--providerActionFailLabel:hover {
+  background-color: var(--figma-error-100);
+  color: var(--figma-error-700);
+}
+
+.invoice-link--providerActionCompleteLabel.disabled,
+.invoice-link--providerActionFailLabel.disabled {
+  border-color: #d1d5db;
+  color: #9ca3af;
+  background-color: #f9fafb;
+  text-decoration: none !important;
+}
+
 mat-paginator {
   border-top: 1px solid #e0e0e0;
   padding: 8px 16px;
@@ -179,6 +221,15 @@ mat-paginator {
     &:hover {
       text-decoration: underline;
     }
+  }
+
+  .invoice-link--providerActionCompleteLabel,
+  .invoice-link--providerActionFailLabel {
+    min-width: 78px;
+    text-align: center;
+    padding: 4px 8px;
+    border-radius: 6px;
+    text-decoration: none !important;
   }
 }
 
