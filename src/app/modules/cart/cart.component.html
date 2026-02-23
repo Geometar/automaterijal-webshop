@@ -148,6 +148,18 @@
             Opcija vazi samo za Febi artikle u korpi.
           </small>
         </div>
+        <div *ngIf="shouldShowGazelaDocumentOptions" class="provider-delivery">
+          <autom-radio-button
+            [label]="'Gazela - dokument'"
+            [options]="gazelaDocumentOptions"
+            [displaySubtitle]="true"
+            [theme]="orientation.VERTICAL"
+            (emitSelected)="onGazelaDocumentSelected($event)"
+          ></autom-radio-button>
+          <small class="provider-delivery__hint">
+            Opcija vazi samo za Gazela artikle u korpi.
+          </small>
+        </div>
         <autom-text-area
           [label]="'Komentar'"
           [placeholder]="'Unesite komentar za internu porudzbinu'"

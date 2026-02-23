@@ -130,6 +130,9 @@ export class CartComponent implements OnInit, OnDestroy {
   readonly febiProviderKey = 'febi-stock';
   readonly febiDeliveryPartyDefault = '0001001983';
   readonly febiDeliveryPartyPickup = '0001003023';
+  readonly gazelaProviderKey = 'gazela';
+  readonly gazelaDocumentFaktura = '1';
+  readonly gazelaDocumentRevers = '2';
 
   // Misc
   account?: Account;
@@ -142,6 +145,7 @@ export class CartComponent implements OnInit, OnDestroy {
 
   // Select config
   febiDeliveryOptions: RadioOption[] = [];
+  gazelaDocumentOptions: RadioOption[] = [];
   payingChoices: SelectModel[] = [];
   transportChoices: SelectModel[] = [];
 
@@ -169,6 +173,7 @@ export class CartComponent implements OnInit, OnDestroy {
       address: ['', Validators.required],
       comment: [''],
       febiDeliveryParty: [this.febiDeliveryPartyDefault],
+      gazelaDocument: [this.gazelaDocumentFaktura],
       payment: ['', Validators.required],
       transport: ['', Validators.required],
       vin: [''],
@@ -194,6 +199,7 @@ export class CartComponent implements OnInit, OnDestroy {
     this.loggedIn = this.accountStateService.isUserLoggedIn();
     this.isAdmin = this.accountStateService.isAdmin();
     this.buildFebiDeliveryOptions();
+    this.buildGazelaDocumentOptions();
     this.getInformation();
     this.syncOnCartItemSize();
     this.setUpdateSeoTags();
@@ -362,6 +368,20 @@ export class CartComponent implements OnInit, OnDestroy {
 
   get shouldShowFebiDeliveryOptions(): boolean {
     return this.isAdmin && this.hasFebiProviderItems;
+  }
+
+  get hasGazelaProviderItems(): boolean {
+    return (this.roba ?? []).some((item) => {
+      const provider = (item?.providerAvailability?.provider || '').trim().toLowerCase();
+      return (
+        provider === this.gazelaProviderKey &&
+        this.requiresExternalWarehouse(item)
+      );
+    });
+  }
+
+  get shouldShowGazelaDocumentOptions(): boolean {
+    return this.isAdmin && this.hasGazelaProviderItems;
   }
 
   get shouldShowMixedDeliveryInfo(): boolean {
@@ -547,6 +567,11 @@ export class CartComponent implements OnInit, OnDestroy {
   onFebiDeliveryPartySelected(option?: RadioOption | null): void {
     const selected = option?.key?.trim() || this.febiDeliveryPartyDefault;
     this.setCartSelectionValue('febiDeliveryParty', selected);
+  }
+
+  onGazelaDocumentSelected(option?: RadioOption | null): void {
+    const selected = option?.key?.trim() || this.gazelaDocumentFaktura;
+    this.setCartSelectionValue('gazelaDocument', selected);
   }
 
   /** Basket send: start */
@@ -1067,20 +1092,29 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   private buildProviderOptions(): ProviderOrderOption[] {
-    if (!this.shouldShowFebiDeliveryOptions) {
-      return [];
-    }
+    const options: ProviderOrderOption[] = [];
 
-    const selection =
-      this.cartForm.get('febiDeliveryParty')?.value || this.febiDeliveryPartyDefault;
-    const deliveryParty = selection?.toString().trim() || this.febiDeliveryPartyDefault;
-
-    return [
-      {
+    if (this.shouldShowFebiDeliveryOptions) {
+      const selection =
+        this.cartForm.get('febiDeliveryParty')?.value || this.febiDeliveryPartyDefault;
+      const deliveryParty = selection?.toString().trim() || this.febiDeliveryPartyDefault;
+      options.push({
         providerKey: this.febiProviderKey,
         deliveryParty,
-      },
-    ];
+      });
+    }
+
+    if (this.shouldShowGazelaDocumentOptions) {
+      const selection =
+        this.cartForm.get('gazelaDocument')?.value || this.gazelaDocumentFaktura;
+      const document = selection?.toString().trim() || this.gazelaDocumentFaktura;
+      options.push({
+        providerKey: this.gazelaProviderKey,
+        document,
+      });
+    }
+
+    return options;
   }
 
   private generateTransactionId(): string {
@@ -1218,6 +1252,21 @@ export class CartComponent implements OnInit, OnDestroy {
       {
         key: this.febiDeliveryPartyPickup,
         value: 'Naše dostavno vozilo',
+        checked: false,
+      },
+    ];
+  }
+
+  private buildGazelaDocumentOptions(): void {
+    this.gazelaDocumentOptions = [
+      {
+        key: this.gazelaDocumentFaktura,
+        value: 'Faktura',
+        checked: true,
+      },
+      {
+        key: this.gazelaDocumentRevers,
+        value: 'Revers',
         checked: false,
       },
     ];

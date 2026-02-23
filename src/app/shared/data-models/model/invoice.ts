@@ -6,6 +6,7 @@ import { AvailabilityStatus, ProviderAvailabilityDto } from './availability';
 export interface ProviderOrderOption {
   providerKey: string;
   deliveryParty?: string;
+  document?: string;
 }
 
 /**

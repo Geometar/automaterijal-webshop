@@ -76,6 +76,10 @@ export class InvoiceDetailsComponent implements OnInit {
   readonly febiProviderKey = 'febi-stock';
   readonly febiDeliveryPartyDefault = '0001001983';
   readonly febiDeliveryPartyPickup = '0001003023';
+  readonly gazelaProviderKey = 'gazela';
+  readonly gazelaDocumentFaktura = '1';
+  readonly gazelaDocumentRevers = '2';
+  readonly gazelaDocumentReversLegacy = '3';
 
   // Misc loading
   loading = false;
@@ -372,7 +376,7 @@ export class InvoiceDetailsComponent implements OnInit {
 
     const deliveryParty = this.resolveProviderDeliveryParty(item);
     if (deliveryParty) {
-      parts.push(`Isporuka: ${deliveryParty}`);
+      parts.push(`${this.resolveProviderDeliveryLabel(item)}: ${deliveryParty}`);
     }
 
     return parts.length ? parts.join('\n') : '—';
@@ -407,8 +411,24 @@ export class InvoiceDetailsComponent implements OnInit {
         return 'Brza pošta';
       }
     }
+    if (provider === this.gazelaProviderKey) {
+      if (code === this.gazelaDocumentFaktura) {
+        return 'Faktura';
+      }
+      if (code === this.gazelaDocumentRevers || code === this.gazelaDocumentReversLegacy) {
+        return 'Revers';
+      }
+    }
 
     return code;
+  }
+
+  private resolveProviderDeliveryLabel(item: InvoiceItem): string {
+    const provider = (item?.providerAvailability?.provider || '').trim().toLowerCase();
+    if (provider === this.gazelaProviderKey) {
+      return 'Dokument';
+    }
+    return 'Isporuka';
   }
 
   private buildProviderEta(pa: ProviderAvailabilityDto): string | null {
