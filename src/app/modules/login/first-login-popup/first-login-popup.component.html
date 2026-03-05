@@ -16,7 +16,7 @@
     custom-body
     class="page-details__body page-details__height--auto body util__flex--center autom-flex-direction--column"
   >
-    <mat-stepper linear class="stepper" [orientation]="'horizontal'">
+    <mat-stepper linear class="stepper" [orientation]="'horizontal'" #firstLoginStepper>
       <!-- Step 1: Welcome step -->
       <mat-step label="Obaveštenje">
         <div>
@@ -86,8 +86,7 @@
             <button mat-button matStepperPrevious>Back</button>
             <button
               mat-button
-              matStepperNext
-              (click)="createNewPassowrd()"
+              (click)="createNewPassowrd(firstLoginStepper)"
               [disabled]="!enablePasswordBtn"
             >
               Next

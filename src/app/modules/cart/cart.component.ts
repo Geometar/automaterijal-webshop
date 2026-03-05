@@ -580,6 +580,9 @@ export class CartComponent implements OnInit, OnDestroy {
   /** Basket send: start */
 
   submitInvoice(): void {
+    if (this.invoiceSubmitted) {
+      return;
+    }
     this.invoiceSubmitted = true;
     const cartItemsSnapshot = this.cartStateService.getAll();
     const accountSnapshot = this.accountStateService.get();

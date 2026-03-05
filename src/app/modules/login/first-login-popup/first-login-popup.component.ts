@@ -27,10 +27,11 @@ import {
 import { BreakpointObserver } from '@angular/cdk/layout';
 import {
   StepperOrientation,
+  MatStepper,
   MatStepperModule,
 } from '@angular/material/stepper';
 import { Observable, Subject } from 'rxjs';
-import { map, takeUntil } from 'rxjs/operators';
+import { finalize, map, takeUntil } from 'rxjs/operators';
 import { MatButtonModule } from '@angular/material/button';
 
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -136,17 +137,30 @@ export class FirstLoginPopupComponent implements OnDestroy {
       this.password === this.repeatPassword;
   }
 
-  createNewPassowrd(): void {
+  createNewPassowrd(stepper: MatStepper): void {
+    if (this.passwordSaving) {
+      return;
+    }
     const passwordChange = new PasswordChange();
     passwordChange.sifra = this.password;
     passwordChange.ponovljenjaSifra = this.repeatPassword;
     passwordChange.ppid = this.account.ppid;
+    this.passwordSaving = true;
 
     this.partnerService
       .promeniSifru(passwordChange, true)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.snackbarService.showAutoClose('Sifra uspesno je uspesno promenjena');
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => (this.passwordSaving = false))
+      )
+      .subscribe({
+        next: () => {
+          this.snackbarService.showAutoClose('Sifra je uspesno promenjena');
+          stepper.next();
+        },
+        error: () => {
+          this.snackbarService.showAutoClose('Promena sifre nije uspela. Pokusajte ponovo.');
+        },
       });
   }
 }

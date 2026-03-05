@@ -1,4 +1,5 @@
 import {
+  buildAvailabilityVm,
   clampCombinedWarehouseQuantity,
   formatDeliveryEstimate,
   formatDispatchCutoff,
@@ -108,6 +109,22 @@ describe('availability-utils (FEBI combined)', () => {
     });
 
     expect(stock).toBe(50);
+  });
+
+  it('does not mark FEBI as mixed warehouse when local stock is zero', () => {
+    const vm = buildAvailabilityVm({
+      stanje: 0,
+      availabilityStatus: 'AVAILABLE',
+      providerAvailability: {
+        provider: 'febi-stock',
+        available: true,
+        warehouseQuantity: 10,
+        totalQuantity: 10,
+      } as any,
+    } as any);
+
+    expect(vm.provider.warehouseSplit.enabled).toBeFalse();
+    expect(vm.label).toBe('Na stanju (eksterni magacin)');
   });
 });
 

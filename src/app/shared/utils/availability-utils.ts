@@ -790,14 +790,18 @@ export function buildAvailabilityVm(
   const noReturnable = providerKey === 'szakal' && !!roba?.providerAvailability?.providerNoReturnable;
   const providerQty = getProviderAvailableQuantity(roba?.providerAvailability);
   const localQty = Math.max(0, Number(roba?.stanje) || 0);
+  const warehouseName = (roba?.providerAvailability?.warehouseName || '').trim();
+  const providerSourceFallback =
+    providerKey === GAZELA_PROVIDER_KEY ? 'Gazela' : EXTERNAL_WAREHOUSE_LABEL;
   const sourceLabel = isAdmin
-    ? roba?.providerAvailability?.warehouseName ?? EXTERNAL_WAREHOUSE_LABEL
+    ? (warehouseName || providerSourceFallback)
     : null;
   const warehouseSplitEnabled =
     !isTecDocOnly &&
     isFebiProvider(roba?.providerAvailability) &&
     !!roba?.providerAvailability?.available &&
-    (localQty > 0 || providerQty > 0);
+    localQty > 0 &&
+    providerQty > 0;
   const beogradLabel = isAdmin ? 'FEBI (Magacin Beograd)' : 'Magacin Beograd';
 
   const rabat = Number((roba as any)?.rabat) || 0;
