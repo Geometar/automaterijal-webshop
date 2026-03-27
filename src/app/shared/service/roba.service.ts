@@ -73,6 +73,11 @@ export class RobaService {
       parameterObject['skipProvider'] = true;
     }
 
+    if (filter.deadStock) {
+      parameterObject['deadStock'] = true;
+      parameterObject['skipProvider'] = true;
+    }
+
     if (filter.filterBy) {
       parameterObject['filterBy'] = filter.filterBy;
     }

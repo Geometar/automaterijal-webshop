@@ -9,6 +9,16 @@
           <p class="product-article" *ngIf="data.katbr">
             Kat br: {{ data.katbr }}
           </p>
+          <p
+            class="product-article product-article--dead-stock"
+            [class.product-article--dead-stock-clearance]="isDeadStockClearance"
+            *ngIf="deadStockMarketingLabel"
+          >
+            {{ deadStockMarketingLabel }}
+          </p>
+          <p class="product-article product-article--admin-signal" *ngIf="deadStockAdminBadgeText">
+            {{ deadStockAdminBadgeText }}
+          </p>
         </div>
         <autom-button
           *ngIf="shareLink"
@@ -186,7 +196,13 @@
               >
                 <div class="price-row" *ngIf="hasDiscount">
                   <span class="old-price">{{ oldPrice! | rsdCurrency }}</span>
-                  <span class="discount-badge">-{{ discountValue }}%</span>
+                  <span class="discount-badge">{{
+                    deadStockDiscountLabel ||
+                      deadStockBadgeLabel ||
+                      (showDeadStockReferencePrice
+                        ? 'Akcija'
+                        : '-' + discountValue + '%')
+                  }}</span>
                 </div>
                 <div class="price">{{ displayPrice | rsdCurrency }}</div>
                 <div class="note">cena po komadu</div>

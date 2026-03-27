@@ -215,6 +215,51 @@
     margin: 0;
   }
 
+  .product-article--dead-stock {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    margin-top: 6px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #fff3b1 0%, #ffd45f 100%);
+    border: 1px solid rgba(245, 158, 11, 0.78);
+    color: #73320f;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    box-shadow:
+      0 12px 24px rgba(245, 158, 11, 0.22),
+      inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  }
+
+  .product-article--dead-stock-clearance {
+    background: linear-gradient(135deg, #ffe0e0 0%, #ffb8b8 100%);
+    border-color: rgba(220, 38, 38, 0.72);
+    color: #9f1239;
+    box-shadow:
+      0 14px 26px rgba(220, 38, 38, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  }
+
+  .product-article--admin-signal {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    margin-top: 8px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(255, 244, 214, 0.98), rgba(255, 226, 138, 0.98));
+    border: 1px solid rgba(245, 158, 11, 0.64);
+    color: #7c2d12;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    box-shadow:
+      0 12px 24px rgba(245, 158, 11, 0.16),
+      inset 0 1px 0 rgba(255, 255, 255, 0.55);
+    white-space: nowrap;
+  }
+
 
   .product-share-button {
     flex: 0 0 auto;
@@ -522,15 +567,19 @@
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      padding: 6px 10px;
+      padding: 8px 13px;
       border-radius: 999px;
-      background: #fef2f2;
-      color: #b91c1c;
-      font-weight: 800;
+      background: linear-gradient(135deg, #ff6b6b 0%, #dc2626 100%);
+      color: #fffaf5;
+      font-weight: 900;
       font-size: 13px;
-      letter-spacing: 0.01em;
-      border: 1px solid #fecdd3;
-      box-shadow: 0 6px 18px rgba(249, 113, 113, 0.18);
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      border: 1px solid rgba(255, 255, 255, 0.78);
+      box-shadow:
+        0 14px 28px rgba(220, 38, 38, 0.32),
+        0 2px 8px rgba(127, 29, 29, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.22);
     }
   }
   .price {

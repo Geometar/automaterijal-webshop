@@ -19,24 +19,30 @@
 
   /* --- Discount badge --- */
   .discount-badge {
-    background: var(--figma-error-600);
-    color: var(--figma-base-white);
-    font-size: 0.95rem;
-    font-weight: 700;
+    background: linear-gradient(135deg, #ff6b6b 0%, #dc2626 100%);
+    color: #fffaf5;
+    font-size: 0.94rem;
+    font-weight: 900;
     line-height: 1;
     position: absolute;
     top: 0.8rem;
     z-index: 2;
     align-items: center;
     border-radius: 9999px; /* kružno */
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.78);
+    box-shadow:
+      0 14px 28px rgba(220, 38, 38, 0.32),
+      0 2px 8px rgba(127, 29, 29, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.22);
     display: flex;
     justify-content: center;
     left: auto;
-    min-height: 2.4rem;
-    min-width: 2.4rem;
-    padding: 0; /* centriramo broj u krugu */
+    min-height: 2.9rem;
+    min-width: 2.9rem;
+    padding: 0 0.95rem;
     right: 0.8rem; /* ↔ prešlo sa left na right */
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
   }
 
   /* --- In-cart icon --- */
@@ -98,6 +104,47 @@
     .product-katbr {
       font-size: 0.85rem;
       color: var(--figma-grey-600);
+    }
+
+    .product-katbr--dead-stock {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      margin-top: 0.35rem;
+      padding: 0.38rem 0.88rem;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #fff3b1 0%, #ffd45f 100%);
+      border: 1px solid rgba(245, 158, 11, 0.78);
+      color: #73320f;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      box-shadow: 0 10px 22px rgba(245, 158, 11, 0.22);
+    }
+
+    .product-katbr--dead-stock-clearance {
+      background: linear-gradient(135deg, #ffe0e0 0%, #ffb8b8 100%);
+      border-color: rgba(220, 38, 38, 0.72);
+      color: #9f1239;
+      box-shadow: 0 12px 24px rgba(220, 38, 38, 0.18);
+    }
+
+    .product-katbr--admin-signal {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      margin-top: 0.45rem;
+      padding: 0.42rem 0.9rem;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(255, 244, 214, 0.98), rgba(255, 226, 138, 0.98));
+      border: 1px solid rgba(245, 158, 11, 0.64);
+      color: #7c2d12;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      box-shadow:
+        0 10px 20px rgba(245, 158, 11, 0.16),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+      white-space: nowrap;
     }
 
     .product-katbr--core {

@@ -1,11 +1,62 @@
 <section class="webshop header-margin--top">
   <webshop-nav
     [assemblyGroupName]="assemblyGroupName"
+    [customBreadcrumbs]="customBreadcrumbs"
     [filter]="filter"
+    [searchRoute]="
+      isDeadStockLanding ? ['/webshop/akcije-rasprodaja'] : ['/webshop']
+    "
     [searchTerm]="searchTerm"
     [selectedVehicle]="selectedVehicleDetails"
     (selectedVehicleDetailsEmit)="selectVehicleDetailsEventHandle($event)"
   ></webshop-nav>
+  <a
+    class="dead-stock-banner dead-stock-banner--promo"
+    *ngIf="showDeadStockPromoBanner"
+    routerLink="/webshop/akcije-rasprodaja"
+    href="/webshop/akcije-rasprodaja"
+  >
+    <div class="dead-stock-banner__image"></div>
+    <div class="dead-stock-banner__overlay"></div>
+    <div class="dead-stock-banner__copy">
+      <p class="dead-stock-banner__eyebrow">Magacinska akcija</p>
+      <h2>Odredjeni artikli su na akciji ili rasprodaji do isteka zaliha</h2>
+      <p>
+        Otvori izdvojenu ponudu i pregledaj artikle sa posebnim cenama,
+        ogranicenim kolicinama i jasno oznacenim uslovima prodaje.
+      </p>
+      <div class="dead-stock-banner__highlights">
+        <span>Akcijske cene</span>
+        <span>Ogranicene kolicine</span>
+        <span>Dok traje zaliha</span>
+      </div>
+      <div class="dead-stock-banner__actions">
+        <span class="dead-stock-banner__cta">Pogledaj akcije</span>
+        <div class="dead-stock-banner__floor-note">Do isteka zaliha</div>
+      </div>
+    </div>
+    <div class="dead-stock-banner__stamp" aria-hidden="true">
+      <span class="dead-stock-banner__stamp-tag">Akcija</span>
+      <strong class="dead-stock-banner__stamp-main">Rasprodaja</strong>
+    </div>
+  </a>
+  <section class="dead-stock-banner dead-stock-banner--landing" *ngIf="isDeadStockLanding">
+    <div class="dead-stock-banner__copy">
+      <p class="dead-stock-banner__eyebrow">Akcije i rasprodaja</p>
+      <h1>Akcije i rasprodaja sa posebnim uslovima</h1>
+      <p>
+        Pregled artikala sa posebnim ponudama. Oznake i cena su već
+        prilagođeni pravilima iz administracije.
+      </p>
+    </div>
+    <a
+      class="dead-stock-banner__link"
+      routerLink="/webshop"
+      href="/webshop"
+    >
+      Nazad na ceo webshop
+    </a>
+  </section>
   <webshop-vehicles
     *ngIf="
       currentState === state.SHOW_ARTICLES_WITH_VEHICLE_DETAILS ||

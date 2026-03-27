@@ -69,6 +69,7 @@ export class WebshopNavComponent implements OnChanges {
   @Input() assemblyGroupName: string = '';
   @Input() filter = new Filter();
   @Input() searchTerm = '';
+  @Input() searchRoute: string | any[] = ['/webshop'];
   @Input() selectedVehicle: TDVehicleDetails | null = null;
   @Input() customBreadcrumbs: WebshopNavBreadcrumbs | null = null;
   @Output() selectedVehicleDetailsEmit = new EventEmitter<TDVehicleDetails>();
@@ -145,9 +146,10 @@ export class WebshopNavComponent implements OnChanges {
 
   emitValue(searchTerm: any): void {
     this.searchTerm = searchTerm?.value ? searchTerm?.value.trim() : '';
+    const targetRoute = Array.isArray(this.searchRoute) ? this.searchRoute : [this.searchRoute];
 
     if (this.searchTerm) {
-      this.urlHelperService.navigateTo(['/webshop'], {
+      this.urlHelperService.navigateTo(targetRoute, {
         queryParams: {
           searchTerm: this.searchTerm,
           filterBy: WebshopPrimaryFilter.SearchTerm,

@@ -37,6 +37,12 @@ import {
   resolveMinOrderQuantity,
   resolvePackagingUnit
 } from '../../utils/availability-utils';
+import {
+  buildDeadStockUiState,
+  buildOldPriceFromDiscount,
+  buildSavingsAmount,
+  parsePricingPercent,
+} from '../../utils/dead-stock-ui';
 
 @Component({
   selector: 'autom-product-card',
@@ -276,7 +282,7 @@ export class AutomProductCardComponent implements OnInit, OnChanges {
   }
 
   private getDiscountValue(): number {
-    return this.parseNumber((this.roba as any)?.rabat);
+    return parsePricingPercent((this.roba as any)?.rabat);
   }
 
   private getPriceValue(): number {
@@ -333,7 +339,20 @@ export class AutomProductCardComponent implements OnInit, OnChanges {
   }
 
   get showDiscount(): boolean {
-    return this.availabilityVm.showDiscount;
+    return this.availabilityVm.showDiscount || this.showDeadStockReferencePrice;
+  }
+
+  private get currentDisplayPrice(): number {
+    return Number(this.availabilityVm.displayPrice);
+  }
+
+  private get deadStockUi() {
+    return buildDeadStockUiState({
+      info: this.roba?.deadStockInfo,
+      isAdmin: this.isAdmin,
+      partnerDiscount: this.getDiscountValue(),
+      currentPrice: this.currentDisplayPrice,
+    });
   }
 
   /* ---------------------------- Pricing ------------------------------ */
@@ -345,34 +364,23 @@ export class AutomProductCardComponent implements OnInit, OnChanges {
   }
 
   get oldPrice(): number | null {
+    if (this.showDeadStockReferencePrice) {
+      return this.deadStockRegularPrice;
+    }
+
     if (!this.availabilityVm.showDiscount) {
       return null;
     }
 
-    const rabat = this.getDiscountValue();
-    const cena = this.getPriceValue();
-    const denom = 1 - rabat / 100;
-    if (denom <= 0) {
-      return null;
-    }
-
-    const val = cena / denom;
-    return Math.round(val * 100) / 100;
+    return buildOldPriceFromDiscount(this.getPriceValue(), this.getDiscountValue());
   }
 
   get savings(): number | null {
-    if (!this.availabilityVm.showDiscount) {
+    if (!this.availabilityVm.showDiscount && !this.showDeadStockReferencePrice) {
       return null;
     }
 
-    const oldPrice = this.oldPrice;
-    if (!oldPrice) {
-      return null;
-    }
-
-    const cena = this.getPriceValue();
-    const savings = oldPrice - cena;
-    return savings > 0 ? Math.round(savings * 100) / 100 : null;
+    return buildSavingsAmount(this.getPriceValue(), this.oldPrice);
   }
 
   get discountLabel(): string {
@@ -411,6 +419,34 @@ export class AutomProductCardComponent implements OnInit, OnChanges {
       tone: this.currentAvailabilityTone,
       defaultLabel: this.availabilityVm.label,
     });
+  }
+
+  get deadStockBadgeLabel(): string | null {
+    return this.deadStockUi.badgeLabel;
+  }
+
+  get deadStockMarketingLabel(): string | null {
+    return this.deadStockUi.marketingLabel;
+  }
+
+  get isDeadStockClearance(): boolean {
+    return this.deadStockUi.isClearance;
+  }
+
+  get deadStockAdminBadgeText(): string | null {
+    return this.deadStockUi.adminBadgeText;
+  }
+
+  get deadStockRegularPrice(): number | null {
+    return this.deadStockUi.regularPrice;
+  }
+
+  get showDeadStockReferencePrice(): boolean {
+    return this.deadStockUi.showReferencePrice;
+  }
+
+  get deadStockDiscountLabel(): string | null {
+    return this.deadStockUi.discountLabel;
   }
 
   /* ------------------------- Unit price (L) -------------------------- */

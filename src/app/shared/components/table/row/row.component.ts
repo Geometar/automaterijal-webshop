@@ -56,6 +56,12 @@ import {
   splitWarehouseQuantityForFlow,
   shouldForceCombinedProviderAvailabilityBox,
 } from '../../../utils/availability-utils';
+import {
+  buildDeadStockUiState,
+  buildOldPriceFromDiscount,
+  buildSavingsAmount,
+  parsePricingPercent,
+} from '../../../utils/dead-stock-ui';
 
 @Component({
   selector: 'row',
@@ -380,6 +386,79 @@ export class RowComponent implements OnInit, OnChanges {
 
   get isStaff(): boolean {
     return this.isAdmin || this.isEmployee;
+  }
+
+  private get partnerDiscount(): number {
+    return parsePricingPercent(this.data?.rabat);
+  }
+
+  private get currentDisplayPrice(): number {
+    return Number(this.availabilityVm.displayPrice);
+  }
+
+  private get deadStockUi() {
+    return buildDeadStockUiState({
+      info: this.data?.deadStockInfo,
+      isAdmin: this.isAdmin,
+      partnerDiscount: this.partnerDiscount,
+      currentPrice: this.currentDisplayPrice,
+    });
+  }
+
+  get deadStockBadgeLabel(): string | null {
+    return this.deadStockUi.badgeLabel;
+  }
+
+  get deadStockMarketingLabel(): string | null {
+    return this.deadStockUi.marketingLabel;
+  }
+
+  get isDeadStockClearance(): boolean {
+    return this.deadStockUi.isClearance;
+  }
+
+  get deadStockAdminBadgeText(): string | null {
+    return this.deadStockUi.adminBadgeText;
+  }
+
+  get deadStockRegularPrice(): number | null {
+    return this.deadStockUi.regularPrice;
+  }
+
+  get showDeadStockReferencePrice(): boolean {
+    return this.deadStockUi.showReferencePrice;
+  }
+
+  get showDiscount(): boolean {
+    return this.availabilityVm.showDiscount || this.showDeadStockReferencePrice;
+  }
+
+  get discountLabel(): string {
+    return this.partnerDiscount > 0 ? String(Math.round(this.partnerDiscount)) : '';
+  }
+
+  get oldPrice(): number | null {
+    if (this.showDeadStockReferencePrice) {
+      return this.deadStockRegularPrice;
+    }
+
+    if (this.isAdminCartView || !this.availabilityVm.showDiscount) {
+      return null;
+    }
+
+    return buildOldPriceFromDiscount(this.currentDisplayPrice, this.partnerDiscount);
+  }
+
+  get savings(): number | null {
+    if (!this.showDiscount || this.isAdminCartView) {
+      return null;
+    }
+
+    return buildSavingsAmount(this.currentDisplayPrice, this.oldPrice);
+  }
+
+  get deadStockDiscountLabel(): string | null {
+    return this.deadStockUi.discountLabel;
   }
 
   get unitPrice(): number {

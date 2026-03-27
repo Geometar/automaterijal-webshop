@@ -105,6 +105,56 @@ export interface TecDocBrandMapping {
   brandLogoId: string | null;
 }
 
+export type DeadStockPricingMode =
+  | 'MARKUP_ON_COST'
+  | 'AT_COST'
+  | 'DISCOUNT_ON_CURRENT_PRICE';
+
+export interface DeadStockImportResponse {
+  batchId: number;
+  fileName: string;
+  totalRowCount: number;
+  importedCount: number;
+  skippedMissingRobaCount: number;
+  duplicateRobaIdCount: number;
+  invalidRowCount: number;
+  importedAt: string;
+  status: string;
+}
+
+export interface DeadStockStatusResponse {
+  activeSnapshotCount: number;
+  activeRuleCount: number;
+  lastBatchId: number | null;
+  lastFileName: string | null;
+  lastItemCount: number | null;
+  lastImportedAt: string | null;
+  lastStatus: string | null;
+}
+
+export interface DeadStockRule {
+  id: number;
+  name: string;
+  minDaysInclusive: number;
+  maxDaysInclusive: number | null;
+  pricingMode: DeadStockPricingMode;
+  pricingValue: number | null;
+  badgeLabel: string | null;
+  active: boolean;
+  sortOrder: number;
+}
+
+export interface DeadStockRulePayload {
+  name: string;
+  minDaysInclusive: number;
+  maxDaysInclusive: number | null;
+  pricingMode: DeadStockPricingMode;
+  pricingValue: number | null;
+  badgeLabel: string | null;
+  active: boolean;
+  sortOrder: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -169,5 +219,31 @@ export class HogwartsAdminService {
   fetchTecdocBrandMappings(query?: string): Observable<TecDocBrandMapping[]> {
     const q = query ? `?q=${encodeURIComponent(query)}` : '';
     return this.http.get<TecDocBrandMapping[]>(`${this.baseUrl}/tecdoc-brand-mappings${q}`);
+  }
+
+  uploadDeadStock(file: File): Observable<DeadStockImportResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<DeadStockImportResponse>(`${this.baseUrl}/dead-stock/import`, formData);
+  }
+
+  fetchDeadStockStatus(): Observable<DeadStockStatusResponse> {
+    return this.http.get<DeadStockStatusResponse>(`${this.baseUrl}/dead-stock/status`);
+  }
+
+  fetchDeadStockRules(): Observable<DeadStockRule[]> {
+    return this.http.get<DeadStockRule[]>(`${this.baseUrl}/dead-stock/rules`);
+  }
+
+  createDeadStockRule(payload: DeadStockRulePayload): Observable<DeadStockRule> {
+    return this.http.post<DeadStockRule>(`${this.baseUrl}/dead-stock/rules`, payload);
+  }
+
+  updateDeadStockRule(id: number, payload: DeadStockRulePayload): Observable<DeadStockRule> {
+    return this.http.put<DeadStockRule>(`${this.baseUrl}/dead-stock/rules/${id}`, payload);
+  }
+
+  deleteDeadStockRule(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/dead-stock/rules/${id}`);
   }
 }
