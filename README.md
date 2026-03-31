@@ -2,6 +2,19 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.10.
 
+## Project notes
+
+Frontend dead stock surfaces currently include:
+
+- public listing `/webshop/akcije-rasprodaja`
+- customer badge filter on dead stock listing, driven by backend `deadStockBadges`
+- product detail dead stock metadata
+- internal admin page `/admin/dead-stock`
+
+For business rules and backend/FE contract, use backend docs:
+
+- `../automaterijal/docs/30-dead-stock.md`
+
 ## Development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.

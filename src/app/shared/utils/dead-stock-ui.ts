@@ -14,6 +14,9 @@ export interface DeadStockUiState {
 }
 
 export function getDeadStockBadgeLabel(info?: DeadStockInfo | null): string | null {
+  if (!info?.matched) {
+    return null;
+  }
   const label = info?.badgeLabel?.trim();
   return label ? label : null;
 }
@@ -32,19 +35,29 @@ export function isDeadStockClearance(info?: DeadStockInfo | null): boolean {
   return (getDeadStockMarketingLabel(info) ?? '').toLowerCase().includes('rasprod');
 }
 
-export function getDeadStockSignalLabel(info?: DeadStockInfo | null): string {
-  return isDeadStockClearance(info) ? 'RASPRODAJA' : 'AKCIJA';
-}
-
 export function getDeadStockAdminBadgeText(
   isAdmin: boolean,
   info?: DeadStockInfo | null
 ): string | null {
-  if (!isAdmin || !info?.matched || info.daysInDeadStock == null) {
+  if (!isAdmin || !info?.candidate || info.daysInDeadStock == null) {
     return null;
   }
 
-  return `${getDeadStockSignalLabel(info)} • Dana nije prodato: ${info.daysInDeadStock}`;
+  const parts: string[] = [];
+  parts.push(`${info.daysInDeadStock} dana bez prodaje`);
+  const lastSaleDate = formatDeadStockDate(info?.lastSaleDate);
+  if (lastSaleDate) {
+    parts.push(`Posl. prodaja ${lastSaleDate}`);
+  }
+  if (info?.suppressedForCustomer) {
+    parts.push(
+      info?.overrideUpdatedByName
+        ? `Kupcu sakrio ${info.overrideUpdatedByName}`
+        : 'Skriveno za kupca'
+    );
+  }
+
+  return parts.join(' • ');
 }
 
 export function getDeadStockRegularPrice(info?: DeadStockInfo | null): number | null {
@@ -60,6 +73,9 @@ export function showDeadStockReferencePrice(
   info: DeadStockInfo | null | undefined,
   currentPrice: number
 ): boolean {
+  if (!info?.matched) {
+    return false;
+  }
   const regular = getDeadStockRegularPrice(info);
   return !!regular && Number.isFinite(currentPrice) && regular > currentPrice;
 }
@@ -69,6 +85,9 @@ export function getDeadStockDiscountPercent(
   partnerDiscount: number,
   currentPrice: number
 ): number | null {
+  if (!info?.matched) {
+    return null;
+  }
   const rawDeadStockValue = Number(info?.pricingValue);
   const deadStockConfiguredDiscount =
     info?.pricingMode === 'DISCOUNT_ON_CURRENT_PRICE' &&
@@ -164,4 +183,22 @@ export function buildDeadStockUiState(params: {
     discountPercent,
     discountLabel: discountPercent ? `-${discountPercent}%` : null,
   };
+}
+
+export function formatDeadStockDate(raw?: string | null): string | null {
+  if (!raw) {
+    return null;
+  }
+  const simpleDateMatch = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (simpleDateMatch) {
+    return `${simpleDateMatch[3]}.${simpleDateMatch[2]}.${simpleDateMatch[1]}.`;
+  }
+  const date = new Date(raw);
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}.${month}.${year}.`;
 }

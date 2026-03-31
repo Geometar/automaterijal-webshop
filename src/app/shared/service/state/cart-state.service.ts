@@ -381,6 +381,7 @@ export class CartStateService {
       providerCoreCharge: hasProviderSnapshot ? provider?.coreCharge : undefined,
       providerRealtimeChecked: hasProviderSnapshot ? provider?.realtimeChecked : undefined,
       providerRealtimeCheckedAt: hasProviderSnapshot ? provider?.realtimeCheckedAt : undefined,
+      deadStockInfo: roba?.deadStockInfo,
       technicalDescription: roba.technicalDescription
     };
   }
@@ -484,6 +485,7 @@ export class CartStateService {
         };
       }
     }
+    retVal.deadStockInfo = cartItem.deadStockInfo;
     retVal.tehnickiOpis = cartItem.technicalDescription;
     return retVal;
   }

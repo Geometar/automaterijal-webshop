@@ -19,6 +19,8 @@ const RAW_PARAM_NAMES = [
   'pretrazitiGrupe',
   'paged',
   'showcase',
+  'deadStock',
+  'deadStockBadges',
   'assembleGroupId',
   'assemblyGroupId',
   'tecdocTargetId',

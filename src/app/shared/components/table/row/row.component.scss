@@ -375,22 +375,25 @@
     }
 
     .dead-stock-admin-note {
-      display: inline-flex;
-      align-items: center;
-      width: fit-content;
+      display: block;
+      width: 100%;
+      max-width: 44rem;
       margin: 0 0 8px;
       padding: 8px 14px;
-      border-radius: 999px;
+      border-radius: 14px;
       background: linear-gradient(135deg, rgba(255, 244, 214, 0.98), rgba(255, 226, 138, 0.98));
       border: 1px solid rgba(245, 158, 11, 0.78);
       color: #7c2d12;
       font-size: 12px;
-      font-weight: 900;
-      letter-spacing: 0.03em;
+      font-weight: 800;
+      line-height: 1.35;
+      letter-spacing: 0.01em;
       box-shadow:
         0 12px 24px rgba(245, 158, 11, 0.18),
         inset 0 1px 0 rgba(255, 255, 255, 0.55);
-      white-space: nowrap;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
 
     .specifications {

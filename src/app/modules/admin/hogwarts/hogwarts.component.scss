@@ -630,6 +630,12 @@
   gap: 24px;
 }
 
+.hogwarts-grid > app-hogwarts-dead-stock {
+  display: block;
+  grid-column: span 2;
+  min-width: 0;
+}
+
 .hogwarts-panel {
   padding: 20px;
   border-radius: 18px;
@@ -1973,6 +1979,10 @@
 @media (max-width: 1100px) {
   .hogwarts-grid {
     grid-template-columns: 1fr;
+  }
+
+  .hogwarts-grid > app-hogwarts-dead-stock {
+    grid-column: span 1;
   }
 
   .hogwarts-panel.wide {

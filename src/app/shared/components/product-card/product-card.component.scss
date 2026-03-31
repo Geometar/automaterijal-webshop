@@ -130,21 +130,25 @@
     }
 
     .product-katbr--admin-signal {
-      display: inline-flex;
-      align-items: center;
-      width: fit-content;
+      display: block;
+      width: 100%;
+      max-width: 100%;
       margin-top: 0.45rem;
-      padding: 0.42rem 0.9rem;
-      border-radius: 999px;
+      padding: 0.55rem 0.8rem;
+      border-radius: 14px;
       background: linear-gradient(135deg, rgba(255, 244, 214, 0.98), rgba(255, 226, 138, 0.98));
       border: 1px solid rgba(245, 158, 11, 0.64);
       color: #7c2d12;
-      font-weight: 900;
-      letter-spacing: 0.04em;
+      font-size: 0.82rem;
+      font-weight: 800;
+      line-height: 1.35;
+      letter-spacing: 0.01em;
       box-shadow:
         0 10px 20px rgba(245, 158, 11, 0.16),
         inset 0 1px 0 rgba(255, 255, 255, 0.5);
-      white-space: nowrap;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
 
     .product-katbr--core {

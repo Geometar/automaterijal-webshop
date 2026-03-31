@@ -18,6 +18,7 @@ export class WebshopLogicService {
     filter.podgrupe = this.parseArrayParam(params['podgrupe']);
     filter.proizvodjaci = this.parseArrayParam(params['proizvodjaci']);
     filter.deadStock = params['deadStock'] === 'true';
+    filter.deadStockBadges = this.parseArrayParam(params['deadStockBadges']);
     const filterBy = this.parseFilterBy(params['filterBy']);
     if (filterBy) {
       filter.filterBy = filterBy;

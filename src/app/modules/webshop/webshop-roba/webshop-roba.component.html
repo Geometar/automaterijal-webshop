@@ -2,11 +2,14 @@
   <webshop-category
     *ngIf="
       magacin &&
-      magacin.categories &&
-      magacin.proizvodjaci &&
-      magacin.proizvodjaci.length
+      (filter.deadStock ||
+        (magacin.categories &&
+          magacin.proizvodjaci &&
+          magacin.proizvodjaci.length))
     "
     [categories]="magacin.categories"
+    [deadStockBadges]="magacin.deadStockBadges || []"
+    [deadStockItems]="magacin.robaDto?.content || []"
     [filter]="filter"
     [manufactures]="magacin.proizvodjaci"
   ></webshop-category>

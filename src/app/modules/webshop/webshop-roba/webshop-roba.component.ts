@@ -51,7 +51,14 @@ export class WebshopRobaComponent {
   }
 
   resetSearchTerm(): void {
-    this.urlHelperService.removeQueryParams(['searchTerm', 'podgrupe', 'proizvodjaci', 'naStanju', 'filterBy']);
+    this.urlHelperService.removeQueryParams([
+      'searchTerm',
+      'podgrupe',
+      'proizvodjaci',
+      'naStanju',
+      'deadStockBadges',
+      'filterBy'
+    ]);
   }
 
   // Build concise chips for active filters
@@ -83,12 +90,21 @@ export class WebshopRobaComponent {
     if (this.filter?.naStanju === true) {
       chips.push('Samo na stanju');
     }
+    if (this.filter?.deadStockBadges?.length) {
+      chips.push(`Akcije: ${this.filter.deadStockBadges.join(', ')}`);
+    }
     return chips;
   }
 
   // Clear all filters & search in one go (URL-based like ostatak)
   clearAllFilters(): void {
-    this.urlHelperService.removeQueryParams(['podgrupe', 'proizvodjaci', 'naStanju', 'filterBy']);
+    this.urlHelperService.removeQueryParams([
+      'podgrupe',
+      'proizvodjaci',
+      'naStanju',
+      'deadStockBadges',
+      'filterBy'
+    ]);
   }
 
 }

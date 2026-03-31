@@ -59,6 +59,7 @@ import { RsdCurrencyPipe } from '../../../shared/pipe/rsd-currency.pipe';
 import { SpinnerComponent } from '../../../shared/components/spinner/spinner.component';
 import { TextAreaComponent } from '../../../shared/components/text-area/text-area.component';
 import { ProviderAvailabilityComponent } from '../../../shared/components/provider-availability/provider-availability.component';
+import { DeadStockOverridePopupComponent } from '../../../shared/components/dead-stock-override-popup/dead-stock-override-popup.component';
 import { EmailService } from '../../../shared/service/email.service';
 import {
   AvailabilityTone,
@@ -82,6 +83,7 @@ import {
   buildDeadStockUiState,
   buildOldPriceFromDiscount,
   buildSavingsAmount,
+  formatDeadStockDate,
   getDeadStockMarketingLabel,
   isDeadStockClearance,
   parsePricingPercent,
@@ -99,6 +101,7 @@ import { TecdocService } from '../../../shared/service/tecdoc.service';
 import { SnackbarService } from '../../../shared/service/utils/snackbar.service';
 import { UrlHelperService } from '../../../shared/service/utils/url-helper.service';
 import { SzakalStockCheckResult, SzakalStockService } from '../../../shared/service/szakal-stock.service';
+import { AdminDeadStockService } from '../../../shared/service/admin-dead-stock.service';
 
 // Utils
 import { StringUtils } from '../../../shared/utils/string-utils';
@@ -132,7 +135,8 @@ interface SpecEntry {
     TextAreaComponent,
     ProviderAvailabilityComponent,
     DividerComponent,
-    ShowcaseComponent
+    ShowcaseComponent,
+    DeadStockOverridePopupComponent
   ],
   providers: [CurrencyPipe],
   templateUrl: './webshop-details.component.html',
@@ -168,8 +172,12 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   quantity: number = 1;
   sanitizedText: SafeHtml = '';
   showAddAttributes = false;
+  showDeadStockOverridePopup = false;
   showDeleteWarningPopup = false;
   showImageDeleteWarningPopup = false;
+  deadStockOverridePopupLoading = false;
+  pendingDeadStockOverrideReason = '';
+  pendingDeadStockSuppressed = false;
   shareLink: string | null = null;
   private shareTitle: string = '';
   readonly skeletonRows = Array.from({ length: 5 });
@@ -270,6 +278,41 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     return this.deadStockUi.discountLabel;
   }
 
+  get isDeadStockCandidate(): boolean {
+    return !!this.data?.deadStockInfo?.candidate;
+  }
+
+  get isDeadStockSuppressed(): boolean {
+    return !!this.data?.deadStockInfo?.suppressedForCustomer;
+  }
+
+  get deadStockLastSaleLabel(): string | null {
+    return formatDeadStockDate(this.data?.deadStockInfo?.lastSaleDate) ?? null;
+  }
+
+  get deadStockOverrideAuditText(): string | null {
+    const info = this.data?.deadStockInfo;
+    if (!this.isAdmin || !info?.overrideUpdatedByName) {
+      return null;
+    }
+
+    const when = formatDeadStockDate(info.overrideUpdatedAt);
+    return when
+      ? `${info.overrideUpdatedByName} • ${when}`
+      : info.overrideUpdatedByName;
+  }
+
+  get deadStockCustomerVisibilityLabel(): string | null {
+    const info = this.data?.deadStockInfo;
+    if (!this.isAdmin || !info?.candidate) {
+      return null;
+    }
+    if (info.suppressedForCustomer) {
+      return 'Skriveno za kupca';
+    }
+    return info.matched ? 'Kupac vidi akciju' : 'Kupac ne vidi akciju';
+  }
+
   // Specs
   displayedSpecs: SpecEntry[] = [];
   private allSpecs: SpecEntry[] = [];
@@ -294,6 +337,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
 
   @HostListener('document:keydown.escape')
   onEscape() {
+    this.closeDeadStockOverridePopup();
     this.showDeleteWarningPopup = false;
     this.showImageDeleteWarningPopup = false;
   }
@@ -313,6 +357,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     private urlHelperService: UrlHelperService,
     private szakalStockService: SzakalStockService,
     private analytics: AnalyticsService,
+    private adminDeadStockService: AdminDeadStockService,
     @Inject(PLATFORM_ID) private platformId: Object,
   ) { }
 
@@ -1254,6 +1299,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   }
   refreshDetails(): void {
     this.showAddAttributes = false;
+    this.showDeadStockOverridePopup = false;
     this.showDeleteWarningPopup = false;
     this.showImageDeleteWarningPopup = false;
     if (this.routeRef) {
@@ -1263,6 +1309,62 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   toggleTextEdit(): void {
     this.editingText = !this.editingText;
   }
+
+  toggleDeadStockCustomerVisibility(): void {
+    if (!this.isAdmin || !this.data?.robaid || !this.isDeadStockCandidate) {
+      return;
+    }
+
+    this.pendingDeadStockSuppressed = !this.isDeadStockSuppressed;
+    this.pendingDeadStockOverrideReason = this.data?.deadStockInfo?.overrideReason ?? '';
+    this.showDeadStockOverridePopup = true;
+  }
+
+  closeDeadStockOverridePopup(): void {
+    if (this.deadStockOverridePopupLoading) {
+      return;
+    }
+
+    this.pendingDeadStockOverrideReason = '';
+    this.pendingDeadStockSuppressed = false;
+    this.showDeadStockOverridePopup = false;
+  }
+
+  confirmDeadStockCustomerVisibility(reason: string): void {
+    if (!this.isAdmin || !this.data?.robaid || !this.isDeadStockCandidate || this.deadStockOverridePopupLoading) {
+      return;
+    }
+
+    const nextSuppressed = this.pendingDeadStockSuppressed;
+    this.deadStockOverridePopupLoading = true;
+
+    this.adminDeadStockService
+      .updateOverride(this.data.robaid, {
+        suppressedForCustomer: nextSuppressed,
+        reason,
+      })
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => (this.deadStockOverridePopupLoading = false))
+      )
+      .subscribe({
+        next: () => {
+          this.pendingDeadStockOverrideReason = '';
+          this.pendingDeadStockSuppressed = false;
+          this.showDeadStockOverridePopup = false;
+          this.snackbarService.showSuccess(
+            nextSuppressed
+              ? 'Artikal je sakriven za kupca'
+              : 'Artikal je vracen kupcu'
+          );
+          this.refreshDetails();
+        },
+        error: () => {
+          this.snackbarService.showError('Promena dead stock override nije uspela');
+        },
+      });
+  }
+
   textChanged(event: string): void {
     this.data.tekst = event;
   }

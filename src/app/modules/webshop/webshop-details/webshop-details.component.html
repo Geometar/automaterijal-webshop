@@ -19,6 +19,27 @@
           <p class="product-article product-article--admin-signal" *ngIf="deadStockAdminBadgeText">
             {{ deadStockAdminBadgeText }}
           </p>
+          <div *ngIf="isAdmin && isDeadStockCandidate" class="product-dead-stock-admin">
+            <p class="product-dead-stock-admin__line" *ngIf="deadStockCustomerVisibilityLabel">
+              {{ deadStockCustomerVisibilityLabel }}
+            </p>
+            <p class="product-dead-stock-admin__line" *ngIf="deadStockLastSaleLabel">
+              Poslednja prodaja: {{ deadStockLastSaleLabel }}
+            </p>
+            <p class="product-dead-stock-admin__line" *ngIf="deadStockOverrideAuditText">
+              Poslednja izmena: {{ deadStockOverrideAuditText }}
+            </p>
+            <p class="product-dead-stock-admin__line" *ngIf="data?.deadStockInfo?.overrideReason as overrideReason">
+              Razlog: {{ overrideReason }}
+            </p>
+            <button
+              type="button"
+              class="product-dead-stock-admin__button"
+              (click)="toggleDeadStockCustomerVisibility()"
+            >
+              {{ isDeadStockSuppressed ? 'Vrati kupcu' : 'Sakrij za kupca' }}
+            </button>
+          </div>
         </div>
         <autom-button
           *ngIf="shareLink"
@@ -608,6 +629,16 @@
   (close)="showAddAttributes = false"
   (saved)="refreshDetails()"
 ></add-attributes>
+
+<autom-dead-stock-override-popup
+  [articleLabel]="data.naziv || ''"
+  [loading]="deadStockOverridePopupLoading"
+  [nextSuppressed]="pendingDeadStockSuppressed"
+  [reason]="pendingDeadStockOverrideReason"
+  [visible]="showDeadStockOverridePopup"
+  (close)="closeDeadStockOverridePopup()"
+  (confirm)="confirmDeadStockCustomerVisibility($event)"
+></autom-dead-stock-override-popup>
 
 <autom-popup
   *ngIf="showDeleteWarningPopup"

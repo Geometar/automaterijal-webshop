@@ -15,13 +15,14 @@ import { AvailabilityFilterComponent } from './availability-filter/availability-
 import { CategoryFilterComponent } from './category-filter/category-filter.component';
 import { InputFieldsComponent } from '../../../shared/components/input-fields/input-fields.component';
 import { ManufactureFilterComponent } from './manufacture-filter/manufacture-filter.component';
+import { CheckboxComponent } from '../../../shared/components/checkbox/checkbox.component';
 
 // Data models
 import {
   CheckboxModel,
   RadioOption,
 } from '../../../shared/data-models/interface';
-import { Filter } from '../../../shared/data-models/model/roba';
+import { Filter, Roba } from '../../../shared/data-models/model/roba';
 import { Manufacture } from '../../../shared/data-models/model/proizvodjac';
 
 // Enums
@@ -57,9 +58,10 @@ export enum FilterEnum {
     CommonModule,
     InputFieldsComponent,
     ManufactureFilterComponent,
+    CheckboxComponent,
     ButtonComponent,
     PopupComponent,
-    AutomIconComponent
+    AutomIconComponent,
   ],
   templateUrl: './webshop-category.component.html',
   styleUrl: './webshop-category.component.scss',
@@ -67,6 +69,8 @@ export enum FilterEnum {
 })
 export class WebshopCategoryComponent implements OnChanges, OnInit {
   @Input() categories: any = null;
+  @Input() deadStockBadges: string[] = [];
+  @Input() deadStockItems: Roba[] = [];
   @Input() filter: Filter = new Filter();
   @Input() manufactures: Manufacture[] | undefined = [];
 
@@ -177,6 +181,16 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
       naStanju: isAvailable,
     });
   }
+
+  onDeadStockBadgeChanged(models: CheckboxModel[]): void {
+    const selected = models
+      .filter((model) => model.checked && model.key)
+      .map((model) => model.key as string);
+
+    this.urlHelperService.addOrUpdateQueryParams({
+      deadStockBadges: selected.length ? selected : null,
+    });
+  }
   // End of: Emit handle
 
   preFilterManufactures(filterTerm: string): void {
@@ -190,20 +204,50 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
       key: m.proid!,
       checked: selected.includes(m.proid!),
     }));
+
+  }
+
+  get deadStockBadgeModels(): CheckboxModel[] {
+    const selectedBadges = this.filter.deadStockBadges ?? [];
+    const availableBadges = [
+      ...(this.deadStockBadges ?? []),
+      ...(this.deadStockItems ?? [])
+        .map((item) => item?.deadStockInfo?.badgeLabel || '')
+        .filter((badge) => !!badge?.trim()),
+    ];
+
+    return availableBadges
+      .filter((badge) => !!badge?.trim())
+      .map((badge) => badge.trim())
+      .filter(
+        (badge, index, all) =>
+          all.findIndex(
+            (candidate) => candidate.toLowerCase() === badge.toLowerCase()
+          ) === index
+      )
+      .sort((a, b) => a.localeCompare(b, 'sr', { sensitivity: 'base' }))
+      .map((badge) => ({
+        key: badge,
+        value: badge,
+        checked: selectedBadges.some(
+          (selected) => selected.toLowerCase() === badge.toLowerCase()
+        ),
+      }));
   }
 
   // --- Accordion state (persist to localStorage) ---
   private readonly collapseKey = 'ws_filters_collapse';
-  collapseState: Record<'availability' | 'categories' | 'manufacturers', boolean> = {
+  collapseState: Record<'availability' | 'categories' | 'manufacturers' | 'discounts', boolean> = {
     availability: false,
     categories: false,
-    manufacturers: false
+    manufacturers: false,
+    discounts: false,
   };
 
   // Restore persisted collapse on init
 
   // Toggle helpers
-  toggleSection(name: 'availability' | 'categories' | 'manufacturers'): void {
+  toggleSection(name: 'availability' | 'categories' | 'manufacturers' | 'discounts'): void {
     const isCurrentlyCollapsed = this.collapseState[name];
     const nextValue = !isCurrentlyCollapsed;
 
@@ -212,6 +256,7 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
         availability: true,
         categories: true,
         manufacturers: true,
+        discounts: true,
       };
 
       nextState[name] = nextValue;
@@ -225,7 +270,7 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
 
     this.persistCollapseState();
   }
-  isCollapsed(name: 'availability' | 'categories' | 'manufacturers') {
+  isCollapsed(name: 'availability' | 'categories' | 'manufacturers' | 'discounts') {
     return !!this.collapseState[name];
   }
 
@@ -243,6 +288,7 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
   // Optional counters for chips (safe if arrays are missing)
   get selectedSubgroupsCount(): number { return this.filter?.podgrupe?.length || 0; }
   get selectedManufacturersCount(): number { return this.filter?.proizvodjaci?.length || 0; }
+  get selectedDeadStockBadgeCount(): number { return this.filter?.deadStockBadges?.length || 0; }
 
   // Reset (atomic URL update; zatvori mobilni popup)
   resetFilters(): void {
@@ -251,6 +297,7 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
       naStanju: null,
       podgrupe: null,
       proizvodjaci: null,
+      deadStockBadges: null,
       filterBy: null,
     });
     this.manufacturerPreFilter = '';

@@ -191,6 +191,12 @@ export const routes: Routes = [
     canActivate: [adminGuard]
   },
   {
+    path: 'admin/dead-stock',
+    loadComponent: () =>
+      import('./modules/admin/dead-stock/dead-stock-admin-page.component').then((m) => m.DeadStockAdminPageComponent),
+    canActivate: [adminGuard]
+  },
+  {
     path: 'admin/invoices/:id',
     loadComponent: () =>
       import('./modules/personal/invoices/invoice-details/invoice-details.component').then((m) => m.InvoiceDetailsComponent),

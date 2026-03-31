@@ -119,6 +119,10 @@
   .filter-container {
     padding-top: 4px;
   }
+
+  .filter-container--compact {
+    padding: 10px 8px 12px;
+  }
 }
 
 /* Collapsed */
@@ -138,7 +142,8 @@
 
 /* Inner option hover (without touching child logic) */
 ::ng-deep category-filter .option,
-::ng-deep manufacture-filter .option {
+::ng-deep manufacture-filter .option,
+::ng-deep .filter-container--compact .autom-checkbox {
   padding: 6px 6px;
   border-radius: 8px;
   transition: background 0.12s ease;

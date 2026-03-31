@@ -127,6 +127,13 @@
                 </div>
               </button>
 
+              <button mat-menu-item routerLink="/admin/dead-stock">
+                <div class="menu-item-align">
+                  <autom-icon [source]="iconEnum.TAG"></autom-icon>
+                  <span>Dead stock kandidati</span>
+                </div>
+              </button>
+
               <button mat-menu-item routerLink="/blog/admin">
                 <div class="menu-item-align">
                   <autom-icon [source]="iconEnum.FILE_TEXT"></autom-icon>
@@ -507,6 +514,16 @@
     >
       <autom-icon [source]="iconEnum.BOOK"></autom-icon>
       Backlog provajder artikala
+    </a>
+    <a
+      routerLink="/admin/dead-stock"
+      href="/admin/dead-stock"
+      [ngClass]="currentUrl.includes('/admin/dead-stock') ? 'nav-active' : null"
+      class="menu-title autom-padding--vertical__xxs"
+      (click)="closeMobileSidebar()"
+    >
+      <autom-icon [source]="iconEnum.TAG"></autom-icon>
+      Dead stock kandidati
     </a>
     <a
       routerLink="/sales-reports"

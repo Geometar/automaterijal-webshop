@@ -57,6 +57,7 @@ interface QueryParams {
   assembleGroupId?: string;
   assemblyGroupName?: string;
   deadStock?: string;
+  deadStockBadges?: string;
   filterBy?: WebshopPrimaryFilter;
   grupe?: string;
   mandatoryproid?: string;
@@ -357,6 +358,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
       tecdocType: (p['tecdocType'] || '').toString(),
       tecdocId: p['tecdocId'] ? String(p['tecdocId']) : '',
       deadStock: p['deadStock'] ? String(p['deadStock']) : '',
+      deadStockBadges: (p['deadStockBadges'] || '').toString(),
       pageIndex: p['pageIndex'] !== undefined ? String(p['pageIndex']) : '',
       rowsPerPage:
         p['rowsPerPage'] !== undefined ? String(p['rowsPerPage']) : '',
@@ -389,6 +391,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
     const params = {
       ...p,
       deadStock: 'true',
+      deadStockBadges: (p['deadStockBadges'] || '').toString(),
       searchTerm: ((p['searchTerm'] || '') as string).trim(),
     } as QueryParams;
 
@@ -835,6 +838,10 @@ export class WebshopComponent implements OnDestroy, OnInit {
   }
 
   private buildListName(): string {
+    if (this.isDeadStockLanding) {
+      return this.searchTerm ? 'Dead Stock Promo Search' : 'Dead Stock Promo Listing';
+    }
+
     if (this.searchTerm) {
       return 'Webshop Search Results';
     }
@@ -863,6 +870,13 @@ export class WebshopComponent implements OnDestroy, OnInit {
       page_index: this.pageIndex,
       page_size: this.rowsPerPage,
     };
+
+    if (this.isDeadStockLanding) {
+      metadata['dead_stock_landing'] = true;
+      if (this.filter.deadStockBadges?.length) {
+        metadata['dead_stock_badges'] = this.filter.deadStockBadges;
+      }
+    }
 
     if (this.searchTerm) {
       metadata['search_term'] = this.searchTerm;
@@ -943,6 +957,11 @@ export class WebshopComponent implements OnDestroy, OnInit {
       } else if (hasSearch) {
         title = `Akcije i rasprodaja: "${searchTerm}" | Automaterijal`;
         description = `Nema rezultata za "${searchTerm}" u akcijskoj ponudi. Pogledajte ostale artikle na akciji i rasprodaji do isteka zaliha.`;
+        robots = 'noindex, follow';
+      } else if (resultCount === 0) {
+        title = 'Akcije i rasprodaja auto delova | Automaterijal';
+        description =
+          'Trenutno nema aktivnih artikala na akciji i rasprodaji. Pogledajte ostatak webshop ponude i vratite se uskoro za nove specijalne cene.';
         robots = 'noindex, follow';
       } else {
         title = `Akcije i rasprodaja auto delova${page ? ` (str. ${page + 1})` : ''
@@ -1127,7 +1146,11 @@ export class WebshopComponent implements OnDestroy, OnInit {
         url: 'https://automaterijal.com/',
       },
       about: ctx.searchTerm
-        ? `Rezultati pretrage za: ${ctx.searchTerm}`
+        ? (this.isDeadStockLanding
+          ? `Rezultati akcijske pretrage za: ${ctx.searchTerm}`
+          : `Rezultati pretrage za: ${ctx.searchTerm}`)
+        : this.isDeadStockLanding
+          ? 'Akcije i rasprodaja auto delova'
         : ctx.isVehicle && ctx.isGroup
           ? `Lista artikala - ${this.assemblyGroupName}`
           : ctx.isVehicle

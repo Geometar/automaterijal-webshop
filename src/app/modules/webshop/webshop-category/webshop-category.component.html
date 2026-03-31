@@ -16,12 +16,42 @@
 <div
   *ngIf="
     !isMobileView &&
-    ((categories && categories !== null) ||
+    (filter.deadStock ||
+      (categories && categories !== null) ||
       (manufactures && manufactures.length))
   "
   class="sidebar"
 >
   <div class="filter-section">
+    <div
+      class="filter-card"
+      *ngIf="filter.deadStock && deadStockBadgeModels.length"
+      [class.collapsed]="isCollapsed('discounts')"
+    >
+      <button
+        class="section-title"
+        type="button"
+        (click)="toggleSection('discounts')"
+      >
+        <span>Akcije</span>
+        <span class="count-chip" *ngIf="selectedDeadStockBadgeCount">{{
+          selectedDeadStockBadgeCount
+        }}</span>
+        <i class="chevron" [class.expanded]="!isCollapsed('discounts')"></i>
+      </button>
+
+      <div class="section-body">
+        <div class="filter-container filter-container--compact">
+          <autom-checkbox
+            [horizontal]="false"
+            [items]="deadStockBadgeModels"
+            (emitCheckbox)="onDeadStockBadgeChanged($event)"
+          >
+          </autom-checkbox>
+        </div>
+      </div>
+    </div>
+
     <!-- Availability -->
     <div class="filter-card" [class.collapsed]="isCollapsed('availability')">
       <button
@@ -141,6 +171,30 @@
   </div>
 
   <div custom-body class="page-details__body">
+    <div class="filter-card" *ngIf="filter.deadStock && deadStockBadgeModels.length">
+      <button
+        class="section-title"
+        type="button"
+        (click)="toggleSection('discounts')"
+      >
+        <span>Akcije</span>
+        <span class="count-chip" *ngIf="selectedDeadStockBadgeCount">{{
+          selectedDeadStockBadgeCount
+        }}</span>
+        <i class="chevron" [class.expanded]="!isCollapsed('discounts')"></i>
+      </button>
+      <div class="section-body" [class.collapsed]="isCollapsed('discounts')">
+        <div class="filter-container filter-container--compact">
+          <autom-checkbox
+            [horizontal]="false"
+            [items]="deadStockBadgeModels"
+            (emitCheckbox)="onDeadStockBadgeChanged($event)"
+          >
+          </autom-checkbox>
+        </div>
+      </div>
+    </div>
+
     <div class="filter-card">
       <button
         class="section-title"

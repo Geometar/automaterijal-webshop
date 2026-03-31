@@ -15,6 +15,7 @@ export class Filter {
   paged: boolean = false;
   showcase: boolean = false;
   deadStock: boolean = false;
+  deadStockBadges?: string[];
   filterBy?: WebshopPrimaryFilter;
 
   Filter() {
@@ -89,6 +90,7 @@ export interface TecDocLinkedManufacturerTargets {
 
 export class Magacin {
   categories?: object;
+  deadStockBadges?: string[];
   proizvodjaci?: Manufacture[];
   robaDto?: PaginatedResponse<Roba>;
 }
@@ -137,7 +139,9 @@ export class Roba {
 }
 
 export interface DeadStockInfo {
+  candidate?: boolean;
   matched?: boolean;
+  suppressedForCustomer?: boolean;
   daysInDeadStock?: number | null;
   bucket?: string | null;
   badgeLabel?: string | null;
@@ -146,6 +150,12 @@ export interface DeadStockInfo {
   specialPrice?: number | null;
   regularPrice?: number | null;
   importedAt?: string | null;
+  lastSaleDate?: string | null;
+  lastPurchaseDate?: string | null;
+  overrideReason?: string | null;
+  overrideUpdatedAt?: string | null;
+  overrideUpdatedByName?: string | null;
+  overrideUpdatedByPpid?: number | null;
 }
 
 export class CartItem {
@@ -190,5 +200,6 @@ export class CartItem {
   providerCoreCharge?: number;
   providerRealtimeChecked?: boolean;
   providerRealtimeCheckedAt?: string;
+  deadStockInfo?: DeadStockInfo;
   technicalDescription?: RobaTehnickiOpis[];
 }
