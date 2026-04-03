@@ -20,7 +20,6 @@ const RAW_PARAM_NAMES = [
   'paged',
   'showcase',
   'deadStock',
-  'deadStockBadges',
   'assembleGroupId',
   'assemblyGroupId',
   'tecdocTargetId',

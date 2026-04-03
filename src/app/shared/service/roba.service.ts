@@ -78,10 +78,6 @@ export class RobaService {
       parameterObject['skipProvider'] = true;
     }
 
-    if (filter.deadStockBadges?.length) {
-      parameterObject['deadStockBadges'] = filter.deadStockBadges;
-    }
-
     if (filter.filterBy) {
       parameterObject['filterBy'] = filter.filterBy;
     }

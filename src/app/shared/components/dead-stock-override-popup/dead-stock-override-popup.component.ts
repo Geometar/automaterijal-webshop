@@ -52,8 +52,8 @@ export class DeadStockOverridePopupComponent implements OnChanges {
 
   get description(): string {
     return this.nextSuppressed
-      ? 'Artikal će biti sakriven kupcu sa akcijske strane, ali ostaje vidljiv adminu.'
-      : 'Artikal će ponovo biti vidljiv kupcu samo ako i dalje ispunjava dead stock pravila.';
+      ? 'Artikal će biti sakriven kupcu, ali ostaje vidljiv adminu kao mrtav lager kandidat.'
+      : 'Artikal će ponovo biti vidljiv kupcu samo ako i dalje ispunjava mrtav lager pravila.';
   }
 
   ngOnChanges(changes: SimpleChanges): void {

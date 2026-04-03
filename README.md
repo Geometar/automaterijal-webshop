@@ -4,12 +4,11 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 ## Project notes
 
-Frontend dead stock surfaces currently include:
+Frontend mrtav lager V1 surfaces currently include:
 
-- public listing `/webshop/akcije-rasprodaja`
-- customer badge filter on dead stock listing, driven by backend `deadStockBadges`
-- product detail dead stock metadata
-- internal admin page `/admin/dead-stock`
+- admin entry in navigation for `/admin/dead-stock`
+- admin-only marker in shared product row/card/detail surfaces
+- technical compatibility route `/webshop/akcije-rasprodaja` that is not promoted in customer UI
 
 For business rules and backend/FE contract, use backend docs:
 

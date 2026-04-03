@@ -56,7 +56,6 @@ export class WebshopRobaComponent {
       'podgrupe',
       'proizvodjaci',
       'naStanju',
-      'deadStockBadges',
       'filterBy'
     ]);
   }
@@ -90,9 +89,6 @@ export class WebshopRobaComponent {
     if (this.filter?.naStanju === true) {
       chips.push('Samo na stanju');
     }
-    if (this.filter?.deadStockBadges?.length) {
-      chips.push(`Akcije: ${this.filter.deadStockBadges.join(', ')}`);
-    }
     return chips;
   }
 
@@ -102,7 +98,6 @@ export class WebshopRobaComponent {
       'podgrupe',
       'proizvodjaci',
       'naStanju',
-      'deadStockBadges',
       'filterBy'
     ]);
   }

@@ -1,62 +1,21 @@
 <section class="header-margin--top dead-stock-admin-page">
-  <header class="dead-stock-admin-page__header">
-    <div>
-      <p class="dead-stock-admin-page__eyebrow">Admin dead stock</p>
-      <h1>Dead stock kandidati</h1>
-      <p>
-        Pregled svih artikala iz aktivnog snapshot-a, customer-visible statusa i
-        ručnih override odluka.
-      </p>
-    </div>
-    <div class="dead-stock-admin-page__meta">
-      <span>{{ totalElements }} kandidata</span>
-      <span>{{ fromRow }}-{{ toRow }} prikazano</span>
-    </div>
-  </header>
+  <webshop-nav
+    [customBreadcrumbs]="customBreadcrumbs"
+    [filter]="filter"
+    [searchRoute]="['/admin/dead-stock']"
+    [searchTerm]="searchTerm"
+    [showCategoriesButton]="false"
+    [showVehicleSelector]="false"
+  ></webshop-nav>
 
-  <div class="dead-stock-admin-page__filters">
-    <input
-      type="search"
-      placeholder="Pretraga po nazivu, kat. broju ili proizvođaču"
-      [(ngModel)]="searchTerm"
-      (ngModelChange)="onSearchChanged($event)"
-    />
-
-    <select [(ngModel)]="statusFilter" (ngModelChange)="onFiltersChanged()" aria-label="Status filter">
-      <option value="all">Svi statusi</option>
-      <option value="visible">Samo customer-visible</option>
-      <option value="suppressed">Samo suppressed</option>
-      <option value="no-rule">Bez rule-a</option>
-    </select>
-
-    <select [(ngModel)]="bucketFilter" (ngModelChange)="onFiltersChanged()" aria-label="Bucket filter">
-      <option value="all">Svi bucket-i</option>
-      <option *ngFor="let bucket of buckets" [value]="bucket">{{ bucket }}</option>
-    </select>
-  </div>
-
-  <div *ngIf="!loading && !items.length" class="dead-stock-admin-page__empty">
-    Nema rezultata za zadate filtere.
-  </div>
-
-  <div *ngIf="loading || items.length" class="dead-stock-admin-page__table-wrap">
-    <autom-table-flat
-      [columns]="columns"
-      [displayedColumns]="displayedColumns"
-      [dataSource]="dataSource"
-      [loading]="loading"
-      [pagination]="pagination"
-      (pageChange)="onPageChange($event)"
-    ></autom-table-flat>
-  </div>
-
-  <autom-dead-stock-override-popup
-    [articleLabel]="pendingOverrideItem?.articleLabel || ''"
-    [loading]="overridePopupLoading"
-    [nextSuppressed]="pendingOverrideSuppressed"
-    [reason]="pendingOverrideReason"
-    [visible]="showOverridePopup"
-    (close)="closeOverridePopup()"
-    (confirm)="confirmOverridePopup($event)"
-  ></autom-dead-stock-override-popup>
+  <webshop-roba
+    [disableCategoryNavigation]="true"
+    [filter]="filter"
+    [loading]="loading"
+    [magacin]="magacin"
+    [pageIndex]="pageIndex"
+    [pageSize]="pageSize"
+    [searchTerm]="searchTerm"
+    (emitTablePage)="handleTablePageEvent($event)"
+  ></webshop-roba>
 </section>

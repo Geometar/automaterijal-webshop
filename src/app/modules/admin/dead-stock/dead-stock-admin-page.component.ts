@@ -1,163 +1,53 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { PageEvent } from '@angular/material/paginator';
-import { MatTableDataSource } from '@angular/material/table';
-import { Router } from '@angular/router';
-import { debounceTime, distinctUntilChanged, finalize, Subject, takeUntil } from 'rxjs';
+import { ActivatedRoute, Params } from '@angular/router';
+import { finalize, Subject, takeUntil } from 'rxjs';
 
-import {
-  AdminDeadStockItem,
-  AdminDeadStockItemsPage,
-  AdminDeadStockService
-} from '../../../shared/service/admin-dead-stock.service';
-import { DeadStockOverridePopupComponent } from '../../../shared/components/dead-stock-override-popup/dead-stock-override-popup.component';
+import { Filter, Magacin, Roba } from '../../../shared/data-models/model/roba';
+import { RobaService } from '../../../shared/service/roba.service';
+import { UrlHelperService } from '../../../shared/service/utils/url-helper.service';
+import { WebshopLogicService } from '../../../shared/service/utils/webshop-logic.service';
 import { SnackbarService } from '../../../shared/service/utils/snackbar.service';
-import { formatDeadStockDate } from '../../../shared/utils/dead-stock-ui';
-import { AutomTableColumn, CellType } from '../../../shared/data-models/enums/table.enum';
-import { TableFlatComponent } from '../../../shared/components/table-flat/table-flat.component';
-
-type DeadStockAdminFilter = 'all' | 'visible' | 'suppressed' | 'no-rule';
-type DeadStockAdminTableRow = AdminDeadStockItem & {
-  actionLabel: string;
-  articleLabel: string;
-  articleMeta: string;
-  overrideReasonDisplay: string;
-  overrideUpdatedByDisplay: string;
-  ruleLabel: string;
-};
+import { WebshopNavBreadcrumbs, WebshopNavComponent } from '../../webshop/webshop-nav/webshop-nav.component';
+import { WebshopRobaComponent } from '../../webshop/webshop-roba/webshop-roba.component';
+import { TablePage } from '../../../shared/data-models/model/page';
 
 @Component({
   selector: 'app-dead-stock-admin-page',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    TableFlatComponent,
-    DeadStockOverridePopupComponent,
-  ],
+  imports: [CommonModule, WebshopNavComponent, WebshopRobaComponent],
   templateUrl: './dead-stock-admin-page.component.html',
   styleUrl: './dead-stock-admin-page.component.scss',
   encapsulation: ViewEncapsulation.None,
 })
 export class DeadStockAdminPageComponent implements OnInit, OnDestroy {
-  items: DeadStockAdminTableRow[] = [];
-  availableBuckets: string[] = [];
-  dataSource = new MatTableDataSource<DeadStockAdminTableRow>([]);
+  filter: Filter = this.buildBaseFilter();
   loading = false;
-  overridePopupLoading = false;
-  updatingIds = new Set<number>();
+  magacin: Magacin | null = null;
+  pageIndex = 0;
+  pageSize = 10;
   searchTerm = '';
-  statusFilter: DeadStockAdminFilter = 'all';
-  bucketFilter = 'all';
-  page = 0;
-  pageSize = 50;
-  pendingOverrideItem: DeadStockAdminTableRow | null = null;
-  pendingOverrideReason = '';
-  pendingOverrideSuppressed = false;
-  showOverridePopup = false;
-  totalElements = 0;
-  totalPages = 0;
+  readonly customBreadcrumbs: WebshopNavBreadcrumbs = {
+    second: 'Mrtav lager',
+  };
 
-  private destroy$ = new Subject<void>();
-  private searchChanged$ = new Subject<string>();
-
-  columns: AutomTableColumn[] = [
-    {
-      key: 'articleLabel',
-      header: 'Artikal',
-      type: CellType.LINK,
-      callback: (row) => this.openArticle(row),
-    },
-    {
-      key: 'articleMeta',
-      header: 'Šifra',
-      type: CellType.TEXT,
-    },
-    {
-      key: 'bucket',
-      header: 'Bucket',
-      type: CellType.TEXT,
-    },
-    {
-      key: 'daysInDeadStock',
-      header: 'Dani',
-      type: CellType.NUMBER,
-    },
-    {
-      key: 'lastSaleDate',
-      header: 'Poslednja prodaja',
-      type: CellType.DATE_ONLY,
-      dateFormat: 'dd.MM.yyyy.',
-    },
-    {
-      key: 'ruleLabel',
-      header: 'Rule',
-      type: CellType.TEXT,
-    },
-    {
-      key: 'customerVisible',
-      header: 'Kupac vidi',
-      type: CellType.BADGE,
-      badgeLabels: {
-        trueLabel: 'Da',
-        falseLabel: 'Ne',
-      },
-    },
-    {
-      key: 'suppressedForCustomer',
-      header: 'Suppressed',
-      type: CellType.BADGE,
-      badgeLabels: {
-        trueLabel: 'Da',
-        falseLabel: 'Ne',
-      },
-    },
-    {
-      key: 'overrideUpdatedByDisplay',
-      header: 'Ko je menjao',
-      type: CellType.TEXT,
-    },
-    {
-      key: 'overrideUpdatedAt',
-      header: 'Kada',
-      type: CellType.DATE,
-      dateFormat: 'dd.MM.yyyy. HH:mm',
-    },
-    {
-      key: 'overrideReasonDisplay',
-      header: 'Razlog',
-      type: CellType.TEXT,
-    },
-    {
-      key: 'actionLabel',
-      header: 'Akcija',
-      type: CellType.LINK,
-      callback: (row) => this.openOverridePopup(row),
-      disableLink: (row) => this.isUpdating(row.robaId),
-    },
-  ];
-  displayedColumns = this.columns.map((column) => column.key);
+  private readonly destroy$ = new Subject<void>();
 
   constructor(
-    private adminDeadStockService: AdminDeadStockService,
-    private router: Router,
-    private snackbarService: SnackbarService
+    private activatedRoute: ActivatedRoute,
+    private logicService: WebshopLogicService,
+    private robaService: RobaService,
+    private snackbarService: SnackbarService,
+    private urlHelperService: UrlHelperService
   ) {}
 
   ngOnInit(): void {
-    this.searchChanged$
-      .pipe(
-        debounceTime(250),
-        distinctUntilChanged(),
-        takeUntil(this.destroy$)
-      )
-      .subscribe(() => {
-        this.page = 0;
+    this.activatedRoute.queryParams
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((params) => {
+        this.syncFromQueryParams(params);
         this.loadItems();
       });
-
-    this.loadItems();
   }
 
   ngOnDestroy(): void {
@@ -165,174 +55,76 @@ export class DeadStockAdminPageComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  get buckets(): string[] {
-    return this.availableBuckets;
+  get items(): Roba[] {
+    return this.magacin?.robaDto?.content ?? [];
   }
 
-  get pagination() {
-    return {
-      length: this.totalElements,
-      pageIndex: this.page,
-      pageSize: this.pageSize,
-      pageSizeOptions: [25, 50, 100],
-    };
+  get totalElements(): number {
+    return this.magacin?.robaDto?.totalElements ?? 0;
   }
 
-  get fromRow(): number {
-    return this.totalElements === 0 ? 0 : this.page * this.pageSize + 1;
-  }
-
-  get toRow(): number {
-    return Math.min((this.page + 1) * this.pageSize, this.totalElements);
-  }
-
-  get canGoPrev(): boolean {
-    return this.page > 0;
-  }
-
-  get canGoNext(): boolean {
-    return this.page + 1 < this.totalPages;
-  }
-
-  onSearchChanged(term: string): void {
-    this.searchTerm = term;
-    this.searchChanged$.next(term.trim());
-  }
-
-  formatDate(raw?: string | null): string {
-    return formatDeadStockDate(raw) ?? '-';
-  }
-
-  isUpdating(robaId: number): boolean {
-    return this.updatingIds.has(robaId);
-  }
-
-  onFiltersChanged(): void {
-    this.page = 0;
-    this.loadItems();
-  }
-
-  onPageChange(event: PageEvent): void {
-    this.page = event.pageIndex;
-    this.pageSize = event.pageSize;
-    this.loadItems();
-  }
-
-  openOverridePopup(item: DeadStockAdminTableRow): void {
-    if (!item?.robaId || this.isUpdating(item.robaId)) {
-      return;
-    }
-
-    this.pendingOverrideItem = item;
-    this.pendingOverrideSuppressed = !item.suppressedForCustomer;
-    this.pendingOverrideReason = item.overrideReason ?? '';
-    this.showOverridePopup = true;
-  }
-
-  closeOverridePopup(): void {
-    if (this.overridePopupLoading) {
-      return;
-    }
-
-    this.pendingOverrideItem = null;
-    this.pendingOverrideReason = '';
-    this.pendingOverrideSuppressed = false;
-    this.showOverridePopup = false;
-  }
-
-  confirmOverridePopup(reason: string): void {
-    const item = this.pendingOverrideItem;
-    if (!item?.robaId || this.overridePopupLoading) {
-      return;
-    }
-
-    const nextSuppressed = this.pendingOverrideSuppressed;
-    this.overridePopupLoading = true;
-    this.updatingIds.add(item.robaId);
-    this.adminDeadStockService
-      .updateOverride(item.robaId, {
-        suppressedForCustomer: nextSuppressed,
-        reason,
-      })
-      .pipe(
-        takeUntil(this.destroy$),
-        finalize(() => {
-          this.overridePopupLoading = false;
-          this.updatingIds.delete(item.robaId);
-        })
-      )
-      .subscribe({
-        next: () => {
-          this.pendingOverrideItem = null;
-          this.pendingOverrideReason = '';
-          this.pendingOverrideSuppressed = false;
-          this.showOverridePopup = false;
-          this.loadItems();
-          this.snackbarService.showSuccess(
-            nextSuppressed
-              ? 'Artikal je sakriven za kupca'
-              : 'Artikal je vracen kupcu'
-          );
-        },
-        error: () => {
-          this.snackbarService.showError('Promena dead stock override nije uspela');
-        },
-      });
-  }
-
-  private openArticle(item: DeadStockAdminTableRow): void {
-    if (!item?.robaId) {
-      return;
-    }
-
-    this.router.navigate(['/webshop', item.robaId]);
+  handleTablePageEvent(tablePage: TablePage): void {
+    this.urlHelperService.addOrUpdateQueryParams({
+      pageIndex: tablePage.pageIndex,
+      rowsPerPage: tablePage.pageSize,
+    });
   }
 
   private loadItems(): void {
     this.loading = true;
-    this.adminDeadStockService
-      .fetchItems({
-        page: this.page,
-        size: this.pageSize,
-        search: this.searchTerm,
-        status: this.statusFilter,
-        bucket: this.bucketFilter === 'all' ? null : this.bucketFilter,
-      })
+    this.robaService
+      .pronadjiSvuRobu(
+        null,
+        this.pageSize,
+        this.pageIndex,
+        this.searchTerm,
+        this.filter
+      )
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => (this.loading = false))
       )
       .subscribe({
-        next: (response: AdminDeadStockItemsPage) => {
-          this.items = (response?.items ?? []).map((item) => this.toTableRow(item));
-          this.dataSource.data = this.items;
-          this.totalElements = response?.totalElements ?? 0;
-          this.totalPages = response?.totalPages ?? 0;
-          this.availableBuckets = response?.availableBuckets ?? [];
+        next: (magacin) => {
+          this.magacin = magacin;
         },
         error: () => {
-          this.items = [];
-          this.dataSource.data = [];
-          this.totalElements = 0;
-          this.totalPages = 0;
-          this.availableBuckets = [];
-          this.snackbarService.showError('Ucitavanje dead stock kandidata nije uspelo');
+          this.magacin = null;
+          this.snackbarService.showError(
+            'Učitavanje mrtvog lagera nije uspelo.'
+          );
         },
       });
   }
 
-  private toTableRow(item: AdminDeadStockItem): DeadStockAdminTableRow {
-    const articleLabel = [item.proizvodjacNaziv, item.naziv].filter(Boolean).join(' ').trim();
-    const articleMeta = [item.katbr ? `#${item.katbr}` : null, item.proid].filter(Boolean).join(' • ');
+  private syncFromQueryParams(params: Params): void {
+    this.filter = this.buildBaseFilter();
+    const parsed = this.logicService.createFilterFromParams(params);
+    this.filter.proizvodjaci = parsed.proizvodjaci;
+    this.filter.podgrupe = parsed.podgrupe;
+    this.filter.filterBy = parsed.filterBy;
 
-    return {
-      ...item,
-      actionLabel: item.suppressedForCustomer ? 'Vrati kupcu' : 'Sakrij za kupca',
-      articleLabel: articleLabel || `Artikal ${item.robaId}`,
-      articleMeta: articleMeta || '-',
-      overrideReasonDisplay: item.overrideReason || '-',
-      overrideUpdatedByDisplay: item.overrideUpdatedByName || '-',
-      ruleLabel: item.hasRule ? (item.badgeLabel || 'Da') : 'Ne',
-    };
+    this.searchTerm =
+      typeof params['searchTerm'] === 'string' ? params['searchTerm'] : '';
+    this.pageIndex = this.parseNonNegativeInt(params['pageIndex'], 0);
+    this.pageSize = this.parsePositiveInt(params['rowsPerPage'], 10);
+  }
+
+  private buildBaseFilter(): Filter {
+    const filter = new Filter();
+    filter.deadStock = true;
+    filter.naStanju = false;
+    filter.filterBy = undefined;
+    return filter;
+  }
+
+  private parseNonNegativeInt(value: unknown, fallback: number): number {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) && parsed >= 0 ? Math.floor(parsed) : fallback;
+  }
+
+  private parsePositiveInt(value: unknown, fallback: number): number {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : fallback;
   }
 }

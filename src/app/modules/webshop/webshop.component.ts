@@ -57,7 +57,6 @@ interface QueryParams {
   assembleGroupId?: string;
   assemblyGroupName?: string;
   deadStock?: string;
-  deadStockBadges?: string;
   filterBy?: WebshopPrimaryFilter;
   grupe?: string;
   mandatoryproid?: string;
@@ -119,7 +118,6 @@ export class WebshopComponent implements OnDestroy, OnInit {
   private primaryFilter: WebshopPrimaryFilter | null = null;
   customBreadcrumbs: WebshopNavBreadcrumbs | null = null;
   isDeadStockLanding = false;
-  showDeadStockPromoBanner = false;
   private lastRoutePageIndex = 0;
   private lastRouteRowsPerPage = 10;
   private hasProcessedRoute = false;
@@ -344,7 +342,6 @@ export class WebshopComponent implements OnDestroy, OnInit {
     this.selectedBrandName = null;
     this.customBreadcrumbs = null;
     this.isDeadStockLanding = false;
-    this.showDeadStockPromoBanner = true;
     this.internalLoading = false;
     this.loading = true;
     const trimmedSearch = ((p['searchTerm'] || '') as string).trim();
@@ -358,7 +355,6 @@ export class WebshopComponent implements OnDestroy, OnInit {
       tecdocType: (p['tecdocType'] || '').toString(),
       tecdocId: p['tecdocId'] ? String(p['tecdocId']) : '',
       deadStock: p['deadStock'] ? String(p['deadStock']) : '',
-      deadStockBadges: (p['deadStockBadges'] || '').toString(),
       pageIndex: p['pageIndex'] !== undefined ? String(p['pageIndex']) : '',
       rowsPerPage:
         p['rowsPerPage'] !== undefined ? String(p['rowsPerPage']) : '',
@@ -381,17 +377,12 @@ export class WebshopComponent implements OnDestroy, OnInit {
   }
 
   private handleDeadStockLanding(p: Params): void {
-    this.customBreadcrumbs = {
-      second: 'Akcije i rasprodaja',
-      secondLink: ['/webshop/akcije-rasprodaja'],
-    };
+    this.customBreadcrumbs = null;
     this.isDeadStockLanding = true;
-    this.showDeadStockPromoBanner = false;
 
     const params = {
       ...p,
       deadStock: 'true',
-      deadStockBadges: (p['deadStockBadges'] || '').toString(),
       searchTerm: ((p['searchTerm'] || '') as string).trim(),
     } as QueryParams;
 
@@ -406,7 +397,6 @@ export class WebshopComponent implements OnDestroy, OnInit {
   private handleManufactureSlug(slug: string, p: Params): void {
     this.customBreadcrumbs = null;
     this.isDeadStockLanding = false;
-    this.showDeadStockPromoBanner = false;
     this.loading = true;
     this.manufactureService.getBySlug(slug).subscribe({
       next: (m) => {
@@ -438,7 +428,6 @@ export class WebshopComponent implements OnDestroy, OnInit {
   ): void {
     this.customBreadcrumbs = null;
     this.isDeadStockLanding = false;
-    this.showDeadStockPromoBanner = false;
     this.categoriesState
       .getCategories$()
       .pipe(take(1), takeUntil(this.destroy$))
@@ -509,7 +498,6 @@ export class WebshopComponent implements OnDestroy, OnInit {
   ): void {
     this.customBreadcrumbs = null;
     this.isDeadStockLanding = false;
-    this.showDeadStockPromoBanner = false;
     if (this.currentState !== WebShopState.SHOW_EMPTY_CONTAINER) {
       this.loading = true;
       this.internalLoading = false;
@@ -839,7 +827,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
 
   private buildListName(): string {
     if (this.isDeadStockLanding) {
-      return this.searchTerm ? 'Dead Stock Promo Search' : 'Dead Stock Promo Listing';
+      return this.searchTerm ? 'Dead Stock Route Search' : 'Dead Stock Route Listing';
     }
 
     if (this.searchTerm) {
@@ -872,10 +860,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
     };
 
     if (this.isDeadStockLanding) {
-      metadata['dead_stock_landing'] = true;
-      if (this.filter.deadStockBadges?.length) {
-        metadata['dead_stock_badges'] = this.filter.deadStockBadges;
-      }
+      metadata['dead_stock_route'] = true;
     }
 
     if (this.searchTerm) {
@@ -951,23 +936,25 @@ export class WebshopComponent implements OnDestroy, OnInit {
 
     if (this.isDeadStockLanding) {
       if (hasSearch && resultCount > 0) {
-        title = `Akcije i rasprodaja: "${searchTerm}"${page ? ` (str. ${page + 1})` : ''
+        title = `Izdvojeni artikli: "${searchTerm}"${page ? ` (str. ${page + 1})` : ''
           } | Automaterijal`;
-        description = `Pronađeno ${resultCount} akcijskih artikala za "${searchTerm}". Izdvojeni auto delovi sa posebnim cenama, ograničenim zalihama i brzom isporukom.`;
+        description = `Pronađeno ${resultCount} artikala za "${searchTerm}" na nepromovisanoj internoj ruti.`;
+        robots = 'noindex, follow';
       } else if (hasSearch) {
-        title = `Akcije i rasprodaja: "${searchTerm}" | Automaterijal`;
-        description = `Nema rezultata za "${searchTerm}" u akcijskoj ponudi. Pogledajte ostale artikle na akciji i rasprodaji do isteka zaliha.`;
+        title = `Izdvojeni artikli: "${searchTerm}" | Automaterijal`;
+        description = `Nema rezultata za "${searchTerm}" na ovoj nepromovisanoj ruti.`;
         robots = 'noindex, follow';
       } else if (resultCount === 0) {
-        title = 'Akcije i rasprodaja auto delova | Automaterijal';
+        title = 'Izdvojeni artikli | Automaterijal';
         description =
-          'Trenutno nema aktivnih artikala na akciji i rasprodaji. Pogledajte ostatak webshop ponude i vratite se uskoro za nove specijalne cene.';
+          'Ova ruta nije deo aktivnog customer proizvoda i nije promovisana u webshop interfejsu.';
         robots = 'noindex, follow';
       } else {
-        title = `Akcije i rasprodaja auto delova${page ? ` (str. ${page + 1})` : ''
+        title = `Izdvojeni artikli${page ? ` (str. ${page + 1})` : ''
           } | Automaterijal`;
         description =
-          'Izdvojeni auto delovi na akciji i rasprodaji do isteka zaliha. Posebne cene, ograničene količine i brza isporuka širom Srbije.';
+          'Ova ruta ostaje tehnički dostupna, ali nije deo aktivnog customer proizvoda.';
+        robots = 'noindex, follow';
       }
     }
 
@@ -1147,10 +1134,10 @@ export class WebshopComponent implements OnDestroy, OnInit {
       },
       about: ctx.searchTerm
         ? (this.isDeadStockLanding
-          ? `Rezultati akcijske pretrage za: ${ctx.searchTerm}`
+          ? `Rezultati pretrage za izdvojenu nepromovisanu rutu: ${ctx.searchTerm}`
           : `Rezultati pretrage za: ${ctx.searchTerm}`)
         : this.isDeadStockLanding
-          ? 'Akcije i rasprodaja auto delova'
+          ? 'Izdvojeni artikli na nepromovisanoj ruti'
         : ctx.isVehicle && ctx.isGroup
           ? `Lista artikala - ${this.assemblyGroupName}`
           : ctx.isVehicle

@@ -1,10 +1,13 @@
-<article class="row-container">
+<article
+  class="row-container"
+  [class.row-container--dead-stock-admin]="hasStrongDeadStockAdminMarker"
+>
   <!-- Image Section -->
   <div class="image-container" [class.image-smaller]="showPriceOnly">
     <!-- Popust badge -->
     <div
       class="discount-badge"
-      *ngIf="!isAdminCartView && !isTecDocOnly && (deadStockDiscountLabel || discountLabel)"
+      *ngIf="!isAdminCartView && !isTecDocOnly && showDiscount && (deadStockDiscountLabel || discountLabel)"
     >
       {{ deadStockDiscountLabel || ('-' + discountLabel + '%') }}
     </div>
@@ -169,13 +172,12 @@
       ></autom-meta-pill>
 
       <autom-meta-pill
-        *ngIf="deadStockMarketingLabel"
+        *ngIf="deadStockStrongAdminMarkerLabel"
         class="product-meta__dead-stock dead-stock-pill"
-        [class.dead-stock-pill--clearance]="isDeadStockClearance"
         variant="warning"
         size="md"
-        [value]="deadStockMarketingLabel"
-        [ariaLabel]="'Oznaka ' + deadStockMarketingLabel"
+        [value]="deadStockStrongAdminMarkerLabel"
+        [ariaLabel]="deadStockStrongAdminMarkerLabel"
       ></autom-meta-pill>
     </div>
 

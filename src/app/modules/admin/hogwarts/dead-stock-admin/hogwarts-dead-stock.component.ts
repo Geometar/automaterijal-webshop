@@ -67,7 +67,7 @@ export class HogwartsDeadStockComponent {
       return;
     }
     if (!this.deadStockUploadFile) {
-      this.setDeadStockStatus('Choose a dead stock .xlsx file first.', 'error');
+      this.setDeadStockStatus('Prvo izaberi .xlsx snapshot mrtvog lagera.', 'error');
       return;
     }
     this.deadStockLoading = true;
@@ -131,10 +131,10 @@ export class HogwartsDeadStockComponent {
       .subscribe({
         next: () => {
           this.setDeadStockStatus(
-            this.deadStockEditingRuleId ? 'Dead stock rule updated.' : 'Dead stock rule created.',
+            this.deadStockEditingRuleId ? 'Pravilo mrtvog lagera je ažurirano.' : 'Pravilo mrtvog lagera je kreirano.',
             'success'
           );
-          this.snackbarService.showSuccess('Dead stock rule saved');
+          this.snackbarService.showSuccess('Pravilo mrtvog lagera je sačuvano');
           this.resetDeadStockRuleForm();
           this.refreshDeadStockRules();
         },
@@ -174,8 +174,8 @@ export class HogwartsDeadStockComponent {
       .pipe(finalize(() => (this.deadStockRulesLoading = false)))
       .subscribe({
         next: () => {
-          this.setDeadStockStatus('Dead stock rule deleted.', 'success');
-          this.snackbarService.showSuccess('Dead stock rule deleted');
+          this.setDeadStockStatus('Pravilo mrtvog lagera je obrisano.', 'success');
+          this.snackbarService.showSuccess('Pravilo mrtvog lagera je obrisano');
           if (this.deadStockEditingRuleId === rule.id) {
             this.resetDeadStockRuleForm();
           }
@@ -192,7 +192,7 @@ export class HogwartsDeadStockComponent {
       maxDaysInclusive: 1825,
       pricingMode: 'MARKUP_ON_COST',
       pricingValue: 10,
-      badgeLabel: 'Akcija',
+      badgeLabel: '',
       active: true,
       sortOrder: 10,
     };
@@ -201,7 +201,7 @@ export class HogwartsDeadStockComponent {
   private buildDeadStockRulePayload(): DeadStockRulePayload | null {
     const name = this.deadStockRuleForm.name.trim();
     if (!name) {
-      this.setDeadStockStatus('Rule name is required.', 'error');
+      this.setDeadStockStatus('Naziv pravila je obavezan.', 'error');
       return null;
     }
 
@@ -274,7 +274,7 @@ export class HogwartsDeadStockComponent {
 
     if (overlapping) {
       this.setDeadStockStatus(
-        `Rule overlaps with existing active rule "${overlapping.name}" (${overlapping.minDaysInclusive}-${overlapping.maxDaysInclusive ?? 'open'}).`,
+        `Pravilo se preklapa sa postojećim aktivnim pravilom "${overlapping.name}" (${overlapping.minDaysInclusive}-${overlapping.maxDaysInclusive ?? 'open'}).`,
         'error'
       );
       return false;
@@ -289,15 +289,15 @@ export class HogwartsDeadStockComponent {
       this.deadStockFileInput.nativeElement.value = '';
     }
     this.setDeadStockStatus(
-      `Dead stock import completed. Imported: ${response?.importedCount ?? 0} / ${response?.totalRowCount ?? 0} | Missing roba: ${response?.skippedMissingRobaCount ?? 0} | Duplicates: ${response?.duplicateRobaIdCount ?? 0} | Invalid: ${response?.invalidRowCount ?? 0}`,
+      `Import mrtvog lagera je završen. Uvezeno: ${response?.importedCount ?? 0} / ${response?.totalRowCount ?? 0} | Nedostaje roba: ${response?.skippedMissingRobaCount ?? 0} | Duplikati: ${response?.duplicateRobaIdCount ?? 0} | Nevalidni redovi: ${response?.invalidRowCount ?? 0}`,
       'success'
     );
-    this.snackbarService.showSuccess('Dead stock imported');
+    this.snackbarService.showSuccess('Mrtav lager je uspešno uvezen');
     this.refreshDeadStockStatus();
   }
 
   private handleDeadStockError(error: any): void {
-    const message = error?.error?.message || error?.message || 'Dead stock spell failed.';
+    const message = error?.error?.message || error?.message || 'Operacija za mrtav lager nije uspela.';
     this.setDeadStockStatus(message, 'error');
     this.snackbarService.showError(message);
   }

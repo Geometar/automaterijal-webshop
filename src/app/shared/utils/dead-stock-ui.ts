@@ -1,11 +1,8 @@
 import { DeadStockInfo } from '../data-models/model/roba';
 
-const TRAILING_DISCOUNT_SUFFIX_REGEX = /\s+\d+\s*%?\s*$/;
-
 export interface DeadStockUiState {
-  badgeLabel: string | null;
-  marketingLabel: string | null;
-  isClearance: boolean;
+  strongAdminMarkerLabel: string | null;
+  highlightAdminCandidate: boolean;
   adminBadgeText: string | null;
   regularPrice: number | null;
   showReferencePrice: boolean;
@@ -13,26 +10,11 @@ export interface DeadStockUiState {
   discountLabel: string | null;
 }
 
-export function getDeadStockBadgeLabel(info?: DeadStockInfo | null): string | null {
-  if (!info?.matched) {
-    return null;
-  }
-  const label = info?.badgeLabel?.trim();
-  return label ? label : null;
-}
-
-export function getDeadStockMarketingLabel(info?: DeadStockInfo | null): string | null {
-  const label = getDeadStockBadgeLabel(info);
-  if (!label) {
-    return null;
-  }
-
-  const normalized = label.replace(TRAILING_DISCOUNT_SUFFIX_REGEX, '').trim();
-  return normalized || label;
-}
-
-export function isDeadStockClearance(info?: DeadStockInfo | null): boolean {
-  return (getDeadStockMarketingLabel(info) ?? '').toLowerCase().includes('rasprod');
+export function getDeadStockStrongAdminMarkerLabel(
+  isAdmin: boolean,
+  info?: DeadStockInfo | null
+): string | null {
+  return isAdmin && info?.candidate ? 'MRTAV LAGER' : null;
 }
 
 export function getDeadStockAdminBadgeText(
@@ -165,18 +147,15 @@ export function buildDeadStockUiState(params: {
   currentPrice: number;
 }): DeadStockUiState {
   const { info, isAdmin, partnerDiscount, currentPrice } = params;
-  const badgeLabel = getDeadStockBadgeLabel(info);
-  const marketingLabel = getDeadStockMarketingLabel(info);
-  const isClearance = isDeadStockClearance(info);
+  const strongAdminMarkerLabel = getDeadStockStrongAdminMarkerLabel(isAdmin, info);
   const adminBadgeText = getDeadStockAdminBadgeText(isAdmin, info);
   const regularPrice = getDeadStockRegularPrice(info);
   const showReferencePrice = showDeadStockReferencePrice(info, currentPrice);
   const discountPercent = getDeadStockDiscountPercent(info, partnerDiscount, currentPrice);
 
   return {
-    badgeLabel,
-    marketingLabel,
-    isClearance,
+    strongAdminMarkerLabel,
+    highlightAdminCandidate: !!strongAdminMarkerLabel,
     adminBadgeText,
     regularPrice,
     showReferencePrice,

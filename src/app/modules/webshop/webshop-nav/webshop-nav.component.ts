@@ -70,6 +70,8 @@ export class WebshopNavComponent implements OnChanges {
   @Input() filter = new Filter();
   @Input() searchTerm = '';
   @Input() searchRoute: string | any[] = ['/webshop'];
+  @Input() showCategoriesButton = true;
+  @Input() showVehicleSelector = true;
   @Input() selectedVehicle: TDVehicleDetails | null = null;
   @Input() customBreadcrumbs: WebshopNavBreadcrumbs | null = null;
   @Output() selectedVehicleDetailsEmit = new EventEmitter<TDVehicleDetails>();
@@ -110,6 +112,18 @@ export class WebshopNavComponent implements OnChanges {
       this.categories = config.categories;
       this.manufacturers = config.brands;
     });
+  }
+
+  get toolbarGridTemplateColumns(): string {
+    const columns: string[] = [];
+    if (this.showVehicleSelector) {
+      columns.push('auto');
+    }
+    columns.push('1fr');
+    if (this.showCategoriesButton) {
+      columns.push('auto');
+    }
+    return columns.join(' ');
   }
 
   /** Angular lifecycle hooks start */

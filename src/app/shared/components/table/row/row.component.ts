@@ -405,16 +405,12 @@ export class RowComponent implements OnInit, OnChanges {
     });
   }
 
-  get deadStockBadgeLabel(): string | null {
-    return this.deadStockUi.badgeLabel;
+  get deadStockStrongAdminMarkerLabel(): string | null {
+    return this.deadStockUi.strongAdminMarkerLabel;
   }
 
-  get deadStockMarketingLabel(): string | null {
-    return this.deadStockUi.marketingLabel;
-  }
-
-  get isDeadStockClearance(): boolean {
-    return this.deadStockUi.isClearance;
+  get hasStrongDeadStockAdminMarker(): boolean {
+    return this.deadStockUi.highlightAdminCandidate;
   }
 
   get deadStockAdminBadgeText(): string | null {
