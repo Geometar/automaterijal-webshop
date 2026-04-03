@@ -8,6 +8,7 @@ Frontend mrtav lager V1 surfaces currently include:
 
 - admin entry in navigation for `/admin/dead-stock`
 - admin-only marker in shared product row/card/detail surfaces
+- `/admin/dead-stock` as a regular filtered webshop browse for admins only
 - technical compatibility route `/webshop/akcije-rasprodaja` that is not promoted in customer UI
 
 For business rules and backend/FE contract, use backend docs:

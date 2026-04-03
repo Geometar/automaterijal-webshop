@@ -31,13 +31,6 @@ export function getDeadStockAdminBadgeText(
   if (lastSaleDate) {
     parts.push(`Posl. prodaja ${lastSaleDate}`);
   }
-  if (info?.suppressedForCustomer) {
-    parts.push(
-      info?.overrideUpdatedByName
-        ? `Kupcu sakrio ${info.overrideUpdatedByName}`
-        : 'Skriveno za kupca'
-    );
-  }
 
   return parts.join(' • ');
 }

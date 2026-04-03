@@ -1762,13 +1762,10 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     const inStock = (roba.stanje ?? 0) > 0;
     const group = this.normalizeWhitespace(roba.grupaNaziv);
     const subgroup = this.normalizeWhitespace(roba.podGrupaNaziv);
-    const salePrefix = this.buildSaleSeoTitlePrefix(roba);
-    const saleDescriptionLead = this.buildSaleSeoDescriptionLead(roba);
-
     // Title
     const baseTitle = [brand, name].filter(Boolean).join(' ');
     const productTitle = sku ? `${baseTitle} (${sku})` : baseTitle;
-    const title = `${salePrefix ? `${salePrefix} | ` : ''}${productTitle || 'Proizvod'} | Automaterijal`;
+    const title = `${productTitle || 'Proizvod'} | Automaterijal`;
 
     const baseDescription = this.buildMetaDescription({
       brand,
@@ -1781,9 +1778,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       specs: roba.tehnickiOpis || [],
       linkedManufacturers: this.getLinkedManufacturersSnippet(),
     });
-    const description = saleDescriptionLead
-      ? this.normalizeWhitespace(`${saleDescriptionLead} ${baseDescription}`).slice(0, 158)
-      : baseDescription;
+    const description = baseDescription;
 
     const { url } = this.buildCanonical(roba);
 
@@ -1883,22 +1878,6 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       itemListElement: items,
     };
     this.seoService.updateJsonLd(breadcrumbsJsonLd, 'jsonld-breadcrumbs');
-  }
-
-  private buildSaleSeoTitlePrefix(roba: Roba): string | null {
-    if (!roba.deadStockInfo?.matched) {
-      return null;
-    }
-
-    return null;
-  }
-
-  private buildSaleSeoDescriptionLead(roba: Roba): string | null {
-    if (!roba.deadStockInfo?.matched) {
-      return null;
-    }
-
-    return 'Snižena cena iz internog mrtav lager modela.';
   }
 
   get primaryImageMeta(): ProductImageMeta {

@@ -23,6 +23,23 @@ describe('dead-stock-ui', () => {
     expect(state.adminBadgeText).toContain('Posl. prodaja 15.01.2025.');
   });
 
+  it('does not surface suppression or override status in v1 admin note', () => {
+    const state = buildDeadStockUiState({
+      info: {
+        ...candidateInfo,
+        suppressedForCustomer: true,
+        overrideUpdatedByName: 'Admin Test',
+      },
+      isAdmin: true,
+      partnerDiscount: 0,
+      currentPrice: 1000,
+    });
+
+    expect(state.adminBadgeText).toBe('420 dana bez prodaje • Posl. prodaja 15.01.2025.');
+    expect(state.adminBadgeText).not.toContain('Skriveno');
+    expect(state.adminBadgeText).not.toContain('Kupcu sakrio');
+  });
+
   it('does not expose strong admin marker to customer', () => {
     const state = buildDeadStockUiState({
       info: candidateInfo,
