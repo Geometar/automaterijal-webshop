@@ -15,7 +15,7 @@ describe('WebshopRobaComponent', () => {
       proizvodjaci: ['BOSCH'],
     } as Filter;
 
-    expect(component.activeChips).toEqual(['Pretraga: “filter”', 'Proizvođači: 1']);
+    expect(component.activeChips).toEqual(['Pretraga: “filter”', 'Proizvođači: BOSCH']);
 
     component.resetSearchTerm();
     component.clearAllFilters();

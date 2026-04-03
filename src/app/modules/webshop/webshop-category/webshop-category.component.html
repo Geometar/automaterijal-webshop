@@ -1,16 +1,25 @@
-<!-- Mobile FAB -->
-<autom-button
-  *ngIf="isMobileView && !openFilterPopup"
-  class="mobile-filter-btn"
-  [iconColor]="colorEnum.INFO_25"
-  [iconPrefix]="true"
-  [iconSource]="iconEnums.FILTER"
-  [label]="'Filteri'"
-  [theme]="buttonThemes.DEFAULT"
-  [type]="buttonTypes.PRIMARY"
-  (clickEvent)="openFilterPopup = true"
->
-</autom-button>
+<div *ngIf="isMobileView && !openFilterPopup" class="mobile-filter-bar">
+  <button
+    class="mobile-filter-trigger"
+    type="button"
+    (click)="openFilterPopup = true"
+  >
+    <span class="mobile-filter-trigger__copy">
+      <span class="mobile-filter-trigger__title">Filteri</span>
+      <span class="mobile-filter-trigger__meta">{{ resultSummaryLabel }}</span>
+    </span>
+
+    <span class="mobile-filter-trigger__count" *ngIf="hasActiveFilters && !loading">
+      {{ activeFilterCount }}
+    </span>
+  </button>
+
+  <div class="mobile-filter-bar__chips" *ngIf="hasActiveFilters">
+    <span class="sidebar-chip" *ngFor="let chip of summaryChips">
+      {{ chip }}
+    </span>
+  </div>
+</div>
 
 <!-- DESKTOP SIDEBAR -->
 <div
@@ -22,7 +31,38 @@
   "
   class="sidebar"
 >
-  <div class="filter-section">
+  <div class="sidebar-panel">
+    <div class="sidebar-header">
+      <div>
+        <p class="sidebar-kicker">Pretraga kataloga</p>
+        <h2 class="sidebar-title">Filteri</h2>
+        <p class="sidebar-meta">Suzi izbor po dostupnosti, kategoriji i proizvođaču.</p>
+      </div>
+
+      <button
+        class="sidebar-reset"
+        type="button"
+        *ngIf="hasActiveFilters"
+        (click)="resetFilters()"
+      >
+        Obriši sve
+      </button>
+    </div>
+
+    <div class="sidebar-summary" *ngIf="hasActiveFilters">
+      <div class="sidebar-summary__head">
+        <span>Aktivni filteri</span>
+        <span class="sidebar-summary__count">{{ activeFilterCount }}</span>
+      </div>
+
+      <div class="sidebar-summary__chips">
+        <span class="sidebar-chip" *ngFor="let chip of summaryChips">
+          {{ chip }}
+        </span>
+      </div>
+    </div>
+
+    <div class="filter-section">
     <!-- Availability -->
     <div class="filter-card" [class.collapsed]="isCollapsed('availability')">
       <button
@@ -116,6 +156,7 @@
         </manufacture-filter>
       </div>
     </div>
+    </div>
   </div>
 </div>
 
@@ -142,6 +183,30 @@
   </div>
 
   <div custom-body class="page-details__body">
+    <div class="mobile-summary" *ngIf="resultCount || hasActiveFilters">
+      <div class="mobile-summary__top">
+        <div>
+          <p class="sidebar-kicker">Pretraga kataloga</p>
+          <p class="sidebar-meta">{{ resultSummaryLabel }}</p>
+        </div>
+
+        <button
+          class="sidebar-reset"
+          type="button"
+          *ngIf="hasActiveFilters"
+          (click)="resetFilters()"
+        >
+          Obriši sve
+        </button>
+      </div>
+
+      <div class="sidebar-summary__chips" *ngIf="hasActiveFilters">
+        <span class="sidebar-chip" *ngFor="let chip of summaryChips">
+          {{ chip }}
+        </span>
+      </div>
+    </div>
+
     <div class="filter-card">
       <button
         class="section-title"
@@ -198,6 +263,19 @@
         class="section-body"
         [class.collapsed]="isCollapsed('manufacturers')"
       >
+        <div
+          class="filter-prefilter"
+          *ngIf="manufactures?.length ?? 0 > 7"
+        >
+          <autom-input-fields
+            [placeholder]="'Pretraži proizvođače...'"
+            [suffixIcon]="iconEnums.FILTER"
+            [type]="inputTypeEnum.SEARCH"
+            (emitSelected)="preFilterManufactures($event)"
+          >
+          </autom-input-fields>
+        </div>
+
         <manufacture-filter
           [manufactures]="manufacturesModels"
           [selected]="filter.proizvodjaci || []"

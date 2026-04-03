@@ -43,11 +43,11 @@
         <div class="gc-h__tools">
           <span
             class="gc-badge"
-            *ngIf="task.subtasks?.length"
+            *ngIf="countSelected(task) > 0"
             [attr.aria-label]="badgeAria(task)"
             [matTooltip]="badgeAria(task)"
           >
-            {{ countSelected(task) }}/{{ countTotal(task) }}
+            {{ countSelected(task) }}
           </span>
 
           <button

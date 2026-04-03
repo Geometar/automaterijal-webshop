@@ -186,7 +186,9 @@ export class CheckboxGroupComponent {
   badgeAria(task: Task): string {
     const selected = this.countSelected(task);
     const total = this.countTotal(task);
-    return `Izabrano ${selected} od ${total}`;
+    return selected > 0
+      ? `Izabrano ${selected} od ${total}`
+      : `${total} stavki u grupi`;
   }
 
   private resolveInitialExpand(item: Task, currentMap: Map<Task['id'], boolean>): boolean {
