@@ -78,6 +78,12 @@ import {
   splitWarehouseQuantityForFlow,
   shouldForceCombinedProviderAvailabilityBox,
 } from '../../../shared/utils/availability-utils';
+import {
+  buildDeadStockUiState,
+  buildOldPriceFromDiscount,
+  buildSavingsAmount,
+  parsePricingPercent,
+} from '../../../shared/utils/dead-stock-ui';
 
 // Services
 import { AccountStateService } from '../../../shared/service/state/account-state.service';
@@ -124,7 +130,7 @@ interface SpecEntry {
     TextAreaComponent,
     ProviderAvailabilityComponent,
     DividerComponent,
-    ShowcaseComponent
+    ShowcaseComponent,
   ],
   providers: [CurrencyPipe],
   templateUrl: './webshop-details.component.html',
@@ -197,7 +203,16 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   }
 
   get hasDiscount(): boolean {
-    return this.availabilityVm.showDiscount;
+    return this.availabilityVm.showDiscount || this.showDeadStockReferencePrice;
+  }
+
+  private get deadStockUi() {
+    return buildDeadStockUiState({
+      info: this.data?.deadStockInfo,
+      isAdmin: this.isAdmin,
+      partnerDiscount: this.getDiscountValue(),
+      currentPrice: Number(this.displayPrice),
+    });
   }
 
   get discountValue(): number {
@@ -205,24 +220,16 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   }
 
   get oldPrice(): number | null {
-    if (!this.hasDiscount) return null;
-    const price = this.getPrice();
-    const rabat = this.getDiscountValue();
-    const denom = 1 - rabat / 100;
-    if (price <= 0 || denom <= 0) {
-      return null;
+    if (this.showDeadStockReferencePrice) {
+      return this.deadStockRegularPrice;
     }
-    return price / denom;
+    if (!this.hasDiscount) return null;
+    return buildOldPriceFromDiscount(this.getPrice(), this.getDiscountValue());
   }
 
   get savings(): number | null {
     if (!this.hasDiscount) return null;
-    const price = this.getPrice();
-    const oldPrice = this.oldPrice;
-    if (!oldPrice || price <= 0) {
-      return null;
-    }
-    return oldPrice - price;
+    return buildSavingsAmount(this.getPrice(), this.oldPrice);
   }
 
   private getPrice(): number {
@@ -230,9 +237,31 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   }
 
   private getDiscountValue(): number {
-    const raw = (this.data as any)?.rabat;
-    const n = Number(raw);
-    return Number.isFinite(n) ? n : 0;
+    return parsePricingPercent((this.data as any)?.rabat);
+  }
+
+  get deadStockStrongAdminMarkerLabel(): string | null {
+    return this.deadStockUi.strongAdminMarkerLabel;
+  }
+
+  get hasStrongDeadStockAdminMarker(): boolean {
+    return this.deadStockUi.highlightAdminCandidate;
+  }
+
+  get deadStockAdminBadgeText(): string | null {
+    return this.deadStockUi.adminBadgeText;
+  }
+
+  get deadStockRegularPrice(): number | null {
+    return this.deadStockUi.regularPrice;
+  }
+
+  get showDeadStockReferencePrice(): boolean {
+    return this.deadStockUi.showReferencePrice;
+  }
+
+  get deadStockDiscountLabel(): string | null {
+    return this.deadStockUi.discountLabel;
   }
 
   // Specs
@@ -1228,6 +1257,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
   toggleTextEdit(): void {
     this.editingText = !this.editingText;
   }
+
   textChanged(event: string): void {
     this.data.tekst = event;
   }
@@ -1732,12 +1762,12 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
     const inStock = (roba.stanje ?? 0) > 0;
     const group = this.normalizeWhitespace(roba.grupaNaziv);
     const subgroup = this.normalizeWhitespace(roba.podGrupaNaziv);
-
     // Title
     const baseTitle = [brand, name].filter(Boolean).join(' ');
-    const title = sku ? `${baseTitle} (${sku}) | Automaterijal` : `${baseTitle} | Automaterijal`;
+    const productTitle = sku ? `${baseTitle} (${sku})` : baseTitle;
+    const title = `${productTitle || 'Proizvod'} | Automaterijal`;
 
-    const description = this.buildMetaDescription({
+    const baseDescription = this.buildMetaDescription({
       brand,
       name,
       sku,
@@ -1748,6 +1778,7 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       specs: roba.tehnickiOpis || [],
       linkedManufacturers: this.getLinkedManufacturersSnippet(),
     });
+    const description = baseDescription;
 
     const { url } = this.buildCanonical(roba);
 
@@ -1817,19 +1848,21 @@ export class WebshopDetailsComponent implements OnInit, OnDestroy {
       { '@type': 'ListItem', position: 1, name: 'Webshop', item: `${base}/webshop` },
     ];
     if (group) {
+      const groupUrl = this.urlHelperService.buildCategoryUrl(group);
       items.push({
         '@type': 'ListItem',
         position: items.length + 1,
         name: group,
-        item: `${base}/webshop?grupa=${encodeURIComponent(group)}`,
+        item: `${base}${groupUrl}`,
       });
     }
     if (subgroup) {
+      const subgroupUrl = this.urlHelperService.buildCategoryUrl(group || undefined, subgroup);
       items.push({
         '@type': 'ListItem',
         position: items.length + 1,
         name: subgroup,
-        item: `${base}/webshop?grupa=${encodeURIComponent(group || '')}&podgrupa=${encodeURIComponent(subgroup)}`,
+        item: `${base}${subgroupUrl}`,
       });
     }
     items.push({

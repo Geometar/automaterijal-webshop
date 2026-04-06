@@ -3,7 +3,7 @@
   <checkbox-group
     class="filter-selection grouped-checkbox"
     [items]="tasks"
-    [label]="'Kategorije'"
+    [label]="''"
     [rememberExpansion]="false"
     (clickEvent)="emitSelectedSubgroups($event)"
   >
@@ -15,7 +15,7 @@
   <autom-select
     *ngIf="selectReady"
     class="filter-selection"
-    [label]="'Kategorije'"
+    [label]="''"
     [placeholder]="'Izaberi kategoriju'"
     [selectedValue]="selectedOption"
     [selectionList]="selectOptions"

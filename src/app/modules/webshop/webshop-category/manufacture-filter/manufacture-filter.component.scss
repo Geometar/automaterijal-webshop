@@ -1,337 +1,161 @@
-/* Sidebar shell */
-.sidebar {
-  width: 320px;
-  position: sticky;
-  top: 68px; /* uskladi sa visinom headera */
-  align-self: flex-start;
-}
-
-/* Vertical rhythm */
-.filter-section {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin-bottom: 80px;
-}
-
-/* Card */
-.filter-card {
-  background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 12px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-  overflow: hidden;
-
-  &:hover {
-    border-color: rgba(0, 0, 0, 0.12);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-  }
-}
-
-/* Section header (clickable) */
-.section-title {
-  width: 100%;
-  display: grid;
-  grid-template-columns: 1fr auto 14px; /* label | chip | chevron */
-  align-items: center;
-  gap: 8px;
-  padding: 12px;
-  font-weight: 700;
-  font-size: 14px;
-  color: #0f172a;
-  background: linear-gradient(#fff, #fbfbfb);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  cursor: pointer;
-
-  .count-chip {
-    justify-self: end;
-    padding: 2px 8px;
-    border-radius: 999px;
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--figma-primary-700);
-    background: color-mix(in oklab, var(--figma-primary-700) 10%, #fff);
-    border: 1px solid color-mix(in oklab, var(--figma-primary-700) 30%, #fff);
-  }
-
-  .chevron {
-    width: 8px;
-    height: 8px;
-    border-right: 2px solid #94a3b8;
-    border-bottom: 2px solid #94a3b8;
-    transform: rotate(-45deg);
-    transition: transform 0.2s ease;
-
-    &.expanded {
-      transform: rotate(45deg);
-    }
-  }
-}
-
-/* Section body */
-.section-body {
-  padding: 10px 12px 12px;
-  transition: max-height 0.25s ease, padding 0.2s ease;
-
-  .filter-container {
-    padding-top: 4px;
-  }
-}
-
-/* Collapsed */
-.filter-card.collapsed .section-body,
-.section-body.collapsed {
-  padding-top: 0;
-  padding-bottom: 0;
-  max-height: 0;
-  overflow: hidden;
-}
-
-/* Prefilter spacing */
-.filter-prefilter {
-  margin-bottom: 4px;
-}
-
-/* Inner option hover */
-::ng-deep category-filter .option,
-::ng-deep manufacture-filter .option {
-  padding: 6px;
-  border-radius: 8px;
-  transition: background 0.12s ease;
-
-  &:hover {
-    background: #f8fafc;
-  }
-}
-
-/* Tall lists get own scroll */
-::ng-deep category-filter,
-::ng-deep manufacture-filter {
-  max-height: 380px;   /* <-- visina vidljivog dela */
-  overflow-y: auto;    /* <-- pojavi se scroll samo kad pređe */
+:host {
   display: block;
 }
 
-/* Scrollbar styling */
-::ng-deep category-filter::-webkit-scrollbar,
-::ng-deep manufacture-filter::-webkit-scrollbar {
-  width: 8px;
-}
-::ng-deep category-filter::-webkit-scrollbar-thumb,
-::ng-deep manufacture-filter::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.18);
-  border-radius: 4px;
-}
-
-.mf-actions {
-  display: flex;
-  gap: 10px;
-  justify-content: space-between;
-  margin-top: 10px;
-}
-
-.mf-more,
-.mf-less {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 13px;
-}
-
-.mf-more {
-  flex: 1;
-  justify-content: center;
-  padding: 8px 12px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--figma-primary-50) 85%, #fff);
-  color: var(--figma-primary-700);
-  border: 1px solid color-mix(in srgb, var(--figma-primary-200) 70%, #fff);
-  transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
-
-  &:hover {
-    background: color-mix(in srgb, var(--figma-primary-100) 85%, #fff);
-    border-color: var(--figma-primary-300);
-    transform: translateY(-1px);
-  }
-}
-
-.mf-more__icon,
-.mf-less__icon {
-  display: inline-flex;
-  align-items: center;
-  .autom-icon {
-    width: 16px;
-    height: 16px;
-  }
-}
-
-.mf-more__count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 26px;
-  height: 18px;
-  padding: 0 6px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 700;
-  color: #fff;
-  background: var(--figma-primary-600);
-}
-
-.mf-less {
-  color: var(--figma-grey-600);
-
-  &:hover {
-    color: var(--figma-grey-800);
-  }
-}
-
-/* Mobile FAB */
-.mobile-filter-btn {
-  background: var(--figma-primary-600);
-  border-radius: 9999px !important;
-  bottom: 72px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
-  font-weight: 700;
-  height: 43px;
-  padding: 4px 11px;
-  position: fixed;
-  right: 16px;
-  transition: transform 0.2s ease, background-color 0.2s ease;
-  z-index: 100;
-
-  &:hover {
-    transform: translateY(-2px);
-  }
-  &:active {
-    transform: scale(0.98);
-  }
-}
-
-/* Mobile popup layout */
-.mobile-filters {
-  .page-details__body {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    margin-left: auto;
-    margin-right: auto;
-    max-height: calc(100vh - 100px);
-    overflow-y: auto;
-    padding: 16px 16px 90px;
-
-    .filter-buttons {
-      position: sticky;
-      bottom: 0;
-      background: linear-gradient(to top, #fff, rgba(255, 255, 255, 0.92));
-      padding-top: 10px;
-      display: flex;
-      gap: 50px;
-      margin: 0 auto;
-
-      autom-button {
-        flex: 1;
-      }
-    }
-  }
-}
-
-/* Responsive */
-@media (max-width: 991px) {
-  .sidebar {
-    position: static;
-    width: 100%;
-    padding: 8px 12px;
-  }
-  .filter-section {
-    gap: 12px;
-    margin-bottom: 40px;
-  }
-}
-/* Manufacture filter card */
 .mf-card {
   display: flex;
   flex-direction: column;
-  padding: 14px 16px 16px;
-  background: #fff;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
-}
-
-.mf-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   gap: 12px;
-  margin-bottom: 12px;
 }
 
-.mf-title {
-  display: inline-flex;
+.mf-toolbar {
   align-items: center;
-  gap: 8px;
-  font-size: 14px;
+  background: #f8fafc;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 14px;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 10px 12px;
+}
+
+.mf-selection {
+  align-items: center;
+  color: #334155;
+  display: inline-flex;
+  font-size: 13px;
   font-weight: 700;
-  color: #0f172a;
+  gap: 8px;
 }
 
 .mf-count {
-  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  min-width: 24px;
-  height: 18px;
-  padding: 0 6px;
+  background: rgba(37, 99, 235, 0.1);
   border-radius: 999px;
+  color: var(--figma-primary-700);
+  display: inline-flex;
   font-size: 11px;
-  font-weight: 700;
-  color: #fff;
-  background: var(--figma-primary-600);
+  font-weight: 800;
+  height: 22px;
+  justify-content: center;
+  min-width: 22px;
+  padding: 0 7px;
 }
 
 .mf-clear {
-  border: none;
-  background: none;
-  color: var(--figma-primary-600);
-  font-size: 12px;
-  font-weight: 600;
+  background: transparent;
+  border: 0;
+  color: var(--figma-primary-700);
   cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 0;
 
   &:hover {
-    color: var(--figma-primary-700);
+    color: var(--figma-primary-800);
   }
+}
+
+.filter-selection {
+  display: block;
+}
+
+::ng-deep .filter-selection .autom-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+::ng-deep .filter-selection .autom-checkbox {
+  border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+  margin: 0;
+  padding: 9px 0;
+}
+
+::ng-deep .filter-selection .autom-checkbox:last-child {
+  border-bottom: 0;
 }
 
 .mf-selected-chips {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-bottom: 12px;
 }
 
 .mf-chip-selected {
-  border: none;
-  background: color-mix(in srgb, var(--figma-primary-50) 70%, #fff);
-  color: #0f172a;
-  font-weight: 600;
-  border-radius: 999px;
-  padding: 4px 10px;
-  display: inline-flex;
   align-items: center;
-  gap: 6px;
+  background: #eff6ff;
+  border: 0;
+  border-radius: 999px;
+  color: #0f172a;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 700;
+  gap: 6px;
+  padding: 6px 10px;
 
   .x {
+    color: var(--figma-primary-700);
     font-size: 14px;
     line-height: 1;
-    color: var(--figma-primary-600);
   }
+}
+
+.mf-actions {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+.mf-more,
+.mf-less {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: #475569;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 700;
+  gap: 6px;
+  padding: 0;
+}
+
+.mf-more {
+  background: rgba(37, 99, 235, 0.08);
+  border: 1px solid rgba(37, 99, 235, 0.14);
+  border-radius: 999px;
+  color: var(--figma-primary-700);
+  justify-content: center;
+  padding: 10px 14px;
+
+  &:hover {
+    background: rgba(37, 99, 235, 0.12);
+  }
+}
+
+.mf-less:hover {
+  color: #0f172a;
+}
+
+.mf-more__icon,
+.mf-less__icon {
+  display: inline-flex;
+}
+
+.mf-more__count {
+  align-items: center;
+  background: var(--figma-primary-600);
+  border-radius: 999px;
+  color: #fff;
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 800;
+  height: 18px;
+  justify-content: center;
+  min-width: 18px;
+  padding: 0 5px;
 }

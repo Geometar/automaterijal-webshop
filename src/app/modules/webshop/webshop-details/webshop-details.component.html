@@ -1,6 +1,9 @@
 <section class="section" [class.section--loading]="loading">
   <ng-container *ngIf="!loading; else productSkeleton">
-    <div class="product-container">
+    <div
+      class="product-container"
+      [class.product-container--dead-stock-admin]="hasStrongDeadStockAdminMarker"
+    >
       <div class="product-header">
         <div class="product-heading">
           <h1 class="product-title" aria-label="Naziv proizvoda">
@@ -8,6 +11,12 @@
           </h1>
           <p class="product-article" *ngIf="data.katbr">
             Kat br: {{ data.katbr }}
+          </p>
+          <p class="product-article product-article--admin-strong" *ngIf="deadStockStrongAdminMarkerLabel">
+            {{ deadStockStrongAdminMarkerLabel }}
+          </p>
+          <p class="product-article product-article--admin-signal" *ngIf="deadStockAdminBadgeText">
+            {{ deadStockAdminBadgeText }}
           </p>
         </div>
         <autom-button
@@ -186,7 +195,7 @@
               >
                 <div class="price-row" *ngIf="hasDiscount">
                   <span class="old-price">{{ oldPrice! | rsdCurrency }}</span>
-                  <span class="discount-badge">-{{ discountValue }}%</span>
+                  <span class="discount-badge">{{ deadStockDiscountLabel || ('-' + discountValue + '%') }}</span>
                 </div>
                 <div class="price">{{ displayPrice | rsdCurrency }}</div>
                 <div class="note">cena po komadu</div>

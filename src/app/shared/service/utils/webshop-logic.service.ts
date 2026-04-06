@@ -17,6 +17,7 @@ export class WebshopLogicService {
     filter.naStanju = params['naStanju'] === 'true' || params['dostupno'] === 'true';
     filter.podgrupe = this.parseArrayParam(params['podgrupe']);
     filter.proizvodjaci = this.parseArrayParam(params['proizvodjaci']);
+    filter.deadStock = params['deadStock'] === 'true';
     const filterBy = this.parseFilterBy(params['filterBy']);
     if (filterBy) {
       filter.filterBy = filterBy;

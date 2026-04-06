@@ -1,7 +1,9 @@
 <section class="webshop header-margin--top">
   <webshop-nav
     [assemblyGroupName]="assemblyGroupName"
+    [customBreadcrumbs]="customBreadcrumbs"
     [filter]="filter"
+    [searchRoute]="isDeadStockLanding ? ['/webshop/akcije-rasprodaja'] : ['/webshop']"
     [searchTerm]="searchTerm"
     [selectedVehicle]="selectedVehicleDetails"
     (selectedVehicleDetailsEmit)="selectVehicleDetailsEventHandle($event)"

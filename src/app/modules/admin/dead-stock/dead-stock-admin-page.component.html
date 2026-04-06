@@ -1,0 +1,21 @@
+<section class="header-margin--top dead-stock-admin-page">
+  <webshop-nav
+    [customBreadcrumbs]="customBreadcrumbs"
+    [filter]="filter"
+    [searchRoute]="['/admin/dead-stock']"
+    [searchTerm]="searchTerm"
+    [showCategoriesButton]="false"
+    [showVehicleSelector]="false"
+  ></webshop-nav>
+
+  <webshop-roba
+    [disableCategoryNavigation]="true"
+    [filter]="filter"
+    [loading]="loading"
+    [magacin]="magacin"
+    [pageIndex]="pageIndex"
+    [pageSize]="pageSize"
+    [searchTerm]="searchTerm"
+    (emitTablePage)="handleTablePageEvent($event)"
+  ></webshop-roba>
+</section>

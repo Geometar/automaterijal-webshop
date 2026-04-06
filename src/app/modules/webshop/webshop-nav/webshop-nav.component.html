@@ -6,8 +6,13 @@
   >
     <div class="nav-wrap">
       <!-- Toolbar -->
-      <div class="nav-toolbar" role="search">
+      <div
+        class="nav-toolbar"
+        role="search"
+        [style.grid-template-columns]="toolbarGridTemplateColumns"
+      >
         <autom-button
+          *ngIf="showVehicleSelector"
           class="nav-btn-webshop"
           [iconSource]="'car'"
           [iconPrefix]="true"
@@ -39,6 +44,7 @@
         </div>
 
         <autom-button
+          *ngIf="showCategoriesButton"
           class="nav-btn-webshop"
           [iconSource]="iconEnum.LIST"
           [iconPrefix]="true"
@@ -49,6 +55,7 @@
           (clickEvent)="openCategories()"
         >
         </autom-button>
+
       </div>
 
       <!-- Breadcrumbs -->

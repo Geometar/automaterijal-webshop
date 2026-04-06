@@ -19,6 +19,7 @@ const RAW_PARAM_NAMES = [
   'pretrazitiGrupe',
   'paged',
   'showcase',
+  'deadStock',
   'assembleGroupId',
   'assemblyGroupId',
   'tecdocTargetId',

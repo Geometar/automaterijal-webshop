@@ -1,5 +1,6 @@
 <div
   class="product-card"
+  [class.product-card--dead-stock-admin]="hasStrongDeadStockAdminMarker"
   role="button"
   tabindex="0"
   [attr.aria-label]="
@@ -8,7 +9,12 @@
   [attr.aria-disabled]="!canNavigateToDetails ? 'true' : null"
 >
   <!-- Badge: popust (gore desno) -->
-  <div class="discount-badge" *ngIf="showDiscount">-{{ discountLabel }}%</div>
+  <div
+    class="discount-badge"
+    *ngIf="showDiscount && (deadStockDiscountLabel || discountLabel)"
+  >
+    {{ deadStockDiscountLabel || ('-' + discountLabel + '%') }}
+  </div>
 
   <!-- Ikonica: u korpi (gore levo) -->
   <div
@@ -50,11 +56,17 @@
     </h3>
 
     <p class="product-katbr" *ngIf="roba.katbr">Kat. broj: {{ roba.katbr }}</p>
+    <p class="product-katbr product-katbr--admin-strong" *ngIf="deadStockStrongAdminMarkerLabel">
+      {{ deadStockStrongAdminMarkerLabel }}
+    </p>
     <p
       class="product-katbr product-katbr--core"
       *ngIf="availabilityVm.provider.coreCharge"
     >
       Kaucija: {{ availabilityVm.provider.coreCharge | rsdCurrency }}
+    </p>
+    <p class="product-katbr product-katbr--admin-signal" *ngIf="deadStockAdminBadgeText">
+      {{ deadStockAdminBadgeText }}
     </p>
   </div>
 

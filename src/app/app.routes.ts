@@ -126,6 +126,11 @@ export const routes: Routes = [
       import('./modules/webshop/webshop.component').then((m) => m.WebshopComponent)
   },
   {
+    path: 'webshop/akcije-rasprodaja',
+    loadComponent: () =>
+      import('./modules/webshop/webshop.component').then((m) => m.WebshopComponent)
+  },
+  {
     path: 'webshop/:id',
     loadComponent: () =>
       import('./modules/webshop/webshop-details/webshop-details.component').then((m) => m.WebshopDetailsComponent)
@@ -183,6 +188,12 @@ export const routes: Routes = [
     path: 'admin/provider-backlog',
     loadComponent: () =>
       import('./modules/admin/provider-backlog/provider-backlog.component').then((m) => m.ProviderBacklogComponent),
+    canActivate: [adminGuard]
+  },
+  {
+    path: 'admin/dead-stock',
+    loadComponent: () =>
+      import('./modules/admin/dead-stock/dead-stock-admin-page.component').then((m) => m.DeadStockAdminPageComponent),
     canActivate: [adminGuard]
   },
   {

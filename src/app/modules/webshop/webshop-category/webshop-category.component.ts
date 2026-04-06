@@ -59,7 +59,7 @@ export enum FilterEnum {
     ManufactureFilterComponent,
     ButtonComponent,
     PopupComponent,
-    AutomIconComponent
+    AutomIconComponent,
   ],
   templateUrl: './webshop-category.component.html',
   styleUrl: './webshop-category.component.scss',
@@ -68,7 +68,9 @@ export enum FilterEnum {
 export class WebshopCategoryComponent implements OnChanges, OnInit {
   @Input() categories: any = null;
   @Input() filter: Filter = new Filter();
+  @Input() loading = false;
   @Input() manufactures: Manufacture[] | undefined = [];
+  @Input() resultCount = 0;
 
   // Misc
   openCategoriesFilters = true;
@@ -177,6 +179,7 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
       naStanju: isAvailable,
     });
   }
+
   // End of: Emit handle
 
   preFilterManufactures(filterTerm: string): void {
@@ -190,6 +193,7 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
       key: m.proid!,
       checked: selected.includes(m.proid!),
     }));
+
   }
 
   // --- Accordion state (persist to localStorage) ---
@@ -197,7 +201,7 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
   collapseState: Record<'availability' | 'categories' | 'manufacturers', boolean> = {
     availability: false,
     categories: false,
-    manufacturers: false
+    manufacturers: false,
   };
 
   // Restore persisted collapse on init
@@ -243,6 +247,35 @@ export class WebshopCategoryComponent implements OnChanges, OnInit {
   // Optional counters for chips (safe if arrays are missing)
   get selectedSubgroupsCount(): number { return this.filter?.podgrupe?.length || 0; }
   get selectedManufacturersCount(): number { return this.filter?.proizvodjaci?.length || 0; }
+  get hasActiveFilters(): boolean {
+    return this.activeFilterCount > 0;
+  }
+
+  get resultSummaryLabel(): string {
+    return this.loading ? 'Učitavanje...' : `${this.resultCount} rezultata`;
+  }
+
+  get activeFilterCount(): number {
+    return (this.filter?.naStanju ? 1 : 0) +
+      this.selectedSubgroupsCount +
+      this.selectedManufacturersCount;
+  }
+
+  get summaryChips(): string[] {
+    const chips: string[] = [];
+
+    if (this.filter?.naStanju) {
+      chips.push('Samo na stanju');
+    }
+    if (this.selectedSubgroupsCount) {
+      chips.push(`${this.selectedSubgroupsCount} kategorije`);
+    }
+    if (this.selectedManufacturersCount) {
+      chips.push(`${this.selectedManufacturersCount} proizvođača`);
+    }
+
+    return chips;
+  }
 
   // Reset (atomic URL update; zatvori mobilni popup)
   resetFilters(): void {

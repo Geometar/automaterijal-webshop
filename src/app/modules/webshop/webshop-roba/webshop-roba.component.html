@@ -2,71 +2,106 @@
   <webshop-category
     *ngIf="
       magacin &&
-      magacin.categories &&
-      magacin.proizvodjaci &&
-      magacin.proizvodjaci.length
+      (filter.deadStock ||
+        !!magacin.categories ||
+        !!magacin.proizvodjaci?.length)
     "
     [categories]="magacin.categories"
     [filter]="filter"
+    [loading]="loading"
     [manufactures]="magacin.proizvodjaci"
+    [resultCount]="resultCount"
   ></webshop-category>
-  <ng-container *ngIf="!loading; else tableSkeleton">
-    <autom-table
-      *ngIf="magacin?.robaDto?.content?.length"
-      [data]="magacin?.robaDto!"
-      [disableCategoryNavigation]="disableCategoryNavigation"
-      [filter]="filter"
-      [pageIndex]="pageIndex"
-      [pageSize]="pageSize"
-      (emitTablePage)="handleTablePageEvent($event)"
-    ></autom-table>
-  </ng-container>
-  <div
-    *ngIf="!magacin?.robaDto?.content?.length && !loading"
-    class="empty-state"
-  >
-    <div class="empty-card">
-      <div class="ill" aria-hidden="true">
-        <autom-icon [source]="iconEnum.SEARCH"></autom-icon>
+
+  <div class="results-column">
+    <div class="results-toolbar" *ngIf="hasResultsContext">
+      <div class="results-toolbar__head">
+        <div>
+          <p class="results-toolbar__kicker">Rezultati</p>
+          <h2 class="results-toolbar__title">{{ resultCount }} proizvoda</h2>
+        </div>
+
+        <div class="results-toolbar__actions">
+          <button
+            class="results-toolbar__action"
+            type="button"
+            *ngIf="hasAppliedFilters"
+            (click)="clearAllFilters()"
+          >
+            Obriši filtere
+          </button>
+          <button
+            class="results-toolbar__action results-toolbar__action--ghost"
+            type="button"
+            *ngIf="searchTerm?.trim()"
+            (click)="resetSearchTerm()"
+          >
+            Resetuj pretragu
+          </button>
+        </div>
       </div>
 
-      <h3 class="title">Nema rezultata</h3>
-
-      <p class="subtitle" *ngIf="searchTerm; else noSearchCopy">
-        Ne postoje rezultati za vašu pretragu
-        <strong>“{{ searchTerm }}”</strong>.
-      </p>
-      <ng-template #noSearchCopy>
-        <p class="subtitle">Nijedna stavka ne odgovara trenutnim filterima.</p>
-      </ng-template>
-
-      <!-- Active filters summary as chips -->
-      <div class="chips" *ngIf="activeChips?.length">
-        <span class="chip" *ngFor="let c of activeChips">{{ c }}</span>
+      <div class="results-toolbar__chips" *ngIf="activeChips?.length">
+        <span class="results-chip" *ngFor="let c of activeChips">{{ c }}</span>
       </div>
+    </div>
 
-      <!-- Quick hints -->
-      <ul class="hints">
-        <li>Pokušajte sa drugim ključnim rečima ili kataloškim brojem.</li>
-        <li>Obrišite filtere ili proširite kategorije.</li>
-        <li>Proverite da li je uključen prikaz dostupnih proizvoda.</li>
-      </ul>
+    <ng-container *ngIf="!loading; else tableSkeleton">
+      <autom-table
+        *ngIf="magacin?.robaDto?.content?.length"
+        [data]="magacin?.robaDto!"
+        [disableCategoryNavigation]="disableCategoryNavigation"
+        [filter]="filter"
+        [pageIndex]="pageIndex"
+        [pageSize]="pageSize"
+        (emitTablePage)="handleTablePageEvent($event)"
+      ></autom-table>
+    </ng-container>
 
-      <!-- Actions -->
-      <div class="actions">
-        <autom-button
-          [label]="'Obriši sve filtere'"
-          [type]="buttonTypes.PRIMARY"
-          [theme]="buttonThemes.DEFAULT"
-          (clickEvent)="clearAllFilters()"
-        ></autom-button>
+    <div
+      *ngIf="!magacin?.robaDto?.content?.length && !loading"
+      class="empty-state"
+    >
+      <div class="empty-card">
+        <div class="ill" aria-hidden="true">
+          <autom-icon [source]="iconEnum.SEARCH"></autom-icon>
+        </div>
 
-        <autom-button
-          [label]="'Resetuj pretragu'"
-          [type]="buttonTypes.SECONDARY"
-          [theme]="buttonThemes.LIGHT_ORANGE"
-          (clickEvent)="resetSearchTerm()"
-        ></autom-button>
+        <h3 class="title">Nema rezultata</h3>
+
+        <p class="subtitle" *ngIf="searchTerm; else noSearchCopy">
+          Ne postoje rezultati za vašu pretragu
+          <strong>“{{ searchTerm }}”</strong>.
+        </p>
+        <ng-template #noSearchCopy>
+          <p class="subtitle">Nijedna stavka ne odgovara trenutnim filterima.</p>
+        </ng-template>
+
+        <div class="chips" *ngIf="activeChips?.length">
+          <span class="chip" *ngFor="let c of activeChips">{{ c }}</span>
+        </div>
+
+        <ul class="hints">
+          <li>Pokušajte sa drugim ključnim rečima ili kataloškim brojem.</li>
+          <li>Obrišite filtere ili proširite kategorije.</li>
+          <li>Proverite da li je uključen prikaz dostupnih proizvoda.</li>
+        </ul>
+
+        <div class="actions">
+          <autom-button
+            [label]="'Obriši sve filtere'"
+            [type]="buttonTypes.PRIMARY"
+            [theme]="buttonThemes.DEFAULT"
+            (clickEvent)="clearAllFilters()"
+          ></autom-button>
+
+          <autom-button
+            [label]="'Resetuj pretragu'"
+            [type]="buttonTypes.SECONDARY"
+            [theme]="buttonThemes.LIGHT_ORANGE"
+            (clickEvent)="resetSearchTerm()"
+          ></autom-button>
+        </div>
       </div>
     </div>
   </div>

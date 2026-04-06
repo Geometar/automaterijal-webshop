@@ -45,6 +45,7 @@ import {
   HogwartsLetter,
 } from './hogwarts.lore';
 import { HOGWARTS_COMMERCE_LESSONS } from './hogwarts.commerce';
+import { HogwartsDeadStockComponent } from './dead-stock-admin/hogwarts-dead-stock.component';
 
 type StatusSeverity = 'critical' | 'warning';
 type ProviderSeverity = 'stable' | 'warning';
@@ -184,7 +185,7 @@ interface BludgerHit {
 @Component({
   selector: 'app-hogwarts',
   standalone: true,
-  imports: [CommonModule, AutomIconComponent, PopupComponent, MatSnackBarModule],
+  imports: [CommonModule, AutomIconComponent, PopupComponent, MatSnackBarModule, HogwartsDeadStockComponent],
   templateUrl: './hogwarts.component.html',
   styleUrl: './hogwarts.component.scss',
   encapsulation: ViewEncapsulation.None,
@@ -495,7 +496,6 @@ export class HogwartsComponent implements OnInit, OnDestroy {
   mappingListFilter = '';
   mappingModalOpen = false;
   mappingListLoading = false;
-
   constructor(
     private febiPriceAdminService: FebiPriceAdminService,
     private hogwartsAdminService: HogwartsAdminService,

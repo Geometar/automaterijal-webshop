@@ -2,6 +2,19 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.10.
 
+## Project notes
+
+Frontend mrtav lager V1 surfaces currently include:
+
+- admin entry in navigation for `/admin/dead-stock`
+- admin-only marker in shared product row/card/detail surfaces
+- `/admin/dead-stock` as a regular filtered webshop browse for admins only
+- technical compatibility route `/webshop/akcije-rasprodaja` that is not promoted in customer UI
+
+For business rules and backend/FE contract, use backend docs:
+
+- `../automaterijal/docs/30-dead-stock.md`
+
 ## Development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.

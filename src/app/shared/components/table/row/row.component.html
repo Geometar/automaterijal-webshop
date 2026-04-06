@@ -1,12 +1,15 @@
-<article class="row-container">
+<article
+  class="row-container"
+  [class.row-container--dead-stock-admin]="hasStrongDeadStockAdminMarker"
+>
   <!-- Image Section -->
   <div class="image-container" [class.image-smaller]="showPriceOnly">
     <!-- Popust badge -->
     <div
       class="discount-badge"
-      *ngIf="!isAdminCartView && !isTecDocOnly && data.rabat"
+      *ngIf="!isAdminCartView && !isTecDocOnly && showDiscount && (deadStockDiscountLabel || discountLabel)"
     >
-      -{{ data.rabat }}%
+      {{ deadStockDiscountLabel || ('-' + discountLabel + '%') }}
     </div>
 
     <img
@@ -167,6 +170,15 @@
         [attr.title]="'Procena isporuke za ovaj artikal.'"
         [ariaLabel]="'Isporuka ' + availabilityVm.provider.deliveryLabel"
       ></autom-meta-pill>
+
+      <autom-meta-pill
+        *ngIf="deadStockStrongAdminMarkerLabel"
+        class="product-meta__dead-stock dead-stock-pill"
+        variant="warning"
+        size="md"
+        [value]="deadStockStrongAdminMarkerLabel"
+        [ariaLabel]="deadStockStrongAdminMarkerLabel"
+      ></autom-meta-pill>
     </div>
 
     <div
@@ -182,6 +194,10 @@
         {{ availabilityVm.provider.warehouseSplit.beogradQuantity | number : '1.0-0' }}
       </span>
     </div>
+
+    <p *ngIf="deadStockAdminBadgeText" class="dead-stock-admin-note">
+      {{ deadStockAdminBadgeText }}
+    </p>
 
     <p *ngIf="isEmployee">
       Stanje:
@@ -279,7 +295,13 @@
       variant="row"
     ></autom-provider-availability>
     <!-- Stara cena -->
-    <p *ngIf="availabilityVm.showDiscount" class="sub-price old-price">
+    <p *ngIf="showDeadStockReferencePrice" class="sub-price old-price">
+      {{ (deadStockRegularPrice ?? 0) | rsdCurrency }}
+    </p>
+    <p
+      *ngIf="!showDeadStockReferencePrice && !isAdminCartView && availabilityVm.showDiscount"
+      class="sub-price old-price"
+    >
       {{ availabilityVm.displayPrice / (1 - data.rabat / 100) | rsdCurrency }}
     </p>
 
@@ -302,13 +324,7 @@
     </p>
 
     <!-- Ušteda -->
-    <p *ngIf="availabilityVm.showDiscount" class="saving">
-      Ušteda
-      {{
-        availabilityVm.displayPrice / (1 - data.rabat / 100) -
-          availabilityVm.displayPrice | rsdCurrency
-      }}
-    </p>
+    <p *ngIf="showDiscount && savings" class="saving">Ušteda {{ savings | rsdCurrency }}</p>
 
     <div
       class="mobile-quantity-cart"

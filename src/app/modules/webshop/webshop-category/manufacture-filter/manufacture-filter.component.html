@@ -1,10 +1,8 @@
 <div class="mf-card">
-  <div class="mf-header">
-    <div class="mf-title">
-      Proizvođači
-      <span class="mf-count" *ngIf="selectedCount()">{{
-        selectedCount()
-      }}</span>
+  <div class="mf-toolbar" *ngIf="selectedCount()">
+    <div class="mf-selection">
+      <span class="mf-count">{{ selectedCount() }}</span>
+      <span>izabrano</span>
     </div>
 
     <button
@@ -20,7 +18,7 @@
   <!-- Mobile: single select + selected chips -->
   <autom-select
     *ngIf="isMobile && selectReady"
-    [label]="'Proizvođači'"
+    [label]="''"
     [selectedValue]="selectedOption"
     [selectionList]="selectOptions"
     (emitSelected)="onSelectChange($event)"

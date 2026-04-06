@@ -14,6 +14,8 @@ export class Filter {
   raspolozivost?: string = 'Svi artikli';
   paged: boolean = false;
   showcase: boolean = false;
+  deadStock: boolean = false;
+  deadStockBadges?: string[];
   filterBy?: WebshopPrimaryFilter;
 
   Filter() {
@@ -88,6 +90,7 @@ export interface TecDocLinkedManufacturerTargets {
 
 export class Magacin {
   categories?: object;
+  deadStockBadges?: string[];
   proizvodjaci?: Manufacture[];
   robaDto?: PaginatedResponse<Roba>;
 }
@@ -108,6 +111,7 @@ export class Roba {
   cena?: number;
   dokumentacija?: Object;
   dozvoljenoZaAnonimusa?: boolean;
+  deadStockInfo?: DeadStockInfo;
   grupa?: string;
   grupaNaziv?: string;
   katbr?: string;
@@ -132,6 +136,26 @@ export class Roba {
   tekst?: string;
   uKorpi = false;
   linkedManufacturers?: TecDocLinkedManufacturer[];
+}
+
+export interface DeadStockInfo {
+  candidate?: boolean;
+  matched?: boolean;
+  suppressedForCustomer?: boolean;
+  daysInDeadStock?: number | null;
+  bucket?: string | null;
+  badgeLabel?: string | null;
+  pricingMode?: 'MARKUP_ON_COST' | 'AT_COST' | 'DISCOUNT_ON_CURRENT_PRICE' | null;
+  pricingValue?: number | null;
+  specialPrice?: number | null;
+  regularPrice?: number | null;
+  importedAt?: string | null;
+  lastSaleDate?: string | null;
+  lastPurchaseDate?: string | null;
+  overrideReason?: string | null;
+  overrideUpdatedAt?: string | null;
+  overrideUpdatedByName?: string | null;
+  overrideUpdatedByPpid?: number | null;
 }
 
 export class CartItem {
@@ -176,5 +200,6 @@ export class CartItem {
   providerCoreCharge?: number;
   providerRealtimeChecked?: boolean;
   providerRealtimeCheckedAt?: string;
+  deadStockInfo?: DeadStockInfo;
   technicalDescription?: RobaTehnickiOpis[];
 }

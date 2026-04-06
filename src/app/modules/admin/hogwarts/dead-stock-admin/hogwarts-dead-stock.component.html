@@ -1,0 +1,258 @@
+<article class="hogwarts-panel wide spellbook">
+  <div class="panel-header">
+    <div>
+      <p class="panel-eyebrow">Mrtav lager vault</p>
+      <h2>Mrtav lager import i pravila</h2>
+      <p class="panel-sub">
+        Upload ERP snapshot-a i podešavanje cena po starosti lagera.
+      </p>
+    </div>
+    <div class="panel-chip">
+      <autom-icon [source]="icons.TAG"></autom-icon>
+      Mrtav lager
+    </div>
+  </div>
+
+  <div class="spell-row">
+    <label
+      class="file-drop"
+      [class.has-file]="deadStockUploadFile"
+      [class.disabled]="deadStockLoading"
+    >
+      <span class="label-title">Izaberi mrtav lager snapshot (.xlsx)</span>
+      <span class="label-sub">ERP export za snapshot mrtvog lagera</span>
+      <div class="file-chip" *ngIf="deadStockUploadFile; else deadStockFilePlaceholder">
+        <autom-icon [source]="icons.FILE"></autom-icon>
+        <span>{{ deadStockUploadFile.name }}</span>
+      </div>
+      <ng-template #deadStockFilePlaceholder>
+        <div class="file-chip ghost">
+          <autom-icon [source]="icons.UPLOAD_CLOUD"></autom-icon>
+          <span>Izaberi fajl</span>
+        </div>
+      </ng-template>
+      <input
+        #deadStockFileInput
+        type="file"
+        accept=".xlsx"
+        [attr.disabled]="deadStockLoading ? true : null"
+        (change)="onDeadStockFileSelected($event)"
+      />
+    </label>
+
+    <div class="cta-row">
+      <button
+        class="hogwarts-btn primary"
+        type="button"
+        (click)="castDeadStockUpload()"
+        [disabled]="deadStockLoading"
+      >
+        <autom-icon [source]="icons.UPLOAD_CLOUD"></autom-icon>
+        <span>{{ deadStockLoading ? "Import..." : "Import snapshot-a" }}</span>
+      </button>
+      <button
+        class="hogwarts-btn ghost"
+        type="button"
+        (click)="refreshDeadStockStatus()"
+        [disabled]="deadStockStatusLoading"
+      >
+        <autom-icon [source]="icons.REFRESH_CW"></autom-icon>
+        <span>{{ deadStockStatusLoading ? "Osvežavanje..." : "Osveži status" }}</span>
+      </button>
+      <button
+        class="hogwarts-btn ghost"
+        type="button"
+        (click)="refreshDeadStockRules()"
+        [disabled]="deadStockRulesLoading"
+      >
+        <autom-icon [source]="icons.LIST"></autom-icon>
+        <span>{{ deadStockRulesLoading ? "Osvežavanje..." : "Osveži pravila" }}</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="status" *ngIf="deadStockMessage">
+    <div class="status-badge" [ngClass]="deadStockType">
+      <autom-icon
+        [source]="deadStockType === 'success' ? icons.CHECK : icons.ALERT_TRIANGLE"
+      ></autom-icon>
+      <span>{{ deadStockMessage }}</span>
+    </div>
+  </div>
+
+  <div class="hogwarts-meta" *ngIf="deadStockStatus">
+    <span>Aktivni snapshot redovi: {{ deadStockStatus.activeSnapshotCount }}</span>
+    <span>Aktivna pravila: {{ deadStockStatus.activeRuleCount }}</span>
+    <span *ngIf="deadStockStatus.lastFileName">Poslednji fajl: {{ deadStockStatus.lastFileName }}</span>
+    <span *ngIf="deadStockStatus.lastImportedAt">
+      Uvezeno: {{ deadStockStatus.lastImportedAt | date: "dd.MM.yyyy HH:mm" }}
+    </span>
+  </div>
+
+  <div class="spell-row">
+    <div class="mapping-box">
+      <span class="label-title">Editor pravila</span>
+      <span class="label-sub">Pricing po starosti mrtvog lagera</span>
+      <input
+        class="text-input"
+        type="text"
+        placeholder="Naziv pravila"
+        [value]="deadStockRuleForm.name"
+        (input)="deadStockRuleForm.name = $any($event.target).value"
+      />
+      <div class="cta-row">
+        <input
+          class="text-input"
+          type="number"
+          placeholder="Min dana"
+          [value]="deadStockRuleForm.minDaysInclusive"
+          (input)="deadStockRuleForm.minDaysInclusive = +$any($event.target).value"
+        />
+        <input
+          class="text-input"
+          type="number"
+          placeholder="Max dana"
+          [value]="deadStockRuleForm.maxDaysInclusive || ''"
+          (input)="deadStockRuleForm.maxDaysInclusive = +$any($event.target).value"
+        />
+      </div>
+      <div class="cta-row">
+        <select
+          class="text-input"
+          [value]="deadStockRuleForm.pricingMode"
+          (change)="deadStockRuleForm.pricingMode = $any($event.target).value"
+        >
+          <option value="MARKUP_ON_COST">Markup on cost</option>
+          <option value="AT_COST">At cost</option>
+          <option value="DISCOUNT_ON_CURRENT_PRICE">Discount on current price</option>
+        </select>
+        <input
+          class="text-input"
+          type="number"
+          placeholder="Vrednost"
+          [disabled]="deadStockRuleForm.pricingMode === 'AT_COST'"
+          [value]="deadStockRuleForm.pricingValue"
+          (input)="deadStockRuleForm.pricingValue = +$any($event.target).value"
+        />
+      </div>
+      <div class="mapping-current">
+        <strong>Kako radi pricing mode:</strong><br />
+        `Markup on cost` = uzmi nabavnu cenu iz webshop baze i dodaj maržu iz polja `Value`.<br />
+        Primer: nabavna 100, value 10, nova cena 110.<br />
+        `At cost` = prodaja po nabavnoj ceni iz webshop baze.<br />
+        Primer: nabavna 100, nova cena 100.<br />
+        `Discount on current price` = uzmi trenutnu webshop cenu i spusti je za procenat iz polja
+        `Value`.<br />
+        Primer: redovna cena 200, value 20, nova cena 160.
+      </div>
+      <div class="mapping-current">
+        <strong>Napomena za V1:</strong><br />
+        `candidate` je primarni admin signal.<br />
+        `badgeLabel` je opcion i ostaje tehničko/kompatibilno polje rule engine-a.<br />
+        Customer UI više ne promoviše ova pravila kao posebnu akciju ili rasprodaju.
+      </div>
+      <div class="cta-row">
+        <input
+          class="text-input"
+          type="text"
+          placeholder="Badge label (opciono)"
+          [value]="deadStockRuleForm.badgeLabel"
+          (input)="deadStockRuleForm.badgeLabel = $any($event.target).value"
+        />
+        <input
+          class="text-input"
+          type="number"
+          placeholder="Sort redosled"
+          [value]="deadStockRuleForm.sortOrder"
+          (input)="deadStockRuleForm.sortOrder = +$any($event.target).value"
+        />
+      </div>
+      <label class="mapping-current">
+        <input
+          type="checkbox"
+          [checked]="deadStockRuleForm.active"
+          (change)="deadStockRuleForm.active = $any($event.target).checked"
+        />
+        Aktivno pravilo
+      </label>
+      <div class="cta-row">
+        <button
+          class="hogwarts-btn primary"
+          type="button"
+          (click)="saveDeadStockRule()"
+          [disabled]="deadStockRulesLoading"
+        >
+          <autom-icon [source]="icons.CHECK"></autom-icon>
+          <span>{{
+            deadStockRulesLoading
+              ? "Čuvanje..."
+              : (deadStockEditingRuleId ? "Ažuriraj pravilo" : "Kreiraj pravilo")
+          }}</span>
+        </button>
+        <button class="hogwarts-btn ghost" type="button" (click)="resetDeadStockRuleForm()">
+          <autom-icon [source]="icons.REFRESH_CW"></autom-icon>
+          <span>Resetuj</span>
+        </button>
+      </div>
+      <div class="status status--inline" *ngIf="deadStockMessage">
+        <div class="status-badge" [ngClass]="deadStockType">
+          <autom-icon
+            [source]="deadStockType === 'success' ? icons.CHECK : icons.ALERT_TRIANGLE"
+          ></autom-icon>
+          <span>{{ deadStockMessage }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mapping-box">
+      <span class="label-title">Aktivna pravila</span>
+      <span class="label-sub">Trenutna pricing matrica</span>
+      <div class="dead-stock-rules" *ngIf="deadStockRules.length; else noDeadStockRules">
+        <article class="dead-stock-rule-card" *ngFor="let rule of deadStockRules">
+          <div class="dead-stock-rule-card__top">
+            <div>
+              <div class="dead-stock-rule-card__name">{{ rule.name }}</div>
+              <div class="dead-stock-rule-card__days">
+                Dani: {{ rule.minDaysInclusive }} - {{ rule.maxDaysInclusive ?? "open" }}
+              </div>
+            </div>
+            <span class="dead-stock-rule-card__status" [class.is-active]="rule.active">
+              {{ rule.active ? "Aktivno" : "Neaktivno" }}
+            </span>
+          </div>
+
+          <div class="dead-stock-rule-card__grid">
+            <div class="dead-stock-rule-card__meta">
+              <span class="dead-stock-rule-card__label">Mode</span>
+              <strong>{{ rule.pricingMode }}</strong>
+            </div>
+            <div class="dead-stock-rule-card__meta">
+              <span class="dead-stock-rule-card__label">Vrednost</span>
+              <strong>{{ rule.pricingValue ?? 0 }}</strong>
+            </div>
+            <div class="dead-stock-rule-card__meta">
+              <span class="dead-stock-rule-card__label">Badge</span>
+              <strong>{{ rule.badgeLabel || "--" }}</strong>
+            </div>
+            <div class="dead-stock-rule-card__meta">
+              <span class="dead-stock-rule-card__label">Sort</span>
+              <strong>{{ rule.sortOrder }}</strong>
+            </div>
+          </div>
+
+          <div class="dead-stock-rule-card__actions">
+            <button class="hogwarts-btn ghost small" type="button" (click)="editDeadStockRule(rule)">
+              Izmeni
+            </button>
+            <button class="hogwarts-btn ghost small" type="button" (click)="deleteDeadStockRule(rule)">
+              Obriši
+            </button>
+          </div>
+        </article>
+      </div>
+      <ng-template #noDeadStockRules>
+        <div class="mapping-current">Još nema pravila mrtvog lagera.</div>
+      </ng-template>
+    </div>
+  </div>
+</article>

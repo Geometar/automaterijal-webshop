@@ -36,6 +36,7 @@ import { WebshopConfig } from '../../shared/data-models/interface';
 import { WebshopLogicService } from '../../shared/service/utils/webshop-logic.service';
 import { WebshopStateService } from '../../shared/service/state/webshop-state.service';
 import { SzakalStockCheckResult, SzakalStockService } from '../../shared/service/szakal-stock.service';
+import { WebshopNavBreadcrumbs } from './webshop-nav/webshop-nav.component';
 
 // Utils
 import {
@@ -55,6 +56,7 @@ export enum WebShopState {
 interface QueryParams {
   assembleGroupId?: string;
   assemblyGroupName?: string;
+  deadStock?: string;
   filterBy?: WebshopPrimaryFilter;
   grupe?: string;
   mandatoryproid?: string;
@@ -114,6 +116,8 @@ export class WebshopComponent implements OnDestroy, OnInit {
   private currentCategoryName: string | null = null;
   private currentSubcategoryName: string | null = null;
   private primaryFilter: WebshopPrimaryFilter | null = null;
+  customBreadcrumbs: WebshopNavBreadcrumbs | null = null;
+  isDeadStockLanding = false;
   private lastRoutePageIndex = 0;
   private lastRouteRowsPerPage = 10;
   private hasProcessedRoute = false;
@@ -170,6 +174,8 @@ export class WebshopComponent implements OnDestroy, OnInit {
 
         if (currentPath === 'webshop/manufacturers/:name' && slug) {
           this.handleManufactureSlug(slug, p);
+        } else if (currentPath === 'webshop/akcije-rasprodaja') {
+          this.handleDeadStockLanding(p);
         } else if (currentPath === 'webshop/category/:name' && slug) {
           this.handleCategorySlug(slug, null, p);
         } else if (
@@ -334,6 +340,8 @@ export class WebshopComponent implements OnDestroy, OnInit {
 
   private handleWebshopParams(p: Params): void {
     this.selectedBrandName = null;
+    this.customBreadcrumbs = null;
+    this.isDeadStockLanding = false;
     this.internalLoading = false;
     this.loading = true;
     const trimmedSearch = ((p['searchTerm'] || '') as string).trim();
@@ -346,6 +354,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
       assemblyGroupName: (p['assemblyGroupName'] || '').toString(),
       tecdocType: (p['tecdocType'] || '').toString(),
       tecdocId: p['tecdocId'] ? String(p['tecdocId']) : '',
+      deadStock: p['deadStock'] ? String(p['deadStock']) : '',
       pageIndex: p['pageIndex'] !== undefined ? String(p['pageIndex']) : '',
       rowsPerPage:
         p['rowsPerPage'] !== undefined ? String(p['rowsPerPage']) : '',
@@ -367,7 +376,27 @@ export class WebshopComponent implements OnDestroy, OnInit {
     this.handleQueryParams(params);
   }
 
+  private handleDeadStockLanding(p: Params): void {
+    this.customBreadcrumbs = null;
+    this.isDeadStockLanding = true;
+
+    const params = {
+      ...p,
+      deadStock: 'true',
+      searchTerm: ((p['searchTerm'] || '') as string).trim(),
+    } as QueryParams;
+
+    const explicitFilterBy = this.normalizeFilterBy(p['filterBy']);
+    if (explicitFilterBy) {
+      params.filterBy = explicitFilterBy;
+    }
+
+    this.handleQueryParams(params);
+  }
+
   private handleManufactureSlug(slug: string, p: Params): void {
+    this.customBreadcrumbs = null;
+    this.isDeadStockLanding = false;
     this.loading = true;
     this.manufactureService.getBySlug(slug).subscribe({
       next: (m) => {
@@ -397,6 +426,8 @@ export class WebshopComponent implements OnDestroy, OnInit {
     subSlug: string | null,
     p: Params
   ): void {
+    this.customBreadcrumbs = null;
+    this.isDeadStockLanding = false;
     this.categoriesState
       .getCategories$()
       .pipe(take(1), takeUntil(this.destroy$))
@@ -465,6 +496,8 @@ export class WebshopComponent implements OnDestroy, OnInit {
     p: Params,
     groupSlug?: string | null
   ): void {
+    this.customBreadcrumbs = null;
+    this.isDeadStockLanding = false;
     if (this.currentState !== WebShopState.SHOW_EMPTY_CONTAINER) {
       this.loading = true;
       this.internalLoading = false;
@@ -675,6 +708,9 @@ export class WebshopComponent implements OnDestroy, OnInit {
   }
 
   private checkEmptyState(params: QueryParams): boolean {
+    if (params.deadStock === 'true') {
+      return false;
+    }
     return this.stateService.shouldShowEmptyContainer(
       this.searchTerm,
       params.mandatoryproid || '',
@@ -790,6 +826,10 @@ export class WebshopComponent implements OnDestroy, OnInit {
   }
 
   private buildListName(): string {
+    if (this.isDeadStockLanding) {
+      return this.searchTerm ? 'Dead Stock Route Search' : 'Dead Stock Route Listing';
+    }
+
     if (this.searchTerm) {
       return 'Webshop Search Results';
     }
@@ -818,6 +858,10 @@ export class WebshopComponent implements OnDestroy, OnInit {
       page_index: this.pageIndex,
       page_size: this.rowsPerPage,
     };
+
+    if (this.isDeadStockLanding) {
+      metadata['dead_stock_route'] = true;
+    }
 
     if (this.searchTerm) {
       metadata['search_term'] = this.searchTerm;
@@ -890,8 +934,32 @@ export class WebshopComponent implements OnDestroy, OnInit {
       'Kupite auto delove, filtere i maziva online putem našeg Webshopa. Pretraga po vozilu, brendu ili kategoriji. Brza isporuka širom Srbije.';
     let robots: string | undefined;
 
+    if (this.isDeadStockLanding) {
+      if (hasSearch && resultCount > 0) {
+        title = `Izdvojeni artikli: "${searchTerm}"${page ? ` (str. ${page + 1})` : ''
+          } | Automaterijal`;
+        description = `Pronađeno ${resultCount} artikala za "${searchTerm}" na nepromovisanoj internoj ruti.`;
+        robots = 'noindex, follow';
+      } else if (hasSearch) {
+        title = `Izdvojeni artikli: "${searchTerm}" | Automaterijal`;
+        description = `Nema rezultata za "${searchTerm}" na ovoj nepromovisanoj ruti.`;
+        robots = 'noindex, follow';
+      } else if (resultCount === 0) {
+        title = 'Izdvojeni artikli | Automaterijal';
+        description =
+          'Ova ruta nije deo aktivnog customer proizvoda i nije promovisana u webshop interfejsu.';
+        robots = 'noindex, follow';
+      } else {
+        title = `Izdvojeni artikli${page ? ` (str. ${page + 1})` : ''
+          } | Automaterijal`;
+        description =
+          'Ova ruta ostaje tehnički dostupna, ali nije deo aktivnog customer proizvoda.';
+        robots = 'noindex, follow';
+      }
+    }
+
     // Vozilo
-    if (isVehicle && this.selectedVehicleDetails) {
+    if (!this.isDeadStockLanding && isVehicle && this.selectedVehicleDetails) {
       const v = this.selectedVehicleDetails;
       const vehicleLabel = [
         v.mfrName,
@@ -910,39 +978,39 @@ export class WebshopComponent implements OnDestroy, OnInit {
     }
 
     // Kategorija
-    if (isGroup && this.assemblyGroupName) {
+    if (!this.isDeadStockLanding && isGroup && this.assemblyGroupName) {
       title = `Kategorija: ${this.assemblyGroupName}${page ? ` (str. ${page + 1})` : ''
         } - Automaterijal`;
       description = `Istražite ${this.assemblyGroupName}. Delovi i oprema, brza isporuka.`;
     }
 
     // Brend
-    if (brandName) {
+    if (!this.isDeadStockLanding && brandName) {
       title = `Webshop | ${brandName} proizvodi - Automaterijal`;
       description = `Kupite ${brandName} proizvode (delovi, filteri, maziva i oprema) putem našeg webshopa. Brza dostava i proveren kvalitet.`;
     }
 
     // Grupe
-    if (this.filter.grupe?.length && groupLabels.length && !isGroup) {
+    if (!this.isDeadStockLanding && this.filter.grupe?.length && groupLabels.length && !isGroup) {
       const allGroups = groupLabels.join(', ');
       title = `Webshop | ${allGroups} - Automaterijal`;
       description = `Istražite ponudu za kategorije: ${allGroups}. Delovi, filteri i maziva za sve potrebe.`;
     }
 
     // Search
-    if (hasSearch && resultCount > 0) {
+    if (!this.isDeadStockLanding && hasSearch && resultCount > 0) {
       title = `Webshop pretraga: "${searchTerm}"${page ? ` (str. ${page + 1})` : ''
         } - Automaterijal`;
       description = `Pronađeno ${resultCount} rezultata za "${searchTerm}". Pogledajte delove, filtere i maziva dostupne za online porudžbinu.`;
-    } else if (hasSearch) {
+    } else if (!this.isDeadStockLanding && hasSearch) {
       title = `Webshop pretraga: "${searchTerm}" - Automaterijal`;
       description = `Nažalost, nema rezultata za "${searchTerm}". Pokušajte sa drugim nazivom ili kataloškim brojem.`;
       robots = 'noindex, follow';
-    } else if (page > 0 && !isVehicle && !isGroup) {
+    } else if (!this.isDeadStockLanding && page > 0 && !isVehicle && !isGroup) {
       title += ` (str. ${page + 1})`;
     }
 
-    if (isCategoryPage && (this.currentCategoryName || this.currentSubcategoryName)) {
+    if (!this.isDeadStockLanding && isCategoryPage && (this.currentCategoryName || this.currentSubcategoryName)) {
       const cat = this.currentCategoryName || '';
       const sub = this.currentSubcategoryName ? ` / ${this.currentSubcategoryName}` : '';
       title = `Kategorija: ${cat}${sub}${page ? ` (str. ${page + 1})` : ''} - Automaterijal`;
@@ -972,6 +1040,14 @@ export class WebshopComponent implements OnDestroy, OnInit {
   }
 
   private buildCanonicalUrlForContext(ctx: any): string {
+    if (this.isDeadStockLanding) {
+      return this.buildCanonicalUrl('https://automaterijal.com/webshop/akcije-rasprodaja', {
+        search: ctx.searchTerm,
+        page: ctx.page > 0 ? String(ctx.page + 1) : '',
+        size: ctx.perPage !== 10 ? String(ctx.perPage) : '',
+      });
+    }
+
     if (ctx.isVehicle) {
       const currentPath = this.urlHelperService.getCurrentPath();
       if (currentPath?.includes('/webshop/vozila/')) {
@@ -1057,7 +1133,11 @@ export class WebshopComponent implements OnDestroy, OnInit {
         url: 'https://automaterijal.com/',
       },
       about: ctx.searchTerm
-        ? `Rezultati pretrage za: ${ctx.searchTerm}`
+        ? (this.isDeadStockLanding
+          ? `Rezultati pretrage za izdvojenu nepromovisanu rutu: ${ctx.searchTerm}`
+          : `Rezultati pretrage za: ${ctx.searchTerm}`)
+        : this.isDeadStockLanding
+          ? 'Izdvojeni artikli na nepromovisanoj ruti'
         : ctx.isVehicle && ctx.isGroup
           ? `Lista artikala - ${this.assemblyGroupName}`
           : ctx.isVehicle
