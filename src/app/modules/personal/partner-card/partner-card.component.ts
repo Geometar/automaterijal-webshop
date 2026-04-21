@@ -286,6 +286,7 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
 
   private handlePartnerCardResponse(response: PartnerCardResponse): void {
     const normalized = this.normalizeGroups(response?.groups ?? []);
+    this.applyApiBalance(response);
     this.groups = this.splitDocumentGroups(normalized);
     this.buildGroupViews();
     this.errorMessage = '';
@@ -720,7 +721,7 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
   }
 
   private setupBalanceCards(
-    source?: Pick<Partner, 'naziv' | 'email' | 'stanje' | 'stanjeporoku'> | null
+    source?: Pick<Partner, 'naziv' | 'email'> | null
   ): void {
     if (!source) {
       this.summaryCards = [];
@@ -737,23 +738,28 @@ export class PartnerCardComponent implements OnInit, OnDestroy {
       cards.push({ label: 'Email', value: source.email, isCurrency: false });
     }
 
-    if (source.stanje !== undefined && source.stanje !== null) {
-      cards.push({
-        label: 'Stanje',
-        isCurrency: true,
-        amount: source.stanje
-      });
-    }
-
-    if (source.stanjeporoku !== undefined && source.stanjeporoku !== null) {
-      cards.push({
-        label: 'Van valute',
-        isCurrency: true,
-        amount: source.stanjeporoku
-      });
-    }
-
     this.summaryCards = cards;
+  }
+
+  private applyApiBalance(response: PartnerCardResponse): void {
+    const apiStanje = this.toOptionalNumber(response?.ukupnoStanje);
+    if (apiStanje === null) {
+      return;
+    }
+
+    const cards = this.summaryCards.filter(
+      (card) => card.label !== 'Stanje' && card.label !== 'Van valute'
+    );
+    cards.push({
+      label: 'Stanje',
+      isCurrency: true,
+      amount: this.toDisplayBalance(apiStanje)
+    });
+    this.summaryCards = cards;
+  }
+
+  private toDisplayBalance(apiStanje: number): number {
+    return -apiStanje;
   }
 
   private asNumber(value: number | string | null | undefined): number {
