@@ -55,6 +55,15 @@
       "section": "PARTS"
     },
     {
+      "src": "/images/brands/maxcore-performance.png",
+      "alt": "MaxCore Performance",
+      "label": "MaxCore Performance",
+      "id": "MXC",
+      "slug": "maxcore",
+      "visible": true,
+      "section": "PARTS"
+    },
+    {
       "src": "/images/brands/blue_print.png",
       "alt": "Blue Print",
       "label": "Blue Print",

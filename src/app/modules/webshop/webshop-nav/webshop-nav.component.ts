@@ -19,6 +19,7 @@ import { VehicleSelectionPopupComponent } from '../../../shared/components/ui/ve
 
 // Data models
 import { Categories } from '../../../shared/data-models/model/webshop';
+import { Brand } from '../../../shared/data-models/interface';
 import { Filter } from '../../../shared/data-models/model/roba';
 import { TDVehicleDetails } from '../../../shared/data-models/model/tecdoc';
 
@@ -95,7 +96,7 @@ export class WebshopNavComponent implements OnChanges {
 
   // Consts
   categories: Categories[] = [];
-  manufacturers: Categories[] = [];
+  manufacturers: Brand[] = [];
 
   @HostListener('window:scroll')
   onScroll() {
@@ -289,11 +290,11 @@ export class WebshopNavComponent implements OnChanges {
     manufacturerIds: string[]
   ): boolean {
     const manufacturer = this.manufacturers.find(
-      (category: Categories) => manufacturerIds.includes(category.id!)
+      (brand: Brand) => manufacturerIds.includes(brand.id)
     );
 
     if (manufacturer) {
-      this.secondNavigation = manufacturer.label!;
+      this.secondNavigation = manufacturer.label;
       return true;
     }
 

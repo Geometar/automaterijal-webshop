@@ -15,7 +15,7 @@ import { ShowcaseComponent, ShowcaseSection } from '../../../shared/components/s
 import { VehicleSelectionPopupComponent } from '../../../shared/components/ui/vehicle-selection-popup/vehicle-selection-popup.component';
 
 // Data models
-import { Category } from '../../../shared/data-models/interface';
+import { Brand } from '../../../shared/data-models/interface';
 import { Roba, ShowcaseResponse } from '../../../shared/data-models/model/roba';
 import { TDVehicleDetails } from '../../../shared/data-models/model';
 
@@ -40,7 +40,7 @@ export class WebshopEmptyComponent implements OnInit {
   @Output() selectedVehicleDetailsEmit = new EventEmitter<TDVehicleDetails>();
   iconEnum = IconsEnum;
 
-  brands: Category[] = [];
+  brands: Brand[] = [];
   error: string | null = null;
   showcase: ShowcaseSection[] = [];
 

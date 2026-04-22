@@ -28,7 +28,7 @@ export class BrendoviComponent implements OnInit {
       .getConfig()
       .pipe(take(1))
       .subscribe((config) => {
-        this.brands = config.brands;
+        this.brands = config.brands.filter((brand) => brand.visible !== false);
       });
   }
 }

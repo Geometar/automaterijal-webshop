@@ -25,13 +25,19 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      padding: 0.9rem;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
       transition: transform 0.3s ease, box-shadow 0.3s ease;
 
       img {
         max-width: 100%;
         height: auto;
-        filter: grayscale(100%); // Početno crno-belo za profesionalan efekat
-        transition: filter 0.3s ease;
+        max-height: 56px;
+        object-fit: contain;
+        opacity: 1;
+        transition: transform 0.3s ease;
       }
 
       &:hover {
@@ -39,7 +45,7 @@
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 
         img {
-          filter: grayscale(0%); // Obojiti na hover
+          transform: scale(1.03);
         }
       }
     }

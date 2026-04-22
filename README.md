@@ -14,6 +14,24 @@ Frontend mrtav lager V1 surfaces currently include:
 For business rules and backend/FE contract, use backend docs:
 
 - `../automaterijal/docs/30-dead-stock.md`
+- `../automaterijal/docs/40-brand-content.md`
+
+## Brand content architecture
+
+Brand rollout u ovom frontendu ima tri obavezna dela:
+
+1. dodaj entry u `public/config/webshop-config.json`
+2. dodaj content fajl u `public/brands/<slug>.json`
+3. dodaj assete u `public/images/brands/`
+
+Pravila:
+
+- `id` u config-u mora da odgovara realnom manufacturer `proid` iz backend-a
+- `slug` mora biti usklađen između frontend config-a, `public/brands/<slug>.json` i backend sitemap liste
+- `/brendovi/<slug>` je SEO / content ruta
+- `/webshop/manufacturers/<slug>` je kanonska manufacturer ruta i mora biti usklađena sa backend slug rezolucijom iz baze
+
+Ako brend dobija detail landing stranu, obavezno dopuni i backend `SitemapService.BRAND_DETAIL_SLUGS`.
 
 ## Development server
 

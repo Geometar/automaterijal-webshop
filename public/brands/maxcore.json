@@ -1,0 +1,112 @@
+{
+  "name": "MaxCore Performance",
+  "logo": "/images/brands/maxcore-performance.png",
+  "description": "Automaterijal je ovlašćeni distributer MaxCore Performance brenda za Srbiju i region. Trenutni fokus su filteri i amortizeri za putnički program, uz pažljivo biran portfolio, sigurnu distribuciju i jasan plan širenja na dodatne segmente.",
+  "hero": {
+    "background": "linear-gradient(135deg, rgba(5, 10, 18, 1) 0%, rgba(10, 22, 38, 0.96) 44%, rgba(16, 50, 84, 0.9) 100%)",
+    "textColor": "#f8fafc",
+    "accentColor": "#2880d8",
+    "tagline": "Ovlašćeni distributer za Srbiju i region",
+    "imageAlt": "MaxCore Performance logo na crnoj pozadini"
+  },
+  "sections": [
+    {
+      "title": "Pouzdan kvalitet za profesionalne servise",
+      "body": "MaxCore Performance je brend razvijen za servise koji traže stabilan kvalitet, pouzdanu dostupnost i jasan odnos cene i performansi. Automaterijal vodi distribuciju za Srbiju i region, sa fokusom na artikle koji treba da isprate svakodnevni servisni ritam bez kompromisa po pitanju završne obrade i funkcionalnosti.",
+      "highlights": [
+        {
+          "title": "Distributerska podrška",
+          "description": "Centralizovana nabavka, lokalna komercijalna podrška i brza isporuka kroz postojeću distributivnu mrežu Automaterijala."
+        },
+        {
+          "title": "Kontrolisan kvalitet",
+          "description": "Portfolio biramo po realnoj primeni, stabilnosti serija i zahtevima profesionalnih servisa."
+        },
+        {
+          "title": "Pametan izbor",
+          "description": "Brend je pozicioniran za partnere kojima su važni pouzdan kvalitet, konkurentna cena i sigurnost ugradnje."
+        }
+      ]
+    },
+    {
+      "title": "Aktuelni portfolio za putnički program",
+      "body": "U ovoj fazi MaxCore Performance program obuhvata filtere i amortizere za putnička vozila. Ponuda je formirana oko najtraženijih referenci kako bi servisi i trgovci imali brz pristup artiklima koji se najčešće traže u redovnom održavanju i zameni.",
+      "highlights": [
+        {
+          "title": "Filtracija",
+          "description": "Filteri vazduha, ulja, goriva i kabine za širok spektar popularnih vozila."
+        },
+        {
+          "title": "Amortizeri",
+          "description": "Program amortizera usmeren na pouzdanu zamenu i stabilan rad u svakodnevnoj eksploataciji."
+        },
+        {
+          "title": "Servisna dostupnost",
+          "description": "Asortiman je biran tako da pokrije reference sa konstantnom potražnjom u putničkom programu."
+        }
+      ],
+      "image": "/images/brands/maxcore-performance-filter-box.jpg"
+    },
+    {
+      "title": "Brend podržan distribucijom i tržišnim planom",
+      "body": "MaxCore Performance uvodimo kao brend koji pratimo kroz lager, komercijalnu podršku i plansko razvijanje tržišta. Partneri dobijaju jasnu komunikaciju, kontinuitet nabavke i podršku u uvođenju artikala u sopstvenu ponudu.",
+      "highlights": [
+        {
+          "title": "Region pokriven jednom mrežom",
+          "description": "Automaterijal koordinira isporuke, prodajnu podršku i tržišno pozicioniranje za Srbiju i region."
+        },
+        {
+          "title": "Brza reakcija na tražnju",
+          "description": "Asortiman i zalihe se prilagođavaju realnoj potrošnji kako bi najtraženije reference bile dostupne bez dugih čekanja."
+        },
+        {
+          "title": "Podrška za partnere",
+          "description": "Jasna komercijalna komunikacija, pomoć pri plasmanu i podrška pri rešavanju operativnih pitanja."
+        }
+      ],
+      "image": "/images/brands/maxcore-performance-campaign.jpg"
+    },
+    {
+      "title": "Platforma za širenje na dodatne segmente",
+      "body": "Današnji fokus je na filterima i amortizerima za putnički program, ali MaxCore Performance razvijamo kao brend koji će se postepeno širiti i na dodatne segmente. Takav pristup omogućava da se portfolio širi kontrolisano, bez spuštanja standarda i bez gubitka konzistentnosti brenda.",
+      "highlights": [
+        {
+          "title": "Postepeno širenje",
+          "description": "Nove kategorije uvodimo tek kada logistika, kvalitet i tržišni potencijal budu usklađeni."
+        },
+        {
+          "title": "Jedinstven identitet",
+          "description": "I u novim segmentima brend zadržava isti fokus: pouzdan kvalitet, pametan izbor i profesionalna podrška."
+        },
+        {
+          "title": "Dugoročan razvoj",
+          "description": "MaxCore Performance gradimo kao održiv program, a ne kao kratkoročnu akcijsku priču."
+        }
+      ]
+    }
+  ],
+  "seo": {
+    "title": "MaxCore Performance filteri i amortizeri – ovlašćeni distributer | Automaterijal",
+    "description": "Automaterijal je ovlašćeni distributer MaxCore Performance brenda za Srbiju i region. Filteri i amortizeri za putnički program uz stabilan kvalitet, podršku i planirano širenje asortimana.",
+    "keywords": [
+      "MaxCore Performance Srbija",
+      "MaxCore Performance distributer",
+      "MaxCore filteri",
+      "MaxCore amortizeri",
+      "MaxCore Performance Automaterijal",
+      "filteri za putnički program",
+      "amortizeri za servise"
+    ],
+    "ogImage": "https://automaterijal.com/images/brands/maxcore-performance.png"
+  },
+  "cta": {
+    "label": "Pogledaj MaxCore Performance ponudu",
+    "url": "/webshop/manufacturers/maxcore"
+  },
+  "showcase": {
+    "title": "MaxCore Performance izdvajamo",
+    "subtitle": "Aktuelni artikli iz MaxCore Performance ponude",
+    "limit": 5
+  },
+  "manufacturerId": "MXC"
+}

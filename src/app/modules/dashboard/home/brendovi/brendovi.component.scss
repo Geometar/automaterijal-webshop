@@ -8,15 +8,30 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 1rem;
     width: clamp(60px, 30%, 160px);
     height: clamp(60px, 30%, 150px);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
   }
 
   &--card img {
     cursor: pointer;
-    filter: grayscale(70%);
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    opacity: 1;
+    transition: transform 0.25s ease;
   }
-  &--card img:hover {
-    filter: grayscale(0%);
+
+  &--card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 36px rgba(15, 23, 42, 0.14);
+  }
+
+  &--card:hover img {
+    transform: scale(1.03);
   }
 }

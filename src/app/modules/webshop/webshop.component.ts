@@ -398,6 +398,7 @@ export class WebshopComponent implements OnDestroy, OnInit {
     this.customBreadcrumbs = null;
     this.isDeadStockLanding = false;
     this.loading = true;
+
     this.manufactureService.getBySlug(slug).subscribe({
       next: (m) => {
         if (m?.proid) {
