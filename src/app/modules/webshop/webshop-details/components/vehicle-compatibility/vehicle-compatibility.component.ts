@@ -223,9 +223,9 @@ export class VehicleCompatibilityComponent implements OnChanges, OnDestroy {
     this.requestedDetailedTargets = true;
     this.linkedTargetsLoading = true;
 
-    const request$ = canUseRobaId
-      ? this.tecDocService.getArticleLinkedTargets(robaId, 'VOLB')
-      : this.tecDocService.getTecDocRobaLinkedTargets(tecDocArticleId, 'VOLB');
+    const request$ = canUseTecDocId
+      ? this.tecDocService.getTecDocRobaLinkedTargets(tecDocArticleId, 'VOLB')
+      : this.tecDocService.getArticleLinkedTargets(robaId, 'VOLB');
 
     request$
       .pipe(

@@ -74,6 +74,7 @@ describe('DeadStockAdminPageComponent', () => {
     expect(filter.filterBy).toBe('SEARCH_TERM' as any);
     expect(component.totalElements).toBe(1);
     expect(component.items.length).toBe(1);
+    expect(component.items[0].deadStockInfo?.candidate).toBeTrue();
 
     component.ngOnDestroy();
   });

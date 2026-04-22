@@ -4,6 +4,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { finalize, Subject, takeUntil } from 'rxjs';
 
 import { Filter, Magacin, Roba } from '../../../shared/data-models/model/roba';
+import { DeadStockInfo } from '../../../shared/data-models/model/roba';
 import { RobaService } from '../../../shared/service/roba.service';
 import { UrlHelperService } from '../../../shared/service/utils/url-helper.service';
 import { WebshopLogicService } from '../../../shared/service/utils/webshop-logic.service';
@@ -86,7 +87,7 @@ export class DeadStockAdminPageComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (magacin) => {
-          this.magacin = magacin;
+          this.magacin = this.ensureDeadStockMarkers(magacin);
         },
         error: () => {
           this.magacin = null;
@@ -116,6 +117,21 @@ export class DeadStockAdminPageComponent implements OnInit, OnDestroy {
     filter.naStanju = false;
     filter.filterBy = undefined;
     return filter;
+  }
+
+  private ensureDeadStockMarkers(magacin: Magacin): Magacin {
+    const content = Array.isArray(magacin?.robaDto?.content) ? magacin.robaDto.content : [];
+    for (const item of content) {
+      if (!item) {
+        continue;
+      }
+      if (!item.deadStockInfo) {
+        item.deadStockInfo = { candidate: true } as DeadStockInfo;
+      } else if (!item.deadStockInfo.candidate) {
+        item.deadStockInfo = { ...item.deadStockInfo, candidate: true };
+      }
+    }
+    return magacin;
   }
 
   private parseNonNegativeInt(value: unknown, fallback: number): number {
